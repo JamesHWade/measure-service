@@ -69,6 +69,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       MEASURE_BACKEND_REF: main
       SEC_BACKEND_REF: fix/separations-sec-correctness
+      METHODS_BACKEND_REF: codex/linear-program-usage
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -93,9 +94,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for backend in measure measure.sec; do
+          for backend in measure measure.sec measure-methods; do
             backend_ref="$MEASURE_BACKEND_REF"
             if [ "$backend" = measure.sec ]; then backend_ref="$SEC_BACKEND_REF"; fi
+            if [ "$backend" = measure-methods ]; then backend_ref="$METHODS_BACKEND_REF"; fi
             observed_sha="$(git ls-remote --exit-code --heads "https://github.com/JamesHWade/$backend.git" "refs/heads/$backend_ref" | awk 'NR == 1 {print $1}')"
             [[ "$observed_sha" =~ ^[0-9a-f]{40}$ ]]
             echo "$backend ($backend_ref) at job start: $observed_sha"
@@ -153,5 +155,22 @@ jobs:
           cat("R", as.character(getRversion()), "\n")
           RS
       - run: python -m pip install '.[dev]'
+      - name: Record installed protocol backend
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+
+          from measure_service.method_backend import method_backend_info
+
+          evidence = method_backend_info()
+          revision = evidence["source_revision"]
+          assert isinstance(revision, str) and re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", revision)
+          assert evidence["source_ref"] == os.environ["METHODS_BACKEND_REF"]
+          print(json.dumps(evidence, sort_keys=True))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+              summary.write(f"Installed measure-methods: `{revision}`\n")
+          PY
       - name: Run complete service, HTTP, R and SEC contracts
         run: python -m pytest -q

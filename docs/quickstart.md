@@ -99,3 +99,13 @@ Use [input guidance](inputs.md) for real data and
 | SEC reports missing calibrated-curve support | Install the corrected backend revision; its version string may match an older checkout |
 | HTTP reports local identity is stdio-only | Configure a verified proxy deployment; see [HTTP setup](deployment.md) |
 | A retry key conflicts | Reuse the original arguments or choose a new key for a different registry operation |
+
+## Protocol resource backend
+
+Python installation also installs the R-free
+[measure-methods](https://github.com/JamesHWade/measure-methods) backend from its
+active development branch. A [method evaluation](methods.md) reports its installed
+version and available VCS source metadata. These observations describe the code
+that calculated the retained result; they do not freeze future installations.
+The numerical CI job records the backend branch at job start and its installed
+source metadata alongside the R backends.
