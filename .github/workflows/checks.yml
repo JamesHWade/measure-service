@@ -68,8 +68,8 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       MEASURE_BACKEND_REF: main
-      SEC_BACKEND_REF: fix/separations-sec-correctness
-      METHODS_BACKEND_REF: codex/linear-program-usage
+      SEC_BACKEND_REF: main
+      METHODS_BACKEND_REF: main
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

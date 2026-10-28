@@ -53,6 +53,7 @@ string does not establish a source revision. Older stored evaluations retain
 unknown backend provenance. A retry returns the original stored evaluation
 rather than relabeling it with the currently installed backend.
 
-Until the backend's initial PR is merged, installation follows its
-`codex/linear-program-usage` branch HEAD. Git is required by pip for this source
-dependency. Resolved source IDs are evidence rather than install constraints.
+Installation follows the backend's `main` branch HEAD. Git is required by pip
+for this source dependency. Resolved source IDs are evidence rather than install
+constraints. The separate package boundary remains open for review; see
+[the architecture follow-up](https://github.com/JamesHWade/measure-methods/issues/2).

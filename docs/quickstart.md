@@ -44,21 +44,19 @@ process. `jsonlite`, `tibble`, `recipes` and `measure` are required. Relative
 SEC also requires the corrected `measure.sec` implementation with calibrated
 molecular-weight columns. The worker checks this capability at runtime.
 
-Use the current R release and CRAN dependencies. Until the SEC correction in
-[measure.sec #61](https://github.com/JamesHWade/measure.sec/pull/61) is merged,
-install that active branch. `measure` follows its default development branch.
-These commands use branch HEADs rather than fixed commit constraints:
+Use the current R release and CRAN dependencies. Both R backends follow their
+default development branches. These commands use branch HEADs rather than fixed
+commit constraints:
 
 ```sh
 Rscript -e 'install.packages(c("remotes", "jsonlite", "tibble", "recipes"), repos = "https://cloud.r-project.org")'
 Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org")); remotes::install_github("JamesHWade/measure@main", dependencies = NA)'
-Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org")); remotes::install_github("JamesHWade/measure.sec@fix/separations-sec-correctness", dependencies = FALSE)'
+Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org")); remotes::install_github("JamesHWade/measure.sec@main", dependencies = FALSE)'
 Rscript -e 'for (p in c("measure", "measure.sec")) {d <- packageDescription(p); cat(p, d$Version, d$RemoteRef, d$RemoteSha, "\n")}'
 ```
 
-The SEC install leaves the selected core package in place. After #61 is merged,
-use `JamesHWade/measure.sec` without the temporary branch override. Record the
-actually installed `RemoteSha` with analytical evidence: development version
+The SEC install leaves the selected core package in place. Record the actually
+installed `RemoteSha` with analytical evidence: development version
 strings alone do not identify source code. CI also records the branch heads at
 job start and checks the installed packages' source metadata and required SEC
 API before numerical tests. A moving branch can resolve to a later revision
@@ -104,8 +102,21 @@ Use [input guidance](inputs.md) for real data and
 
 Python installation also installs the R-free
 [measure-methods](https://github.com/JamesHWade/measure-methods) backend from its
-active development branch. A [method evaluation](methods.md) reports its installed
+`main` branch. A [method evaluation](methods.md) reports its installed
 version and available VCS source metadata. These observations describe the code
 that calculated the retained result; they do not freeze future installations.
 The numerical CI job records the backend branch at job start and its installed
 source metadata alongside the R backends.
+
+
+Pip may retain an already installed backend when its package version is
+unchanged, even if a moving branch has advanced. To refresh that source
+installation explicitly, run:
+
+```sh
+.venv/bin/python -m pip install --force-reinstall --no-deps "measure-methods @ git+https://github.com/JamesHWade/measure-methods.git@main"
+```
+
+Inspect a new method evaluation's `calculation_backend` after the refresh. The
+recorded revision identifies the installed code, rather than assuming that a
+branch name or repeated install command refreshed it.

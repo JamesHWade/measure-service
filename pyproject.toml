@@ -13,7 +13,7 @@ license-files = ["LICENSE"]
 authors = [{name = "James Wade"}]
 dependencies = [
   "mcp==1.30.0",
-  "measure-methods @ git+https://github.com/JamesHWade/measure-methods.git@codex/linear-program-usage",
+  "measure-methods @ git+https://github.com/JamesHWade/measure-methods.git@main",
 ]
 
 [project.optional-dependencies]
