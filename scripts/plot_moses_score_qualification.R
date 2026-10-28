@@ -122,5 +122,6 @@ ggplot2::ggsave(
   file.path(report_dir, "score-agreement.svg"),
   figure,
   width = 11,
-  height = 6.3
+  height = 6.3,
+  device = grDevices::svg
 )
