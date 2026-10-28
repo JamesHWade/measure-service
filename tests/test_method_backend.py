@@ -1,7 +1,10 @@
 """Retain the calculation backend with immutable method evidence."""
 
 import json
+from importlib.metadata import PackageNotFoundError
 from pathlib import Path
+
+import pytest
 
 from measure_service import method_registry, methods
 
@@ -63,6 +66,30 @@ def test_new_evaluations_name_the_containing_service_distribution():
     assert evaluation.calculation_backend.package == "measure-service"
 
 
+def test_method_backend_rejects_coexisting_standalone_distribution(monkeypatch):
+    from measure_service import method_backend
+
+    class InstalledDistribution:
+        version = "0.1.0.dev0"
+
+        def read_text(self, name):
+            assert name == "direct_url.json"
+            return "{}"
+
+    def distribution(name):
+        assert name in {"measure-service", "measure-methods"}
+        return InstalledDistribution()
+
+    monkeypatch.setattr(method_backend.metadata, "distribution", distribution)
+
+    with pytest.raises(RuntimeError, match="method calculations are blocked") as error:
+        method_backend.method_backend_info()
+
+    assert "Remove 'measure-methods' first" in str(error.value)
+    assert "force-reinstall 'measure-service'" in str(error.value)
+    assert "/private" not in str(error.value)
+
+
 def test_legacy_backend_without_package_keeps_its_historical_default():
     old = methods.evaluate_method(declaration()).model_dump(mode="json")
     old["calculation_backend"].pop("package")
@@ -87,7 +114,13 @@ def test_installed_backend_evidence_does_not_emit_private_install_paths(monkeypa
                 {"url": "file:///private/local/backend", "dir_info": {"editable": True}}
             )
 
-    monkeypatch.setattr(method_backend.metadata, "distribution", lambda _: InstalledDistribution())
+    def distribution(name):
+        if name == "measure-methods":
+            raise PackageNotFoundError(name)
+        assert name == "measure-service"
+        return InstalledDistribution()
+
+    monkeypatch.setattr(method_backend.metadata, "distribution", distribution)
     evidence = method_backend.method_backend_info()
 
     assert evidence["package"] == "measure-service"
@@ -119,6 +152,8 @@ def test_backend_provenance_uses_the_containing_distribution_pep610_metadata(mon
             )
 
     def distribution(name):
+        if name == "measure-methods":
+            raise PackageNotFoundError(name)
         assert name == "measure-service"
         return InstalledDistribution()
 
@@ -131,6 +166,80 @@ def test_backend_provenance_uses_the_containing_distribution_pep610_metadata(mon
         "source_revision": revision,
         "source_ref": "release-candidate",
     }
+
+
+def test_method_calculation_rejects_coexisting_distribution_before_kernel_use(monkeypatch):
+    from measure_service import method_backend
+
+    class InstalledDistribution:
+        version = "0.1.0.dev0"
+
+        def read_text(self, name):
+            assert name == "direct_url.json"
+            return "{}"
+
+    def distribution(name):
+        assert name in {"measure-service", "measure-methods"}
+        return InstalledDistribution()
+
+    def unexpected_kernel(*args, **kwargs):
+        raise AssertionError("The numerical kernel ran before the distribution guard")
+
+    monkeypatch.setattr(method_backend.metadata, "distribution", distribution)
+    monkeypatch.setattr(methods, "constant_solvent_use", unexpected_kernel)
+    monkeypatch.setattr(methods, "program_solvent_use", unexpected_kernel)
+
+    with pytest.raises(RuntimeError) as error:
+        methods.evaluate_method(declaration())
+
+    message = str(error.value)
+    assert "both claim the 'measure_methods' import files" in message
+    assert "Remove 'measure-methods' first" in message
+    assert "force-reinstall 'measure-service'" in message
+    assert "/private" not in message
+
+
+def test_coexisting_distribution_keeps_old_reads_and_retries_but_blocks_new_methods(
+    tmp_path, monkeypatch
+):
+    from measure_service import method_backend
+
+    monkeypatch.setenv("MEASURE_MCP_DATA_DIR", str(tmp_path))
+    stored_backend = {
+        "package": "measure-methods",
+        "version": "0.1.0.dev0",
+        "source_revision": "3" * 40,
+        "source_ref": "historical",
+    }
+    monkeypatch.setattr(methods, "method_backend_info", lambda: stored_backend)
+    original = method_registry.register_method(
+        "owner", "Historical", declaration(), None, "historical-request"
+    )
+
+    class InstalledDistribution:
+        version = "0.1.0.dev0"
+
+        def read_text(self, name):
+            assert name == "direct_url.json"
+            return "{}"
+
+    def distribution(name):
+        assert name in {"measure-service", "measure-methods"}
+        return InstalledDistribution()
+
+    monkeypatch.setattr(method_backend.metadata, "distribution", distribution)
+    monkeypatch.setattr(methods, "method_backend_info", method_backend.method_backend_info)
+
+    assert method_registry.get_method("owner", original["method_id"]) == original
+    assert (
+        method_registry.register_method(
+            "owner", "Historical", declaration(), None, "historical-request"
+        )
+        == original
+    )
+    with pytest.raises(RuntimeError, match="method calculations are blocked"):
+        method_registry.register_method("owner", "New", declaration(), None, "new-request")
+    assert method_registry.list_methods("owner")["count"] == 1
 
 
 def test_existing_ordinary_method_keeps_its_entire_canonical_program_and_digest(

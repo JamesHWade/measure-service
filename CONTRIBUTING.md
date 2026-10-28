@@ -55,7 +55,9 @@ outside this checkout. Check that both `measure_service` and `measure_methods`
 are in the wheel, along with `measure_service/worker.R`. Run the installed tests
 without installing a separate `measure-methods` distribution. The source archive
 must include both packages as well. The CI distribution job performs these
-checks. A successful editable install alone does not verify packaging.
+checks and exercises the uninstall/force-reinstall upgrade sequence with local
+wheel files and no package index. A successful editable install alone does not
+verify packaging.
 
 ## Documentation standard
 

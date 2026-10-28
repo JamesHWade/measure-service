@@ -112,3 +112,21 @@ version and, when available, the source revision/ref from the installed
 distribution's PEP 610 metadata. Local source installs and ordinary wheels can
 have no source metadata; those source fields are `null`. The source location is
 not exposed. Retries retain the provenance stored with the original method.
+
+## Upgrade from a separately installed method package
+
+If this Python environment has the older standalone `measure-methods`
+distribution, uninstall it first, then force-reinstall the selected combined
+service wheel:
+
+```sh
+python -m pip uninstall -y measure-methods
+python -m pip install --force-reinstall /path/to/measure_service-0.1.0.dev0-py3-none-any.whl
+```
+
+For a checkout, use `python -m pip install --force-reinstall .` as the second
+command. The former distribution's uninstall record includes
+`measure_methods/*.py`, which the service wheel also contains. The forced
+reinstall restores those files even when both distributions report the same
+version. The service blocks new method calculations while both distributions
+are present; stored method reads and idempotent retries remain available.

@@ -7,6 +7,17 @@ from importlib import metadata
 
 def method_backend_info() -> dict:
     distribution = metadata.distribution("measure-service")
+    try:
+        metadata.distribution("measure-methods")
+    except metadata.PackageNotFoundError:
+        pass
+    else:
+        raise RuntimeError(
+            "The standalone 'measure-methods' distribution is installed alongside "
+            "'measure-service'; both claim the 'measure_methods' import files, so "
+            "method calculations are blocked. Remove 'measure-methods' first, then "
+            "force-reinstall 'measure-service' to restore its bundled files."
+        )
     revision = reference = None
     try:
         direct_url = json.loads(distribution.read_text("direct_url.json") or "{}")

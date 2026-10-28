@@ -832,13 +832,14 @@ def evaluate_method(
         raise ValueError("Method declaration exceeds the byte limit")
     if limits is not None and len(limits.model_dump_json().encode("utf-8")) > MAX_CONSTRAINTS_BYTES:
         raise ValueError("Method constraints exceed the byte limit")
+    backend_info = method_backend_info()
     canonical = _canonical_method(method)
     violations = _method_violations(method, canonical, limits)
     return MethodEvaluation(
         declaration=method,
         constraints=limits,
         canonical=canonical,
-        calculation_backend=MethodCalculationBackend.model_validate(method_backend_info()),
+        calculation_backend=MethodCalculationBackend.model_validate(backend_info),
         feasible=not violations,
         violations=violations,
     )

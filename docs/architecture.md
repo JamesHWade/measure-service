@@ -54,6 +54,11 @@ rewrite them. Parsing an omitted package retains the historical
 evaluation and provenance. CI reports the checkout source separately; it does
 not fill in missing runtime installation metadata.
 
+An environment upgraded from the former standalone Python distribution must
+remove `measure-methods` before force-reinstalling `measure-service`; the
+[upgrade instructions](quickstart.md#upgrade-from-a-separately-installed-method-package)
+give the required order. CI exercises it with local wheels and no package index.
+
 The service owns experiment evidence: intended conditions, actual attempts,
 measurement links, outcomes and corrections. An optimizer owns its model and
 suggestion state. Campaign orchestration must record which immutable evidence
