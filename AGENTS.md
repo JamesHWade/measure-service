@@ -1,8 +1,10 @@
 # Repository instructions
 
 Read README.md and CONTRIBUTING.md before editing. Work on a feature branch.
-Keep numerical methods in backend packages; use this repository for MCP,
-storage, evidence contracts and adapters.
+Keep numerical method calculations in `src/measure_methods`, shipped in the
+service distribution. Its calculation interface stays independent of MCP,
+storage and identity. The service owns schemas, normalization, feasibility and
+retention. For method packaging or provenance changes, read `docs/architecture.md`.
 
 Before a PR, run repository-wide Ruff, Air and Jarl, the documentation checks
 and the Python-only suite. Run the R-backed suite for worker, method, packaging
