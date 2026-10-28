@@ -85,3 +85,65 @@ A difference in these curves cannot establish that one optimizer is better:
 all curves reuse the same suggestions and observations. Fresh optimization
 must make suggestions using its explicitly selected observation, utility and
 acceptance contract, and requires its own qualified retention or signal model.
+
+
+## Compare the qualified MoSeS histories
+
+After the [immutable replay and scalar-score qualification](moses-reproduction.md),
+run the comparison into a separate output directory:
+
+```sh
+python -m measure_service.benchmarks compare-moses-trajectories \
+  --replay-dir /tmp/moses-replay \
+  --qualification-dir /tmp/moses-score-qualification \
+  --output-dir /tmp/moses-trajectory-sensitivity
+```
+
+The command reads only the two checksum-verified evidence bundles. It does not
+open the original ZIP or rerun scalarization. Every original observation is
+joined by campaign identity, sequence, member digest and archived score to all
+four qualified score candidates. A missing, duplicate, reordered or divergent
+row stops publication. The archived-score series must reproduce every cell of
+the preserved success-trajectories table. Both input bundles and implementation
+hashes are rechecked before atomic publication.
+
+Seven explicit rules are compared: archived scores; published and excess-rule
+array scores; published and excess-rule serialized-summary scores; hard array
+count/resolution acceptance; and hard array count/resolution/runtime acceptance.
+For targeted experiments only, the two summary-or-target rules use the qualified
+selected-target array entry. They do not fabricate global summaries or fill
+missing summaries for other objectives. The target gap remains recorded.
+
+| Output | Contents |
+| --- | --- |
+| `report.json`, `report.md` | Definitions, source and software digests, descriptive final-state counts and paired state matrices |
+| `campaigns.csv` | First possible/confirmed success, event costs and volumes, and budget state for each retained campaign and rule |
+| `success-trajectories.csv` | All configurations, rules and HF budgets, retaining the full planned denominator and unknown bounds |
+| `configuration-summary.csv` | Final states and largest curve differences for every configuration and rule |
+| `paired-comparisons.csv` | Campaign-level state changes and first-confirmation differences from archived scores |
+| `complete.json` | Sizes and SHA256 digests of all numerical evidence files |
+
+A known success gain requires candidate-confirmed success versus an observed
+no-success archived state. The reverse is a known loss. A change involving an
+unknown state remains a separate indeterminate comparison. Planned campaigns
+with no history contribute unknown/unknown to each paired matrix, even though
+no observation row can be emitted for them.
+
+Earlier/later first-confirmation counts describe only pairs for which both
+rules confirm success within the declared budget. They are conditional
+comparisons, not evidence that a rule improves optimization. Global final-state
+counts combine different configuration-specific budgets for descriptive
+accounting; use the configuration tables and curves for individual comparisons.
+
+The optional source-checkout plotting script creates both a complete simulated
+configuration atlas and a compact summary:
+
+```sh
+Rscript scripts/plot_moses_sensitivity.R /tmp/moses-trajectory-sensitivity
+```
+
+Plots are additional presentation files; they do not change the checksummed
+numerical results. The shaded curves show unknown-outcome bounds, not confidence
+intervals. Read the [metric audit](moses-metric-reconciliation.md) and selected
+[subsequent observation contract](moses-observation-contract.md) before using
+these results to design fresh optimization.

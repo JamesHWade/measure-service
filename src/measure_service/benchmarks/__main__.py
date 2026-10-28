@@ -7,6 +7,7 @@ from pathlib import Path
 from ..moses_score_qualification import qualify_moses_scores
 from .moses_archive import fetch_archive, inspect_archive
 from .moses_replay import analyze_archive
+from .moses_sensitivity import compare_moses_trajectories
 
 
 def main() -> None:
@@ -28,6 +29,12 @@ def main() -> None:
     qualify.add_argument("--archive", type=Path, required=True)
     qualify.add_argument("--replay-dir", type=Path, required=True)
     qualify.add_argument("--output-dir", type=Path, required=True)
+    sensitivity = commands.add_parser(
+        "compare-moses-trajectories", help="compare paired success curves from verified evidence"
+    )
+    sensitivity.add_argument("--replay-dir", type=Path, required=True)
+    sensitivity.add_argument("--qualification-dir", type=Path, required=True)
+    sensitivity.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "fetch-moses":
         print(fetch_archive(args.cache_dir))
@@ -53,8 +60,12 @@ def main() -> None:
             )
         )
 
-    else:
+    elif args.command == "qualify-moses-scores":
         qualify_moses_scores(args.archive, args.replay_dir, args.output_dir)
+        print(args.output_dir / "report.md")
+
+    else:
+        compare_moses_trajectories(args.replay_dir, args.qualification_dir, args.output_dir)
         print(args.output_dir / "report.md")
 
 

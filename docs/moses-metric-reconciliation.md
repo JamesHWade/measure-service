@@ -140,3 +140,35 @@ tested candidates. Preserve that uncertainty; do not silently substitute one
 candidate for the other. The separate
 [`moses-observation-contract.md`](moses-observation-contract.md) declares the
 inputs and acceptance rules selected for subsequent optimization.
+
+
+## Reproduce the metric-candidate audit
+
+From a source checkout with the service installed, use the verified archive and
+original replay as inputs, and write a separate bundle:
+
+```sh
+python scripts/audit_moses_metrics.py \
+  --archive /tmp/moses-data/moses-record-22109729-results.zip \
+  --replay-dir /tmp/moses-replay \
+  --output-dir /tmp/moses-metric-audit
+```
+
+The source ZIP must match its published size and MD5 and the reviewed full
+SHA256. Every replay observation is checked against all regenerated source
+fields, with campaign identity, scientific configuration and source digests
+verified. The command safely interprets bounded data records; it neither
+executes pickle constructors nor extracts the ZIP. Existing source/replay
+files are unchanged and existing output is preserved.
+
+`report.json` records candidate agreement, exact and tolerance counts,
+nonfinite/availability statuses, origin-specific results and actual
+implementation hashes. `report.md` provides the comparison table;
+`complete.json` records output sizes and SHA256 values. Targeted objectives are
+explicitly excluded from global-summary comparisons. The report contains
+aggregate metrics, not the original per-analyte arrays. Inputs and software
+are rechecked before atomic publication.
+
+The Gaussian reconstruction qualifies the simulation array equation only.
+Agreement with an archived summary or scalar score does not resolve the
+historical producer or validate a physical analytical method.
