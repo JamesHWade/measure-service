@@ -26,7 +26,9 @@ retry behavior and an explicit objective definition.
 
 The [MoSeS archive replay](moses-reproduction.md) supplies the first real-data
 benchmark layer: verified source records, recomputed raw metrics, complete
-cohort accounting and stored-score trajectories. It does not supply a fresh
+cohort accounting and stored-score trajectories. The separate scalar-score
+qualification evaluates versioned hierarchy rules and exposes source-input
+discrepancies and hard-threshold disagreements. It does not supply a fresh
 optimizer comparison or qualify the signal-processing and instrument paths.
 
 A first adapter should support caller-provided numeric/categorical spaces,

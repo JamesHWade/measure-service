@@ -111,12 +111,80 @@ imports their globals or uses `pickle.load`. Unsupported representations,
 duplicate keys, cycles and excessive work stop explicitly. Archive members are
 read into bounded memory; they are not extracted or executed.
 
+## Independently qualify scalar scores
+
+Keep the replay directory intact and write a separate score report:
+
+```sh
+python -m measure_service.benchmarks qualify-moses-scores \
+  --archive /tmp/moses-data/moses-record-22109729-results.zip \
+  --replay-dir /tmp/moses-replay \
+  --output-dir /tmp/moses-score-qualification
+```
+
+The qualifier verifies all six core replay files against `complete.json`,
+verifies the exact ZIP and its recorded manifest, reconnects every observation
+to its safely decoded source, and checks every replay observation cell against
+that source. Optional plot files are ignored and are not claimed as verified
+replay inputs. Missing, duplicate, reordered or altered observations stop the
+run. Publication is atomic into an absent or empty directory; the original
+replay is never rewritten. Source, replay and implementation integrity are
+checked again before publication.
+
+Profile `moses-score-qualification/1` evaluates the two
+[named hierarchy rules](hierarchy-scores.md) against two separate input policies:
+
+- `raw_resolution_array` derives count and critical resolution from the
+  per-analyte arrays using the reviewed LCBO experiment properties. Targeted
+  observations use the selected peak, including zero-based target index 0.
+- `serialized_summary_hypothesis` evaluates the stored count/resolution
+  summaries. It tests a historical-input hypothesis and does not substitute
+  summaries into the raw-array calculation. Targeted observations have no
+  summary candidate. Missing arrays or summaries remain explicitly unscorable.
+
+The default source scorer builds cumulative observed objectives even when its
+surrogate is labelled compoundwise. All calculations use binary64. Time-based
+records use the final absolute gradient endpoint; segment-based records round
+each interval to four decimal places using the source's scale/nearest-even/
+unscale convention, then sum them. The declared runtime is compared separately.
+Units remain minutes. The fixed comparison uses
+`math.isclose(abs_tol=1e-10, rel_tol=1e-10)`; errors are retained even when they
+fall within tolerance. Raw-versus-summary discrepancy counts compare exact
+values; their absolute differences show whether a mismatch exceeds numerical
+rounding.
+
+Read the new `report.md` and `report.json` for per-profile/input-policy
+agreement, maximum score errors, classification differences, runtime
+diagnostics and raw-array versus stored-summary differences. Its
+`observations.csv` has four candidate rows per original observation with source
+identity, score decomposition and explicit unavailable statuses. The new
+`complete.json` checksums all three numerical evidence files. Original
+per-analyte arrays are not copied into these outputs.
+
+Analytical acceptance remains separate from the scalar cutoff. The report
+compares archived and native `score >= 2` with explicit count/resolution
+thresholds, and separately includes runtime. For example, ten peaks all at
+resolution 1.49 with a one-minute run produce a published-profile score above
+2.6 despite failing the declared resolution threshold of 1.5. Smooth tier gates
+make these different questions.
+
+An optional publication figure reads only the derived aggregates:
+
+```sh
+Rscript scripts/plot_moses_score_qualification.R /tmp/moses-score-qualification
+```
+
+It writes `score-agreement.png` and `.svg`. Plotting does not change any of the
+checksummed numerical results. Numerical agreement with a source rule and
+input hypothesis establishes neither the historical installed software nor the
+validity of discrepant source inputs. A fresh optimizer comparison and raw
+signal analysis still require independent evidence.
+
 ## What remains for the full paper
 
 This layer reproduces the archived-observation calculations and accounting. A
-fresh optimization comparison, independent scalarizer evaluation, qualified
-retention models, DAD/MS processing, cross-run tracking and instrument execution
-require their own evidence. The reviewed simulation wrapper reads latent
+fresh optimization comparison, qualified retention models, DAD/MS processing,
+cross-run tracking and instrument execution require their own evidence. The reviewed simulation wrapper reads latent
 analyte outputs and ignores its `advanced_peak_detection` argument, so an
 advanced/basic flag comparison cannot qualify peak deconvolution.
 
