@@ -60,6 +60,7 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Architecture and package boundaries](docs/architecture.md)
 - [HTTP deployment, identity and storage](docs/deployment.md)
 - [Roadmap and acceptance criteria](docs/roadmap.md)
+- [MoSeS archived-result reproduction](docs/moses-reproduction.md)
 - [Development and checks](CONTRIBUTING.md)
 
 Data live in a local SQLite database. Stdio uses one `local` principal. HTTP
