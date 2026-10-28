@@ -1,6 +1,6 @@
 # Local setup
 
-Run commands from the repository root. Python 3.10+ is required; the initial
+Run commands from the repository root. Python 3.10+ and Git are required; the initial
 extraction was checked on Python 3.12. The Python package has no R installation
 step or dependency on the R packages at install time.
 

@@ -1,12 +1,13 @@
 # Architecture
 
 The MCP process validates tool arguments, resolves the principal, enforces
-record ownership and stores records in SQLite. Numerical calls pass JSON to
-a fixed R subprocess. The worker returns JSON; the MCP process stores the
+record ownership and stores records in SQLite. Trace-analysis calls pass JSON to
+a fixed R subprocess. Protocol resource accounting calls the R-free Python
+`measure-methods` backend. The worker returns JSON; the MCP process stores the
 result and returns a compact record. Arrays and original text are read in pages.
 
 No tool accepts executable code, a server file path or an arbitrary URL. The R
-worker path comes from the installed Python package. A numerical call is
+worker path comes from the installed Python package. An R-backed call is
 synchronous and has a 90-second subprocess timeout. There is no job queue or
 worker pool.
 
@@ -16,6 +17,7 @@ worker pool.
 | --- | --- |
 | `measure` | R measurement structures, preprocessing, calibration and validation primitives |
 | `measure.sec` | SEC calibration, moments, distributions and technique-specific calculations |
+| `measure-methods` | Numerical solvent-use integration for declared method programs |
 | Future technique packages | Domain models and methods that can be tested independently of an agent protocol |
 | `measure-service` | MCP contracts, identities, evidence records, storage and backend adapters |
 | Future BO adapter | Translate qualified evidence and objectives to an optimizer protocol |
@@ -38,6 +40,9 @@ label alone does not implement them.
 ## Code layout
 
 - `src/measure_service/server.py`: MCP tools, trace/method validation and R adapter.
+- `src/measure_service/methods.py`: declaration validation, normalization, constraints and numerical-backend adaptation.
+- `src/measure_service/method_backend.py`: installed numerical-backend metadata.
+- `src/measure_service/method_registry.py`: immutable owned method records and identities.
 - `src/measure_service/experiments.py`: registry models, evidence checks and writes.
 - `src/measure_service/storage.py`: canonical serialization and SQLite tables.
 - `src/measure_service/worker.R`: adapter to the installed scientific packages.

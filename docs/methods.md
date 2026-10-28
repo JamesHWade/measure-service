@@ -38,3 +38,21 @@ The method schema permits up to 16 analytical points and 6 solvents; its bounded
 ## Run the example
 
 After installing this checkout, run `python examples/methods.py` from the repository root. The example uses stdio MCP and a temporary database without R. It validates and retains a two-minute gradient, records separate intended and reported method links, and checks an idempotent retry. The reported attempt is labeled as a simulator record; the example performs no acquisition.
+
+## Numerical backend and provenance
+
+Solvent-use integration runs in the independent Python package
+[measure-methods](https://github.com/JamesHWade/measure-methods). The service
+validates declarations and constraints, converts to canonical units, calls the
+backend and retains the results. It contains no integration kernel.
+
+Each newly calculated evaluation records `calculation_backend`: the installed
+package version and, when available, the source revision/ref supplied by pip's
+installed VCS metadata. Missing source metadata is returned as `null`; a version
+string does not establish a source revision. Older stored evaluations retain
+unknown backend provenance. A retry returns the original stored evaluation
+rather than relabeling it with the currently installed backend.
+
+Until the backend's initial PR is merged, installation follows its
+`codex/linear-program-usage` branch HEAD. Git is required by pip for this source
+dependency. Resolved source IDs are evidence rather than install constraints.

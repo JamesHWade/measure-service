@@ -1,0 +1,84 @@
+{
+  "source_commit": "71f5aec227c572e5cce9364098fa75e6a5aa120c",
+  "declaration": {
+    "schema_version": "1.0",
+    "time_unit": "min",
+    "flow_unit": "mL/min",
+    "solvents": [
+      "A",
+      "B"
+    ],
+    "program": {
+      "kind": "isocratic",
+      "acquisition_duration": 2,
+      "state": {
+        "flow": 0.2,
+        "solvent_fractions": {
+          "A": 0.7,
+          "B": 0.3
+        }
+      }
+    },
+    "pre_acquisition": {
+      "duration": 0.1,
+      "state": {
+        "flow": 0.3,
+        "solvent_fractions": {
+          "A": 0.7,
+          "B": 0.3
+        }
+      }
+    }
+  },
+  "canonical": {
+    "schema_version": "1.0",
+    "time_unit": "min",
+    "flow_unit": "mL/min",
+    "volume_unit": "mL",
+    "program_kind": "isocratic",
+    "acquisition_duration_min": 2.0,
+    "pre_acquisition_duration_min": 0.1,
+    "post_acquisition_duration_min": 0.0,
+    "occupancy_duration_min": 2.1,
+    "points": [
+      {
+        "time_min": 0.0,
+        "flow_ml_min": 0.2,
+        "solvent_fractions": {
+          "A": 0.7,
+          "B": 0.3
+        }
+      },
+      {
+        "time_min": 2.0,
+        "flow_ml_min": 0.2,
+        "solvent_fractions": {
+          "A": 0.7,
+          "B": 0.3
+        }
+      }
+    ],
+    "pre_acquisition": {
+      "duration_min": 0.1,
+      "flow_ml_min": 0.3,
+      "solvent_fractions": {
+        "A": 0.7,
+        "B": 0.3
+      },
+      "solvent_use_ml": {
+        "A": 0.021,
+        "B": 0.009
+      }
+    },
+    "post_acquisition": null,
+    "analytical_solvent_use_ml": {
+      "A": 0.27999999999999997,
+      "B": 0.12
+    },
+    "total_solvent_use_ml": {
+      "A": 0.301,
+      "B": 0.129
+    }
+  },
+  "canonical_program_sha256": "50a13d497563ba9413db398fbc968ee511c67141eb657d64da84383599b15dde"
+}

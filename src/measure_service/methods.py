@@ -10,6 +10,7 @@ import math
 from decimal import Decimal, localcontext
 from typing import Annotated, Any, Literal, TypeAlias
 
+from measure_methods import constant_solvent_use, program_solvent_use
 from pydantic import (
     BaseModel,
     BeforeValidator,
@@ -20,6 +21,8 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+
+from .method_backend import method_backend_info
 
 METHOD_SCHEMA_VERSION = "1.0"
 MAX_SOLVENTS = 6
@@ -312,11 +315,21 @@ class MethodViolation(StrictModel):
     unit: Identifier
 
 
+class MethodCalculationBackend(StrictModel):
+    package: Literal["measure-methods"] = "measure-methods"
+    version: Annotated[str, StringConstraints(min_length=1, max_length=100)]
+    source_revision: (
+        Annotated[str, StringConstraints(pattern=r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")] | None
+    ) = None
+    source_ref: Annotated[str, StringConstraints(max_length=256)] | None = None
+
+
 class MethodEvaluation(StrictModel):
     schema_version: Literal["1.0"] = METHOD_SCHEMA_VERSION
     declaration: MethodDeclaration
     constraints: MethodConstraints | None = None
     canonical: CanonicalMethod
+    calculation_backend: MethodCalculationBackend | None = None
     feasible: bool
     violations: list[MethodViolation] = Field(max_length=MAX_VIOLATIONS)
 
@@ -455,50 +468,13 @@ def _canonical_fractions(state: GradientState) -> dict[str, float]:
     }
 
 
-def _linear_product_volume(
-    duration_min: float,
-    flow_start: float,
-    flow_end: float,
-    fraction_start: float,
-    fraction_end: float,
-) -> float:
-    """Integrate the product of linearly varying flow and fraction exactly.
-
-    Their product is quadratic, so Simpson's rule evaluates this integral
-    exactly (up to floating-point rounding).
-    """
-    flow_mid = flow_start + (flow_end - flow_start) * 0.5
-    fraction_mid = fraction_start + (fraction_end - fraction_start) * 0.5
-    average_product = math.fsum(
-        (
-            (flow_start * fraction_start) / 6.0,
-            (flow_mid * fraction_mid) * (2.0 / 3.0),
-            (flow_end * fraction_end) / 6.0,
-        )
-    )
-    return _finite_result(duration_min * average_product, "solvent use")
-
-
 def _integrate_points(points: list[CanonicalPoint], solvents: list[str]) -> dict[str, float]:
-    by_solvent: dict[str, list[float]] = {solvent: [] for solvent in solvents}
-    for start, end in zip(points, points[1:]):
-        duration = end.time_min - start.time_min
-        if duration <= 0:
-            raise ValueError("Canonical analytical point times must remain strictly increasing")
-        for solvent in solvents:
-            by_solvent[solvent].append(
-                _linear_product_volume(
-                    duration,
-                    start.flow_ml_min,
-                    end.flow_ml_min,
-                    start.solvent_fractions[solvent],
-                    end.solvent_fractions[solvent],
-                )
-            )
-    return {
-        solvent: _finite_sum(volumes, "solvent-use total")
-        for solvent, volumes in by_solvent.items()
-    }
+    use = program_solvent_use(
+        times_min=[point.time_min for point in points],
+        flows_ml_min=[point.flow_ml_min for point in points],
+        solvent_fractions=[point.solvent_fractions for point in points],
+    )
+    return {solvent: use[solvent] for solvent in solvents}
 
 
 def _canonical_phase(
@@ -511,10 +487,7 @@ def _canonical_phase(
         raise ValueError("Canonical overhead duration must remain positive after unit conversion")
     flow_ml_min = _flow_to_ml_min(phase.state.flow, method.flow_unit)
     fractions = _canonical_fractions(phase.state)
-    use = {
-        solvent: _finite_result(duration_min * (flow_ml_min * fraction), "overhead solvent use")
-        for solvent, fraction in fractions.items()
-    }
+    use = constant_solvent_use(duration_min, flow_ml_min, fractions)
     return CanonicalPhase(
         duration_min=duration_min,
         flow_ml_min=flow_ml_min,
@@ -857,6 +830,7 @@ def evaluate_method(
         declaration=method,
         constraints=limits,
         canonical=canonical,
+        calculation_backend=MethodCalculationBackend.model_validate(method_backend_info()),
         feasible=not violations,
         violations=violations,
     )
