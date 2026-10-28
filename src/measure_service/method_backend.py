@@ -1,4 +1,4 @@
-"""Read installed numerical-backend provenance without inferring a source revision."""
+"""Read the containing distribution's provenance without inferring a source revision."""
 
 import json
 import re
@@ -6,7 +6,7 @@ from importlib import metadata
 
 
 def method_backend_info() -> dict:
-    distribution = metadata.distribution("measure-methods")
+    distribution = metadata.distribution("measure-service")
     revision = reference = None
     try:
         direct_url = json.loads(distribution.read_text("direct_url.json") or "{}")
@@ -23,7 +23,7 @@ def method_backend_info() -> dict:
         if isinstance(requested, str) and len(requested) <= 256:
             reference = requested
     return {
-        "package": "measure-methods",
+        "package": "measure-service",
         "version": distribution.version,
         "source_revision": revision,
         "source_ref": reference,

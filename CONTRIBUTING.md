@@ -2,8 +2,11 @@
 
 Use a feature branch and a reviewable pull request. The service is an installed
 Python package; tests must not depend on adding source directories to
-`PYTHONPATH`. Scientific changes belong in the relevant backend package, with
-reference tests there and an integration test here.
+`PYTHONPATH`. The pure-Python method resource kernel is the importable
+`measure_methods` package under `src/` and is included in the same distribution
+as the MCP service. Keep its reference tests with the kernel and add service
+contract tests when the adapter changes. R calculations remain in their R
+backend packages.
 
 ## Set up and check
 
@@ -24,7 +27,7 @@ worker. Fix new findings. This repository starts with no accepted Air/Jarl
 baseline. To apply formatting, use `ruff format .` and `air format .`; use
 `ruff check . --fix` for supported Python fixes and review the diff.
 
-For numerical integration, install the backends described in the
+For R-backed numerical integration, install the R packages described in the
 [quickstart](docs/quickstart.md), then run:
 
 ```sh
@@ -34,10 +37,10 @@ MEASURE_MCP_R="$(command -v R)" .venv/bin/python examples/analyze_trace.py
 
 Use `MEASURE_MCP_TEST_R` for the R-backed contract test and `MEASURE_MCP_R` for
 the example/runtime. Python-only checks do not establish that numerical
-analysis works. CI keeps those checks in a separate job from R integration. The numerical job
-uses current R/CRAN dependencies and live backend branches. It logs the installed
-source revisions and checks required SEC capabilities; those observations do
-not impose fixed revision constraints.
+analysis works. CI keeps those checks in a separate job from R integration. The
+R job uses current R/CRAN dependencies and live `measure` and `measure.sec`
+branches. It logs installed source revisions and checks required SEC
+capabilities; those observations do not impose fixed revision constraints.
 
 ## Check the distribution
 
@@ -48,10 +51,11 @@ Build both a source archive and a wheel:
 ```
 
 Install the wheel in a separate environment, then run tests and examples from
-outside this checkout. Check that `measure_service/worker.R` is in the wheel
-and the installed CLI starts. The CI distribution job performs these checks;
-it also installs from the source archive. A successful editable install alone
-does not verify packaging.
+outside this checkout. Check that both `measure_service` and `measure_methods`
+are in the wheel, along with `measure_service/worker.R`. Run the installed tests
+without installing a separate `measure-methods` distribution. The source archive
+must include both packages as well. The CI distribution job performs these
+checks. A successful editable install alone does not verify packaging.
 
 ## Documentation standard
 
@@ -81,6 +85,10 @@ claims or prose quality.
 ## PR evidence
 
 Describe the concrete behavior change, why it matters and the checks that ran.
-Include backend revisions for numerical results and explain material limits.
+Include installed R backend revisions for trace-analysis results and explain
+material limits. Method resource calculations report the containing
+`measure-service` distribution and its PEP 610 source revision when available.
+CI reports the checkout revision separately; it does not infer installed
+provenance from the checkout.
 Do not label an item complete because it has a stub, a schema or a mock.
 Do not merge without maintainer review.

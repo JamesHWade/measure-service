@@ -10,7 +10,6 @@ import math
 from decimal import Decimal, localcontext
 from typing import Annotated, Any, Literal, TypeAlias
 
-from measure_methods import constant_solvent_use, program_solvent_use
 from pydantic import (
     BaseModel,
     BeforeValidator,
@@ -21,6 +20,8 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+
+from measure_methods import constant_solvent_use, program_solvent_use
 
 from .method_backend import method_backend_info
 
@@ -316,12 +317,19 @@ class MethodViolation(StrictModel):
 
 
 class MethodCalculationBackend(StrictModel):
-    package: Literal["measure-methods"] = "measure-methods"
+    package: Literal["measure-service", "measure-methods"] = "measure-service"
     version: Annotated[str, StringConstraints(min_length=1, max_length=100)]
     source_revision: (
         Annotated[str, StringConstraints(pattern=r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")] | None
     ) = None
     source_ref: Annotated[str, StringConstraints(max_length=256)] | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def preserve_legacy_package_default(cls, value: Any) -> Any:
+        if isinstance(value, dict) and "version" in value and "package" not in value:
+            return {**value, "package": "measure-methods"}
+        return value
 
 
 class MethodEvaluation(StrictModel):

@@ -1,8 +1,9 @@
 # Local setup
 
-Run commands from the repository root. Python 3.10+ and Git are required; the initial
-extraction was checked on Python 3.12. The Python package has no R installation
-step or dependency on the R packages at install time.
+Run commands from the repository root. Python 3.10+ is required; Git is only
+needed when installing the R backends from their source repositories. The
+Python distribution has no R installation step or dependency on the R packages
+at install time.
 
 ```sh
 python -m venv .venv
@@ -98,25 +99,16 @@ Use [input guidance](inputs.md) for real data and
 | HTTP reports local identity is stdio-only | Configure a verified proxy deployment; see [HTTP setup](deployment.md) |
 | A retry key conflicts | Reuse the original arguments or choose a new key for a different registry operation |
 
-## Protocol resource backend
+## Method resource calculations
 
-Python installation also installs the R-free
-[measure-methods](https://github.com/JamesHWade/measure-methods) backend from its
-`main` branch. A [method evaluation](methods.md) reports its installed
-version and available VCS source metadata. These observations describe the code
-that calculated the retained result; they do not freeze future installations.
-The numerical CI job records the backend branch at job start and its installed
-source metadata alongside the R backends.
+The pure-Python `measure_methods` package is included in the `measure-service`
+wheel and source archive. The exact import remains
+`from measure_methods import constant_solvent_use, program_solvent_use`. A
+single installation of `measure-service` provides the MCP service and this
+calculation package; it needs no R runtime or separate Python distribution.
 
-
-Pip may retain an already installed backend when its package version is
-unchanged, even if a moving branch has advanced. To refresh that source
-installation explicitly, run:
-
-```sh
-.venv/bin/python -m pip install --force-reinstall --no-deps "measure-methods @ git+https://github.com/JamesHWade/measure-methods.git@main"
-```
-
-Inspect a new method evaluation's `calculation_backend` after the refresh. The
-recorded revision identifies the installed code, rather than assuming that a
-branch name or repeated install command refreshed it.
+A new [method evaluation](methods.md) records `measure-service`, its installed
+version and, when available, the source revision/ref from the installed
+distribution's PEP 610 metadata. Local source installs and ordinary wheels can
+have no source metadata; those source fields are `null`. The source location is
+not exposed. Retries retain the provenance stored with the original method.

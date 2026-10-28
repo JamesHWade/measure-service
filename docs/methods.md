@@ -41,19 +41,18 @@ After installing this checkout, run `python examples/methods.py` from the reposi
 
 ## Numerical backend and provenance
 
-Solvent-use integration runs in the independent Python package
-[measure-methods](https://github.com/JamesHWade/measure-methods). The service
-validates declarations and constraints, converts to canonical units, calls the
-backend and retains the results. It contains no integration kernel.
+Solvent-use integration runs in the pure-Python package `measure_methods`,
+which is shipped inside the `measure-service` distribution. Its public imports
+remain `constant_solvent_use` and `program_solvent_use`; the module has no MCP,
+storage or R dependency. The service validates declarations and constraints,
+converts to canonical units, calls the package and retains the results.
 
-Each newly calculated evaluation records `calculation_backend`: the installed
-package version and, when available, the source revision/ref supplied by pip's
-installed VCS metadata. Missing source metadata is returned as `null`; a version
-string does not establish a source revision. Older stored evaluations retain
-unknown backend provenance. A retry returns the original stored evaluation
-rather than relabeling it with the currently installed backend.
-
-Installation follows the backend's `main` branch HEAD. Git is required by pip
-for this source dependency. Resolved source IDs are evidence rather than install
-constraints. The separate package boundary remains open for review; see
-[the architecture follow-up](https://github.com/JamesHWade/measure-methods/issues/2).
+Each newly calculated evaluation records `calculation_backend` with package
+`measure-service`, its installed distribution version and, when available, the
+source revision/ref in pip's PEP 610 metadata. Missing source metadata is
+stored as `null`; a version string does not establish a source revision. The
+source URL and local install path are not included. Historical records with
+package `measure-methods` and records with unknown backend provenance remain
+unchanged and readable. Records that omit `package` retain the historical
+`measure-methods` default when parsed. A retry returns the original stored
+evaluation with its original fields and values.

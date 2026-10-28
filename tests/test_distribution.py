@@ -4,6 +4,7 @@ import json
 import os
 import subprocess
 import sys
+from importlib import metadata
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,32 @@ import pytest
 import measure_service
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_service_distribution_contains_both_import_packages_and_worker():
+    distribution = metadata.distribution("measure-service")
+    files = {str(path) for path in distribution.files or ()}
+    direct_url = json.loads(distribution.read_text("direct_url.json") or "{}")
+
+    if direct_url.get("dir_info", {}).get("editable"):
+        pytest.skip("An editable install cannot verify built distribution contents")
+
+    assert "measure_methods/__init__.py" in files
+    assert "measure_methods/volume.py" in files
+    assert "measure_service/worker.R" in files
+
+
+def test_method_backend_imports_without_service_or_mcp(tmp_path):
+    probe = """
+import sys
+from measure_methods import constant_solvent_use, program_solvent_use
+
+assert constant_solvent_use(1, 1, {"A": 1}) == {"A": 1.0}
+assert program_solvent_use([0, 1], [1, 1], [{"A": 1}, {"A": 1}]) == {"A": 1.0}
+assert "measure_service" not in sys.modules
+assert "mcp" not in sys.modules
+"""
+    subprocess.run([sys.executable, "-c", probe], cwd=tmp_path, check=True)
 
 
 def test_installed_cli_and_worker_outside_checkout(tmp_path):

@@ -2,9 +2,9 @@
 
 MCP tools for processing analytical traces and tracking experiment results.
 The service stores measurements, analysis methods, results and their provenance.
-Method resource calculations use the R-free Python backend
-[measure-methods](https://github.com/JamesHWade/measure-methods).
-It delegates numerical analysis to the R packages
+Method resource calculations use the R-free Python package `measure_methods`,
+which ships inside the `measure-service` distribution. It has no dependency on
+MCP, storage or R. The service delegates trace analysis to the R packages
 [measure](https://github.com/JamesHWade/measure) and
 [measure.sec](https://github.com/JamesHWade/measure.sec).
 
@@ -13,7 +13,7 @@ BO integration and instrument control are not implemented or qualified.
 
 ## Try it
 
-From this checkout, with Python 3.10 or later and Git:
+From this checkout, with Python 3.10 or later:
 
 ```sh
 python -m venv .venv
