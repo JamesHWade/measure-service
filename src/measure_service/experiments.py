@@ -7,7 +7,7 @@ import math
 import sqlite3
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 from pydantic import (
     AwareDatetime,
@@ -22,7 +22,8 @@ from pydantic import (
     model_validator,
 )
 
-from .storage import canonical, now, registry_connection, sha256
+from .method_registry import method_link
+from .storage import canonical, now, registry_connection, registry_mutation, sha256
 
 SCHEMA_VERSION = "1.0"
 MAX_RECORD_BYTES = 64_000
@@ -93,6 +94,12 @@ class ExperimentSpec(RecordModel):
         max_length=200,
         description="Optional external proposal ID; not a service-validated optimizer campaign.",
     )
+    executable_method_id: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=100,
+        description="Owned immutable executable method for the intended design; validation does not imply instrument execution.",
+    )
     intended_conditions: list[Condition] = Field(default_factory=list, max_length=64)
     description: str = Field(default="", max_length=2000)
 
@@ -127,6 +134,12 @@ class AttemptSpec(RecordModel):
     ended_at: AwareDatetime | None = None
     external_reference: str | None = Field(default=None, min_length=1, max_length=200)
     instrument_reference: str | None = Field(default=None, min_length=1, max_length=200)
+    executable_method_id: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=100,
+        description="Owned immutable executable method reported for this attempt; actual instrument settings remain separately reported.",
+    )
     method_reference: str | None = Field(default=None, min_length=1, max_length=200)
     replicate_group: str | None = Field(default=None, min_length=1, max_length=100)
     replicate_kind: Literal["technical", "biological", "independent", "unspecified"] | None = None
@@ -253,53 +266,43 @@ def _owned(con: sqlite3.Connection, table: str, owner: str, record_id: str) -> s
     return row
 
 
-def _mutate(
-    owner: str, key: str, request: dict, action: Callable[[sqlite3.Connection], dict]
-) -> dict[str, Any]:
-    if not isinstance(key, str) or not 1 <= len(key) <= 100 or not key.strip():
-        raise ValueError("A nonempty idempotency key of at most 100 characters is required")
-    digest = sha256(bounded(request))
-    with registry_connection(write=True) as con:
-        receipt = con.execute(
-            "SELECT digest, response FROM registry_receipts WHERE owner=? AND request_key=?",
-            (owner, key),
-        ).fetchone()
-        if receipt is not None:
-            if receipt["digest"] != digest:
-                raise ValueError(
-                    "Idempotency key was already used for a different registry request"
-                )
-            return json.loads(receipt["response"])
-        response = action(con)
-        con.execute(
-            "INSERT INTO registry_receipts VALUES (?, ?, ?, ?, ?)",
-            (owner, key, digest, canonical(response), now()),
-        )
-        return response
-
-
 def _experiment(row: sqlite3.Row) -> dict[str, Any]:
+    payload = json.loads(row["payload"])
+    method = payload.pop("executable_method", None)
     return {
         "schema_version": SCHEMA_VERSION,
         "experiment_id": row["id"],
-        "spec": json.loads(row["payload"]),
+        "spec": payload,
+        "executable_method": method,
         "input_sha256": row["digest"],
         "created_at": row["created_at"],
     }
 
 
+def _requested_spec(spec: ExperimentSpec | AttemptSpec) -> dict:
+    # Omit the new optional field when absent to preserve pre-method retry hashes.
+    payload = spec.model_dump(mode="json")
+    if payload["executable_method_id"] is None:
+        payload.pop("executable_method_id")
+    return bounded(payload)
+
+
 def create_experiment(owner: str, spec: ExperimentSpec, key: str) -> dict[str, Any]:
-    payload = bounded(spec.model_dump(mode="json"))
+    payload = _requested_spec(spec)
 
     def write(con: sqlite3.Connection) -> dict:
+        retained = dict(payload)
+        if payload.get("executable_method_id") is not None:
+            retained["executable_method"] = method_link(con, owner, payload["executable_method_id"])
+        bounded(retained)
         record_id = str(uuid.uuid4())
         con.execute(
             "INSERT INTO experiments VALUES (?, ?, ?, ?, ?)",
-            (record_id, owner, canonical(payload), sha256(payload), now()),
+            (record_id, owner, canonical(retained), sha256(retained), now()),
         )
         return _experiment(_owned(con, "experiments", owner, record_id))
 
-    return _mutate(owner, key, {"operation": "create_experiment", "spec": payload}, write)
+    return registry_mutation(owner, key, {"operation": "create_experiment", "spec": payload}, write)
 
 
 def get_experiment(owner: str, experiment_id: str) -> dict[str, Any]:
@@ -370,13 +373,16 @@ def _attempt(
     ).fetchone()
     if row is None:
         raise ValueError("Attempt revision was not found")
+    payload = json.loads(row["payload"])
+    method = payload.pop("executable_method", None)
     return {
         "schema_version": SCHEMA_VERSION,
         "attempt_id": attempt_id,
         "experiment_id": attempt["experiment_id"],
         "revision": row["revision"],
         "latest_revision": attempt["latest_revision"],
-        "spec": json.loads(row["payload"]),
+        "spec": payload,
+        "executable_method": method,
         "input_sha256": row["digest"],
         "reason": row["reason"],
         "created_at": row["created_at"],
@@ -384,13 +390,17 @@ def _attempt(
 
 
 def _attempt_payload(con: sqlite3.Connection, owner: str, spec: dict) -> dict:
-    return bounded(
-        {**spec, "measurements": [_measurement(con, owner, link) for link in spec["measurements"]]}
-    )
+    payload = {
+        **spec,
+        "measurements": [_measurement(con, owner, link) for link in spec["measurements"]],
+    }
+    if spec.get("executable_method_id") is not None:
+        payload["executable_method"] = method_link(con, owner, spec["executable_method_id"])
+    return bounded(payload)
 
 
 def record_attempt(owner: str, experiment_id: str, spec: AttemptSpec, key: str) -> dict[str, Any]:
-    requested = bounded(spec.model_dump(mode="json"))
+    requested = _requested_spec(spec)
 
     def write(con: sqlite3.Connection) -> dict:
         _owned(con, "experiments", owner, experiment_id)
@@ -406,7 +416,7 @@ def record_attempt(owner: str, experiment_id: str, spec: AttemptSpec, key: str) 
         )
         return _attempt(con, owner, attempt_id)
 
-    return _mutate(
+    return registry_mutation(
         owner,
         key,
         {"operation": "record_attempt", "experiment_id": experiment_id, "spec": requested},
@@ -419,7 +429,7 @@ def revise_attempt(
 ) -> dict[str, Any]:
     if not reason.strip() or len(reason) > 2000:
         raise ValueError("A revision explanation of 1 to 2000 characters is required")
-    requested = bounded(spec.model_dump(mode="json"))
+    requested = _requested_spec(spec)
 
     def write(con: sqlite3.Connection) -> dict:
         current = _owned(con, "experiment_attempts", owner, attempt_id)
@@ -439,7 +449,7 @@ def revise_attempt(
         )
         return _attempt(con, owner, attempt_id)
 
-    return _mutate(
+    return registry_mutation(
         owner,
         key,
         {
@@ -623,7 +633,7 @@ def record_results(
             }
         )
 
-    return _mutate(
+    return registry_mutation(
         owner,
         key,
         {

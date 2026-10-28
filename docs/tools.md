@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 24 tools.
+The current catalog contains 29 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -22,11 +22,14 @@ The current catalog contains 24 tools.
 | `measurement_get_analysis` | `analysis_id` | read | idempotent |
 | `measurement_get_attempt` | `attempt_id` | read | idempotent |
 | `measurement_get_experiment` | `experiment_id` | read | idempotent |
+| `measurement_get_method` | `method_id` | read | idempotent |
 | `measurement_get_result` | `result_id` | read | idempotent |
 | `measurement_inspect_dataset` | `dataset_id` | read | idempotent |
 | `measurement_list_attempts` | `experiment_id` | read | idempotent |
 | `measurement_list_experiments` | — | read | idempotent |
+| `measurement_list_methods` | — | read | idempotent |
 | `measurement_list_results` | `attempt_id` | read | idempotent |
+| `measurement_method_capabilities` | — | read | idempotent |
 | `measurement_quantify_peak` | `analysis_id`, `peak_id`, `method` | write | creates new record |
 | `measurement_read_analysis_data` | `analysis_id`, `kind` | read | idempotent |
 | `measurement_read_source` | `dataset_id` | read | idempotent |
@@ -35,9 +38,11 @@ The current catalog contains 24 tools.
 | `measurement_register_csv` | `title`, `csv_text`, `axis_column`, `signal_column`, `metadata` | write | creates new record |
 | `measurement_register_dataset` | `dataset` | write | creates new record |
 | `measurement_register_long_csv` | `title`, `csv_text`, `axis_column`, `signal_column`, `group_columns`, `groups` | write | creates new record |
+| `measurement_register_method` | `title`, `declaration`, `idempotency_key` | write | idempotent |
 | `measurement_register_wide_csv` | `title`, `csv_text`, `axis_column`, `channels` | write | creates new record |
 | `measurement_registry_capabilities` | — | read | idempotent |
 | `measurement_revise_attempt` | `attempt_id`, `expected_revision`, `spec`, `reason`, `idempotency_key` | write | idempotent |
+| `measurement_validate_method` | `declaration` | read | idempotent |
 
 ## Tool descriptions
 
@@ -73,6 +78,10 @@ Read the latest or a specific historical attempt revision, including sample/inje
 
 Retrieve an experiment's intended conditions and caller-declared origin.
 
+### `measurement_get_method`
+
+Retrieve an owned immutable executable method and its declared limits.
+
 ### `measurement_get_result`
 
 Retrieve an immutable outcome with evidence provenance, attempt revision and any later superseding result.
@@ -89,9 +98,17 @@ List a bounded page of attempts and latest reported statuses for an owned experi
 
 List a bounded page of the current owner's experiments.
 
+### `measurement_list_methods`
+
+List compact method identities in a bounded owner-scoped page.
+
 ### `measurement_list_results`
 
 List compact current outcome heads or the full result history for an owned attempt; no missing outcome is converted to zero.
+
+### `measurement_method_capabilities`
+
+Describe executable LC method validation and storage without an R backend.
 
 ### `measurement_quantify_peak`
 
@@ -125,6 +142,10 @@ Register bounded one-dimensional traces and their sample, injection, detector an
 
 Register row-oriented traces grouped by explicit column values, with a separate axis and metadata for each group.
 
+### `measurement_register_method`
+
+Retain an immutable method that meets its declared constraints, with original units, canonical program and digests; does not run an instrument.
+
 ### `measurement_register_wide_csv`
 
 Register multiple explicitly mapped detector columns that share one numeric axis; retain the source text and mapping.
@@ -136,6 +157,10 @@ Describe the local experiment registry without requiring an R backend.
 ### `measurement_revise_attempt`
 
 Append a corrected or updated reported attempt snapshot with an explanation and optimistic version check; earlier revisions remain available.
+
+### `measurement_validate_method`
+
+Normalize a declared LC method, calculate time and solvent use, and report feasibility; performs no execution or storage.
 
 ## Related contracts
 

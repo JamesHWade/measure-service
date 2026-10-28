@@ -101,3 +101,7 @@ per batch and 50 records per retrieval page. Records and registry
 request/response batches are limited to 64,000 serialized UTF-8 bytes. List
 operations use offset pagination and `next_offset`; they are not immutable
 campaign snapshots. See [deployment](deployment.md) for persistence limits.
+
+## Intended and reported chromatography methods
+
+Both an experiment and each attempt may supply `executable_method_id` for an [owned immutable method](methods.md). The experiment retains its intended method identity and digests; an attempt separately retains the method reported for that attempt. No automatic inheritance equates the two. An attempt correction appends a revision and keeps the earlier link accessible. Free-text `method_reference` remains an external reference.

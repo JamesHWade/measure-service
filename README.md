@@ -36,6 +36,7 @@ configuration and a numerical analysis example.
 | Peak quantitation | Linear response calibration from supplied standards | Caller assigns the peak; no automatic dilution, LOD or uncertainty |
 | Relative SEC | Calibration, molecular-weight averages and distributions | Requires corrected `measure.sec`; results are relative to supplied standards |
 | Comparison | SEC deltas and method/backend/unit comparability flags | No statistical equivalence claim |
+| Method declarations | Isocratic/linear gradients, explicit units, flow/solvent use, declared feasibility and immutable method identities | No optimizer-domain sampling, pressure model or acquisition |
 | Experiment tracking | Intended and actual conditions, attempt revisions, evidence-linked outcomes and explicit corrections | Reported records; no execution or optimizer state machine |
 
 Registry operations, import and record retrieval work without R. Numerical
@@ -51,6 +52,7 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Local setup and examples](docs/quickstart.md)
 - [Input formats and limits](docs/inputs.md)
 - [Scientific methods and interpretation](docs/analysis.md)
+- [Chromatography method declarations](docs/methods.md)
 - [Experiment and result contracts](docs/experiments.md)
 - [MCP tool reference](docs/tools.md)
 - [Architecture and package boundaries](docs/architecture.md)
