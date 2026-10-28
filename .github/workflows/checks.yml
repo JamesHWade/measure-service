@@ -62,11 +62,13 @@ jobs:
           /tmp/measure-sdist/bin/python "$GITHUB_WORKSPACE/examples/registry.py"
 
   r-integration:
-    name: R-backed numerical workflows
+    name: Current R and numerical backend heads
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
-      MEASURE_MCP_MEASURE_REVISION: aac4cf0c6b99b8c7ce868fb43f30478fd663bf25
-      MEASURE_MCP_SEC_REVISION: a3ff1fe965f53b6388a3ce535746ff40fdbda0c2
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      MEASURE_BACKEND_REF: main
+      SEC_BACKEND_REF: fix/separations-sec-correctness
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -74,18 +76,82 @@ jobs:
           python-version: '3.12'
       - uses: r-lib/actions/setup-r@v2
         with:
-          r-version: '4.3.3'
+          r-version: release
           use-public-rspm: true
+      - name: Prepare isolated backend libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/measure-r-library" "$RUNNER_TEMP/measure-r-site"
+          {
+            echo "R_LIBS_USER=$RUNNER_TEMP/measure-r-library"
+            echo "R_LIBS_SITE=$RUNNER_TEMP/measure-r-site"
+            echo "MEASURE_MCP_R=$(command -v R)"
+            echo "MEASURE_MCP_TEST_R=$(command -v R)"
+          } >> "$GITHUB_ENV"
+      - name: Record backend heads at job start
+        shell: bash
+        run: |
+          set -euo pipefail
+          for backend in measure measure.sec; do
+            backend_ref="$MEASURE_BACKEND_REF"
+            if [ "$backend" = measure.sec ]; then backend_ref="$SEC_BACKEND_REF"; fi
+            observed_sha="$(git ls-remote --exit-code --heads "https://github.com/JamesHWade/$backend.git" "refs/heads/$backend_ref" | awk 'NR == 1 {print $1}')"
+            [[ "$observed_sha" =~ ^[0-9a-f]{40}$ ]]
+            echo "$backend ($backend_ref) at job start: $observed_sha"
+            echo "$backend ($backend_ref) at job start: \`$observed_sha\`" >> "$GITHUB_STEP_SUMMARY"
+          done
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           dependencies: '"hard"'
           packages: |
             any::jsonlite
             any::tibble
-            tidymodels/recipes@04c2139b011810ea1e56eca947a3ca932ea3c38a
-            JamesHWade/measure@aac4cf0c6b99b8c7ce868fb43f30478fd663bf25
-            JamesHWade/measure.sec@a3ff1fe965f53b6388a3ce535746ff40fdbda0c2
-          cache-version: 1
+            any::recipes
+            any::remotes
+          cache: false
+      - name: Install live backend branches with current CRAN dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          Rscript - <<'RS'
+          remotes::install_github(
+            paste0("JamesHWade/measure@", Sys.getenv("MEASURE_BACKEND_REF")),
+            dependencies = NA,
+            upgrade = "never"
+          )
+          # The installed core must remain the one selected above.
+          remotes::install_github(
+            paste0("JamesHWade/measure.sec@", Sys.getenv("SEC_BACKEND_REF")),
+            dependencies = FALSE
+          )
+          RS
+      - name: Verify and record installed numerical backends
+        shell: bash
+        run: |
+          set -euo pipefail
+          Rscript - <<'RS'
+          user_lib <- normalizePath(Sys.getenv("R_LIBS_USER"), mustWork = TRUE)
+          for (package in c("measure", "measure.sec")) {
+            installed <- normalizePath(find.package(package), mustWork = TRUE)
+            stopifnot(startsWith(installed, paste0(user_lib, .Platform$file.sep)))
+            description <- utils::packageDescription(package, lib.loc = user_lib)
+            revision <- description$RemoteSha
+            stopifnot(length(revision) == 1L, grepl("^[0-9a-f]{40}$", revision))
+            expected_ref <- Sys.getenv(if (package == "measure") "MEASURE_BACKEND_REF" else "SEC_BACKEND_REF")
+            stopifnot(identical(description$RemoteRef, expected_ref))
+            variable <- if (package == "measure") "MEASURE_MCP_MEASURE_REVISION" else "MEASURE_MCP_SEC_REVISION"
+            cat(paste0(variable, "=", revision, "\n"), file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+            cat(package, description$Version, "installed from", expected_ref, revision, "at", installed, "\n")
+            cat(paste0("Installed ", package, ": `", revision, "`\n"), file = Sys.getenv("GITHUB_STEP_SUMMARY"), append = TRUE)
+          }
+          stopifnot(all(c("mw_col", "mw_scale") %in% names(formals(measure.sec::step_sec_mw_averages))))
+          stopifnot(all(c("mw_col", "mw_scale", "integration_range") %in% names(formals(measure.sec::step_sec_mw_distribution))))
+          for (package in c("recipes", "jsonlite", "tibble")) {
+            cat(package, as.character(utils::packageVersion(package)), "\n")
+          }
+          cat("R", as.character(getRversion()), "\n")
+          RS
       - run: python -m pip install '.[dev]'
-      - name: Run full service suite against the R backends
-        run: MEASURE_MCP_TEST_R="$(command -v R)" python -m pytest -q
+      - name: Run complete service, HTTP, R and SEC contracts
+        run: python -m pytest -q

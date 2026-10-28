@@ -34,7 +34,10 @@ MEASURE_MCP_R="$(command -v R)" .venv/bin/python examples/analyze_trace.py
 
 Use `MEASURE_MCP_TEST_R` for the R-backed contract test and `MEASURE_MCP_R` for
 the example/runtime. Python-only checks do not establish that numerical
-analysis works. CI keeps those checks in a separate job from R integration.
+analysis works. CI keeps those checks in a separate job from R integration. The numerical job
+uses current R/CRAN dependencies and live backend branches. It logs the installed
+source revisions and checks required SEC capabilities; those observations do
+not impose fixed revision constraints.
 
 ## Check the distribution
 

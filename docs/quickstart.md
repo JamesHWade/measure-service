@@ -44,24 +44,30 @@ process. `jsonlite`, `tibble`, `recipes` and `measure` are required. Relative
 SEC also requires the corrected `measure.sec` implementation with calibrated
 molecular-weight columns. The worker checks this capability at runtime.
 
-The following source revisions were used for the initial integration check:
-
-| Component | Source revision | Installed version |
-| --- | --- | --- |
-| R | R 4.3.3 | 4.3.3 |
-| measure | `aac4cf0c6b99b8c7ce868fb43f30478fd663bf25` | 0.0.1.9002 |
-| measure.sec | `a3ff1fe965f53b6388a3ce535746ff40fdbda0c2` | 0.0.0.9000 |
-| recipes | `04c2139b011810ea1e56eca947a3ca932ea3c38a` | 1.4.0.9000 |
-
-These are compatibility evidence, not a locked R environment. Development
-version strings alone do not identify source code. For checked-out copies at
-those revisions, with their R dependencies already installed:
+Use the current R release and CRAN dependencies. Until the SEC correction in
+[measure.sec #61](https://github.com/JamesHWade/measure.sec/pull/61) is merged,
+install that active branch. `measure` follows its default development branch.
+These commands use branch HEADs rather than fixed commit constraints:
 
 ```sh
-R CMD INSTALL ../recipes
-R CMD INSTALL ../measure
-R CMD INSTALL ../measure.sec
+Rscript -e 'install.packages(c("remotes", "jsonlite", "tibble", "recipes"))'
+Rscript -e 'remotes::install_github("JamesHWade/measure@main", dependencies = NA)'
+Rscript -e 'remotes::install_github("JamesHWade/measure.sec@fix/separations-sec-correctness", dependencies = FALSE)'
+Rscript -e 'for (p in c("measure", "measure.sec")) {d <- packageDescription(p); cat(p, d$Version, d$RemoteRef, d$RemoteSha, "\n")}'
 ```
+
+The SEC install leaves the selected core package in place. After #61 is merged,
+use `JamesHWade/measure.sec` without the temporary branch override. Record the
+actually installed `RemoteSha` with analytical evidence: development version
+strings alone do not identify source code. CI also records the branch heads at
+job start and checks the installed packages' source metadata and required SEC
+API before numerical tests. A moving branch can resolve to a later revision
+between those two observations; neither observation becomes an install pin.
+
+The original fixed-source integration evidence remains in the
+[extraction PR](https://github.com/JamesHWade/measure-service/pull/14). Current
+CI tests R release, released CRAN `recipes`, and live `measure`/corrected SEC
+branches in isolated libraries.
 
 Set `MEASURE_MCP_R` to the R executable, not `Rscript`. If R is on `PATH`, the
 default is `R`. Include `R_LIBS_USER` in the client environment when the backend
