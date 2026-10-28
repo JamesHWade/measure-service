@@ -36,9 +36,33 @@ general migration/downgrade framework.
 
 ## Work tracking
 
-Existing `measure` issues retain the scientific literature audit and planning
-history. The [roadmap](roadmap.md) separates service work from backend work.
-Service issues and the two draft PRs should be linked to their replacement
-here once the new remote and review branch are available. Until that move is
-verified, their source links remain the record of the proposed implementation.
-The SEC correction PR stays in `measure.sec`.
+The initial standalone implementation is proposed in
+[measure-service #14](https://github.com/JamesHWade/measure-service/pull/14).
+It replaces the two source service PRs. The SEC correction PR remains in
+`measure.sec`.
+
+Service issues were recreated here with links to the original planning
+history. Their acceptance criteria remain open; relocation does not mean the
+work is complete. Scientific models, technique packages and the detailed
+literature audit remain in the R repositories.
+
+| Original measure issue | Service issue |
+| --- | --- |
+| [#82](https://github.com/JamesHWade/measure/issues/82) | [#1: MCP service](https://github.com/JamesHWade/measure-service/issues/1) |
+| [#86](https://github.com/JamesHWade/measure/issues/86) | [#2: Environments, CI and reference data](https://github.com/JamesHWade/measure-service/issues/2) |
+| [#90](https://github.com/JamesHWade/measure/issues/90) | [#3: BO campaign roadmap](https://github.com/JamesHWade/measure-service/issues/3) |
+| [#91](https://github.com/JamesHWade/measure/issues/91) | [#4: Experiment and result registry](https://github.com/JamesHWade/measure-service/issues/4) |
+| [#94](https://github.com/JamesHWade/measure/issues/94) | [#5: Campaign benchmarks](https://github.com/JamesHWade/measure-service/issues/5) |
+| [#95](https://github.com/JamesHWade/measure/issues/95) | [#6: BO backend adapter](https://github.com/JamesHWade/measure-service/issues/6) |
+| [#96](https://github.com/JamesHWade/measure/issues/96) | [#7: Durable experiment loop](https://github.com/JamesHWade/measure-service/issues/7) |
+| [#97](https://github.com/JamesHWade/measure/issues/97) | [#8: Optimization diagnostics](https://github.com/JamesHWade/measure-service/issues/8) |
+| [#101](https://github.com/JamesHWade/measure/issues/101) | [#9: Instrument adapters](https://github.com/JamesHWade/measure-service/issues/9) |
+| [#102](https://github.com/JamesHWade/measure/issues/102) | [#10: Evidence views and exports](https://github.com/JamesHWade/measure-service/issues/10) |
+| [#103](https://github.com/JamesHWade/measure/issues/103) | [#11: Batch jobs and snapshots](https://github.com/JamesHWade/measure-service/issues/11) |
+| [#104](https://github.com/JamesHWade/measure/issues/104) | [#12: Application demonstrations](https://github.com/JamesHWade/measure-service/issues/12) |
+| [#106](https://github.com/JamesHWade/measure/issues/106) | [#13: Cost-aware multi-fidelity campaigns](https://github.com/JamesHWade/measure-service/issues/13) |
+
+The [capability audit](https://github.com/JamesHWade/measure/issues/105)
+retains the full source-to-requirement matrix and points service-owned work
+to these issues. See the [roadmap](roadmap.md) for implementation order and
+acceptance evidence.

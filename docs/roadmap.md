@@ -4,19 +4,19 @@ The first implementation covers scalar-trace analysis and experiment evidence.
 It does not claim feature parity with MoSeS or MOCCA2. The detailed
 [capability audit in measure #105](https://github.com/JamesHWade/measure/issues/105)
 maps the manuscript, supplement and source findings to the existing issues.
-Those scientific findings remain the reference while service ownership moves
-here.
+Those scientific findings remain the reference. Service work is tracked here;
+backend and scientific-audit issues remain in the R repositories.
 
 ## Next service increments
 
 | Increment | Deliverable | Acceptance evidence | Existing planning |
 | --- | --- | --- | --- |
-| Independent package | Installed MCP service, packaged worker, executable examples and explicit deployment limits | Wheel installation outside the checkout; contract and R integration tests; Air/Jarl checks | [#82](https://github.com/JamesHWade/measure/issues/82), [#86](https://github.com/JamesHWade/measure/issues/86) |
-| BO adapter | Versioned campaign/objective contracts and an optimizer adapter using immutable outcome snapshots | Replay a small campaign; duplicate delivery does not consume an outcome twice; failures/censoring and evaluator origins survive round trips | [#90](https://github.com/JamesHWade/measure/issues/90), [#93](https://github.com/JamesHWade/measure/issues/93), [#95](https://github.com/JamesHWade/measure/issues/95) |
-| Durable campaign loop | Persisted proposal, attempt, analysis and consumption states, with recovery | Restart between each stage; reconcile partial failures; distinguish transport retries from new physical attempts | [#96](https://github.com/JamesHWade/measure/issues/96) |
-| Data and batch infrastructure | Authenticated asset ingestion, bounded jobs and campaign snapshots | Ownership checks on every artifact link; stable snapshot contents; restart/cancellation behavior documented and tested | [#87](https://github.com/JamesHWade/measure/issues/87), [#103](https://github.com/JamesHWade/measure/issues/103), [#107](https://github.com/JamesHWade/measure/issues/107) |
-| Evidence views | Inspectable methods, traces, assignments, warnings and exportable lineage | Trace an exported objective back to exact input, analysis and outcome revisions | [#102](https://github.com/JamesHWade/measure/issues/102) |
-| Optional execution adapters | Device-specific command/observation adapters kept separate from scientific methods | Simulator/fake-device tests followed by named instrument qualification; no claim based only on a mock | [#101](https://github.com/JamesHWade/measure/issues/101) |
+| Independent package | Installed MCP service, packaged worker, executable examples and explicit deployment limits | Wheel installation outside the checkout; contract and R integration tests; Air/Jarl checks | [#1](https://github.com/JamesHWade/measure-service/issues/1), [#2](https://github.com/JamesHWade/measure-service/issues/2) |
+| BO adapter | Versioned campaign/objective contracts and an optimizer adapter using immutable outcome snapshots | Replay a small campaign; duplicate delivery does not consume an outcome twice; failures/censoring and evaluator origins survive round trips | [#3](https://github.com/JamesHWade/measure-service/issues/3), [#93](https://github.com/JamesHWade/measure/issues/93), [#6](https://github.com/JamesHWade/measure-service/issues/6) |
+| Durable campaign loop | Persisted proposal, attempt, analysis and consumption states, with recovery | Restart between each stage; reconcile partial failures; distinguish transport retries from new physical attempts | [#7](https://github.com/JamesHWade/measure-service/issues/7) |
+| Data and batch infrastructure | Authenticated asset ingestion, bounded jobs and campaign snapshots | Ownership checks on every artifact link; stable snapshot contents; restart/cancellation behavior documented and tested | [#87](https://github.com/JamesHWade/measure/issues/87), [#11](https://github.com/JamesHWade/measure-service/issues/11), [#107](https://github.com/JamesHWade/measure/issues/107) |
+| Evidence views | Inspectable methods, traces, assignments, warnings and exportable lineage | Trace an exported objective back to exact input, analysis and outcome revisions | [#10](https://github.com/JamesHWade/measure-service/issues/10) |
+| Optional execution adapters | Device-specific command/observation adapters kept separate from scientific methods | Simulator/fake-device tests followed by named instrument qualification; no claim based only on a mock | [#9](https://github.com/JamesHWade/measure-service/issues/9) |
 
 The BO adapter is the next functional increment. The optimizer retains its
 surrogate/acquisition state. The service retains evidence and records exactly
@@ -46,10 +46,10 @@ exist merely because it appears here.
 | Cross-run identity | UV/MS/rank/area matching, correspondence graphs and ambiguous assignments | Versioned assignment evidence and correction history | [#98](https://github.com/JamesHWade/measure/issues/98) |
 | Retention models | LSS/QSS/Neue–Kuss, transport/width models, fitting and identifiability checks | Named model profiles, training snapshots and simulator provenance | [#100](https://github.com/JamesHWade/measure/issues/100), [#108](https://github.com/JamesHWade/measure/issues/108) |
 | Chromatography objectives | Resolution, analyte count, runtime, feasibility and method constraints | Versioned extraction rules and objective-to-evidence links | [#92](https://github.com/JamesHWade/measure/issues/92), [#93](https://github.com/JamesHWade/measure/issues/93) |
-| Cost-aware multi-fidelity BO | Qualified simulation and discrepancy diagnostics | Cost/fidelity accounting, physical-data refits and optimizer protocol | [#106](https://github.com/JamesHWade/measure/issues/106) |
+| Cost-aware multi-fidelity BO | Qualified simulation and discrepancy diagnostics | Cost/fidelity accounting, physical-data refits and optimizer protocol | [#13](https://github.com/JamesHWade/measure-service/issues/13) |
 | Exchange and native inputs | Explicit readers/writers and unit-aware gradient models | Authenticated ingestion and round-trip provenance | [#107](https://github.com/JamesHWade/measure/issues/107) |
-| Knowledge-guided diagnostics | Scientific failure modes and interpretable model diagnostics | Evidence-backed suggestions with stated assumptions | [#97](https://github.com/JamesHWade/measure/issues/97) |
-| Benchmarks and demonstrations | Ground truth, representative mixtures and reference tolerances | Replayable campaign records, baselines and complete failures | [#94](https://github.com/JamesHWade/measure/issues/94), [#104](https://github.com/JamesHWade/measure/issues/104) |
+| Knowledge-guided diagnostics | Scientific failure modes and interpretable model diagnostics | Evidence-backed suggestions with stated assumptions | [#8](https://github.com/JamesHWade/measure-service/issues/8) |
+| Benchmarks and demonstrations | Ground truth, representative mixtures and reference tolerances | Replayable campaign records, baselines and complete failures | [#5](https://github.com/JamesHWade/measure-service/issues/5), [#12](https://github.com/JamesHWade/measure-service/issues/12) |
 
 Native NPZ persistence, mzML exchange and a usable mzML reader are separate
 capabilities. Analytical target-method development and preparative fraction
