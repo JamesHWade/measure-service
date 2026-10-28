@@ -13,7 +13,7 @@ HPLC-MS study. SEC/GPC capabilities are separate from this reproduction.
 
 ## Run the archive replay
 
-Install the service, then explicitly fetch the authors' 1.49 GB ZIP into a
+From a source checkout, install the service, then explicitly fetch the authors' 1.49 GB ZIP into a
 cache outside this repository:
 
 ```sh

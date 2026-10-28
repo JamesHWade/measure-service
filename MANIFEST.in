@@ -1,6 +1,6 @@
 include AGENTS.md CONTRIBUTING.md
 recursive-include docs *.md
 recursive-include examples *.py
-recursive-include scripts *.py
+recursive-include scripts *.py *.R
 recursive-include tests *.py *.json
 recursive-include src/measure_service *.R
