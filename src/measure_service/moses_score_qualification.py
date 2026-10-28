@@ -678,7 +678,8 @@ def _qualify_row(source: _SourceObservation, runtime: dict[str, Any]) -> list[di
             )
         resolved_disagreement = (
             raw_metrics.get("resolved_count") != summary_metrics.get("resolved_count")
-            if "resolved_count" in raw_metrics and "resolved_count" in summary_metrics
+            if raw_metrics.get("resolved_count") is not None
+            and summary_metrics.get("resolved_count") is not None
             else None
         )
 

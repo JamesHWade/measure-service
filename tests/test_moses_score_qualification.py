@@ -348,3 +348,30 @@ def test_a_resealed_replay_change_during_scoring_prevents_publication(tmp_path, 
         qualify_moses_scores(archive_path, replay_dir, output_dir)
     assert not output_dir.exists()
     assert not list(tmp_path.glob(".moses-score-qualification-*"))
+
+
+def test_unevaluated_summary_resolved_count_is_not_an_input_disagreement(tmp_path, monkeypatch):
+    archive_path, replay_dir = _fixture(tmp_path, monkeypatch)
+    output_dir = tmp_path / "qualification"
+    qualify_moses_scores(archive_path, replay_dir, output_dir)
+    rows = _read_csv(output_dir / "observations.csv")
+    assert all(row["raw_array_resolved_count"] == "1" for row in rows)
+    assert all(row["serialized_resolved_count"] == "" for row in rows)
+    assert all(row["raw_vs_serialized_resolved_count_disagreement"] == "" for row in rows)
+
+
+@pytest.mark.parametrize(("reported_resolved", "disagrees"), [(1, "False"), (0, "True")])
+def test_evaluated_summary_resolved_counts_are_compared_when_available(
+    tmp_path, monkeypatch, reported_resolved, disagrees
+):
+    archive_path, replay_dir = _fixture(
+        tmp_path,
+        monkeypatch,
+        observations=[_observation(num_resolved_peaks=reported_resolved)],
+        config_overrides={"objective": "NumPeaks-NumResPeaks"},
+    )
+    output_dir = tmp_path / "qualification"
+    qualify_moses_scores(archive_path, replay_dir, output_dir)
+    rows = _read_csv(output_dir / "observations.csv")
+    assert all(row["serialized_resolved_count"] == str(reported_resolved) for row in rows)
+    assert all(row["raw_vs_serialized_resolved_count_disagreement"] == disagrees for row in rows)
