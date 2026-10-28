@@ -61,6 +61,9 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [HTTP deployment, identity and storage](docs/deployment.md)
 - [Roadmap and acceptance criteria](docs/roadmap.md)
 - [Hierarchical objective scores](docs/hierarchy-scores.md)
+- [MoSeS metric reconciliation](docs/moses-metric-reconciliation.md)
+- [Subsequent observation contract](docs/moses-observation-contract.md)
+- [Campaign success accounting](docs/moses-trajectory-sensitivity.md)
 - [MoSeS archived-result reproduction](docs/moses-reproduction.md)
 - [Development and checks](CONTRIBUTING.md)
 

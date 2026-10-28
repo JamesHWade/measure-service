@@ -18,7 +18,7 @@ worker pool.
 | --- | --- |
 | `measure` | R measurement structures, preprocessing, calibration and validation primitives |
 | `measure.sec` | SEC calibration, moments, distributions and technique-specific calculations |
-| `measure_methods` in `measure-service` | Pure-Python numerical solvent-use integration for declared method programs |
+| `measure_methods` in `measure-service` | Pure-Python resource integration, objective scores and campaign-success accounting |
 | Future technique packages | Domain models and methods that can be tested independently of an agent protocol |
 | `measure-service` | MCP contracts, identities, evidence records, storage and backend adapters |
 | Future BO adapter | Translate qualified evidence and objectives to an optimizer protocol |
@@ -70,7 +70,7 @@ label alone does not implement them.
 
 - `src/measure_service/server.py`: MCP tools, trace/method validation and R adapter.
 - `src/measure_service/methods.py`: declaration validation, normalization, constraints and numerical-backend adaptation.
-- `src/measure_methods/`: pure-Python method resource calculations, packaged with the service.
+- `src/measure_methods/`: pure-Python resource, objective and campaign-trajectory calculations, packaged with the service.
 - `src/measure_service/method_backend.py`: containing-distribution and PEP 610 source metadata.
 - `src/measure_service/method_registry.py`: immutable owned method records and identities.
 - `src/measure_service/experiments.py`: registry models, evidence checks and writes.
