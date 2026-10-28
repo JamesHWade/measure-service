@@ -60,6 +60,7 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Architecture and package boundaries](docs/architecture.md)
 - [HTTP deployment, identity and storage](docs/deployment.md)
 - [Roadmap and acceptance criteria](docs/roadmap.md)
+- [Hierarchical objective scores](docs/hierarchy-scores.md)
 - [MoSeS archived-result reproduction](docs/moses-reproduction.md)
 - [Development and checks](CONTRIBUTING.md)
 
