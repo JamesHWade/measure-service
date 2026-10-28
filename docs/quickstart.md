@@ -50,9 +50,9 @@ install that active branch. `measure` follows its default development branch.
 These commands use branch HEADs rather than fixed commit constraints:
 
 ```sh
-Rscript -e 'install.packages(c("remotes", "jsonlite", "tibble", "recipes"))'
-Rscript -e 'remotes::install_github("JamesHWade/measure@main", dependencies = NA)'
-Rscript -e 'remotes::install_github("JamesHWade/measure.sec@fix/separations-sec-correctness", dependencies = FALSE)'
+Rscript -e 'install.packages(c("remotes", "jsonlite", "tibble", "recipes"), repos = "https://cloud.r-project.org")'
+Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org")); remotes::install_github("JamesHWade/measure@main", dependencies = NA)'
+Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org")); remotes::install_github("JamesHWade/measure.sec@fix/separations-sec-correctness", dependencies = FALSE)'
 Rscript -e 'for (p in c("measure", "measure.sec")) {d <- packageDescription(p); cat(p, d$Version, d$RemoteRef, d$RemoteSha, "\n")}'
 ```
 
