@@ -258,6 +258,7 @@ def test_unrepresentable_resolution_requires_explicit_failure():
         },
         "expected_failure": {
             "category": "numeric_overflow",
+            "allowed_exception_types": ["OverflowError", "ValueError"],
             "must_not_return_resolution": True,
         },
     }
@@ -437,3 +438,61 @@ def test_runtime_errors_preserve_all_fixed_oracle_coverage_denominators(tmp_path
         and row["numeric_unmatched_count"] == row["numeric_comparison_count"]
         for row in report["numerical_case_results"]
     )
+
+
+@pytest.mark.parametrize(
+    ("exception_type", "passes"),
+    [
+        (OverflowError, True),
+        (ValueError, True),
+        (TypeError, False),
+        (RuntimeError, False),
+        (None, False),
+    ],
+)
+def test_numeric_overflow_enforces_the_oracles_allowed_exception_types(
+    monkeypatch, exception_type, passes
+):
+    case = {
+        "case_id": "resolution_overflow_must_fail",
+        "input_sha256": "f" * 64,
+        "expected_failure": {
+            "category": "numeric_overflow",
+            "allowed_exception_types": ["OverflowError", "ValueError"],
+            "must_not_return_resolution": True,
+        },
+    }
+
+    def calculate(_):
+        if exception_type is not None:
+            raise exception_type("Injected overflow-path behavior")
+        return {}
+
+    monkeypatch.setattr(qualification, "_run_case_inputs", calculate)
+    result = qualification._run_failure_case(case)
+    assert result["case_passed"] is passes
+    assert result["returned_any_result"] is (exception_type is None)
+
+
+def test_wrong_overflow_exception_publishes_unqualified_evidence(tmp_path, monkeypatch):
+    original = qualification._run_case_inputs
+
+    def wrong_overflow(case):
+        if case["case_id"] == "resolution_overflow_must_fail":
+            raise TypeError("Broken numerical overflow branch")
+        return original(case)
+
+    monkeypatch.setattr(qualification, "_run_case_inputs", wrong_overflow)
+    output = tmp_path / "overflow-type-disagreement"
+    report = qualification.qualify_gaussian_producer(output)
+    assert report["qualified"] is False
+    assert report["numerical_comparison"]["passed_case_count"] == 43
+    assert report["range_and_input_failure_checks"]["passed_check_count"] == 9
+    overflow = next(
+        row
+        for row in report["failure_check_results"]
+        if row["case_id"] == "resolution_overflow_must_fail"
+    )
+    assert overflow["observed_exception_type"] == "TypeError"
+    assert overflow["case_passed"] is False
+    assert (output / "complete.json").is_file()

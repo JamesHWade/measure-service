@@ -989,9 +989,11 @@ def _run_failure_case(case: dict[str, Any]) -> dict[str, Any]:
         # false numeric value from a case whose oracle requires explicit failure.
         del result
     category = case["expected_failure"]["category"]
-    allowed_types = {"TypeError", "ValueError"}
-    if category == "numeric_overflow":
-        allowed_types.add("OverflowError")
+    allowed_types = (
+        set(case["expected_failure"]["allowed_exception_types"])
+        if category == "numeric_overflow"
+        else {"TypeError", "ValueError"}
+    )
     passed = not returned and exception_type in allowed_types
     return {
         "case_id": case["case_id"],
