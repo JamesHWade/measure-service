@@ -55,3 +55,26 @@ production dependency revisions need not be pinned to a reference generator.
 Neither reference establishes original archive model assignment, fitted
 physical parameters, signal or hardware qualification, or fresh optimizer
 performance.
+
+
+## Independent Gaussian centroid reference
+
+`gaussian-centroid-binary64-v1.json` contains 43 synthetic numerical cases and 10
+separate input/range failure checks generated for this project under MIT. The
+reference covers every cohort size from 1 through 32, full analyte and adjacent
+pair identities, censored/null states, singleton resolution, ties, unequal
+widths, acquisition endpoints, common time scaling and extreme numeric ranges.
+
+Seventy-digit mpmath calculations use the exact rational values of parsed
+binary64 inputs and the profile's explicit approximate FWHM factor 2.3548.
+They do not import the production calculator. Comparisons use absolute
+tolerance 0 and relative tolerance 1e-12; nulls, IDs and statuses require exact
+agreement. Code performing qualification needs neither mpmath nor Torch.
+
+Reference SHA256:
+`c508f761b8547cc40a64c8b3dc603d5e2ec69103f93c3396008c9c32fed43dd7`.
+
+See [the executable guide](../../../../docs/gaussian-reference-benchmark.md).
+This reference qualifies a declared synthetic centroid calculation; it does
+not infer physical width, plate height, signal processing, chemical identity,
+instrument behavior or fresh optimizer performance.

@@ -62,6 +62,7 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)
 - [Ideal retention declarations and predictions](docs/retention-predictions.md)
 - [Generate synthetic Gaussian observation evidence](docs/gaussian-observation-producer.md)
+- [Reproduce the independent Gaussian reference checks](docs/gaussian-reference-benchmark.md)
 - [Retention equations, units and qualification scope](docs/retention-model-qualification.md)
 - [Reproduce archived retention input qualification](docs/retention-reference-benchmark.md)
 - [MCP tool reference](docs/tools.md)
