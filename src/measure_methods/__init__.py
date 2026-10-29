@@ -3,6 +3,7 @@
 from measure_methods.metric_candidates import chromatography_metric_candidates
 from measure_methods.objectives import Criterion, hierarchical_score
 from measure_methods.observations import AnalyteObservation, assess_analytical_observation
+from measure_methods.retention import RetentionParameters, predict_retention_time, retention_factor
 from measure_methods.trajectories import (
     SuccessObservation,
     aggregate_success_trajectories,
@@ -16,6 +17,9 @@ from measure_methods.volume import (
 )
 
 __all__ = [
+    "RetentionParameters",
+    "predict_retention_time",
+    "retention_factor",
     "AnalyteObservation",
     "assess_analytical_observation",
     "chromatography_metric_candidates",

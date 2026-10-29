@@ -107,3 +107,24 @@ def test_observation_example_outside_checkout_preserves_three_valued_evidence(tm
     assert evidence["historical_observation_unchanged"] is True
     assert evidence["origin"] == "simulator_latent"
     assert len(evidence["snapshot_sha256"]) == 64
+
+
+def test_retention_example_outside_checkout_keeps_censoring_and_qualification_limits(tmp_path):
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "examples" / "retention.py")],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        cwd=tmp_path,
+        check=True,
+    )
+    evidence = json.loads(completed.stdout)
+    assert evidence["profile"] == "ideal-lc-retention-zeta/1"
+    assert evidence["eluted_retention_time_min"] == pytest.approx(2.2, abs=1e-12, rel=0)
+    assert evidence["geometry_dead_time_min"] == pytest.approx(0.5, abs=1e-12, rel=0)
+    assert evidence["post_column_transit_min"] == 0.2
+    assert evidence["censored_status"] == "not_eluted"
+    assert evidence["censored_retention_time_min"] is None
+    assert evidence["right_censor_bound_min"] == 10
+    assert evidence["qualification_scope"]["physical_retention_qualification_established"] is False
+    assert evidence["qualification_scope"]["utility_score_calculated"] is False

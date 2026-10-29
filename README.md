@@ -41,13 +41,14 @@ configuration and a numerical analysis example.
 | Method declarations | Isocratic/linear gradients, explicit units, flow/solvent use, declared feasibility and immutable method identities | No optimizer-domain sampling, pressure model or acquisition |
 | Experiment tracking | Intended and actual conditions, attempt revisions, evidence-linked outcomes and explicit corrections | Reported records; no execution or optimizer state machine |
 | Analytical acceptance | Predeclared analyte cohorts, evidence-bound three-valued decisions and immutable observation snapshots | Assignments and producer qualifications remain separate |
+| Ideal retention | Explicit linear, quadratic and Neue–Kuss laws, constant-flow inlet programs and immutable predictions | No fitting, gradient-delay inference, widths or physical qualification |
 
 Registry operations, import and record retrieval work without R. Numerical
 analysis and `measurement_capabilities` require R; use
 `measurement_registry_capabilities` for discovery without it.
 
 The service does not yet implement the full MoSeS or MOCCA2 workflow. LC-MS,
-GC-MS, DAD deconvolution, cross-run analyte tracking, retention models, BO
+GC-MS, DAD deconvolution, cross-run analyte tracking, retention-model fitting, BO
 suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 
 ## Documentation
@@ -58,6 +59,8 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Chromatography method declarations](docs/methods.md)
 - [Experiment and result contracts](docs/experiments.md)
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)
+- [Ideal retention declarations and predictions](docs/retention-predictions.md)
+- [Retention equations, units and qualification scope](docs/retention-model-qualification.md)
 - [MCP tool reference](docs/tools.md)
 - [Architecture and package boundaries](docs/architecture.md)
 - [HTTP deployment, identity and storage](docs/deployment.md)

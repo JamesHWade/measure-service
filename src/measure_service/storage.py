@@ -135,6 +135,23 @@ def connect() -> sqlite3.Connection:
       FOREIGN KEY(snapshot_id) REFERENCES observation_snapshots(id),
       FOREIGN KEY(observation_id) REFERENCES analytical_observations(id)
     );
+    CREATE TABLE IF NOT EXISTS retention_models (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, title TEXT NOT NULL,
+      payload TEXT NOT NULL, input_digest TEXT NOT NULL, created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS retention_models_owner_order
+      ON retention_models(owner, created_at, id);
+    CREATE TABLE IF NOT EXISTS retention_predictions (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, retention_model_id TEXT NOT NULL,
+      model_input_digest TEXT NOT NULL, method_id TEXT NOT NULL,
+      method_input_digest TEXT NOT NULL, canonical_program_digest TEXT NOT NULL,
+      payload TEXT NOT NULL, input_digest TEXT NOT NULL, output_digest TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY(retention_model_id) REFERENCES retention_models(id),
+      FOREIGN KEY(method_id) REFERENCES executable_methods(id)
+    );
+    CREATE INDEX IF NOT EXISTS retention_predictions_owner_order
+      ON retention_predictions(owner, created_at, id);
     """)
     return con
 

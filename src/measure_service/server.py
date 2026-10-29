@@ -23,7 +23,7 @@ from mcp.types import ToolAnnotations
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from . import experiments as registry
-from . import method_registry, observations
+from . import method_registry, observations, retention
 from .experiments import AttemptSpec, ExperimentSpec, ResultSpec
 from .methods import (
     MAX_CONSTRAINTS_BYTES,
@@ -35,6 +35,7 @@ from .methods import (
     evaluate_method,
 )
 from .observations import ObservationContractSpec, ObservationEvidenceSpec
+from .retention import RetentionModelSpec
 from .storage import canonical, connect, now, sha256
 
 ROOT = Path(__file__).resolve().parent
@@ -583,6 +584,7 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "observation_contracts": "predeclared_immutable_analytes_and_acceptance_rules",
         "analytical_observations": "exact_attempt_and_result_evidence_with_three_valued_acceptance",
         "observation_snapshots": "immutable_explicit_membership_without_duplicate_attempts",
+        "retention_models": "explicit_ideal_reference_inputs_with_immutable_predictions",
         "limits": {
             "record_bytes": registry.MAX_RECORD_BYTES,
             "page_size": registry.MAX_REGISTRY_PAGE,
@@ -817,6 +819,37 @@ def measurement_create_observation_snapshot(
 def measurement_get_observation_snapshot(snapshot_id: RecordId, ctx: Context) -> dict[str, Any]:
     """Read immutable owned snapshot membership; later result corrections or attempt revisions cannot change its contents."""
     return observations.get_observation_snapshot(identity(ctx), snapshot_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_register_retention_model(
+    title: Annotated[str, Field(min_length=1, max_length=200)],
+    spec: RetentionModelSpec,
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Retain a declared ideal retention reference with natural-log coefficients, explicit geometry/clock/units and optional immutable training lineage; does not fit or physically validate parameters."""
+    return retention.register_retention_model(identity(ctx), title, spec, idempotency_key)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_retention_model(model_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read an owned immutable retention model declaration, input checks, warnings and source evidence."""
+    return retention.get_retention_model(identity(ctx), model_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_predict_retention(
+    model_id: RecordId, method_id: RecordId, idempotency_key: RequestKey, ctx: Context
+) -> dict[str, Any]:
+    """Calculate and retain ideal retention times for an owned constant-flow binary inlet program; missing within-window events remain censored, with no peak-width, resolution or instrument claim."""
+    return retention.predict_retention(identity(ctx), model_id, method_id, idempotency_key)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_retention_prediction(prediction_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Retrieve an immutable ideal prediction and its exact model, method, solver and backend evidence."""
+    return retention.get_retention_prediction(identity(ctx), prediction_id)
 
 
 @mcp.tool(annotations=READ, structured_output=True)
