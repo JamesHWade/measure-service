@@ -154,6 +154,28 @@ def _diagnostic(
     return result
 
 
+def _gaussian_pair_resolution(
+    left_time: float,
+    right_time: float,
+    left_fwhm: float,
+    right_fwhm: float,
+) -> tuple[float, float]:
+    """Return retention-time delta and source-convention Gaussian Rs."""
+    left_sigma = left_fwhm / _FWHM_PER_SIGMA
+    right_sigma = right_fwhm / _FWHM_PER_SIGMA
+    sigma_sum = left_sigma + right_sigma
+    denominator = 2.0 * sigma_sum
+    delta = right_time - left_time
+    if not math.isfinite(denominator) or denominator <= 0 or not math.isfinite(delta):
+        raise ValueError(
+            "Gaussian resolution inputs produce an unrepresentable denominator or time delta"
+        )
+    resolution = delta / denominator
+    if not math.isfinite(resolution):
+        raise ValueError("Gaussian resolution is not finite")
+    return delta, resolution
+
+
 def summarize_chromatography_observation(
     *,
     num_compounds: int,
@@ -417,18 +439,12 @@ def gaussian_pairwise_resolutions(
             )
             continue
         assert left_fwhm is not None and right_fwhm is not None
-        left_sigma = left_fwhm / _FWHM_PER_SIGMA
-        right_sigma = right_fwhm / _FWHM_PER_SIGMA
-        sigma_sum = left_sigma + right_sigma
-        denominator = 2.0 * sigma_sum
-        delta = right_time - left_time
-        if not math.isfinite(denominator) or denominator <= 0 or not math.isfinite(delta):
-            raise ValueError(
-                "Gaussian resolution inputs produce an unrepresentable denominator or time delta"
-            )
-        resolution = delta / denominator
-        if not math.isfinite(resolution):
-            raise ValueError("Gaussian resolution is not finite")
+        delta, resolution = _gaussian_pair_resolution(
+            left_time,
+            right_time,
+            left_fwhm,
+            right_fwhm,
+        )
         pairs.append(
             {
                 "left_analyte_index": left_index,

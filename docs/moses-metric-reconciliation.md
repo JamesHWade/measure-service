@@ -172,3 +172,26 @@ are rechecked before atomic publication.
 The Gaussian reconstruction qualifies the simulation array equation only.
 Agreement with an archived summary or scalar score does not resolve the
 historical producer or validate a physical analytical method.
+
+
+The audit delegates numerical candidates to the packaged pure backend:
+
+```python
+from measure_methods import chromatography_metric_candidates
+
+metrics = chromatography_metric_candidates(
+    num_compounds=2,
+    retention_times=[1, 3],
+    peak_resolutions=[0.5, 0.5],
+    fwhms=[2.3548, 2.3548],
+    run_time_min=4,
+)
+print(metrics["candidates"]["reported_critical_vs_sigma_pair_adjacent_min"])
+```
+
+All time and FWHM values use minutes. The backend shares its Gaussian
+calculation with `measure_methods.chromatography.gaussian_pairwise_resolutions`;
+it has no archive, MCP, R or storage dependency. The script owns source binding,
+normalization of archived fields and reporting. The method requires a positive
+declared analyte count; empty arrays for that nonempty experiment remain
+unavailable, while present nonfinite entries retain the source zero sentinel.

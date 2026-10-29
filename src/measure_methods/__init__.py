@@ -1,5 +1,6 @@
 """Pure-Python kernels for analytical method accounting and objective scores."""
 
+from measure_methods.metric_candidates import chromatography_metric_candidates
 from measure_methods.objectives import Criterion, hierarchical_score
 from measure_methods.trajectories import (
     SuccessObservation,
@@ -14,6 +15,7 @@ from measure_methods.volume import (
 )
 
 __all__ = [
+    "chromatography_metric_candidates",
     "SuccessObservation",
     "aggregate_success_trajectories",
     "summarize_campaign_success",

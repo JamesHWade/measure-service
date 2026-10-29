@@ -23,6 +23,7 @@ from itertools import chain
 from pathlib import Path
 from typing import Any
 
+from measure_methods import metric_candidates
 from measure_service import moses_score_qualification as score_qualification
 from measure_service.benchmarks import evidence, moses_archive, moses_replay, pickle_records
 from measure_service.benchmarks.evidence import staged_bundle
@@ -31,7 +32,6 @@ AUDIT_PROFILE = "moses-metric-source-audit/1"
 EXPECTED_ARCHIVE_SHA256 = "880533ded926f766ce9504d4f164e9c5195b775e40061c18d70ae79497f03f71"
 ABSOLUTE_TOLERANCE = 1e-12
 RELATIVE_TOLERANCE = 1e-12
-_MAX_PAIR_COMPOUNDS = 500
 _REPLAY_FILES = {
     "archive-manifest.json",
     "campaigns.csv",
@@ -48,6 +48,7 @@ _IMPLEMENTATION_FILES = {
     "measure_service.benchmarks.pickle_records": pickle_records,
     "measure_service.benchmarks.evidence": evidence,
     "measure_methods.chromatography": moses_replay.chromatography,
+    "measure_methods.metric_candidates": metric_candidates,
     "measure_methods.volume": moses_replay.volume,
 }
 
@@ -76,47 +77,6 @@ def _safe_number(value: object) -> float | None:
     except (OverflowError, TypeError, ValueError):
         return None
     return number if math.isfinite(number) else None
-
-
-def _classify_array(values: object) -> tuple[list[float | None] | None, dict[str, int]]:
-    if not isinstance(values, list) or not values:
-        # All supported source campaigns declare at least one analyte. The
-        # historical empty-list representation denotes unavailable measurements.
-        return None, {"array_unavailable": 1}
-    result: list[float | None] = []
-    counts: Counter[str] = Counter()
-    for value in values:
-        if value is None:
-            result.append(None)
-            counts["null"] += 1
-            continue
-        if isinstance(value, bool) or not isinstance(value, (int, float)):
-            result.append(None)
-            counts["invalid"] += 1
-            continue
-        try:
-            number = float(value)
-        except (OverflowError, TypeError, ValueError):
-            result.append(None)
-            counts["invalid"] += 1
-            continue
-        if math.isnan(number):
-            result.append(None)
-            counts["nan"] += 1
-        elif math.isinf(number):
-            result.append(None)
-            counts["positive_infinity" if number > 0 else "negative_infinity"] += 1
-        else:
-            result.append(number)
-            counts["finite"] += 1
-    return result, dict(counts)
-
-
-def _finite_min(values: list[float | None] | None) -> float | None:
-    if values is None:
-        return None
-    finite = [value for value in values if value is not None]
-    return min(finite) if finite else 0.0
 
 
 def _new_metric() -> dict[str, Any]:
@@ -177,239 +137,21 @@ def _compare(
 
 
 def _candidate_values(observation: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
-    retention, retention_status = _classify_array(observation.get("retention_times"))
-    resolutions, resolution_status = _classify_array(observation.get("peak_resolutions"))
-    widths, width_status = _classify_array(observation.get("fwhms"))
-    declared = config["num_compounds"]
-    runtime = _safe_number(observation.get("gradient", {}).get("run_time"))
-    threshold = _safe_number(config.get("resolution_threshold"))
-
-    finite_rt = [] if retention is None else [value for value in retention if value is not None]
-    finite_rs = [] if resolutions is None else [value for value in resolutions if value is not None]
-    count_rt = None if retention is None else len(finite_rt)
-    count_rs = None if resolutions is None else len(finite_rs)
-    count_rt_le = (
-        None
-        if retention is None or runtime is None
-        else sum(value <= runtime for value in finite_rt)
+    numeric = metric_candidates.chromatography_metric_candidates(
+        num_compounds=config["num_compounds"],
+        retention_times=observation.get("retention_times"),
+        peak_resolutions=observation.get("peak_resolutions"),
+        fwhms=observation.get("fwhms"),
+        run_time_min=observation.get("gradient", {}).get("run_time"),
+        resolution_threshold=config.get("resolution_threshold"),
     )
-    count_rt_lt = (
-        None
-        if retention is None or runtime is None
-        else sum(value < runtime for value in finite_rt)
-    )
-    count_rt_r_le = None
-    if (
-        retention is not None
-        and resolutions is not None
-        and runtime is not None
-        and len(retention) == len(resolutions)
-    ):
-        count_rt_r_le = sum(
-            time is not None and resolution is not None and time <= runtime
-            for time, resolution in zip(retention, resolutions)
-        )
-
-    min_rs = _finite_min(resolutions)
-    min_rs_finite_rt = None
-    min_rs_within_runtime = None
-    if retention is not None and resolutions is not None and len(retention) == len(resolutions):
-        paired = [
-            resolution
-            for time, resolution in zip(retention, resolutions)
-            if time is not None and resolution is not None
-        ]
-        min_rs_finite_rt = min(paired) if paired else 0.0
-        if runtime is not None:
-            within = [
-                resolution
-                for time, resolution in zip(retention, resolutions)
-                if time is not None and resolution is not None and time <= runtime
-            ]
-            min_rs_within_runtime = min(within) if within else 0.0
-
-    resolved_threshold = (
-        None
-        if resolutions is None or threshold is None
-        else sum(value >= threshold for value in finite_rs)
-    )
-    resolved_default = None if resolutions is None else sum(value >= 1.5 for value in finite_rs)
-
-    candidate: dict[str, float | int | None] = {
-        "reported_num_peaks_vs_finite_resolution_count": count_rs,
-        "reported_num_peaks_vs_finite_retention_time_count": count_rt,
-        "reported_num_peaks_vs_finite_rt_within_runtime_inclusive": count_rt_le,
-        "reported_num_peaks_vs_finite_rt_within_runtime_exclusive": count_rt_lt,
-        "reported_num_peaks_vs_finite_rt_and_resolution_within_runtime": count_rt_r_le,
-        "reported_critical_vs_min_finite_resolution": min_rs,
-        "reported_critical_vs_min_resolution_with_finite_rt": min_rs_finite_rt,
-        "reported_critical_vs_min_resolution_within_runtime": min_rs_within_runtime,
-        "reported_num_resolved_vs_finite_resolution_threshold_count": resolved_threshold,
-        "reported_num_resolved_vs_finite_resolution_default_1_5": resolved_default,
-    }
-
-    value_status_counts = {
-        "retention_times": retention_status,
-        "peak_resolutions": resolution_status,
-        "fwhms": width_status,
-    }
-    if retention is None or resolutions is None or widths is None:
-        shape_status = "array_unavailable"
-    elif len(retention) == len(resolutions) == len(widths) == declared:
-        shape_status = "aligned_arrays"
-    else:
-        shape_status = "length_mismatch"
-
-    pair_counts: Counter[str] = Counter()
-    pair_comparison = {"compared": 0, "mismatches": 0, "max_abs_error": 0.0}
-    if retention is not None and resolutions is not None:
-        for time, resolution in zip(retention, resolutions):
-            pair_counts["finite_resolution_without_finite_rt"] += int(
-                resolution is not None and time is None
-            )
-            pair_counts["finite_rt_without_finite_resolution"] += int(
-                time is not None and resolution is None
-            )
-    if retention is not None:
-        rt_positions = [index for index, value in enumerate(retention) if value is not None]
-        pair_counts["observations_with_fewer_than_two_finite_rt"] += int(len(rt_positions) < 2)
-        pair_counts["source_style_boundary_singleton_rows"] += int(len(rt_positions) == 1)
-        ties = Counter(retention[index] for index in rt_positions)
-        duplicate_pairs = sum(count * (count - 1) // 2 for count in ties.values())
-        pair_counts["observations_with_retention_time_ties"] += int(duplicate_pairs > 0)
-        pair_counts["duplicate_retention_time_pairs"] += duplicate_pairs
-        if runtime is not None:
-            pair_counts["retention_time_equal_runtime"] += sum(
-                value == runtime for value in finite_rt
-            )
-            pair_counts["retention_time_after_runtime"] += sum(
-                value > runtime for value in finite_rt
-            )
-
-    pair_values: dict[str, list[float]] = defaultdict(list)
-    per_analyte_neighbours: list[list[float]] | None = None
-    if (
-        retention is not None
-        and widths is not None
-        and len(retention) == len(widths)
-        and declared <= _MAX_PAIR_COMPOUNDS
-    ):
-        ordered_positions = sorted(
-            (index for index, value in enumerate(retention) if value is not None),
-            key=lambda index: (retention[index], index),
-        )
-        per_analyte_neighbours = [[] for _ in range(declared)]
-        valid_adjacent = []
-
-        for left_position in range(len(ordered_positions)):
-            for right_position in range(left_position + 1, len(ordered_positions)):
-                left_index = ordered_positions[left_position]
-                right_index = ordered_positions[right_position]
-                left_width = widths[left_index]
-                right_width = widths[right_index]
-                if left_width is None or right_width is None or left_width <= 0 or right_width <= 0:
-                    continue
-                delta = retention[right_index] - retention[left_index]
-                sigma_total = left_width / 2.3548 + right_width / 2.3548
-                if not math.isfinite(delta) or not math.isfinite(sigma_total) or sigma_total <= 0:
-                    continue
-                width_total = left_width + right_width
-                if not math.isfinite(width_total) or width_total <= 0:
-                    continue
-                values = {
-                    "sigma_pair": delta / (2 * sigma_total),
-                    "fwhm_delta_over_width_sum": delta / width_total,
-                    "fwhm_2delta_over_width_sum": 2 * delta / width_total,
-                    "fwhm_1_1774delta_over_width_sum": 1.1774 * delta / width_total,
-                }
-                if any(not math.isfinite(value) for value in values.values()):
-                    continue
-                for base, value in values.items():
-                    pair_values[f"{base}_all_min"].append(value)
-                if right_position == left_position + 1:
-                    valid_adjacent.append((left_index, right_index, values))
-                    pair_counts["source_style_usable_adjacent_pairs"] += 1
-                    if values["sigma_pair"] == 0:
-                        pair_counts["zero_resolution_adjacent_pairs"] += 1
-                    per_analyte_neighbours[left_index].append(values["sigma_pair"])
-                    per_analyte_neighbours[right_index].append(values["sigma_pair"])
-
-        for left, right in zip(valid_adjacent, valid_adjacent[1:]):
-            pair_counts["source_style_adjacent_pair_ties"] += int(
-                left[2]["sigma_pair"] == right[2]["sigma_pair"]
-            )
-        pair_counts["source_style_all_pairs"] += len(pair_values["sigma_pair_all_min"])
-        pair_counts["source_style_adjacent_pairs"] += len(valid_adjacent)
-        pair_counts[
-            "observations_with_finite_rt_pairs_but_no_positive_finite_width_adjacent_pair"
-        ] += int(len(ordered_positions) >= 2 and not valid_adjacent)
-        for base in (
-            "sigma_pair",
-            "fwhm_delta_over_width_sum",
-            "fwhm_2delta_over_width_sum",
-            "fwhm_1_1774delta_over_width_sum",
-        ):
-            pair_values[f"{base}_adjacent_min"] = [item[2][base] for item in valid_adjacent]
-        pair_candidate_names = (
-            "sigma_pair_adjacent_min",
-            "sigma_pair_all_min",
-            "fwhm_delta_over_width_sum_adjacent_min",
-            "fwhm_delta_over_width_sum_all_min",
-            "fwhm_2delta_over_width_sum_adjacent_min",
-            "fwhm_2delta_over_width_sum_all_min",
-            "fwhm_1_1774delta_over_width_sum_adjacent_min",
-            "fwhm_1_1774delta_over_width_sum_all_min",
-        )
-        for name in pair_candidate_names:
-            pair_name = name.removeprefix("reported_critical_vs_")
-            values = pair_values.get(pair_name, [])
-            candidate[f"reported_critical_vs_{name}"] = min(values) if values else None
-
-        if resolutions is not None:
-            reconstructed = [min(items) if items else None for items in per_analyte_neighbours]
-            paired = [
-                (derived, archived)
-                for derived, archived in zip(reconstructed, resolutions)
-                if derived is not None and archived is not None
-            ]
-            pair_comparison["compared"] = len(paired)
-            for derived, archived in paired:
-                error = abs(derived - archived)
-                if math.isfinite(error) and pair_comparison["max_abs_error"] is not None:
-                    pair_comparison["max_abs_error"] = max(pair_comparison["max_abs_error"], error)
-                else:
-                    pair_comparison["max_abs_error"] = None
-                if not math.isclose(
-                    derived,
-                    archived,
-                    rel_tol=RELATIVE_TOLERANCE,
-                    abs_tol=ABSOLUTE_TOLERANCE,
-                ):
-                    pair_comparison["mismatches"] += 1
-    else:
-        for name in (
-            "sigma_pair_adjacent_min",
-            "sigma_pair_all_min",
-            "fwhm_delta_over_width_sum_adjacent_min",
-            "fwhm_delta_over_width_sum_all_min",
-            "fwhm_2delta_over_width_sum_adjacent_min",
-            "fwhm_2delta_over_width_sum_all_min",
-            "fwhm_1_1774delta_over_width_sum_adjacent_min",
-            "fwhm_1_1774delta_over_width_sum_all_min",
-        ):
-            candidate[f"reported_critical_vs_{name}"] = None
-
     return {
-        "candidates": candidate,
+        **numeric,
         "reported": {
             "num_peaks": observation.get("num_peaks"),
             "num_resolved_peaks": observation.get("num_resolved_peaks"),
             "critical_resolution": observation.get("critical_resolution"),
         },
-        "arrays": value_status_counts,
-        "shape_status": shape_status,
-        "pair_counts": dict(pair_counts),
-        "pair_array_comparison": pair_comparison,
         "targeted": config.get("objective") == "SinglePeak-Resolution",
     }
 
