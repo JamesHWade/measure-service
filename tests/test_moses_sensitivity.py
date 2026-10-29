@@ -651,3 +651,66 @@ def test_rejects_divergent_or_reordered_evidence_without_publishing(
 def _replace_csv(path: Path, rows):
     fields = list(rows[0])
     path.write_bytes(_csv_bytes(fields, rows))
+
+
+@pytest.mark.parametrize(
+    ("states", "gain", "loss"),
+    [
+        (("confirmed_success", "observed_no_success"), 0, 1),
+        (("observed_no_success", "confirmed_success"), 1, 0),
+        (("unknown", "unknown"), 0, 0),
+        (None, 0, 0),
+    ],
+)
+def test_summary_keeps_zero_timing_counts_without_joint_success(tmp_path, states, gain, loss):
+    from measure_service.benchmarks.sensitivity_summary import summarize_outputs
+
+    baseline = "archived_score_at_least_two"
+    candidate = "published_1.0_raw_resolution_array"
+    curves = [
+        {
+            "configuration_id": "synthetic",
+            "series": series,
+            "high_fidelity_budget": 1,
+            "cohort_size": 1,
+            "success_count": int(state == "confirmed_success"),
+            "unknown_success_count": int(state == "unknown"),
+            "observed_no_success_count": int(state == "observed_no_success"),
+            "success_fraction": float(state == "confirmed_success"),
+            "success_fraction_upper_bound": float(state != "observed_no_success"),
+        }
+        for series, state in zip((baseline, candidate), states or ("unknown", "unknown"))
+    ]
+    (tmp_path / "success-trajectories.csv").write_bytes(_csv_bytes(list(curves[0]), curves))
+    fields = [
+        "configuration_id",
+        "candidate_series",
+        "archived_score_state",
+        "candidate_state",
+        "confirmed_success_gain",
+        "confirmed_success_loss",
+        "candidate_minus_archived_first_index",
+    ]
+    pairs = (
+        []
+        if states is None
+        else [dict(zip(fields, ["synthetic", candidate, *states, bool(gain), bool(loss), ""]))]
+    )
+    (tmp_path / "paired-comparisons.csv").write_bytes(_csv_bytes(fields, pairs))
+    result = summarize_outputs(tmp_path)
+    overall = result["overall_paired_changes"][0]
+    assert overall["known_success_gain_count"] == gain
+    assert overall["known_success_loss_count"] == loss
+    for field in (
+        "both_confirmed_by_budget_count",
+        "earlier_confirmed_event_count",
+        "later_confirmed_event_count",
+        "unchanged_confirmed_event_count",
+    ):
+        assert overall[field] == 0
+    with (tmp_path / "configuration-summary.csv").open(newline="") as source:
+        configuration = next(row for row in csv.DictReader(source) if row["series"] == candidate)
+    assert configuration["known_success_gain_count"] == str(gain)
+    assert configuration["known_success_loss_count"] == str(loss)
+    assert configuration["earlier_confirmed_event_count"] == "0"
+    assert configuration["later_confirmed_event_count"] == "0"

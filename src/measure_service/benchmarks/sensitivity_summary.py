@@ -4,6 +4,18 @@ import csv
 from collections import Counter, defaultdict
 from pathlib import Path
 
+_PAIR_COUNT_FIELDS = (
+    "recorded_pair_count",
+    "changed_state_count",
+    "known_success_gain_count",
+    "known_success_loss_count",
+    "changed_state_involving_unknown_count",
+    "both_confirmed_by_budget_count",
+    "earlier_confirmed_event_count",
+    "later_confirmed_event_count",
+    "unchanged_confirmed_event_count",
+)
+
 
 def summarize_outputs(stage: Path) -> dict:
     """Summarize final states and paired timing without pooling budget scales.
@@ -86,8 +98,11 @@ def summarize_outputs(stage: Path) -> dict:
             **curves[key],
         )
         if series != "archived_score_at_least_two":
-            item.update(paired[key])
-            pair_totals[series].update(paired[key])
+            # A cohort may have no jointly successful or even recorded pairs.
+            # Keep zero counts explicit in both CSV and JSON consumers.
+            counts = {field: paired[key][field] for field in _PAIR_COUNT_FIELDS}
+            item.update(counts)
+            pair_totals[series].update(counts)
         configuration_rows.append(item)
     columns = list(dict.fromkeys(name for row in configuration_rows for name in row))
     with (stage / "configuration-summary.csv").open("w", newline="", encoding="utf-8") as output:
