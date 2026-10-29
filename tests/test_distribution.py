@@ -87,3 +87,57 @@ def test_analysis_example_outside_checkout(tmp_path):
     result = json.loads(completed.stdout)
     assert result["peak_count"] == 1
     assert len(result["input_sha256"]) == 64
+
+
+def test_observation_example_outside_checkout_preserves_three_valued_evidence(tmp_path):
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "examples" / "observations.py")],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        cwd=tmp_path,
+        check=True,
+    )
+    evidence = json.loads(completed.stdout)
+    assert evidence["analytical_acceptance"] == "accepted"
+    assert evidence["feasible"] is True
+    assert evidence["runtime_preference_satisfied"] is False
+    assert evidence["corrected_acceptance"] == "not_accepted"
+    assert evidence["ambiguous_acceptance"] == "unknown"
+    assert evidence["historical_observation_unchanged"] is True
+    assert evidence["origin"] == "simulator_latent"
+    assert len(evidence["snapshot_sha256"]) == 64
+
+
+def test_retention_example_outside_checkout_keeps_censoring_and_qualification_limits(tmp_path):
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "examples" / "retention.py")],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        cwd=tmp_path,
+        check=True,
+    )
+    evidence = json.loads(completed.stdout)
+    assert evidence["profile"] == "ideal-lc-retention-zeta/1"
+    assert evidence["eluted_retention_time_min"] == pytest.approx(2.2, abs=1e-12, rel=0)
+    assert evidence["geometry_dead_time_min"] == pytest.approx(0.5, abs=1e-12, rel=0)
+    assert evidence["post_column_transit_min"] == 0.2
+    assert evidence["censored_status"] == "not_eluted"
+    assert evidence["censored_retention_time_min"] is None
+    assert evidence["right_censor_bound_min"] == 10
+    assert evidence["qualification_scope"]["physical_retention_qualification_established"] is False
+    assert evidence["qualification_scope"]["utility_score_calculated"] is False
+
+
+def test_installed_retention_references_match_the_reviewed_data_digests():
+    import hashlib
+
+    from measure_service.benchmarks import retention_qualification as qualification
+
+    for path, expected in [
+        (qualification.DEFAULT_LAW_ORACLE, qualification.EXPECTED_LAW_ORACLE_SHA256),
+        (qualification.DEFAULT_TRAJECTORY_ORACLE, qualification.EXPECTED_TRAJECTORY_ORACLE_SHA256),
+    ]:
+        assert path.is_file()
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected

@@ -24,6 +24,26 @@ which versioned outcomes were sent to the optimizer. A source label or
 `proposal_reference` is not enough: consumption needs a durable identifier,
 retry behavior and an explicit objective definition.
 
+The [observation boundary](observation-evidence.md) now supplies predeclared
+analyte requirements, evidence-bound analytical acceptance and immutable
+snapshot membership. Its three-valued decisions preserve missing measurements
+and keep source fidelity separate from physical origin. It does not yet fit a
+retention model, propose experiments, or consume observations in an optimizer.
+
+The [ideal retention reference](retention-predictions.md) now evaluates explicit
+coefficient/geometry declarations against constant-flow inlet programs. Its
+source/unit audit and independent numerical checks qualify this bounded
+reference. They do not fit model parameters, reconstruct source peak widths,
+establish measured clock delays, qualify signals/instruments or complete a
+fresh optimizer comparison.
+
+The [MoSeS archive replay](moses-reproduction.md) supplies the first real-data
+benchmark layer: verified source records, recomputed raw metrics, complete
+cohort accounting and stored-score trajectories. The separate scalar-score
+qualification evaluates versioned hierarchy rules and exposes source-input
+discrepancies and hard-threshold disagreements. It does not supply a fresh
+optimizer comparison or qualify the signal-processing and instrument paths.
+
 A first adapter should support caller-provided numeric/categorical spaces,
 objective directions and units, constraints, campaign creation, suggestions,
 and outcome submission through one selected optimizer backend. It should

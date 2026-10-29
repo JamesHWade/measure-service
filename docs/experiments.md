@@ -105,3 +105,15 @@ campaign snapshots. See [deployment](deployment.md) for persistence limits.
 ## Intended and reported chromatography methods
 
 Both an experiment and each attempt may supply `executable_method_id` for an [owned immutable method](methods.md). The experiment retains its intended method identity and digests; an attempt separately retains the method reported for that attempt. No automatic inheritance equates the two. An attempt correction appends a revision and keeps the earlier link accessible. Free-text `method_reference` remains an external reference.
+
+## Predeclared analytical observation contracts
+
+An experiment may also supply `observation_contract_id` for an owned immutable
+[observation contract](observation-evidence.md). Creation retains its exact
+identity and input digest before attempts exist. Evaluating analytical
+acceptance requires this binding, the attempt's actual executable method and
+exact current result IDs at the selected attempt revision. Historical
+experiments and their original retry receipts remain readable; no contract is
+inferred for them. Observation snapshots retain explicitly selected immutable
+assessments through subsequent corrections and do not implement optimizer
+suggestions or consumption.

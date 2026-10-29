@@ -314,9 +314,15 @@ def test_retry_receipts_from_before_optional_method_fields_remain_valid():
 
     design_spec = experiments.ExperimentSpec(title="Prior design", source="manual")
     attempt_spec = experiments.AttemptSpec(status="planned")
-    old_design = design_spec.model_dump(mode="json")
+    old_design = {
+        "title": "Prior design",
+        "source": "manual",
+        "external_reference": None,
+        "proposal_reference": None,
+        "intended_conditions": [],
+        "description": "",
+    }
     old_attempt = attempt_spec.model_dump(mode="json")
-    old_design.pop("executable_method_id")
     old_attempt.pop("executable_method_id")
     cases = [
         (

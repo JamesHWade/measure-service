@@ -18,7 +18,7 @@ worker pool.
 | --- | --- |
 | `measure` | R measurement structures, preprocessing, calibration and validation primitives |
 | `measure.sec` | SEC calibration, moments, distributions and technique-specific calculations |
-| `measure_methods` in `measure-service` | Pure-Python numerical solvent-use integration for declared method programs |
+| `measure_methods` in `measure-service` | Pure-Python resource integration, objective scores, analytical acceptance, ideal retention and campaign-success accounting |
 | Future technique packages | Domain models and methods that can be tested independently of an agent protocol |
 | `measure-service` | MCP contracts, identities, evidence records, storage and backend adapters |
 | Future BO adapter | Translate qualified evidence and objectives to an optimizer protocol |
@@ -62,22 +62,33 @@ give the required order. CI exercises it with local wheels and no package index.
 The service owns experiment evidence: intended conditions, actual attempts,
 measurement links, outcomes and corrections. An optimizer owns its model and
 suggestion state. Campaign orchestration must record which immutable evidence
-snapshot produced each suggestion and when an outcome was consumed. Those
-contracts and synchronization logic are roadmap work; an external proposal
-label alone does not implement them.
+snapshot produced each suggestion and when an outcome was consumed. The
+[observation registry](observation-evidence.md) implements predeclared
+analytical contracts, immutable evidence-bound assessments and explicit
+snapshot membership. It does not yet bind suggestions or synchronize optimizer
+consumption. An external proposal label alone does not implement that state.
 
 ## Code layout
 
 - `src/measure_service/server.py`: MCP tools, trace/method validation and R adapter.
 - `src/measure_service/methods.py`: declaration validation, normalization, constraints and numerical-backend adaptation.
-- `src/measure_methods/`: pure-Python method resource calculations, packaged with the service.
+- `src/measure_methods/`: pure-Python resource, objective and campaign-trajectory calculations, packaged with the service.
 - `src/measure_service/method_backend.py`: containing-distribution and PEP 610 source metadata.
 - `src/measure_service/method_registry.py`: immutable owned method records and identities.
 - `src/measure_service/experiments.py`: registry models, evidence checks and writes.
+- `src/measure_service/observations.py`: analytical contracts, owned evidence and immutable snapshot membership.
+- `src/measure_service/retention.py`: explicit ideal-model inputs, canonical-method adaptation and retained predictions.
 - `src/measure_service/storage.py`: canonical serialization and SQLite tables.
 - `src/measure_service/worker.R`: adapter to the installed scientific packages.
 - `tests/`: validation, persistence, concurrency, MCP and HTTP contracts.
 - `examples/`: complete client workflows using the installed package.
+
+Ideal retention calculations live in `measure_methods.retention`, independent
+of service schemas and storage. The service requires explicit model units and
+column-inlet timing, resolves owned immutable methods/training lineage, and
+retains numerical/backend evidence. A training reference does not perform or
+qualify a fit. The [retention contract](retention-predictions.md) excludes
+variable flow, inferred delays, peak widths and physical validation.
 
 ## Evidence before automation
 

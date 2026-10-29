@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 29 tools.
+The current catalog contains 39 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -19,17 +19,25 @@ The current catalog contains 29 tools.
 | `measurement_capabilities` | — | read | idempotent |
 | `measurement_compare_sec` | `analysis_ids` | read | idempotent |
 | `measurement_create_experiment` | `spec`, `idempotency_key` | write | idempotent |
+| `measurement_create_observation_snapshot` | `contract_id`, `observation_ids`, `idempotency_key` | write | idempotent |
+| `measurement_evaluate_observation` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_get_analysis` | `analysis_id` | read | idempotent |
 | `measurement_get_attempt` | `attempt_id` | read | idempotent |
 | `measurement_get_experiment` | `experiment_id` | read | idempotent |
 | `measurement_get_method` | `method_id` | read | idempotent |
+| `measurement_get_observation` | `observation_id` | read | idempotent |
+| `measurement_get_observation_contract` | `contract_id` | read | idempotent |
+| `measurement_get_observation_snapshot` | `snapshot_id` | read | idempotent |
 | `measurement_get_result` | `result_id` | read | idempotent |
+| `measurement_get_retention_model` | `model_id` | read | idempotent |
+| `measurement_get_retention_prediction` | `prediction_id` | read | idempotent |
 | `measurement_inspect_dataset` | `dataset_id` | read | idempotent |
 | `measurement_list_attempts` | `experiment_id` | read | idempotent |
 | `measurement_list_experiments` | — | read | idempotent |
 | `measurement_list_methods` | — | read | idempotent |
 | `measurement_list_results` | `attempt_id` | read | idempotent |
 | `measurement_method_capabilities` | — | read | idempotent |
+| `measurement_predict_retention` | `model_id`, `method_id`, `idempotency_key` | write | idempotent |
 | `measurement_quantify_peak` | `analysis_id`, `peak_id`, `method` | write | creates new record |
 | `measurement_read_analysis_data` | `analysis_id`, `kind` | read | idempotent |
 | `measurement_read_source` | `dataset_id` | read | idempotent |
@@ -39,6 +47,8 @@ The current catalog contains 29 tools.
 | `measurement_register_dataset` | `dataset` | write | creates new record |
 | `measurement_register_long_csv` | `title`, `csv_text`, `axis_column`, `signal_column`, `group_columns`, `groups` | write | creates new record |
 | `measurement_register_method` | `title`, `declaration`, `idempotency_key` | write | idempotent |
+| `measurement_register_observation_contract` | `title`, `spec`, `idempotency_key` | write | idempotent |
+| `measurement_register_retention_model` | `title`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_register_wide_csv` | `title`, `csv_text`, `axis_column`, `channels` | write | creates new record |
 | `measurement_registry_capabilities` | — | read | idempotent |
 | `measurement_revise_attempt` | `attempt_id`, `expected_revision`, `spec`, `reason`, `idempotency_key` | write | idempotent |
@@ -66,6 +76,14 @@ Compare stored SEC moments to the first analysis; report method and detector dif
 
 Record an immutable experiment design with intended conditions; does not execute it or create an optimizer campaign.
 
+### `measurement_create_observation_snapshot`
+
+Freeze explicitly selected observation identities and digests for one contract, retaining at most one observation per physical attempt; does not generate optimizer suggestions.
+
+### `measurement_evaluate_observation`
+
+Assess exact owned retention/resolution result records under the experiment's predeclared contract; retain immutable evidence, explicit unknowns and separate fidelity/origin declarations.
+
 ### `measurement_get_analysis`
 
 Retrieve a compact analysis record, method, diagnostics and provenance.
@@ -82,9 +100,29 @@ Retrieve an experiment's intended conditions and caller-declared origin.
 
 Retrieve an owned immutable executable method and its declared limits.
 
+### `measurement_get_observation`
+
+Retrieve an immutable analytical observation, source evidence and decision even after later corrections.
+
+### `measurement_get_observation_contract`
+
+Read an owned observation contract and its exact input digest; declarations do not qualify the measurement producer.
+
+### `measurement_get_observation_snapshot`
+
+Read immutable owned snapshot membership; later result corrections or attempt revisions cannot change its contents.
+
 ### `measurement_get_result`
 
 Retrieve an immutable outcome with evidence provenance, attempt revision and any later superseding result.
+
+### `measurement_get_retention_model`
+
+Read an owned immutable retention model declaration, input checks, warnings and source evidence.
+
+### `measurement_get_retention_prediction`
+
+Retrieve an immutable ideal prediction and its exact model, method, solver and backend evidence.
 
 ### `measurement_inspect_dataset`
 
@@ -109,6 +147,10 @@ List compact current outcome heads or the full result history for an owned attem
 ### `measurement_method_capabilities`
 
 Describe executable LC method validation and storage without an R backend.
+
+### `measurement_predict_retention`
+
+Calculate and retain ideal retention times for an owned constant-flow binary inlet program; missing within-window events remain censored, with no peak-width, resolution or instrument claim.
 
 ### `measurement_quantify_peak`
 
@@ -145,6 +187,14 @@ Register row-oriented traces grouped by explicit column values, with a separate 
 ### `measurement_register_method`
 
 Retain an immutable method that meets its declared constraints, with original units, canonical program and digests; does not run an instrument.
+
+### `measurement_register_observation_contract`
+
+Declare an immutable required analyte cohort, analytical acceptance and separate feasibility/runtime preferences before creating experiments.
+
+### `measurement_register_retention_model`
+
+Retain a declared ideal retention reference with natural-log coefficients, explicit geometry/clock/units and optional immutable training lineage; does not fit or physically validate parameters.
 
 ### `measurement_register_wide_csv`
 
