@@ -152,6 +152,35 @@ def connect() -> sqlite3.Connection:
     );
     CREATE INDEX IF NOT EXISTS retention_predictions_owner_order
       ON retention_predictions(owner, created_at, id);
+    CREATE TABLE IF NOT EXISTS gaussian_producers (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, title TEXT NOT NULL,
+      retention_model_id TEXT NOT NULL, retention_model_input_digest TEXT NOT NULL,
+      payload TEXT NOT NULL, input_digest TEXT NOT NULL, created_at TEXT NOT NULL,
+      FOREIGN KEY(retention_model_id) REFERENCES retention_models(id)
+    );
+    CREATE INDEX IF NOT EXISTS gaussian_producers_owner_order
+      ON gaussian_producers(owner, created_at, id);
+    CREATE TABLE IF NOT EXISTS gaussian_observations (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, producer_id TEXT NOT NULL,
+      producer_input_digest TEXT NOT NULL, retention_prediction_id TEXT NOT NULL,
+      prediction_input_digest TEXT NOT NULL, prediction_output_digest TEXT NOT NULL,
+      experiment_id TEXT NOT NULL, attempt_id TEXT NOT NULL,
+      attempt_revision INTEGER NOT NULL, attempt_digest TEXT NOT NULL,
+      executable_method_id TEXT NOT NULL, method_input_digest TEXT NOT NULL,
+      canonical_program_digest TEXT NOT NULL, payload TEXT NOT NULL,
+      input_digest TEXT NOT NULL, output_digest TEXT NOT NULL, created_at TEXT NOT NULL,
+      UNIQUE(owner, attempt_id, attempt_revision),
+      FOREIGN KEY(producer_id) REFERENCES gaussian_producers(id),
+      FOREIGN KEY(retention_prediction_id) REFERENCES retention_predictions(id),
+      FOREIGN KEY(experiment_id) REFERENCES experiments(id),
+      FOREIGN KEY(attempt_id, attempt_revision)
+        REFERENCES attempt_revisions(attempt_id, revision),
+      FOREIGN KEY(executable_method_id) REFERENCES executable_methods(id)
+    );
+    CREATE INDEX IF NOT EXISTS gaussian_observations_owner_order
+      ON gaussian_observations(owner, created_at, id);
+    CREATE INDEX IF NOT EXISTS gaussian_observations_owner_attempt
+      ON gaussian_observations(owner, attempt_id, attempt_revision);
     """)
     return con
 

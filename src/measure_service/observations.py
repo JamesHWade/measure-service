@@ -458,9 +458,11 @@ def evaluate_observation(
             raise ValueError(
                 "Attempt revision conflict; retrieve the current revision before evaluation"
             )
-        experiment_id, _ = _experiment_contract_link(
+        experiment_id, experiment_row = _experiment_contract_link(
             con, owner, attempt["experiment_id"], contract_id
         )
+        experiment_spec = json.loads(experiment_row["payload"])
+        producer_id = experiment_spec.get("observation_producer_id")
 
         method_id = attempt["spec"].get("executable_method_id")
         if not isinstance(method_id, str) or not method_id:
@@ -565,6 +567,41 @@ def evaluate_observation(
                 "processed_signal evidence requires a linked supporting analysis result"
             )
 
+        producer_evidence = None
+        if producer_id is not None:
+            from .gaussian_producer import validate_gaussian_result_evidence
+
+            if spec.observation_origin != "simulator_latent":
+                raise ValueError(
+                    "The experiment's Gaussian producer requires simulator_latent origin"
+                )
+            producer_evidence = validate_gaussian_result_evidence(
+                con,
+                owner,
+                producer_id,
+                attempt_id,
+                expected_attempt_revision,
+                [
+                    result
+                    for row in evidence_rows
+                    for result in (row["retention_result"], row["resolution_result"])
+                    if result is not None
+                ],
+            )
+            # The immutable producer run retains shared source evidence once.
+            # Keep exact result identities and normalized values here without
+            # repeating that complete provenance for every analyte and metric.
+            # input_sha256 still hashes the full immutable outcome retrievable
+            # with measurement_get_result, not this compact reference.
+            for row in evidence_rows:
+                for field in ("retention_result", "resolution_result"):
+                    result = row[field]
+                    if result is not None:
+                        row[field] = {
+                            **{key: value for key, value in result.items() if key != "outcome"},
+                            "outcome_included": False,
+                        }
+
         assessment = assess_analytical_observation(
             required_analytes=contract_spec.required_analytes,
             observations=kernel_rows,
@@ -584,6 +621,8 @@ def evaluate_observation(
                 item for item in contract_spec.required_analytes if item not in provided_ids
             ],
         }
+        if producer_id is not None:
+            evidence["producer_evidence"] = producer_evidence
         payload = {
             "schema_version": SCHEMA_VERSION,
             "contract": {

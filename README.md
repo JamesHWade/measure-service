@@ -42,6 +42,7 @@ configuration and a numerical analysis example.
 | Experiment tracking | Intended and actual conditions, attempt revisions, evidence-linked outcomes and explicit corrections | Reported records; no execution or optimizer state machine |
 | Analytical acceptance | Predeclared analyte cohorts, evidence-bound three-valued decisions and immutable observation snapshots | Assignments and producer qualifications remain separate |
 | Ideal retention | Explicit linear, quadratic and Neue–Kuss laws, constant-flow inlet programs and immutable predictions | No fitting, gradient-delay inference, widths or physical qualification |
+| Latent Gaussian observations | Predeclared synthetic FWHM widths, prediction-bound generated results and immutable producer evidence | Finite-centroid reference; no traces, physical widths or signal processing |
 
 Registry operations, import and record retrieval work without R. Numerical
 analysis and `measurement_capabilities` require R; use
@@ -60,6 +61,7 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Experiment and result contracts](docs/experiments.md)
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)
 - [Ideal retention declarations and predictions](docs/retention-predictions.md)
+- [Generate synthetic Gaussian observation evidence](docs/gaussian-observation-producer.md)
 - [Retention equations, units and qualification scope](docs/retention-model-qualification.md)
 - [Reproduce archived retention input qualification](docs/retention-reference-benchmark.md)
 - [MCP tool reference](docs/tools.md)

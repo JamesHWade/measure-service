@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping, Sequence
+from fractions import Fraction
 from numbers import Real
 from typing import Any
 
@@ -166,11 +167,26 @@ def _gaussian_pair_resolution(
     sigma_sum = left_sigma + right_sigma
     denominator = 2.0 * sigma_sum
     delta = right_time - left_time
-    if not math.isfinite(denominator) or denominator <= 0 or not math.isfinite(delta):
+    if not math.isfinite(delta):
         raise ValueError(
             "Gaussian resolution inputs produce an unrepresentable denominator or time delta"
         )
-    resolution = delta / denominator
+    if not math.isfinite(denominator) or denominator <= 0:
+        # The final ratio can be representable even when summing/scaling sigma
+        # overflows or rounds both tiny widths to zero. Keep ordinary source
+        # arithmetic unchanged; resolve only this exceptional range with the
+        # exact rational values of the supplied binary64 inputs and constant.
+        ratio = (
+            Fraction(delta)
+            * Fraction(_FWHM_PER_SIGMA)
+            / (2 * (Fraction(left_fwhm) + Fraction(right_fwhm)))
+        )
+        try:
+            resolution = float(ratio)
+        except OverflowError as error:
+            raise ValueError("Gaussian resolution is not finite") from error
+    else:
+        resolution = delta / denominator
     if not math.isfinite(resolution):
         raise ValueError("Gaussian resolution is not finite")
     return delta, resolution

@@ -18,7 +18,7 @@ worker pool.
 | --- | --- |
 | `measure` | R measurement structures, preprocessing, calibration and validation primitives |
 | `measure.sec` | SEC calibration, moments, distributions and technique-specific calculations |
-| `measure_methods` in `measure-service` | Pure-Python resource integration, objective scores, analytical acceptance, ideal retention and campaign-success accounting |
+| `measure_methods` in `measure-service` | Pure-Python resource integration, objective scores, analytical acceptance, ideal retention, latent Gaussian observations and campaign-success accounting |
 | Future technique packages | Domain models and methods that can be tested independently of an agent protocol |
 | `measure-service` | MCP contracts, identities, evidence records, storage and backend adapters |
 | Future BO adapter | Translate qualified evidence and objectives to an optimizer protocol |
@@ -78,6 +78,7 @@ consumption. An external proposal label alone does not implement that state.
 - `src/measure_service/experiments.py`: registry models, evidence checks and writes.
 - `src/measure_service/observations.py`: analytical contracts, owned evidence and immutable snapshot membership.
 - `src/measure_service/retention.py`: explicit ideal-model inputs, canonical-method adaptation and retained predictions.
+- `src/measure_service/gaussian_producer.py`: predeclared synthetic widths, immutable producer runs and exact generated-result evidence.
 - `src/measure_service/storage.py`: canonical serialization and SQLite tables.
 - `src/measure_service/worker.R`: adapter to the installed scientific packages.
 - `tests/`: validation, persistence, concurrency, MCP and HTTP contracts.
@@ -98,3 +99,13 @@ fitness for a particular analytical use. Future objective extraction must
 version its definitions, preserve failed and censored observations, and avoid
 treating simulated data as physical measurements. The service has no blanket
 human-signoff gate and currently sends no instrument commands.
+
+
+The [Gaussian latent producer](gaussian-observation-producer.md) binds synthetic
+width assumptions before attempts, consumes an owned immutable retention
+prediction for the exact actual method, and records generated result identities
+in one transaction. Its resolution calculation reuses the pure chromatography
+helper. The observation registry verifies those exact generated results for a
+producer-bound experiment. It does not accept caller replacements as generated
+evidence. Existing experiments without a producer binding retain their original
+caller-reported evidence contract and retry identities.

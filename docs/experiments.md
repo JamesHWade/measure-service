@@ -117,3 +117,19 @@ experiments and their original retry receipts remain readable; no contract is
 inferred for them. Observation snapshots retain explicitly selected immutable
 assessments through subsequent corrections and do not implement optimizer
 suggestions or consumption.
+
+
+## Bind a synthetic observation producer
+
+An optional `observation_producer_id` binds the experiment to an immutable
+[Gaussian latent producer](gaussian-observation-producer.md) before attempts.
+It requires the existing observation contract, matching full analyte cohort and
+named resolution definition. Generated results retain exact producer, run,
+prediction and actual-method identities. Analytical evaluation on a bound
+experiment verifies those links and rejects caller-created substitutes.
+
+The producer writes its run and generated result batch atomically with its retry
+receipt. Analytical assessment and explicit snapshot membership are separate
+writes. A later caller correction preserves the original producer run and
+snapshots but cannot become generated producer evidence. Omitting the new
+optional field preserves earlier experiment request and payload identities.

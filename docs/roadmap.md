@@ -37,6 +37,14 @@ reference. They do not fit model parameters, reconstruct source peak widths,
 establish measured clock delays, qualify signals/instruments or complete a
 fresh optimizer comparison.
 
+The [Gaussian latent producer](gaussian-observation-producer.md) adds a bounded
+reference path from declared synthetic widths and retained ideal predictions to
+generated result records. It preserves censored cohorts and unavailable
+singleton resolution and binds analytical evidence to the exact stored producer
+run. Its numerical qualification does not fit physical widths or qualify a
+processed-signal producer. A matched protocol and optimizer-consumption loop
+remain before fresh campaign comparisons.
+
 The [MoSeS archive replay](moses-reproduction.md) supplies the first real-data
 benchmark layer: verified source records, recomputed raw metrics, complete
 cohort accounting and stored-score trajectories. The separate scalar-score

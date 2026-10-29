@@ -106,6 +106,12 @@ class ExperimentSpec(RecordModel):
         max_length=100,
         description="Owned immutable analytical observation contract declared before attempts; not an optimizer campaign.",
     )
+    observation_producer_id: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=100,
+        description="Optional owned immutable observation producer bound before attempts.",
+    )
     intended_conditions: list[Condition] = Field(default_factory=list, max_length=64)
     description: str = Field(default="", max_length=2000)
 
@@ -276,12 +282,14 @@ def _experiment(row: sqlite3.Row) -> dict[str, Any]:
     payload = json.loads(row["payload"])
     method = payload.pop("executable_method", None)
     contract = payload.pop("observation_contract", None)
+    producer = payload.pop("observation_producer", None)
     return {
         "schema_version": SCHEMA_VERSION,
         "experiment_id": row["id"],
         "spec": payload,
         "executable_method": method,
         "observation_contract": contract,
+        "observation_producer": producer,
         "input_sha256": row["digest"],
         "created_at": row["created_at"],
     }
@@ -294,6 +302,8 @@ def _requested_spec(spec: ExperimentSpec | AttemptSpec) -> dict:
         payload.pop("executable_method_id")
     if payload.get("observation_contract_id") is None:
         payload.pop("observation_contract_id", None)
+    if payload.get("observation_producer_id") is None:
+        payload.pop("observation_producer_id", None)
     return bounded(payload)
 
 
@@ -309,6 +319,17 @@ def create_experiment(owner: str, spec: ExperimentSpec, key: str) -> dict[str, A
 
             retained["observation_contract"] = observation_contract_link(
                 con, owner, payload["observation_contract_id"]
+            )
+        if payload.get("observation_producer_id") is not None:
+            if payload.get("observation_contract_id") is None:
+                raise ValueError("An observation producer requires a declared observation contract")
+            from .gaussian_producer import gaussian_producer_link
+
+            retained["observation_producer"] = gaussian_producer_link(
+                con,
+                owner,
+                payload["observation_producer_id"],
+                payload["observation_contract_id"],
             )
         bounded(retained)
         record_id = str(uuid.uuid4())
@@ -584,6 +605,83 @@ def _outcome(con: sqlite3.Connection, owner: str, attempt: dict, spec: ResultSpe
     return bounded({**payload, "provenance": provenance})
 
 
+def _insert_result_records(
+    con: sqlite3.Connection,
+    owner: str,
+    attempt_id: str,
+    expected_attempt_revision: int,
+    specs: list[ResultSpec],
+    *,
+    trusted_provenance: dict[str, Any] | None = None,
+    result_ids: list[str] | None = None,
+) -> list[dict[str, Any]]:
+    """Insert a result batch inside an existing transaction.
+
+    Public caller-reported results and trusted service-generated results share
+    the same revision, current-result and supersession checks. Only service
+    adapters call this function with ``trusted_provenance`` or preallocated
+    result IDs; the public ``record_results`` API never accepts provenance.
+    """
+    attempt = _attempt(con, owner, attempt_id)
+    if attempt["revision"] != expected_attempt_revision:
+        raise ValueError(
+            "Attempt revision conflict; retrieve the current revision before recording outcomes"
+        )
+    if result_ids is not None and len(result_ids) != len(specs):
+        raise ValueError("The internal result ID batch must match its result specs")
+    ids = result_ids or [str(uuid.uuid4()) for _ in specs]
+    results = []
+    for index, spec in enumerate(specs):
+        current = con.execute(
+            """SELECT r.id FROM experiment_results r WHERE r.owner=? AND r.attempt_id=?
+            AND r.metric=? AND r.analyte_reference IS ?
+            AND NOT EXISTS(SELECT 1 FROM experiment_results next WHERE next.supersedes_id=r.id)""",
+            (owner, attempt_id, spec.metric, spec.analyte_reference),
+        ).fetchone()
+        if spec.supersedes_result_id is not None:
+            previous = _owned(con, "experiment_results", owner, spec.supersedes_result_id)
+            successor = con.execute(
+                "SELECT id FROM experiment_results WHERE supersedes_id=?", (previous["id"],)
+            ).fetchone()
+            if previous["attempt_id"] != attempt_id or successor is not None:
+                raise ValueError(
+                    "Result supersession conflict; specify a current result from the same attempt"
+                )
+            if current is not None and current["id"] != previous["id"]:
+                raise ValueError(
+                    "Result supersession would collide with another current metric/analyte result"
+                )
+        elif current is not None:
+            raise ValueError(
+                "A current result already exists; explicitly supersede it to record a correction"
+            )
+        payload = _outcome(con, owner, attempt, spec)
+        if trusted_provenance is not None:
+            payload["provenance"] = {
+                "value_origin": "stored_ideal_gaussian_producer",
+                **trusted_provenance,
+            }
+            bounded(payload)
+        result_id = ids[index]
+        con.execute(
+            "INSERT INTO experiment_results VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                result_id,
+                owner,
+                attempt_id,
+                expected_attempt_revision,
+                spec.metric,
+                spec.analyte_reference,
+                spec.supersedes_result_id,
+                canonical(payload),
+                sha256(payload),
+                now(),
+            ),
+        )
+        results.append(_result(con, owner, result_id))
+    return results
+
+
 def record_results(
     owner: str, attempt_id: str, expected_attempt_revision: int, specs: list[ResultSpec], key: str
 ) -> dict[str, Any]:
@@ -592,54 +690,7 @@ def record_results(
     requested = bounded([v.model_dump(mode="json") for v in specs])
 
     def write(con: sqlite3.Connection) -> dict:
-        attempt = _attempt(con, owner, attempt_id)
-        if attempt["revision"] != expected_attempt_revision:
-            raise ValueError(
-                "Attempt revision conflict; retrieve the current revision before recording outcomes"
-            )
-        results = []
-        for spec in specs:
-            current = con.execute(
-                """SELECT r.id FROM experiment_results r WHERE r.owner=? AND r.attempt_id=?
-                AND r.metric=? AND r.analyte_reference IS ?
-                AND NOT EXISTS(SELECT 1 FROM experiment_results next WHERE next.supersedes_id=r.id)""",
-                (owner, attempt_id, spec.metric, spec.analyte_reference),
-            ).fetchone()
-            if spec.supersedes_result_id is not None:
-                previous = _owned(con, "experiment_results", owner, spec.supersedes_result_id)
-                successor = con.execute(
-                    "SELECT id FROM experiment_results WHERE supersedes_id=?", (previous["id"],)
-                ).fetchone()
-                if previous["attempt_id"] != attempt_id or successor is not None:
-                    raise ValueError(
-                        "Result supersession conflict; specify a current result from the same attempt"
-                    )
-                if current is not None and current["id"] != previous["id"]:
-                    raise ValueError(
-                        "Result supersession would collide with another current metric/analyte result"
-                    )
-            elif current is not None:
-                raise ValueError(
-                    "A current result already exists; explicitly supersede it to record a correction"
-                )
-            payload = _outcome(con, owner, attempt, spec)
-            result_id = str(uuid.uuid4())
-            con.execute(
-                "INSERT INTO experiment_results VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    result_id,
-                    owner,
-                    attempt_id,
-                    expected_attempt_revision,
-                    spec.metric,
-                    spec.analyte_reference,
-                    spec.supersedes_result_id,
-                    canonical(payload),
-                    sha256(payload),
-                    now(),
-                ),
-            )
-            results.append(_result(con, owner, result_id))
+        results = _insert_result_records(con, owner, attempt_id, expected_attempt_revision, specs)
         return bounded(
             {
                 "schema_version": SCHEMA_VERSION,
