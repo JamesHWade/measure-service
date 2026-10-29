@@ -210,6 +210,9 @@ audit](https://github.com/JamesHWade/measure/issues/105) maps the remaining work
 
 Source revisions and input digests identify reviewed evidence; they impose no
 fixed revision requirement on runtime package installation. The original data
-remain in the external cache. The Zenodo record has no displayed dataset
-license and the experiment-code repository has no license file; this package
-does not redistribute those data or source files. Tests use synthetic records.
+remain in the external cache. The [official record API](https://zenodo.org/api/records/22109729)
+declares CC BY 4.0 for the dataset, verified 2026-10-28. The package includes
+[attributed derived retention-factor references](../src/measure_service/benchmarks/reference_data/README.md)
+for numerical qualification; original chromatograms, serialized campaign
+records and author implementation files remain external. The experiment-code
+repository has no license file. Tests otherwise use synthetic records.

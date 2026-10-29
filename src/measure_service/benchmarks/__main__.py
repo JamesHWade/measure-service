@@ -8,6 +8,11 @@ from ..moses_score_qualification import qualify_moses_scores
 from .moses_archive import fetch_archive, inspect_archive
 from .moses_replay import analyze_archive
 from .moses_sensitivity import compare_moses_trajectories
+from .retention_qualification import (
+    DEFAULT_LAW_ORACLE,
+    DEFAULT_TRAJECTORY_ORACLE,
+    qualify_retention_inputs,
+)
 
 
 def main() -> None:
@@ -35,6 +40,14 @@ def main() -> None:
     sensitivity.add_argument("--replay-dir", type=Path, required=True)
     sensitivity.add_argument("--qualification-dir", type=Path, required=True)
     sensitivity.add_argument("--output-dir", type=Path, required=True)
+    retention = commands.add_parser(
+        "qualify-retention-inputs",
+        help="qualify source retention laws and the continuous ideal reference",
+    )
+    retention.add_argument("--archive", type=Path, required=True)
+    retention.add_argument("--law-oracle-json", type=Path, default=DEFAULT_LAW_ORACLE)
+    retention.add_argument("--trajectory-oracle-json", type=Path, default=DEFAULT_TRAJECTORY_ORACLE)
+    retention.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "fetch-moses":
         print(fetch_archive(args.cache_dir))
@@ -64,8 +77,16 @@ def main() -> None:
         qualify_moses_scores(args.archive, args.replay_dir, args.output_dir)
         print(args.output_dir / "report.md")
 
-    else:
+    elif args.command == "compare-moses-trajectories":
         compare_moses_trajectories(args.replay_dir, args.qualification_dir, args.output_dir)
+        print(args.output_dir / "report.md")
+    else:
+        qualify_retention_inputs(
+            args.archive,
+            args.output_dir,
+            law_oracle_json=args.law_oracle_json,
+            trajectory_oracle_json=args.trajectory_oracle_json,
+        )
         print(args.output_dir / "report.md")
 
 

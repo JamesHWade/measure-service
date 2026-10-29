@@ -8,8 +8,8 @@ version = "0.1.0.dev0"
 description = "MCP tools for analytical traces and experiment result tracking"
 readme = "README.md"
 requires-python = ">=3.10"
-license = "MIT"
-license-files = ["LICENSE"]
+license = "MIT AND CC-BY-4.0"
+license-files = ["LICENSE", "src/measure_service/benchmarks/reference_data/README.md"]
 authors = [{name = "James Wade"}]
 dependencies = [
   "mcp==1.30.0",
@@ -35,7 +35,7 @@ Issues = "https://github.com/JamesHWade/measure-service/issues"
 where = ["src"]
 
 [tool.setuptools.package-data]
-measure_service = ["worker.R"]
+measure_service = ["worker.R", "benchmarks/reference_data/*.json", "benchmarks/reference_data/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

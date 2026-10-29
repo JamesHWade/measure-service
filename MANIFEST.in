@@ -4,3 +4,4 @@ recursive-include examples *.py
 recursive-include scripts *.py *.R
 recursive-include tests *.py *.json
 recursive-include src/measure_service *.R
+recursive-include src/measure_service/benchmarks/reference_data *.json *.md

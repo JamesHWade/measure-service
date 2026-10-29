@@ -128,3 +128,16 @@ def test_retention_example_outside_checkout_keeps_censoring_and_qualification_li
     assert evidence["right_censor_bound_min"] == 10
     assert evidence["qualification_scope"]["physical_retention_qualification_established"] is False
     assert evidence["qualification_scope"]["utility_score_calculated"] is False
+
+
+def test_installed_retention_references_match_the_reviewed_data_digests():
+    import hashlib
+
+    from measure_service.benchmarks import retention_qualification as qualification
+
+    for path, expected in [
+        (qualification.DEFAULT_LAW_ORACLE, qualification.EXPECTED_LAW_ORACLE_SHA256),
+        (qualification.DEFAULT_TRAJECTORY_ORACLE, qualification.EXPECTED_TRAJECTORY_ORACLE_SHA256),
+    ]:
+        assert path.is_file()
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected

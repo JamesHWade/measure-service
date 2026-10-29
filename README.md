@@ -61,6 +61,7 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)
 - [Ideal retention declarations and predictions](docs/retention-predictions.md)
 - [Retention equations, units and qualification scope](docs/retention-model-qualification.md)
+- [Reproduce archived retention input qualification](docs/retention-reference-benchmark.md)
 - [MCP tool reference](docs/tools.md)
 - [Architecture and package boundaries](docs/architecture.md)
 - [HTTP deployment, identity and storage](docs/deployment.md)
@@ -82,4 +83,6 @@ Extracted from the service and registry proposed in
 [measure #83](https://github.com/JamesHWade/measure/pull/83) and
 [measure #109](https://github.com/JamesHWade/measure/pull/109).
 The [migration record](docs/migration.md) identifies the source revisions and
-compatibility decisions. Licensed under [MIT](LICENSE).
+compatibility decisions. Code is licensed under [MIT](LICENSE). Packaged
+[derived source-law reference data](src/measure_service/benchmarks/reference_data/README.md)
+carry the author dataset's CC BY 4.0 attribution.
