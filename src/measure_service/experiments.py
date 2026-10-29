@@ -100,6 +100,12 @@ class ExperimentSpec(RecordModel):
         max_length=100,
         description="Owned immutable executable method for the intended design; validation does not imply instrument execution.",
     )
+    observation_contract_id: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=100,
+        description="Owned immutable analytical observation contract declared before attempts; not an optimizer campaign.",
+    )
     intended_conditions: list[Condition] = Field(default_factory=list, max_length=64)
     description: str = Field(default="", max_length=2000)
 
@@ -269,11 +275,13 @@ def _owned(con: sqlite3.Connection, table: str, owner: str, record_id: str) -> s
 def _experiment(row: sqlite3.Row) -> dict[str, Any]:
     payload = json.loads(row["payload"])
     method = payload.pop("executable_method", None)
+    contract = payload.pop("observation_contract", None)
     return {
         "schema_version": SCHEMA_VERSION,
         "experiment_id": row["id"],
         "spec": payload,
         "executable_method": method,
+        "observation_contract": contract,
         "input_sha256": row["digest"],
         "created_at": row["created_at"],
     }
@@ -284,6 +292,8 @@ def _requested_spec(spec: ExperimentSpec | AttemptSpec) -> dict:
     payload = spec.model_dump(mode="json")
     if payload["executable_method_id"] is None:
         payload.pop("executable_method_id")
+    if payload.get("observation_contract_id") is None:
+        payload.pop("observation_contract_id", None)
     return bounded(payload)
 
 
@@ -294,6 +304,12 @@ def create_experiment(owner: str, spec: ExperimentSpec, key: str) -> dict[str, A
         retained = dict(payload)
         if payload.get("executable_method_id") is not None:
             retained["executable_method"] = method_link(con, owner, payload["executable_method_id"])
+        if payload.get("observation_contract_id") is not None:
+            from .observations import observation_contract_link
+
+            retained["observation_contract"] = observation_contract_link(
+                con, owner, payload["observation_contract_id"]
+            )
         bounded(retained)
         record_id = str(uuid.uuid4())
         con.execute(

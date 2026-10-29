@@ -95,6 +95,46 @@ def connect() -> sqlite3.Connection:
       response TEXT NOT NULL, created_at TEXT NOT NULL,
       PRIMARY KEY(owner, request_key)
     );
+    CREATE TABLE IF NOT EXISTS observation_contracts (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, title TEXT NOT NULL,
+      payload TEXT NOT NULL, input_digest TEXT NOT NULL, created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS observation_contracts_owner_order
+      ON observation_contracts(owner, created_at, id);
+    CREATE TABLE IF NOT EXISTS analytical_observations (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, contract_id TEXT NOT NULL,
+      contract_input_digest TEXT NOT NULL, experiment_id TEXT NOT NULL,
+      attempt_id TEXT NOT NULL, attempt_revision INTEGER NOT NULL,
+      executable_method_id TEXT, method_input_digest TEXT, canonical_program_digest TEXT,
+      payload TEXT NOT NULL, input_digest TEXT NOT NULL, evidence_digest TEXT NOT NULL,
+      assessment_digest TEXT NOT NULL, created_at TEXT NOT NULL,
+      FOREIGN KEY(contract_id) REFERENCES observation_contracts(id),
+      FOREIGN KEY(experiment_id) REFERENCES experiments(id),
+      FOREIGN KEY(attempt_id, attempt_revision)
+        REFERENCES attempt_revisions(attempt_id, revision),
+      FOREIGN KEY(executable_method_id) REFERENCES executable_methods(id)
+    );
+    CREATE INDEX IF NOT EXISTS analytical_observations_owner_order
+      ON analytical_observations(owner, created_at, id);
+    CREATE INDEX IF NOT EXISTS analytical_observations_contract_attempt
+      ON analytical_observations(owner, contract_id, attempt_id, attempt_revision);
+    CREATE TABLE IF NOT EXISTS observation_snapshots (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, contract_id TEXT NOT NULL,
+      contract_input_digest TEXT NOT NULL, payload TEXT NOT NULL,
+      digest TEXT NOT NULL, created_at TEXT NOT NULL,
+      FOREIGN KEY(contract_id) REFERENCES observation_contracts(id)
+    );
+    CREATE INDEX IF NOT EXISTS observation_snapshots_owner_order
+      ON observation_snapshots(owner, created_at, id);
+    CREATE TABLE IF NOT EXISTS observation_snapshot_members (
+      snapshot_id TEXT NOT NULL, owner TEXT NOT NULL, ordinal INTEGER NOT NULL,
+      observation_id TEXT NOT NULL, attempt_id TEXT NOT NULL, attempt_revision INTEGER NOT NULL,
+      observation_input_digest TEXT NOT NULL, evidence_digest TEXT NOT NULL,
+      assessment_digest TEXT NOT NULL, PRIMARY KEY(snapshot_id, ordinal),
+      UNIQUE(snapshot_id, observation_id), UNIQUE(snapshot_id, attempt_id),
+      FOREIGN KEY(snapshot_id) REFERENCES observation_snapshots(id),
+      FOREIGN KEY(observation_id) REFERENCES analytical_observations(id)
+    );
     """)
     return con
 

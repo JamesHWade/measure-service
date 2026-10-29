@@ -8,8 +8,55 @@ import pytest
 from measure_methods.moses_objective import (
     MOSES_SCORE_PROFILES,
     moses_observation_score,
+    moses_score_definition,
     moses_summary_score,
 )
+
+
+@pytest.mark.parametrize("profile", MOSES_SCORE_PROFILES)
+def test_predeclared_definition_replays_the_selected_score_without_an_observation(profile):
+    from measure_methods.objectives import Criterion, hierarchical_score
+
+    definition = moses_score_definition(profile=profile, num_compounds=2, max_run_time_min=20)
+    assert definition["criteria"] == [
+        {
+            "name": "missing_analytes",
+            "direction": "minimize",
+            "lower_bound": 0.0,
+            "upper_bound": 10.0,
+            "threshold": 0.5,
+        },
+        {
+            "name": "critical_resolution",
+            "direction": "maximize",
+            "lower_bound": 0.0,
+            "upper_bound": 5.0,
+            "threshold": 1.5,
+        },
+        {
+            "name": "run_time_min",
+            "direction": "minimize",
+            "lower_bound": 1.0,
+            "upper_bound": 20.0,
+            "threshold": 5.0,
+        },
+    ]
+    reconstructed = hierarchical_score(
+        {"missing_analytes": 0, "critical_resolution": 3, "run_time_min": 4},
+        [Criterion(**criterion) for criterion in definition["criteria"]],
+        smoothing=definition["smoothing"],
+        final_objective=definition["final_objective"],
+        final_rule=definition["final_rule"],
+    )
+    observed = moses_observation_score(
+        profile=profile,
+        num_compounds=2,
+        peak_resolutions=[3, 3],
+        run_time_min=4,
+        max_run_time_min=20,
+    )
+    assert reconstructed["score"] == observed["score"]
+    json.dumps(definition, allow_nan=False)
 
 
 def score(**kwargs):

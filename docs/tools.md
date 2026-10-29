@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 29 tools.
+The current catalog contains 35 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -19,10 +19,15 @@ The current catalog contains 29 tools.
 | `measurement_capabilities` | — | read | idempotent |
 | `measurement_compare_sec` | `analysis_ids` | read | idempotent |
 | `measurement_create_experiment` | `spec`, `idempotency_key` | write | idempotent |
+| `measurement_create_observation_snapshot` | `contract_id`, `observation_ids`, `idempotency_key` | write | idempotent |
+| `measurement_evaluate_observation` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_get_analysis` | `analysis_id` | read | idempotent |
 | `measurement_get_attempt` | `attempt_id` | read | idempotent |
 | `measurement_get_experiment` | `experiment_id` | read | idempotent |
 | `measurement_get_method` | `method_id` | read | idempotent |
+| `measurement_get_observation` | `observation_id` | read | idempotent |
+| `measurement_get_observation_contract` | `contract_id` | read | idempotent |
+| `measurement_get_observation_snapshot` | `snapshot_id` | read | idempotent |
 | `measurement_get_result` | `result_id` | read | idempotent |
 | `measurement_inspect_dataset` | `dataset_id` | read | idempotent |
 | `measurement_list_attempts` | `experiment_id` | read | idempotent |
@@ -39,6 +44,7 @@ The current catalog contains 29 tools.
 | `measurement_register_dataset` | `dataset` | write | creates new record |
 | `measurement_register_long_csv` | `title`, `csv_text`, `axis_column`, `signal_column`, `group_columns`, `groups` | write | creates new record |
 | `measurement_register_method` | `title`, `declaration`, `idempotency_key` | write | idempotent |
+| `measurement_register_observation_contract` | `title`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_register_wide_csv` | `title`, `csv_text`, `axis_column`, `channels` | write | creates new record |
 | `measurement_registry_capabilities` | — | read | idempotent |
 | `measurement_revise_attempt` | `attempt_id`, `expected_revision`, `spec`, `reason`, `idempotency_key` | write | idempotent |
@@ -66,6 +72,14 @@ Compare stored SEC moments to the first analysis; report method and detector dif
 
 Record an immutable experiment design with intended conditions; does not execute it or create an optimizer campaign.
 
+### `measurement_create_observation_snapshot`
+
+Freeze explicitly selected observation identities and digests for one contract, retaining at most one observation per physical attempt; does not generate optimizer suggestions.
+
+### `measurement_evaluate_observation`
+
+Assess exact owned retention/resolution result records under the experiment's predeclared contract; retain immutable evidence, explicit unknowns and separate fidelity/origin declarations.
+
 ### `measurement_get_analysis`
 
 Retrieve a compact analysis record, method, diagnostics and provenance.
@@ -81,6 +95,18 @@ Retrieve an experiment's intended conditions and caller-declared origin.
 ### `measurement_get_method`
 
 Retrieve an owned immutable executable method and its declared limits.
+
+### `measurement_get_observation`
+
+Retrieve an immutable analytical observation, source evidence and decision even after later corrections.
+
+### `measurement_get_observation_contract`
+
+Read an owned observation contract and its exact input digest; declarations do not qualify the measurement producer.
+
+### `measurement_get_observation_snapshot`
+
+Read immutable owned snapshot membership; later result corrections or attempt revisions cannot change its contents.
 
 ### `measurement_get_result`
 
@@ -145,6 +171,10 @@ Register row-oriented traces grouped by explicit column values, with a separate 
 ### `measurement_register_method`
 
 Retain an immutable method that meets its declared constraints, with original units, canonical program and digests; does not run an instrument.
+
+### `measurement_register_observation_contract`
+
+Declare an immutable required analyte cohort, analytical acceptance and separate feasibility/runtime preferences before creating experiments.
 
 ### `measurement_register_wide_csv`
 

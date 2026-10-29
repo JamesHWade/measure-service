@@ -11,6 +11,7 @@ from __future__ import annotations
 import math
 from collections import Counter
 from collections.abc import Sequence
+from dataclasses import asdict
 from numbers import Real
 
 from .objectives import Criterion, hierarchical_score
@@ -19,6 +20,48 @@ MOSES_SCORE_PROFILES = {
     "moses-botier-1.0.0-binary64/1": "value",
     "moses-botier-1.1.0-binary64/1": "excess",
 }
+
+
+def moses_score_definition(
+    *,
+    profile: str,
+    num_compounds: int,
+    max_run_time_min: Real,
+    objective: str = "NumPeaks-CritRes",
+    compound_idx: int | None = None,
+    count_threshold: Real = 0.5,
+    resolution_threshold: Real = 1.5,
+    run_time_threshold_min: Real = 5.0,
+) -> dict:
+    """Describe the exact source-profile utility before observing an outcome.
+
+    The definition uses the same criteria builder as both score APIs. It
+    preserves the source's fixed count/resolution bounds, criterion order,
+    thresholds, continuation rule and arithmetic. It does not convert the
+    finite-resolution count into an analytical detection claim.
+    """
+    criteria, *_ = _profile_criteria(
+        profile,
+        num_compounds,
+        objective,
+        compound_idx,
+        0.0,
+        max_run_time_min,
+        count_threshold,
+        resolution_threshold,
+        run_time_threshold_min,
+    )
+    return {
+        "profile": profile,
+        "objective": objective,
+        "num_compounds": num_compounds,
+        "compound_idx": compound_idx,
+        "criteria": [asdict(criterion) for criterion in criteria],
+        "smoothing": 100.0,
+        "final_objective": criteria[0].name,
+        "final_rule": MOSES_SCORE_PROFILES[profile],
+        "arithmetic": "binary64",
+    }
 
 
 def _finite(value, name, *, minimum=None):

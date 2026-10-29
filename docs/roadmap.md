@@ -24,6 +24,12 @@ which versioned outcomes were sent to the optimizer. A source label or
 `proposal_reference` is not enough: consumption needs a durable identifier,
 retry behavior and an explicit objective definition.
 
+The [observation boundary](observation-evidence.md) now supplies predeclared
+analyte requirements, evidence-bound analytical acceptance and immutable
+snapshot membership. Its three-valued decisions preserve missing measurements
+and keep source fidelity separate from physical origin. It does not yet fit a
+retention model, propose experiments, or consume observations in an optimizer.
+
 The [MoSeS archive replay](moses-reproduction.md) supplies the first real-data
 benchmark layer: verified source records, recomputed raw metrics, complete
 cohort accounting and stored-score trajectories. The separate scalar-score

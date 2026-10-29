@@ -23,7 +23,7 @@ from mcp.types import ToolAnnotations
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from . import experiments as registry
-from . import method_registry
+from . import method_registry, observations
 from .experiments import AttemptSpec, ExperimentSpec, ResultSpec
 from .methods import (
     MAX_CONSTRAINTS_BYTES,
@@ -34,6 +34,7 @@ from .methods import (
     MethodDeclaration,
     evaluate_method,
 )
+from .observations import ObservationContractSpec, ObservationEvidenceSpec
 from .storage import canonical, connect, now, sha256
 
 ROOT = Path(__file__).resolve().parent
@@ -579,6 +580,9 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "bo_suggestions": False,
         "instrument_actuation": False,
         "executable_method_links": "owned_immutable_methods_with_digests",
+        "observation_contracts": "predeclared_immutable_analytes_and_acceptance_rules",
+        "analytical_observations": "exact_attempt_and_result_evidence_with_three_valued_acceptance",
+        "observation_snapshots": "immutable_explicit_membership_without_duplicate_attempts",
         "limits": {
             "record_bytes": registry.MAX_RECORD_BYTES,
             "page_size": registry.MAX_REGISTRY_PAGE,
@@ -756,6 +760,63 @@ def measurement_list_results(
 ) -> dict[str, Any]:
     """List compact current outcome heads or the full result history for an owned attempt; no missing outcome is converted to zero."""
     return registry.list_results(identity(ctx), attempt_id, include_superseded, offset, limit)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_register_observation_contract(
+    title: Annotated[str, Field(min_length=1, max_length=200)],
+    spec: ObservationContractSpec,
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Declare an immutable required analyte cohort, analytical acceptance and separate feasibility/runtime preferences before creating experiments."""
+    return observations.register_observation_contract(identity(ctx), title, spec, idempotency_key)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_observation_contract(contract_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read an owned observation contract and its exact input digest; declarations do not qualify the measurement producer."""
+    return observations.get_observation_contract(identity(ctx), contract_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_evaluate_observation(
+    contract_id: RecordId,
+    attempt_id: RecordId,
+    expected_attempt_revision: Annotated[int, Field(ge=1)],
+    spec: ObservationEvidenceSpec,
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Assess exact owned retention/resolution result records under the experiment's predeclared contract; retain immutable evidence, explicit unknowns and separate fidelity/origin declarations."""
+    return observations.evaluate_observation(
+        identity(ctx), contract_id, attempt_id, expected_attempt_revision, spec, idempotency_key
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_observation(observation_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Retrieve an immutable analytical observation, source evidence and decision even after later corrections."""
+    return observations.get_observation(identity(ctx), observation_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_create_observation_snapshot(
+    contract_id: RecordId,
+    observation_ids: Annotated[list[RecordId], Field(min_length=1, max_length=50)],
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Freeze explicitly selected observation identities and digests for one contract, retaining at most one observation per physical attempt; does not generate optimizer suggestions."""
+    return observations.create_observation_snapshot(
+        identity(ctx), contract_id, observation_ids, idempotency_key
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_observation_snapshot(snapshot_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read immutable owned snapshot membership; later result corrections or attempt revisions cannot change its contents."""
+    return observations.get_observation_snapshot(identity(ctx), snapshot_id)
 
 
 @mcp.tool(annotations=READ, structured_output=True)

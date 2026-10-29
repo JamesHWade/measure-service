@@ -1,8 +1,9 @@
 # Observation and acceptance contract for subsequent optimization
 
 The archive reconciliation selects explicit inputs, utility and acceptance
-rules for the next optimization milestone. This is a contract decision, not an
-implemented optimizer or a qualification of new physical measurements.
+rules for the next optimization milestone. The pure acceptance kernel and
+[immutable service evidence](observation-evidence.md) implement this boundary.
+They do not qualify new physical measurements or implement an optimizer.
 
 ## Keep reproduction and new decisions identifiable
 
@@ -27,7 +28,7 @@ The selected subsequent-run contract is `moses-observed-analytical/1`:
 | Identity | Declare the required analytes or selected target before suggestion; preserve each observation's assignment evidence |
 | Detection | Determine observed presence from a qualified retention-time/assignment result within the acquisition window, independently of resolution availability |
 | Resolution | Use an explicitly named and qualified resolution definition; missing, nonfinite or unsupported results remain unavailable rather than proving separation |
-| Analytical acceptance | Every required analyte must have confirmed detection and meet the declared inclusive resolution threshold; a confirmed absent analyte or failed resolution fails acceptance, and unresolved evidence remains unknown unless failure is already established |
+| Analytical acceptance | Every required analyte must have confirmed detection and meet the declared inclusive resolution threshold; confirmed absence or an observed resolution below the threshold fails acceptance, and unavailable evidence remains unknown unless non-acceptance is already established |
 | Feasibility | Check the declared maximum acquisition time, method constraints and units separately from analytical acceptance |
 | Runtime preference | The five-minute hierarchy threshold is an optimization preference; it is not automatically a hard analytical-acceptance condition |
 | Utility | Declare the scalarizer version, criterion order, bounds, thresholds, continuation rule and binary64 arithmetic before the campaign; retain their decomposition |
@@ -50,10 +51,11 @@ and their Gaussian reconstruction do not supply that qualification.
 
 ## Evidence required before fresh optimization
 
-The next milestone must implement this contract at its observation boundary,
-qualify the selected retention or signal producer with independent numerical
-and dimensional checks, and test the distinction among success, known
-non-acceptance and unknown. A scalar score cutoff alone is insufficient.
+The observation boundary distinguishes accepted, known non-acceptance and
+unknown. Failed measurement or evaluation attempts provide unavailable evidence;
+they do not establish analytical non-acceptance. A scalar score cutoff alone is
+insufficient. Qualification of the selected retention or signal producer still
+requires independent numerical and dimensional checks.
 
 New suggestions must be generated using the selected utility and the same
 recorded evidence snapshot. Reclassifying the existing archive is a paired

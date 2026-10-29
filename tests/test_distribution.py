@@ -87,3 +87,23 @@ def test_analysis_example_outside_checkout(tmp_path):
     result = json.loads(completed.stdout)
     assert result["peak_count"] == 1
     assert len(result["input_sha256"]) == 64
+
+
+def test_observation_example_outside_checkout_preserves_three_valued_evidence(tmp_path):
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "examples" / "observations.py")],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        cwd=tmp_path,
+        check=True,
+    )
+    evidence = json.loads(completed.stdout)
+    assert evidence["analytical_acceptance"] == "accepted"
+    assert evidence["feasible"] is True
+    assert evidence["runtime_preference_satisfied"] is False
+    assert evidence["corrected_acceptance"] == "not_accepted"
+    assert evidence["ambiguous_acceptance"] == "unknown"
+    assert evidence["historical_observation_unchanged"] is True
+    assert evidence["origin"] == "simulator_latent"
+    assert len(evidence["snapshot_sha256"]) == 64

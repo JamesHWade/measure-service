@@ -40,6 +40,7 @@ configuration and a numerical analysis example.
 | Comparison | SEC deltas and method/backend/unit comparability flags | No statistical equivalence claim |
 | Method declarations | Isocratic/linear gradients, explicit units, flow/solvent use, declared feasibility and immutable method identities | No optimizer-domain sampling, pressure model or acquisition |
 | Experiment tracking | Intended and actual conditions, attempt revisions, evidence-linked outcomes and explicit corrections | Reported records; no execution or optimizer state machine |
+| Analytical acceptance | Predeclared analyte cohorts, evidence-bound three-valued decisions and immutable observation snapshots | Assignments and producer qualifications remain separate |
 
 Registry operations, import and record retrieval work without R. Numerical
 analysis and `measurement_capabilities` require R; use
@@ -56,6 +57,7 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Scientific methods and interpretation](docs/analysis.md)
 - [Chromatography method declarations](docs/methods.md)
 - [Experiment and result contracts](docs/experiments.md)
+- [Analytical observation evidence and snapshots](docs/observation-evidence.md)
 - [MCP tool reference](docs/tools.md)
 - [Architecture and package boundaries](docs/architecture.md)
 - [HTTP deployment, identity and storage](docs/deployment.md)
