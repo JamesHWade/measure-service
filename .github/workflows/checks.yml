@@ -57,6 +57,12 @@ jobs:
               members = {member.name.partition("/")[2] for member in source.getmembers()}
           assert "docs/moses-reproduction.md" in members
           assert "scripts/plot_moses_replay.R" in members
+          assert "scripts/plot_synthetic_campaigns.R" in members
+          assert "docs/reference-data/synthetic-evaluations.csv" in members
+          assert "docs/reference-data/synthetic-analytes.csv" in members
+          assert "docs/reference-data/synthetic-reference.json" in members
+          assert "docs/figures/synthetic-success.png" in members
+          assert "docs/figures/synthetic-utility.svg" in members
           PY
       - name: Check upgrade from the standalone method distribution
         run: python scripts/check_distribution_upgrade.py dist/*.whl

@@ -1,0 +1,250 @@
+{
+  "counts": {
+    "actual_gp_calls": 42,
+    "analytes": 360,
+    "campaigns": 12,
+    "evaluations": 120
+  },
+  "files": {
+    "figures/synthetic-success.png": {
+      "sha256": "6d14a7adb84852eaf88fdec23cfe085d1cbd54a2e618b366131961970562c066",
+      "size_bytes": 88813
+    },
+    "figures/synthetic-success.svg": {
+      "sha256": "8c9b755f217657e81461856156fc36788230c18c1b1a73335c34aef54a1a8433",
+      "size_bytes": 199626
+    },
+    "figures/synthetic-utility.png": {
+      "sha256": "6c293c44da5b6d4819ca4f7b8ab73d0beb0e92931174ee0cead1a1d7302f6d14",
+      "size_bytes": 99707
+    },
+    "figures/synthetic-utility.svg": {
+      "sha256": "9dcf83298072d3c3a2fe41062d5a23e44a863d5bfe310480d5202144034ee66f",
+      "size_bytes": 195011
+    },
+    "reference-data/synthetic-analytes.csv": {
+      "sha256": "f4eead9c36a29d2c4cc2e54cc48a76dd63bf42e4a66c1db37cf77f3e8e293e87",
+      "size_bytes": 28581
+    },
+    "reference-data/synthetic-evaluations.csv": {
+      "sha256": "5c14754d6530071ae0a1fbad1ada3ebad139aaaa88982d8db0400ff52dee2d89",
+      "size_bytes": 22440
+    }
+  },
+  "grains": {
+    "synthetic-analytes.csv": [
+      "task_id",
+      "seed",
+      "policy",
+      "ordinal",
+      "analyte_id"
+    ],
+    "synthetic-evaluations.csv": [
+      "task_id",
+      "seed",
+      "policy",
+      "ordinal"
+    ]
+  },
+  "limitations": {
+    "analytical_success_series": "separate strict observation-contract acceptance",
+    "finite_resolution_count_is_analytical_detection": false,
+    "fwhm_values_are_declared_synthetic_assumptions": true,
+    "instrument_qualified": false,
+    "manuscript_protocol_match": false,
+    "multi_fidelity": false,
+    "noise": "none",
+    "physical_model_fit": false,
+    "retention_models_are_constructed_equations_not_physical_fits": true,
+    "score_success_series": "finite-resolution utility score >= 2.0",
+    "trace_simulation_or_signal_processing_qualified": false,
+    "utility_input_definition": "finite-resolution-reference/1",
+    "utility_profile": "moses-botier-1.0.0-binary64/1"
+  },
+  "missingness": "Empty numeric cells remain unavailable; they are not zero. Censored analyte states are explicit.",
+  "outcomes": [
+    {
+      "cohort_size": 6,
+      "high_fidelity_budget": 10,
+      "observed_at_budget_count": 6,
+      "observed_no_success_count": 0,
+      "policy": "random",
+      "recorded_campaign_count": 6,
+      "series": "strict_analytical_accepted",
+      "success_count": 5,
+      "success_fraction": 0.8333333333333334,
+      "success_fraction_upper_bound": 1.0,
+      "unknown_success_count": 1
+    },
+    {
+      "cohort_size": 6,
+      "high_fidelity_budget": 10,
+      "observed_at_budget_count": 6,
+      "observed_no_success_count": 0,
+      "policy": "random",
+      "recorded_campaign_count": 6,
+      "series": "finite_resolution_score_ge_2",
+      "success_count": 6,
+      "success_fraction": 1.0,
+      "success_fraction_upper_bound": 1.0,
+      "unknown_success_count": 0
+    },
+    {
+      "cohort_size": 6,
+      "high_fidelity_budget": 10,
+      "observed_at_budget_count": 6,
+      "observed_no_success_count": 0,
+      "policy": "bo_mcp_gp_logei",
+      "recorded_campaign_count": 6,
+      "series": "strict_analytical_accepted",
+      "success_count": 5,
+      "success_fraction": 0.8333333333333334,
+      "success_fraction_upper_bound": 1.0,
+      "unknown_success_count": 1
+    },
+    {
+      "cohort_size": 6,
+      "high_fidelity_budget": 10,
+      "observed_at_budget_count": 6,
+      "observed_no_success_count": 3,
+      "policy": "bo_mcp_gp_logei",
+      "recorded_campaign_count": 6,
+      "series": "finite_resolution_score_ge_2",
+      "success_count": 3,
+      "success_fraction": 0.5,
+      "success_fraction_upper_bound": 0.5,
+      "unknown_success_count": 0
+    }
+  ],
+  "plot_script_sha256": "3eeadeb07d8064c3ad7bcf2cdccdfc43a37d0471345f2c39181594e5e5360e85",
+  "predeclared_input_sha256": "0728c6b2e03132d2889fef030c57a5331cae24067ca3fc5e6c40256f1238b38e",
+  "profile": "synthetic-isocratic-paired-comparison/1",
+  "run_created_at": "2026-10-30T12:01:47.294334+00:00",
+  "runner_module_sha256": "bef7452723735d74fc5be77746a78242e6311f96f0ff452c83432bcff89e0c06",
+  "runtime": {
+    "acquisition_implementation": "qLogExpectedImprovement",
+    "acquisition_method": "expected_improvement",
+    "adapter_profile": "bo-mcp-gp-logei/1",
+    "adapter_source_sha256": "1fca31cea7ac85d1d3ccb54128028f38f3e5398fc543e00d411652aaadeea5ca",
+    "backend_class": "BoTorchBackend",
+    "backend_id": "bo-engine/BoTorchBackend",
+    "backend_name": "bo-mcp",
+    "backend_sha256": "1619ae8f66b9c544eac02472d61e5048ebab10c310600ef775db65c8a97b8207",
+    "campaign_protocol_source_sha256": "809f252b8129987e0e5de26b9e75ea0717e6a7467f9da9c6af1943f0e5342585",
+    "design_kernel_source_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+    "distribution_versions": {
+      "bo-engine": "0.1.0",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "measure-service": "0.1.0.dev0",
+      "torch": "2.15.0"
+    },
+    "generation_method": "bo",
+    "model_type": "SingleTaskGP",
+    "optimization_strategy": "L-BFGS-B with random restarts",
+    "protocol_sha256": "eccbeb2c3b48e335837ef6ad294a368285961166a51f6d80401ae81620307038",
+    "runtime": {
+      "device": "cpu",
+      "elapsed_seconds": 6.078482166863978,
+      "implementation": "CPython",
+      "platform": "darwin",
+      "python_version": "3.13.11"
+    },
+    "seed": 17,
+    "settings": {
+      "acquisition_implementation": "qLogExpectedImprovement",
+      "acquisition_method": "expected_improvement",
+      "acquisition_optimization": {
+        "configured_num_restarts": null,
+        "configured_raw_samples": null,
+        "num_restarts": 14,
+        "raw_samples": 512
+      },
+      "backend_state": "stateless; no prior backend state supplied",
+      "batch_size": 1,
+      "input_transform": "BoTorch SingleTaskGP default input normalization",
+      "iteration": 6,
+      "kernel": "RBF with automatic relevance determination (ARD); BoTorch SingleTaskGP default, no custom covar_module",
+      "objective": {
+        "direction": "maximize",
+        "name": "utility"
+      },
+      "outcome_transform": "BoTorch SingleTaskGP default outcome standardization",
+      "parameters": [
+        "strong_solvent_fraction",
+        "acquisition_duration_min"
+      ],
+      "replay": "ordered training history is supplied on every call"
+    },
+    "source_revision": null,
+    "source_tree_sha256": "f7f9b9003ff61e05e0f93629e07e0a21b0b6947ff9fafbc7428822c1e6887fb9",
+    "suggestion_provenance": {
+      "acquisition_function": "expected_improvement",
+      "batch_index": 0,
+      "confidence_level": "low",
+      "generation_method": "bo",
+      "iteration": 6,
+      "model_type": "SingleTaskGP (Gaussian Process)",
+      "random_seed": 1520860147
+    },
+    "training_count": 6,
+    "training_sha256": "0144e7e9b71fe26a34dbd130de1ecdec967510372ca7900293ee8c5bdad5ff6c",
+    "warnings": []
+  },
+  "schema_version": 1,
+  "source_commit": "3d5db431dd5c4c3297916123ed315e8f2e394771",
+  "source_complete_json_sha256": "002a458adf393a407723a47bd2d8096c28ec97c2f3ba385c6faf33aa4d7c79b9",
+  "source_core_manifest": {
+    "files": {
+      "campaigns.jsonl": {
+        "sha256": "4ba9486013f8a4f35b5f13b2683d360572e6e33c77683897068d5468be91dfb7",
+        "size_bytes": 7060073
+      },
+      "evaluations.csv": {
+        "sha256": "3576451d6ca2fd6a95c27424271c80ba4c340d424c3b5f3bda076afc76ccfac4",
+        "size_bytes": 236331
+      },
+      "evaluations.jsonl": {
+        "sha256": "58f87c4cd9b6cd591055d26dca5a011596df24f20a7c3456657c7e973f220dd7",
+        "size_bytes": 6955205
+      },
+      "measure.sqlite3": {
+        "sha256": "936065b12d3111daa4a3dc933659a9d3fa1668e1d384118b7a5ae1afa82b4039",
+        "size_bytes": 12890112
+      },
+      "paired-comparisons.csv": {
+        "sha256": "30c131f987c742406805f9687c059120ba7e019853fdac7dcd61fe16499656da",
+        "size_bytes": 3305
+      },
+      "protocol.json": {
+        "sha256": "a2b5500e59b752a3b57b22cbb188607a56686b7ed190b1c06635fee221d748c3",
+        "size_bytes": 24289
+      },
+      "report.json": {
+        "sha256": "35e37160fbf85d693af06330e2655e867aef4177e3a400596bfea7557726e269",
+        "size_bytes": 11762428
+      },
+      "report.md": {
+        "sha256": "6046d7a51d6a1a3571629f346605c8c4c1311c64e1994080e2f149fd8a665f1f",
+        "size_bytes": 2667
+      },
+      "success-trajectories.csv": {
+        "sha256": "17419b7e93a7098c10db9438f63dccc1b61eb4bd1740d9c321d2ff88681d4cd2",
+        "size_bytes": 3227
+      }
+    },
+    "schema_version": 1
+  },
+  "units": {
+    "acquisition_duration_min": "min",
+    "declared_cost": "synthetic_evaluation",
+    "declared_solvent_volume_ml": "mL declared by the synthetic method",
+    "optimizer_walltime_seconds": "s, unavailable for the random and initialization steps",
+    "ordinal": "zero-based evaluation ordinal",
+    "resolution": "1",
+    "retention_time_min": "min",
+    "strong_solvent_fraction": "1",
+    "utility_score": "source profile units"
+  },
+  "validated_source_tree": "411c9609a8e8252c90af5eec132c9b40caa9c636"
+}

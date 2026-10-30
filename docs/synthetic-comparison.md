@@ -7,6 +7,10 @@ initial points. The complete plan contains twelve campaigns and 120 evaluation
 slots. Every task and seed stays in the report, whether it succeeds, fails or
 leaves an outcome unresolved.
 
+The [recorded reference result](synthetic-reference-results.md) includes checked
+trajectories, the complete public numerical tables and the distinctions between
+analytical acceptance and source-utility success.
+
 Install the [optional BO-MCP runtime](campaign-runtime.md#optional-real-bo-mcp-runtime)
 and configure `MEASURE_BO_PYTHON`. From an installed service environment:
 
