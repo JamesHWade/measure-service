@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 39 tools.
+The current catalog contains 43 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -24,6 +24,8 @@ The current catalog contains 39 tools.
 | `measurement_get_analysis` | `analysis_id` | read | idempotent |
 | `measurement_get_attempt` | `attempt_id` | read | idempotent |
 | `measurement_get_experiment` | `experiment_id` | read | idempotent |
+| `measurement_get_gaussian_observation` | `run_id` | read | idempotent |
+| `measurement_get_gaussian_producer` | `producer_id` | read | idempotent |
 | `measurement_get_method` | `method_id` | read | idempotent |
 | `measurement_get_observation` | `observation_id` | read | idempotent |
 | `measurement_get_observation_contract` | `contract_id` | read | idempotent |
@@ -42,9 +44,11 @@ The current catalog contains 39 tools.
 | `measurement_read_analysis_data` | `analysis_id`, `kind` | read | idempotent |
 | `measurement_read_source` | `dataset_id` | read | idempotent |
 | `measurement_record_attempt` | `experiment_id`, `spec`, `idempotency_key` | write | idempotent |
+| `measurement_record_gaussian_observation` | `producer_id`, `prediction_id`, `attempt_id`, `expected_attempt_revision`, `idempotency_key` | write | idempotent |
 | `measurement_record_results` | `attempt_id`, `expected_attempt_revision`, `results`, `idempotency_key` | write | idempotent |
 | `measurement_register_csv` | `title`, `csv_text`, `axis_column`, `signal_column`, `metadata` | write | creates new record |
 | `measurement_register_dataset` | `dataset` | write | creates new record |
+| `measurement_register_gaussian_producer` | `title`, `retention_model_id`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_register_long_csv` | `title`, `csv_text`, `axis_column`, `signal_column`, `group_columns`, `groups` | write | creates new record |
 | `measurement_register_method` | `title`, `declaration`, `idempotency_key` | write | idempotent |
 | `measurement_register_observation_contract` | `title`, `spec`, `idempotency_key` | write | idempotent |
@@ -95,6 +99,14 @@ Read the latest or a specific historical attempt revision, including sample/inje
 ### `measurement_get_experiment`
 
 Retrieve an experiment's intended conditions and caller-declared origin.
+
+### `measurement_get_gaussian_observation`
+
+Read an immutable owned Gaussian producer run and its exact prediction, assumed widths and generated result identities.
+
+### `measurement_get_gaussian_producer`
+
+Retrieve the owned immutable latent-producer declaration, assumed FWHM widths and retention-model identity.
 
 ### `measurement_get_method`
 
@@ -168,6 +180,10 @@ Read a bounded character page of the retained original CSV/TSV text and its impo
 
 Record one attempted experiment, its reported status/actual conditions and owned dataset/trace links; no instrument action occurs.
 
+### `measurement_record_gaussian_observation`
+
+Atomically retain latent Gaussian results for a prebound completed simulator attempt and its exact actual-method prediction; returns result IDs for separate analytical assessment and snapshot selection.
+
 ### `measurement_record_results`
 
 Atomically record outcomes against an exact attempt revision; copy numeric analysis-summary values or record explicit caller-reported outcomes. Units are caller-declared.
@@ -179,6 +195,10 @@ Register one explicitly mapped numeric trace from bounded CSV/TSV text; metadata
 ### `measurement_register_dataset`
 
 Register bounded one-dimensional traces and their sample, injection, detector and unit metadata.
+
+### `measurement_register_gaussian_producer`
+
+Declare immutable synthetic Gaussian widths for an owned synthetic retention model before an experiment; does not fit physical peak widths or identify chemicals.
 
 ### `measurement_register_long_csv`
 

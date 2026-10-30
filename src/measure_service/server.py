@@ -23,8 +23,9 @@ from mcp.types import ToolAnnotations
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from . import experiments as registry
-from . import method_registry, observations, retention
+from . import gaussian_producer, method_registry, observations, retention
 from .experiments import AttemptSpec, ExperimentSpec, ResultSpec
+from .gaussian_producer import GaussianProducerSpec
 from .methods import (
     MAX_CONSTRAINTS_BYTES,
     MAX_GRADIENT_POINTS,
@@ -585,6 +586,7 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "analytical_observations": "exact_attempt_and_result_evidence_with_three_valued_acceptance",
         "observation_snapshots": "immutable_explicit_membership_without_duplicate_attempts",
         "retention_models": "explicit_ideal_reference_inputs_with_immutable_predictions",
+        "gaussian_observation_producer": "predeclared_synthetic_widths_and_exact_prediction_bound_results",
         "limits": {
             "record_bytes": registry.MAX_RECORD_BYTES,
             "page_size": registry.MAX_REGISTRY_PAGE,
@@ -850,6 +852,52 @@ def measurement_predict_retention(
 def measurement_get_retention_prediction(prediction_id: RecordId, ctx: Context) -> dict[str, Any]:
     """Retrieve an immutable ideal prediction and its exact model, method, solver and backend evidence."""
     return retention.get_retention_prediction(identity(ctx), prediction_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_register_gaussian_producer(
+    title: Annotated[str, Field(min_length=1, max_length=200)],
+    retention_model_id: RecordId,
+    spec: GaussianProducerSpec,
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Declare immutable synthetic Gaussian widths for an owned synthetic retention model before an experiment; does not fit physical peak widths or identify chemicals."""
+    return gaussian_producer.register_gaussian_producer(
+        identity(ctx), title, retention_model_id, spec, idempotency_key
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_gaussian_producer(producer_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Retrieve the owned immutable latent-producer declaration, assumed FWHM widths and retention-model identity."""
+    return gaussian_producer.get_gaussian_producer(identity(ctx), producer_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_record_gaussian_observation(
+    producer_id: RecordId,
+    prediction_id: RecordId,
+    attempt_id: RecordId,
+    expected_attempt_revision: Annotated[int, Field(ge=1)],
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Atomically retain latent Gaussian results for a prebound completed simulator attempt and its exact actual-method prediction; returns result IDs for separate analytical assessment and snapshot selection."""
+    return gaussian_producer.record_gaussian_observation(
+        identity(ctx),
+        producer_id,
+        prediction_id,
+        attempt_id,
+        expected_attempt_revision,
+        idempotency_key,
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_gaussian_observation(run_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read an immutable owned Gaussian producer run and its exact prediction, assumed widths and generated result identities."""
+    return gaussian_producer.get_gaussian_observation(identity(ctx), run_id)
 
 
 @mcp.tool(annotations=READ, structured_output=True)

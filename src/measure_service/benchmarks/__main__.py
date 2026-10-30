@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from ..moses_score_qualification import qualify_moses_scores
+from .gaussian_qualification import qualify_gaussian_producer
 from .moses_archive import fetch_archive, inspect_archive
 from .moses_replay import analyze_archive
 from .moses_sensitivity import compare_moses_trajectories
@@ -48,6 +49,12 @@ def main() -> None:
     retention.add_argument("--law-oracle-json", type=Path, default=DEFAULT_LAW_ORACLE)
     retention.add_argument("--trajectory-oracle-json", type=Path, default=DEFAULT_TRAJECTORY_ORACLE)
     retention.add_argument("--output-dir", type=Path, required=True)
+    gaussian = commands.add_parser(
+        "qualify-gaussian-producer",
+        help="qualify the synthetic Gaussian centroid producer against independent references",
+    )
+    gaussian.add_argument("--output-dir", type=Path, required=True)
+    gaussian.add_argument("--reference-json", type=Path, default=None)
     args = parser.parse_args()
     if args.command == "fetch-moses":
         print(fetch_archive(args.cache_dir))
@@ -80,13 +87,16 @@ def main() -> None:
     elif args.command == "compare-moses-trajectories":
         compare_moses_trajectories(args.replay_dir, args.qualification_dir, args.output_dir)
         print(args.output_dir / "report.md")
-    else:
+    elif args.command == "qualify-retention-inputs":
         qualify_retention_inputs(
             args.archive,
             args.output_dir,
             law_oracle_json=args.law_oracle_json,
             trajectory_oracle_json=args.trajectory_oracle_json,
         )
+        print(args.output_dir / "report.md")
+    else:
+        qualify_gaussian_producer(args.output_dir, reference_json=args.reference_json)
         print(args.output_dir / "report.md")
 
 

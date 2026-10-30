@@ -115,3 +115,18 @@ even after evidence is superseded. A changed request needs a new key; an invalid
 request rolls back its records and receipt. Contract/observation records and
 snapshot responses are bounded to 64,000 UTF-8 bytes. SQLite persistence and
 local concurrency do not establish a distributed acquisition guarantee.
+
+
+For experiments prebound to the [Gaussian latent producer](gaussian-observation-producer.md),
+linked results must be exact members of that immutable producer run for the
+current attempt revision. The assessment retains verified producer evidence.
+The latent model's known analyte labels do not establish chemical identity, and
+the producer's assumed widths do not qualify physical or processed-signal
+measurements. Caller-created replacements are rejected as producer evidence.
+
+For producer-bound observations, a result with `outcome_included: false` is a
+compact reference. Its `input_sha256` hashes the full immutable outcome returned
+by `measurement_get_result`; it does not hash the compact fields alone. Raw and
+normalized values and the exact result/attempt/analyte identities remain in the
+assessment evidence. The verified producer run retains shared source metadata.
+Existing unbound observations continue to retain their full outcome snapshots.

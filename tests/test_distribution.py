@@ -31,9 +31,14 @@ def test_method_backend_imports_without_service_or_mcp(tmp_path):
     probe = """
 import sys
 from measure_methods import constant_solvent_use, program_solvent_use
+from measure_methods.gaussian_observations import GaussianAnalyte, simulate_gaussian_centroids
 
 assert constant_solvent_use(1, 1, {"A": 1}) == {"A": 1.0}
 assert program_solvent_use([0, 1], [1, 1], [{"A": 1}, {"A": 1}]) == {"A": 1.0}
+assert simulate_gaussian_centroids(
+    analytes=[GaussianAnalyte("A", "eluted", 1.0, 0.2), GaussianAnalyte("B", "eluted", 1.0, 0.2)],
+    acquisition_duration_min=2.0,
+)["pairs"][0]["resolution"] == 0.0
 assert "measure_service" not in sys.modules
 assert "mcp" not in sys.modules
 """
@@ -130,14 +135,39 @@ def test_retention_example_outside_checkout_keeps_censoring_and_qualification_li
     assert evidence["qualification_scope"]["utility_score_calculated"] is False
 
 
-def test_installed_retention_references_match_the_reviewed_data_digests():
+def test_installed_numerical_references_match_the_reviewed_data_digests():
     import hashlib
 
+    from measure_service.benchmarks import gaussian_qualification as gaussian
     from measure_service.benchmarks import retention_qualification as qualification
 
     for path, expected in [
         (qualification.DEFAULT_LAW_ORACLE, qualification.EXPECTED_LAW_ORACLE_SHA256),
         (qualification.DEFAULT_TRAJECTORY_ORACLE, qualification.EXPECTED_TRAJECTORY_ORACLE_SHA256),
+        (gaussian.DEFAULT_REFERENCE_ORACLE, gaussian.EXPECTED_REFERENCE_SHA256),
     ]:
         assert path.is_file()
         assert hashlib.sha256(path.read_bytes()).hexdigest() == expected
+
+
+def test_generated_observation_example_outside_checkout(tmp_path):
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "examples" / "gaussian_observations.py")],
+        capture_output=True,
+        text=True,
+        timeout=45,
+        cwd=tmp_path,
+        check=True,
+    )
+    evidence = json.loads(completed.stdout)
+    assert evidence["profile"] == "ideal-gaussian-centroid/1"
+    assert evidence["fwhm_per_sigma"] == 2.3548
+    assert evidence["complete_analytical_acceptance"] == "accepted"
+    assert evidence["complete_runtime_preference"] is False
+    assert evidence["short_analytical_acceptance"] == "unknown"
+    assert evidence["short_censored_analytes"] == 2
+    assert evidence["short_has_no_fabricated_event_times"] is True
+    assert evidence["caller_replacement_rejected"] is True
+    assert evidence["original_run_and_snapshot_unchanged"] is True
+    assert evidence["observation_origin"] == "simulator_latent"
+    assert evidence["fresh_optimizer_run"] is False
