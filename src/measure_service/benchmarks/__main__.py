@@ -14,6 +14,7 @@ from .retention_qualification import (
     DEFAULT_TRAJECTORY_ORACLE,
     qualify_retention_inputs,
 )
+from .synthetic_campaigns import run_synthetic_campaigns
 
 
 def main() -> None:
@@ -55,6 +56,12 @@ def main() -> None:
     )
     gaussian.add_argument("--output-dir", type=Path, required=True)
     gaussian.add_argument("--reference-json", type=Path, default=None)
+    synthetic = commands.add_parser(
+        "run-synthetic-campaigns",
+        help="run or resume the fixed paired synthetic random/GP comparison",
+    )
+    synthetic.add_argument("--data-dir", type=Path, required=True)
+    synthetic.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "fetch-moses":
         print(fetch_archive(args.cache_dir))
@@ -95,8 +102,11 @@ def main() -> None:
             trajectory_oracle_json=args.trajectory_oracle_json,
         )
         print(args.output_dir / "report.md")
-    else:
+    elif args.command == "qualify-gaussian-producer":
         qualify_gaussian_producer(args.output_dir, reference_json=args.reference_json)
+        print(args.output_dir / "report.md")
+    else:
+        run_synthetic_campaigns(args.output_dir, data_dir=args.data_dir)
         print(args.output_dir / "report.md")
 
 
