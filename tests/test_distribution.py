@@ -161,6 +161,8 @@ def test_generated_observation_example_outside_checkout(tmp_path):
     )
     evidence = json.loads(completed.stdout)
     assert evidence["profile"] == "ideal-gaussian-centroid/1"
+    assert evidence["campaign_protocol_profile"] == "synthetic-isocratic-paired/1"
+    assert evidence["campaign_protocol_roundtrip"] is True
     assert evidence["fwhm_per_sigma"] == 2.3548
     assert evidence["complete_analytical_acceptance"] == "accepted"
     assert evidence["complete_runtime_preference"] is False

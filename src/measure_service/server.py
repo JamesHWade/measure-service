@@ -22,8 +22,15 @@ from mcp.server.fastmcp import Context, FastMCP
 from mcp.types import ToolAnnotations
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from . import (
+    campaign_protocol_registry,
+    gaussian_producer,
+    method_registry,
+    observations,
+    retention,
+)
 from . import experiments as registry
-from . import gaussian_producer, method_registry, observations, retention
+from .campaign_protocol import CampaignProtocolSpec
 from .experiments import AttemptSpec, ExperimentSpec, ResultSpec
 from .gaussian_producer import GaussianProducerSpec
 from .methods import (
@@ -898,6 +905,25 @@ def measurement_record_gaussian_observation(
 def measurement_get_gaussian_observation(run_id: RecordId, ctx: Context) -> dict[str, Any]:
     """Read an immutable owned Gaussian producer run and its exact prediction, assumed widths and generated result identities."""
     return gaussian_producer.get_gaussian_observation(identity(ctx), run_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_register_campaign_protocol(
+    title: Annotated[str, Field(min_length=1, max_length=200)],
+    spec: CampaignProtocolSpec,
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Freeze a bounded matched synthetic isocratic protocol and owned model, Gaussian producer and observation-contract identities before campaign execution; initialization counts against each arm's budget."""
+    return campaign_protocol_registry.register_campaign_protocol(
+        identity(ctx), title, spec, idempotency_key
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_campaign_protocol(protocol_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read an owned immutable matched protocol, complete task bindings, budgets, seeds and provenance."""
+    return campaign_protocol_registry.get_campaign_protocol(identity(ctx), protocol_id)
 
 
 @mcp.tool(annotations=READ, structured_output=True)

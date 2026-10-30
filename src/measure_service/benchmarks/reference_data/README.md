@@ -78,3 +78,13 @@ See [the executable guide](../../../../docs/gaussian-reference-benchmark.md).
 This reference qualifies a declared synthetic centroid calculation; it does
 not infer physical width, plate height, signal processing, chemical identity,
 instrument behavior or fresh optimizer performance.
+
+## Constructed synthetic campaign declaration
+
+`synthetic-isocratic-paired-v1.json` is an original, predeclared synthetic
+experiment design distributed under the repository's MIT license. It is not
+derived author data. Its two unfiltered constructed tasks, three seeds,
+ten-evaluation budgets and three shared initial candidate points are fixed
+before fresh optimizer execution. Its SHA256 is
+`0728c6b2e03132d2889fef030c57a5331cae24067ca3fc5e6c40256f1238b38e`.
+The file explicitly excludes manuscript equivalence and physical qualification.

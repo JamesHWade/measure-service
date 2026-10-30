@@ -181,6 +181,13 @@ def connect() -> sqlite3.Connection:
       ON gaussian_observations(owner, created_at, id);
     CREATE INDEX IF NOT EXISTS gaussian_observations_owner_attempt
       ON gaussian_observations(owner, attempt_id, attempt_revision);
+    CREATE TABLE IF NOT EXISTS campaign_protocols (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, title TEXT NOT NULL,
+      payload TEXT NOT NULL, input_digest TEXT NOT NULL,
+      output_digest TEXT NOT NULL, created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS campaign_protocols_owner_order
+      ON campaign_protocols(owner, created_at, id);
     """)
     return con
 

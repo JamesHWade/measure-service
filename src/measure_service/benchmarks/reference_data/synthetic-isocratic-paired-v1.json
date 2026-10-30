@@ -1,0 +1,58 @@
+{
+  "profile": "synthetic-isocratic-paired/1",
+  "declaration_version": "1",
+  "selection": "two predeclared unfiltered constructed tasks; no selection using optimizer outcomes",
+  "seeds": [17, 29, 43],
+  "evaluation_budget": 10,
+  "initial_design_size": 3,
+  "policies": ["random", "bo_mcp_gp_logei"],
+  "stopping_policy": "full_budget",
+  "flow_ml_min": 0.5,
+  "domain": {
+    "strong_solvent_fraction": {"lower": 0.1, "upper": 0.9},
+    "acquisition_duration_min": {"lower": 2.0, "upper": 10.0}
+  },
+  "evaluation_cost": 1.0,
+  "evaluation_cost_unit": "synthetic_evaluation",
+  "geometry": {
+    "column_length_m": 0.1,
+    "effective_area_m2": 0.0000025,
+    "post_column_volume_ml": 0.0
+  },
+  "contract": {
+    "resolution_threshold": 1.5,
+    "max_acquisition_duration_min": 10.0,
+    "runtime_preference_min": 5.0,
+    "count_threshold": 0.5
+  },
+  "tasks": [
+    {
+      "task_id": "parallel-linear",
+      "analytes": [
+        {"analyte_id": "A", "model": "linear", "ln_k0": 4.0, "S1": 6.0},
+        {"analyte_id": "B", "model": "linear", "ln_k0": 4.6, "S1": 6.0},
+        {"analyte_id": "C", "model": "linear", "ln_k0": 5.2, "S1": 6.0}
+      ],
+      "fwhm_min": 0.15
+    },
+    {
+      "task_id": "crossing-linear",
+      "analytes": [
+        {"analyte_id": "A", "model": "linear", "ln_k0": 3.0, "S1": 4.0},
+        {"analyte_id": "B", "model": "linear", "ln_k0": 4.5, "S1": 7.0},
+        {"analyte_id": "C", "model": "linear", "ln_k0": 6.0, "S1": 10.0}
+      ],
+      "fwhm_min": 0.15
+    }
+  ],
+  "scope": {
+    "observation_origin": "simulator_latent",
+    "fidelity": 1.0,
+    "noise": "none",
+    "initial_evaluations_count_against_each_arm": true,
+    "manuscript_protocol_match": false,
+    "physical_model_fit": false,
+    "signal_processing_qualified": false,
+    "instrument_qualified": false
+  }
+}

@@ -81,6 +81,38 @@ async def run(data_dir: str) -> dict:
                     "idempotency_key": "contract",
                 },
             )
+            protocol = await call(
+                "measurement_register_campaign_protocol",
+                {
+                    "title": "Predeclared synthetic reference campaign",
+                    "spec": {
+                        "domain": {
+                            "strong_solvent_fraction": {"lower": 0.1, "upper": 0.9},
+                            "acquisition_duration_min": {"lower": 2.0, "upper": 10.0},
+                        },
+                        "flow_ml_min": 0.5,
+                        "constraints": {"max_acquisition_duration_min": 10.0},
+                        "tasks": [
+                            {
+                                "task_id": "synthetic-reference",
+                                "producer_id": producer["producer_id"],
+                                "observation_contract_id": contract["contract_id"],
+                            }
+                        ],
+                        "seeds": [17],
+                        "evaluation_budget": 10,
+                        "initial_design_size": 3,
+                        "evaluation_cost": 1.0,
+                        "evaluation_cost_unit": "synthetic_evaluation",
+                    },
+                    "idempotency_key": "campaign-protocol",
+                },
+            )
+            retained_protocol = await call(
+                "measurement_get_campaign_protocol", {"protocol_id": protocol["protocol_id"]}
+            )
+            if retained_protocol != protocol:
+                raise RuntimeError("The immutable campaign protocol changed during retrieval")
 
             async def observe(duration, label):
                 method = await call(
@@ -204,6 +236,8 @@ async def run(data_dir: str) -> dict:
                     "A later result correction rewrote generated evidence or history"
                 )
             return {
+                "campaign_protocol_profile": protocol["spec"]["profile"],
+                "campaign_protocol_roundtrip": True,
                 "profile": complete["observation"]["profile"],
                 "resolution_definition": complete["observation"]["resolution_definition"],
                 "fwhm_per_sigma": complete["observation"]["fwhm_per_sigma"],

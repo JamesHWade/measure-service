@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 43 tools.
+The current catalog contains 45 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -23,6 +23,7 @@ The current catalog contains 43 tools.
 | `measurement_evaluate_observation` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_get_analysis` | `analysis_id` | read | idempotent |
 | `measurement_get_attempt` | `attempt_id` | read | idempotent |
+| `measurement_get_campaign_protocol` | `protocol_id` | read | idempotent |
 | `measurement_get_experiment` | `experiment_id` | read | idempotent |
 | `measurement_get_gaussian_observation` | `run_id` | read | idempotent |
 | `measurement_get_gaussian_producer` | `producer_id` | read | idempotent |
@@ -46,6 +47,7 @@ The current catalog contains 43 tools.
 | `measurement_record_attempt` | `experiment_id`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_record_gaussian_observation` | `producer_id`, `prediction_id`, `attempt_id`, `expected_attempt_revision`, `idempotency_key` | write | idempotent |
 | `measurement_record_results` | `attempt_id`, `expected_attempt_revision`, `results`, `idempotency_key` | write | idempotent |
+| `measurement_register_campaign_protocol` | `title`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_register_csv` | `title`, `csv_text`, `axis_column`, `signal_column`, `metadata` | write | creates new record |
 | `measurement_register_dataset` | `dataset` | write | creates new record |
 | `measurement_register_gaussian_producer` | `title`, `retention_model_id`, `spec`, `idempotency_key` | write | idempotent |
@@ -95,6 +97,10 @@ Retrieve a compact analysis record, method, diagnostics and provenance.
 ### `measurement_get_attempt`
 
 Read the latest or a specific historical attempt revision, including sample/injection metadata from its linked traces.
+
+### `measurement_get_campaign_protocol`
+
+Read an owned immutable matched protocol, complete task bindings, budgets, seeds and provenance.
 
 ### `measurement_get_experiment`
 
@@ -187,6 +193,10 @@ Atomically retain latent Gaussian results for a prebound completed simulator att
 ### `measurement_record_results`
 
 Atomically record outcomes against an exact attempt revision; copy numeric analysis-summary values or record explicit caller-reported outcomes. Units are caller-declared.
+
+### `measurement_register_campaign_protocol`
+
+Freeze a bounded matched synthetic isocratic protocol and owned model, Gaussian producer and observation-contract identities before campaign execution; initialization counts against each arm's budget.
 
 ### `measurement_register_csv`
 
