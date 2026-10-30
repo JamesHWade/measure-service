@@ -79,6 +79,13 @@ strata once; coordinate permutations and within-stratum draws use separate
 standard-library random streams. This is the declared baseline design, not the
 author software's Sobol or polytope initialization.
 
+The reusable numerical functions are `measure_methods.design.latin_hypercube_design`
+and `uniform_random_point`. They accept explicit bound pairs and one integer
+stream seed per dimension, return coordinate tuples, and import no service,
+storage, schemas or identity code. The service prepares identity-derived seeds,
+normalizes the protocol and checks executable-method feasibility. Protocol
+provenance records the numerical design module's source hash separately.
+
 Seeds are predeclared integers from 0 through 2^31 - 1. The full protocol identity
 includes owned record IDs. Candidate random streams instead use a design
 digest that replaces opaque producer and contract IDs with logical task IDs.

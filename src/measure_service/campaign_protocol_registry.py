@@ -9,6 +9,8 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+from measure_methods import design
+
 from . import gaussian_producer, observations, retention
 from .campaign_protocol import CampaignProtocolSpec
 from .method_backend import method_backend_info
@@ -134,6 +136,9 @@ def register_campaign_protocol(
                     Path(protocol_module.__file__).read_bytes()
                 ).hexdigest(),
                 "registry_module_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                "design_kernel_module_sha256": hashlib.sha256(
+                    Path(design.__file__).read_bytes()
+                ).hexdigest(),
             },
         }
         _bounded(payload)

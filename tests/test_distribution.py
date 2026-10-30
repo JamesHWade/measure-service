@@ -31,9 +31,12 @@ def test_method_backend_imports_without_service_or_mcp(tmp_path):
     probe = """
 import sys
 from measure_methods import constant_solvent_use, program_solvent_use
+from measure_methods.design import latin_hypercube_design, uniform_random_point
 from measure_methods.gaussian_observations import GaussianAnalyte, simulate_gaussian_centroids
 
 assert constant_solvent_use(1, 1, {"A": 1}) == {"A": 1.0}
+assert len(latin_hypercube_design(bounds=[(0, 1)], size=3, dimension_seeds=[17])) == 3
+assert 0 <= uniform_random_point(bounds=[(0, 1)], dimension_seeds=[17])[0] <= 1
 assert program_solvent_use([0, 1], [1, 1], [{"A": 1}, {"A": 1}]) == {"A": 1.0}
 assert simulate_gaussian_centroids(
     analytes=[GaussianAnalyte("A", "eluted", 1.0, 0.2), GaussianAnalyte("B", "eluted", 1.0, 0.2)],

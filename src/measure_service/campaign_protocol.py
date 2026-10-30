@@ -10,10 +10,11 @@ from __future__ import annotations
 
 import hashlib
 import math
-import random
 from typing import Annotated, Any, Literal
 
 from pydantic import Field, StrictBool, StrictInt, field_validator, model_validator
+
+from measure_methods.design import latin_hypercube_design, uniform_random_point
 
 from .methods import (
     FiniteNumber,
@@ -268,14 +269,14 @@ def _validate_seed_ordinal(
         )
 
 
-def _random_stream(
+def _random_seed(
     spec: CampaignProtocolSpec,
     *,
     seed: int,
     stream: str,
     ordinal: int,
     coordinate: str,
-) -> random.Random:
+) -> int:
     entropy = {
         "campaign_design_sha256": campaign_design_sha256(spec),
         "seed": seed,
@@ -284,81 +285,30 @@ def _random_stream(
         "coordinate": coordinate,
     }
     digest = hashlib.sha256(canonical(entropy).encode("utf-8")).digest()
-    return random.Random(int.from_bytes(digest, "big"))
+    return int.from_bytes(digest, "big")
 
 
-def _candidate_from_unit_coordinates(
-    spec: CampaignProtocolSpec,
-    strong_unit: float,
-    duration_unit: float,
-) -> dict[str, float]:
-    strong = spec.domain.strong_solvent_fraction
-    duration = spec.domain.acquisition_duration_min
-    return {
-        "strong_solvent_fraction": strong.lower + (strong.upper - strong.lower) * strong_unit,
-        "acquisition_duration_min": duration.lower
-        + (duration.upper - duration.lower) * duration_unit,
-    }
-
-
-def _initial_design_units(spec: CampaignProtocolSpec, seed: int) -> list[tuple[float, float]]:
-    size = spec.initial_design_size
-    dimensions: list[list[float]] = []
-    for name in ("strong_solvent_fraction", "acquisition_duration_min"):
-        rng = _random_stream(
-            spec,
-            seed=seed,
-            stream="initial_lhs",
-            ordinal=0,
-            coordinate=name,
-        )
-        strata = list(range(size))
-        rng.shuffle(strata)
-        jitters = [rng.random() for _ in range(size)]
-        units = [(strata[index] + jitters[index]) / size for index in range(size)]
-        dimensions.append([math.nextafter(1.0, 0.0) if unit >= 1.0 else unit for unit in units])
-    return list(zip(dimensions[0], dimensions[1], strict=True))
+def _numeric_design_inputs(spec: CampaignProtocolSpec, seed: int, stream: str, ordinal: int):
+    names = ("strong_solvent_fraction", "acquisition_duration_min")
+    bounds = [
+        (getattr(spec.domain, name).lower, getattr(spec.domain, name).upper) for name in names
+    ]
+    seeds = [
+        _random_seed(spec, seed=seed, stream=stream, ordinal=ordinal, coordinate=name)
+        for name in names
+    ]
+    return bounds, seeds
 
 
 def _initial_design_is_representable(spec: CampaignProtocolSpec) -> bool:
-    size = spec.initial_design_size
-    bounds = (
-        spec.domain.strong_solvent_fraction,
-        spec.domain.acquisition_duration_min,
-    )
     for seed in spec.seeds:
-        units = _initial_design_units(spec, seed)
-        points = [
-            _candidate_from_unit_coordinates(spec, strong_unit, duration_unit)
-            for strong_unit, duration_unit in units
-        ]
-        point_values = [
-            (point["strong_solvent_fraction"], point["acquisition_duration_min"])
-            for point in points
-        ]
-        if len(set(point_values)) != size:
-            return False
-        for coordinate_index, (name, bound) in enumerate(
-            zip(
-                ("strong_solvent_fraction", "acquisition_duration_min"),
-                bounds,
-                strict=True,
+        bounds, dimension_seeds = _numeric_design_inputs(spec, seed, "initial_lhs", 0)
+        try:
+            latin_hypercube_design(
+                bounds=bounds, size=spec.initial_design_size, dimension_seeds=dimension_seeds
             )
-        ):
-            realized_strata: set[int] = set()
-            for point_units, point in zip(units, points, strict=True):
-                intended_unit = point_units[coordinate_index]
-                actual_value = point[name]
-                actual_unit = (actual_value - bound.lower) / (bound.upper - bound.lower)
-                if not math.isfinite(actual_unit) or not 0.0 <= actual_unit <= 1.0:
-                    return False
-                intended_stratum = min(size - 1, int(intended_unit * size))
-                actual_stratum = min(size - 1, int(actual_unit * size))
-                if actual_stratum != intended_stratum:
-                    return False
-                realized_strata.add(actual_stratum)
-            if realized_strata != set(range(size)):
-                return False
+        except ValueError:
+            return False
     return True
 
 
@@ -375,8 +325,11 @@ def initial_candidate(
     """
     protocol = _protocol_spec(spec)
     _validate_seed_ordinal(protocol, seed, ordinal, initial=True)
-    units = _initial_design_units(protocol, seed)
-    return _candidate_from_unit_coordinates(protocol, *units[ordinal])
+    bounds, dimension_seeds = _numeric_design_inputs(protocol, seed, "initial_lhs", 0)
+    point = latin_hypercube_design(
+        bounds=bounds, size=protocol.initial_design_size, dimension_seeds=dimension_seeds
+    )[ordinal]
+    return dict(zip(("strong_solvent_fraction", "acquisition_duration_min"), point, strict=True))
 
 
 def random_candidate(
@@ -384,23 +337,15 @@ def random_candidate(
 ) -> dict[str, float]:
     """Return one stateless random-policy candidate for a later ordinal.
 
-    The per-coordinate RNG is derived from the normalized protocol hash, seed,
+    The per-coordinate RNG is derived from the normalized design hash, seed,
     ordinal and coordinate name. Replaying a candidate needs no persisted RNG
     state and does not execute an optimizer.
     """
     protocol = _protocol_spec(spec)
     _validate_seed_ordinal(protocol, seed, ordinal, initial=False)
-    units = [
-        _random_stream(
-            protocol,
-            seed=seed,
-            stream="random_policy",
-            ordinal=ordinal,
-            coordinate=name,
-        ).random()
-        for name in ("strong_solvent_fraction", "acquisition_duration_min")
-    ]
-    return _candidate_from_unit_coordinates(protocol, *units)
+    bounds, dimension_seeds = _numeric_design_inputs(protocol, seed, "random_policy", ordinal)
+    point = uniform_random_point(bounds=bounds, dimension_seeds=dimension_seeds)
+    return dict(zip(("strong_solvent_fraction", "acquisition_duration_min"), point, strict=True))
 
 
 def method_declaration(
