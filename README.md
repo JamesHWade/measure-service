@@ -67,6 +67,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Reproduce the independent Gaussian reference checks](docs/gaussian-reference-benchmark.md)
 - [Declare matched synthetic campaign protocols](docs/synthetic-campaigns.md)
 - [Run durable synthetic campaigns with optional BO-MCP](docs/campaign-runtime.md)
+- [Reproduce the fixed paired synthetic comparison](docs/synthetic-comparison.md)
 - [Retention equations, units and qualification scope](docs/retention-model-qualification.md)
 - [Reproduce archived retention input qualification](docs/retention-reference-benchmark.md)
 - [MCP tool reference](docs/tools.md)
