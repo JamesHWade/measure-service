@@ -20,10 +20,18 @@ from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import Context, FastMCP
 from mcp.types import ToolAnnotations
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
+from . import (
+    campaign_protocol_registry,
+    campaigns,
+    gaussian_producer,
+    method_registry,
+    observations,
+    retention,
+)
 from . import experiments as registry
-from . import gaussian_producer, method_registry, observations, retention
+from .campaign_protocol import CampaignProtocolSpec
 from .experiments import AttemptSpec, ExperimentSpec, ResultSpec
 from .gaussian_producer import GaussianProducerSpec
 from .methods import (
@@ -579,7 +587,7 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
             "infeasible",
         ],
         "idempotency": "required_key_per_owner_for_registry_writes",
-        "bo_suggestions": False,
+        "bo_suggestions": True,
         "instrument_actuation": False,
         "executable_method_links": "owned_immutable_methods_with_digests",
         "observation_contracts": "predeclared_immutable_analytes_and_acceptance_rules",
@@ -587,6 +595,15 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "observation_snapshots": "immutable_explicit_membership_without_duplicate_attempts",
         "retention_models": "explicit_ideal_reference_inputs_with_immutable_predictions",
         "gaussian_observation_producer": "predeclared_synthetic_widths_and_exact_prediction_bound_results",
+        "synthetic_campaigns": {
+            "profile": "synthetic-isocratic-paired/1",
+            "execution": "sequential_single_fidelity_simulator_latent",
+            "policies": ["random", "bo_mcp_gp_logei"],
+            "bo_runtime": "optional_administrator_configured_MEASURE_BO_PYTHON",
+            "bo_runtime_configured": bool(os.environ.get("MEASURE_BO_PYTHON")),
+            "outcome_consumption": "exact_owned_immutable_observation_snapshot",
+            "generic_bo_service": False,
+        },
         "limits": {
             "record_bytes": registry.MAX_RECORD_BYTES,
             "page_size": registry.MAX_REGISTRY_PAGE,
@@ -898,6 +915,86 @@ def measurement_record_gaussian_observation(
 def measurement_get_gaussian_observation(run_id: RecordId, ctx: Context) -> dict[str, Any]:
     """Read an immutable owned Gaussian producer run and its exact prediction, assumed widths and generated result identities."""
     return gaussian_producer.get_gaussian_observation(identity(ctx), run_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_register_campaign_protocol(
+    title: Annotated[str, Field(min_length=1, max_length=200)],
+    spec: CampaignProtocolSpec,
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Freeze a bounded matched synthetic isocratic protocol and owned model, Gaussian producer and observation-contract identities before campaign execution; initialization counts against each arm's budget."""
+    return campaign_protocol_registry.register_campaign_protocol(
+        identity(ctx), title, spec, idempotency_key
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_campaign_protocol(protocol_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read an owned immutable matched protocol, complete task bindings, budgets, seeds and provenance."""
+    return campaign_protocol_registry.get_campaign_protocol(identity(ctx), protocol_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_create_campaign(
+    protocol_id: RecordId,
+    task_id: RecordId,
+    seed: Annotated[StrictInt, Field(ge=0, le=2**31 - 1)],
+    policy: Literal["random", "bo_mcp_gp_logei"],
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Create one owned sequential synthetic task/seed/policy arm from a frozen protocol; all initialization consumes its declared evaluation budget."""
+    return campaigns.create_campaign(
+        identity(ctx), protocol_id, task_id, seed, policy, idempotency_key
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_campaign(campaign_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Inspect an owned synthetic campaign's revision, pending proposal, budget and compact immutable consumption history."""
+    return campaigns.get_campaign(identity(ctx), campaign_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_suggest_campaign(
+    campaign_id: RecordId,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Atomically retain one feasible synthetic proposal and its exact training-snapshot identities; uses common initialization, deterministic random sampling or the optional BO-MCP runtime without fallback."""
+    return campaigns.suggest_campaign(
+        identity(ctx), campaign_id, expected_revision, idempotency_key
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_campaign_proposal(proposal_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read an owned immutable proposal with its executable method, exact consumed training references and actual policy/backend provenance."""
+    return campaigns.get_campaign_proposal(identity(ctx), proposal_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_consume_campaign_snapshot(
+    campaign_id: RecordId,
+    proposal_id: RecordId,
+    snapshot_id: RecordId,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Consume exactly one frozen complete generated observation for the pending proposal; preserve analytical unknowns and source-profile utility separately, with atomic budget/revision updates and retry receipts."""
+    return campaigns.consume_campaign_snapshot(
+        identity(ctx), campaign_id, proposal_id, snapshot_id, expected_revision, idempotency_key
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_campaign_consumption(consumption_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Retrieve the owned immutable consumption record, exact source digests, raw metrics, utility, analytical acceptance and declared expenditure."""
+    return campaigns.get_campaign_consumption(identity(ctx), consumption_id)
 
 
 @mcp.tool(annotations=READ, structured_output=True)

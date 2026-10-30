@@ -596,7 +596,9 @@ def test_registry_mcp_round_trip_without_r(tmp_path):
                     return response.structuredContent
 
                 caps = await call("measurement_registry_capabilities", {})
-                assert not caps["bo_suggestions"] and not caps["instrument_actuation"]
+                assert caps["bo_suggestions"] and not caps["instrument_actuation"]
+                assert caps["synthetic_campaigns"]["profile"] == "synthetic-isocratic-paired/1"
+                assert caps["synthetic_campaigns"]["generic_bo_service"] is False
                 exp_args = {
                     "spec": {"title": "MCP experiment", "source": "manual"},
                     "idempotency_key": "create",

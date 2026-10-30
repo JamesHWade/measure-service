@@ -8,8 +8,9 @@ MCP, storage or R. The service delegates trace analysis to the R packages
 [measure](https://github.com/JamesHWade/measure) and
 [measure.sec](https://github.com/JamesHWade/measure.sec).
 
-**Status: research prototype.** Local workflows are tested. A hosted deployment,
-BO integration and instrument control are not implemented or qualified.
+**Status: research prototype.** Local analytical workflows and a bounded
+synthetic campaign loop are tested. BO-MCP execution uses an optional separate
+runtime. Hosted deployment and instrument control are not qualified.
 
 ## Try it
 
@@ -43,14 +44,15 @@ configuration and a numerical analysis example.
 | Analytical acceptance | Predeclared analyte cohorts, evidence-bound three-valued decisions and immutable observation snapshots | Assignments and producer qualifications remain separate |
 | Ideal retention | Explicit linear, quadratic and Neue–Kuss laws, constant-flow inlet programs and immutable predictions | No fitting, gradient-delay inference, widths or physical qualification |
 | Latent Gaussian observations | Predeclared synthetic FWHM widths, prediction-bound generated results and immutable producer evidence | Finite-centroid reference; no traces, physical widths or signal processing |
+| Synthetic campaigns | Frozen isocratic protocols, sequential proposals and exact immutable outcome consumption; optional BO-MCP GP suggestions | Single-fidelity latent reference; no general BO or physical-instrument claim |
 
 Registry operations, import and record retrieval work without R. Numerical
 analysis and `measurement_capabilities` require R; use
 `measurement_registry_capabilities` for discovery without it.
 
 The service does not yet implement the full MoSeS or MOCCA2 workflow. LC-MS,
-GC-MS, DAD deconvolution, cross-run analyte tracking, retention-model fitting, BO
-suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
+GC-MS, DAD deconvolution, cross-run analyte tracking, retention-model fitting,
+broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 
 ## Documentation
 
@@ -63,6 +65,8 @@ suggestions and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Ideal retention declarations and predictions](docs/retention-predictions.md)
 - [Generate synthetic Gaussian observation evidence](docs/gaussian-observation-producer.md)
 - [Reproduce the independent Gaussian reference checks](docs/gaussian-reference-benchmark.md)
+- [Declare matched synthetic campaign protocols](docs/synthetic-campaigns.md)
+- [Run durable synthetic campaigns with optional BO-MCP](docs/campaign-runtime.md)
 - [Retention equations, units and qualification scope](docs/retention-model-qualification.md)
 - [Reproduce archived retention input qualification](docs/retention-reference-benchmark.md)
 - [MCP tool reference](docs/tools.md)

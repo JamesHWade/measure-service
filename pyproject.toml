@@ -39,7 +39,10 @@ measure_service = ["worker.R", "benchmarks/reference_data/*.json", "benchmarks/r
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["r_backend: requires R, measure, and the corrected measure.sec backend"]
+markers = [
+  "r_backend: requires R, measure, and the corrected measure.sec backend",
+  "bo_backend: requires MEASURE_BO_PYTHON with the optional public BO-MCP backend",
+]
 
 [tool.ruff]
 line-length = 100
