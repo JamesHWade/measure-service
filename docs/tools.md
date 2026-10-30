@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 45 tools.
+The current catalog contains 51 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -18,11 +18,16 @@ The current catalog contains 45 tools.
 | `measurement_analyze_sec` | `dataset_id`, `trace_id`, `method` | write | creates new record |
 | `measurement_capabilities` | — | read | idempotent |
 | `measurement_compare_sec` | `analysis_ids` | read | idempotent |
+| `measurement_consume_campaign_snapshot` | `campaign_id`, `proposal_id`, `snapshot_id`, `expected_revision`, `idempotency_key` | write | idempotent |
+| `measurement_create_campaign` | `protocol_id`, `task_id`, `seed`, `policy`, `idempotency_key` | write | idempotent |
 | `measurement_create_experiment` | `spec`, `idempotency_key` | write | idempotent |
 | `measurement_create_observation_snapshot` | `contract_id`, `observation_ids`, `idempotency_key` | write | idempotent |
 | `measurement_evaluate_observation` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_get_analysis` | `analysis_id` | read | idempotent |
 | `measurement_get_attempt` | `attempt_id` | read | idempotent |
+| `measurement_get_campaign` | `campaign_id` | read | idempotent |
+| `measurement_get_campaign_consumption` | `consumption_id` | read | idempotent |
+| `measurement_get_campaign_proposal` | `proposal_id` | read | idempotent |
 | `measurement_get_campaign_protocol` | `protocol_id` | read | idempotent |
 | `measurement_get_experiment` | `experiment_id` | read | idempotent |
 | `measurement_get_gaussian_observation` | `run_id` | read | idempotent |
@@ -58,6 +63,7 @@ The current catalog contains 45 tools.
 | `measurement_register_wide_csv` | `title`, `csv_text`, `axis_column`, `channels` | write | creates new record |
 | `measurement_registry_capabilities` | — | read | idempotent |
 | `measurement_revise_attempt` | `attempt_id`, `expected_revision`, `spec`, `reason`, `idempotency_key` | write | idempotent |
+| `measurement_suggest_campaign` | `campaign_id`, `expected_revision`, `idempotency_key` | write | idempotent |
 | `measurement_validate_method` | `declaration` | read | idempotent |
 
 ## Tool descriptions
@@ -78,6 +84,14 @@ Report installed R backends and the experimental operations available.
 
 Compare stored SEC moments to the first analysis; report method and detector differences without assigning pass/fail.
 
+### `measurement_consume_campaign_snapshot`
+
+Consume exactly one frozen complete generated observation for the pending proposal; preserve analytical unknowns and source-profile utility separately, with atomic budget/revision updates and retry receipts.
+
+### `measurement_create_campaign`
+
+Create one owned sequential synthetic task/seed/policy arm from a frozen protocol; all initialization consumes its declared evaluation budget.
+
 ### `measurement_create_experiment`
 
 Record an immutable experiment design with intended conditions; does not execute it or create an optimizer campaign.
@@ -97,6 +111,18 @@ Retrieve a compact analysis record, method, diagnostics and provenance.
 ### `measurement_get_attempt`
 
 Read the latest or a specific historical attempt revision, including sample/injection metadata from its linked traces.
+
+### `measurement_get_campaign`
+
+Inspect an owned synthetic campaign's revision, pending proposal, budget and compact immutable consumption history.
+
+### `measurement_get_campaign_consumption`
+
+Retrieve the owned immutable consumption record, exact source digests, raw metrics, utility, analytical acceptance and declared expenditure.
+
+### `measurement_get_campaign_proposal`
+
+Read an owned immutable proposal with its executable method, exact consumed training references and actual policy/backend provenance.
 
 ### `measurement_get_campaign_protocol`
 
@@ -237,6 +263,10 @@ Describe the local experiment registry without requiring an R backend.
 ### `measurement_revise_attempt`
 
 Append a corrected or updated reported attempt snapshot with an explanation and optimistic version check; earlier revisions remain available.
+
+### `measurement_suggest_campaign`
+
+Atomically retain one feasible synthetic proposal and its exact training-snapshot identities; uses common initialization, deterministic random sampling or the optional BO-MCP runtime without fallback.
 
 ### `measurement_validate_method`
 

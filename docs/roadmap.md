@@ -18,17 +18,20 @@ backend and scientific-audit issues remain in the R repositories.
 | Evidence views | Inspectable methods, traces, assignments, warnings and exportable lineage | Trace an exported objective back to exact input, analysis and outcome revisions | [#10](https://github.com/JamesHWade/measure-service/issues/10) |
 | Optional execution adapters | Device-specific command/observation adapters kept separate from scientific methods | Simulator/fake-device tests followed by named instrument qualification; no claim based only on a mock | [#9](https://github.com/JamesHWade/measure-service/issues/9) |
 
-The BO adapter is the next functional increment. The optimizer retains its
-surrogate/acquisition state. The service retains evidence and records exactly
-which versioned outcomes were sent to the optimizer. A source label or
-`proposal_reference` is not enough: consumption needs a durable identifier,
-retry behavior and an explicit objective definition.
+The [bounded synthetic campaign loop](campaign-runtime.md) now records exactly
+which immutable outcomes produced each suggestion. Its optional BO-MCP adapter
+fits the optimizer from the ordered consumed evidence on each call; the service
+retains proposals, consumption IDs and retry receipts. It supports a declared
+two-coordinate isocratic domain, shared initialization, random and scalar-GP
+policies, one pending evaluation and full-budget accounting. Generic parameter
+spaces, asynchronous batches and richer BO strategies remain roadmap work.
 
 The [observation boundary](observation-evidence.md) now supplies predeclared
 analyte requirements, evidence-bound analytical acceptance and immutable
 snapshot membership. Its three-valued decisions preserve missing measurements
-and keep source fidelity separate from physical origin. It does not yet fit a
-retention model, propose experiments, or consume observations in an optimizer.
+and keep source fidelity separate from physical origin. The synthetic loop can
+propose methods and consume exact producer-bound snapshots; it does not fit a
+physical retention model or qualify instrument observations.
 
 The [ideal retention reference](retention-predictions.md) now evaluates explicit
 coefficient/geometry declarations against constant-flow inlet programs. Its
@@ -42,8 +45,9 @@ reference path from declared synthetic widths and retained ideal predictions to
 generated result records. It preserves censored cohorts and unavailable
 singleton resolution and binds analytical evidence to the exact stored producer
 run. Its numerical qualification does not fit physical widths or qualify a
-processed-signal producer. A matched protocol and optimizer-consumption loop
-remain before fresh campaign comparisons.
+processed-signal producer. A declared matched protocol and exact
+optimizer-consumption loop now support bounded synthetic campaign comparisons;
+the broader noisy-signal and physical paths remain separate.
 
 The [MoSeS archive replay](moses-reproduction.md) supplies the first real-data
 benchmark layer: verified source records, recomputed raw metrics, complete
@@ -52,12 +56,12 @@ qualification evaluates versioned hierarchy rules and exposes source-input
 discrepancies and hard-threshold disagreements. It does not supply a fresh
 optimizer comparison or qualify the signal-processing and instrument paths.
 
-A first adapter should support caller-provided numeric/categorical spaces,
-objective directions and units, constraints, campaign creation, suggestions,
-and outcome submission through one selected optimizer backend. It should
-reject unsupported censored/failed observations explicitly rather than invent
-numbers. Multi-fidelity policies, scheduling and richer diagnostics follow
-after the basic replay/recovery contract works.
+A broader adapter still needs caller-provided numeric/categorical spaces,
+objective directions and units, general constraints and additional supported
+backend routes. The first synthetic profile only consumes complete generated
+observations, preserving censoring and analytical unknowns separately from its
+declared source utility. Multi-fidelity policies, scheduling and richer
+diagnostics need their own replay/recovery evidence.
 
 ## Separations coverage
 

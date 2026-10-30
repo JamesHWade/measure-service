@@ -188,6 +188,43 @@ def connect() -> sqlite3.Connection:
     );
     CREATE INDEX IF NOT EXISTS campaign_protocols_owner_order
       ON campaign_protocols(owner, created_at, id);
+    CREATE TABLE IF NOT EXISTS campaign_runs (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, protocol_id TEXT NOT NULL,
+      protocol_input_digest TEXT NOT NULL, task_id TEXT NOT NULL,
+      seed INTEGER NOT NULL, policy TEXT NOT NULL, payload TEXT NOT NULL,
+      input_digest TEXT NOT NULL, revision INTEGER NOT NULL, created_at TEXT NOT NULL,
+      FOREIGN KEY(protocol_id) REFERENCES campaign_protocols(id)
+    );
+    CREATE INDEX IF NOT EXISTS campaign_runs_owner_order
+      ON campaign_runs(owner, created_at, id);
+    CREATE TABLE IF NOT EXISTS campaign_proposals (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, campaign_id TEXT NOT NULL,
+      ordinal INTEGER NOT NULL, state TEXT NOT NULL, candidate_digest TEXT NOT NULL,
+      executable_method_id TEXT NOT NULL, method_input_digest TEXT NOT NULL,
+      canonical_program_digest TEXT NOT NULL, payload TEXT NOT NULL,
+      input_digest TEXT NOT NULL, created_at TEXT NOT NULL,
+      UNIQUE(campaign_id, ordinal), UNIQUE(campaign_id, candidate_digest),
+      FOREIGN KEY(campaign_id) REFERENCES campaign_runs(id),
+      FOREIGN KEY(executable_method_id) REFERENCES executable_methods(id)
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS campaign_one_pending
+      ON campaign_proposals(owner, campaign_id) WHERE state='pending';
+    CREATE TABLE IF NOT EXISTS campaign_consumptions (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, campaign_id TEXT NOT NULL,
+      proposal_id TEXT NOT NULL, observation_snapshot_id TEXT NOT NULL,
+      snapshot_digest TEXT NOT NULL, observation_id TEXT NOT NULL, attempt_id TEXT NOT NULL,
+      attempt_revision INTEGER NOT NULL, observation_input_digest TEXT NOT NULL,
+      evidence_digest TEXT NOT NULL, assessment_digest TEXT NOT NULL,
+      payload TEXT NOT NULL, input_digest TEXT NOT NULL, output_digest TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      UNIQUE(campaign_id, proposal_id), UNIQUE(campaign_id, attempt_id),
+      UNIQUE(campaign_id, observation_snapshot_id),
+      FOREIGN KEY(campaign_id) REFERENCES campaign_runs(id),
+      FOREIGN KEY(proposal_id) REFERENCES campaign_proposals(id),
+      FOREIGN KEY(observation_snapshot_id) REFERENCES observation_snapshots(id),
+      FOREIGN KEY(observation_id) REFERENCES analytical_observations(id),
+      FOREIGN KEY(attempt_id, attempt_revision) REFERENCES attempt_revisions(attempt_id, revision)
+    );
     """)
     return con
 

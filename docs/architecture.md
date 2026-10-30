@@ -18,10 +18,10 @@ worker pool.
 | --- | --- |
 | `measure` | R measurement structures, preprocessing, calibration and validation primitives |
 | `measure.sec` | SEC calibration, moments, distributions and technique-specific calculations |
-| `measure_methods` in `measure-service` | Pure-Python resource integration, objective scores, analytical acceptance, ideal retention, latent Gaussian observations and campaign-success accounting |
+| `measure_methods` in `measure-service` | Pure-Python experimental designs, resource integration, objective scores, analytical acceptance, ideal retention, latent Gaussian observations and campaign-success accounting |
 | Future technique packages | Domain models and methods that can be tested independently of an agent protocol |
 | `measure-service` | MCP contracts, identities, evidence records, storage and backend adapters |
-| Future BO adapter | Translate qualified evidence and objectives to an optimizer protocol |
+| Optional BO-MCP adapter | Replay exact consumed synthetic evidence into the public optimizer backend |
 | Optimizer engine | Surrogate models, acquisition functions and optimizer state |
 | Client application | User interaction, authenticated uploads and policy for using outputs |
 
@@ -65,8 +65,9 @@ suggestion state. Campaign orchestration must record which immutable evidence
 snapshot produced each suggestion and when an outcome was consumed. The
 [observation registry](observation-evidence.md) implements predeclared
 analytical contracts, immutable evidence-bound assessments and explicit
-snapshot membership. It does not yet bind suggestions or synchronize optimizer
-consumption. An external proposal label alone does not implement that state.
+snapshot membership. The [synthetic campaign registry](campaign-runtime.md)
+binds those snapshots to sequential proposals and immutable consumption records.
+An external proposal label alone does not implement that state.
 
 ## Code layout
 
@@ -79,6 +80,11 @@ consumption. An external proposal label alone does not implement that state.
 - `src/measure_service/observations.py`: analytical contracts, owned evidence and immutable snapshot membership.
 - `src/measure_service/retention.py`: explicit ideal-model inputs, canonical-method adaptation and retained predictions.
 - `src/measure_service/gaussian_producer.py`: predeclared synthetic widths, immutable producer runs and exact generated-result evidence.
+- `src/measure_methods/design.py`: explicit seeded Latin-hypercube and uniform designs, independent of service schemas and identity.
+- `src/measure_service/campaign_protocol.py`: protocol normalization, identity-derived numerical seeds and candidate feasibility.
+- `src/measure_service/campaign_protocol_registry.py`: owned immutable task/model/producer/contract bindings.
+- `src/measure_service/campaigns.py`: sequential proposals, revision checks, immutable consumption and evidence replay.
+- `src/measure_service/optimizer_backend.py`: bounded JSON adapter to an optional installed BO-MCP interpreter.
 - `src/measure_service/storage.py`: canonical serialization and SQLite tables.
 - `src/measure_service/worker.R`: adapter to the installed scientific packages.
 - `tests/`: validation, persistence, concurrency, MCP and HTTP contracts.
@@ -109,3 +115,13 @@ helper. The observation registry verifies those exact generated results for a
 producer-bound experiment. It does not accept caller replacements as generated
 evidence. Existing experiments without a producer binding retain their original
 caller-reported evidence contract and retry identities.
+
+Campaign suggestions use the complete ordered consumed history. BO-MCP owns
+surrogate fitting and acquisition optimization; this service implements no
+second Bayesian optimizer. The optional child receives explicit finite inputs
+and records its actual installed source/version/model/acquisition evidence.
+The service keeps evidence and retry receipts, reconstructing training state
+after restart. There is one pending proposal per campaign, full initialization
+expenditure counts against its budget, and no fallback policy is substituted
+after a backend failure. This path is limited to the predeclared two-coordinate
+isocratic latent profile and does not execute an instrument.
