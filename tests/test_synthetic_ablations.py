@@ -991,6 +991,169 @@ def test_failed_resume_keeps_consumed_outcomes_and_blocks_new_proposals(tmp_path
         )
 
 
+def test_duplicate_gp_candidate_preserves_three_observations_and_unknown_future_slots(
+    tmp_path, monkeypatch
+):
+    document, digest = ablations._read_study_document()
+    data_dir = tmp_path / "registry"
+    data_dir.mkdir()
+    shared._claim_or_verify_owned_store(
+        data_dir,
+        digest,
+        profile=ablations.STORE_PROFILE,
+        owner=ablations.OWNER,
+        receipt_prefixes=ablations._receipt_scopes(document, digest),
+    )
+    monkeypatch.setenv("MEASURE_MCP_DATA_DIR", str(data_dir))
+
+    arm = next(
+        item
+        for item in document["arms"]
+        if item["policy"] == "bo_mcp_gp_logei"
+        and item["optimizer_target"] == "historical_utility"
+        and item["surrogate_noise_prior"] == "default"
+    )
+    task = document["tasks"][0]
+    plan = next(
+        item
+        for item in ablations._plan(document, digest)
+        if item["arm_id"] == arm["arm_id"]
+        and item["task_id"] == task["task_id"]
+        and item["seed"] == 17
+    )
+    backend_calls = []
+
+    with shared._scoped_data_dir(data_dir):
+        protocols, _, _ = ablations._register_inputs(document, digest)
+        registered = protocols[arm["arm_id"]]
+        monkeypatch.setattr(
+            "measure_service.optimizer_backend.preflight_ablation_backend",
+            lambda spec: _backend_report(spec, digest, succeed=True),
+        )
+        gate = ablations._record_preflight_attempt(
+            document, digest, registered["protocol"], attempt=1
+        )
+        assert gate["qualified"] is True
+        expected_backend = ablations._expected_backend_identity(gate, arm)
+        assert expected_backend is not None
+
+        template = next(
+            case["backend_provenance"]
+            for case in gate["backend_report"]["cases"]
+            if case["target"] == arm["optimizer_target"]
+            and case["noise_prior"] == arm["surrogate_noise_prior"]
+            and case["history_length"] == document["initial_design_size"]
+        )
+        duplicate = campaign_protocol.initial_candidate(registered["spec"], plan["seed"], ordinal=0)
+
+        def suggest_duplicate(spec, training_data, seed):
+            backend_calls.append((spec, copy.deepcopy(training_data), seed))
+            backend = copy.deepcopy(template)
+            backend["protocol_sha256"] = campaign_protocol.campaign_protocol_sha256(spec)
+            backend["training_sha256"] = sha256(training_data)
+            backend["training_count"] = len(training_data)
+            backend["settings"]["iteration"] = len(training_data)
+            backend["suggestion_provenance"]["iteration"] = len(training_data)
+            return {"candidate": dict(duplicate), "backend": backend}
+
+        monkeypatch.setattr(
+            "measure_service.optimizer_backend.suggest_candidate", suggest_duplicate
+        )
+        result = shared._execute_campaign(
+            owner=ablations.OWNER,
+            protocol_id=registered["protocol"]["protocol_id"],
+            task_id=plan["task_id"],
+            seed=plan["seed"],
+            policy=plan["policy"],
+            default_sha256=plan["arm_operation_sha256"],
+            planned_budget=document["evaluation_budget"],
+            expected_backend_identity=expected_backend,
+        )
+
+        assert len(backend_calls) == 1
+        assert backend_calls[0][2] == plan["seed"]
+        assert len(backend_calls[0][1]) == document["initial_design_size"]
+        assert result["consumed_evaluations"] == document["initial_design_size"]
+        assert result["status"] == "partial_failure"
+        assert result["failure"] == {
+            "ordinal": document["initial_design_size"],
+            "step": "suggest_campaign",
+            "type": "ValueError",
+            "message": "Campaign candidate duplicates a prior proposal",
+        }
+
+        # The ablation projection keeps stored observations and leaves the rejected
+        # GP ordinal plus every later planned slot explicitly unavailable.
+        campaign = ablations._campaign_labels(result, plan)
+        rows = [ablations._evaluation_csv_row(item) for item in campaign["evaluations"]]
+        assert len(rows) == document["evaluation_budget"]
+        assert [row["ordinal"] for row in rows] == list(range(document["evaluation_budget"]))
+        assert [row["status"] for row in rows[:3]] == ["consumed"] * 3
+        assert rows[3]["status"] == "partial_failure"
+        assert rows[3]["failure_step"] == "suggest_campaign"
+        assert rows[3]["failure_type"] == "ValueError"
+        assert rows[3]["optimizer_walltime_seconds"] is None
+        assert [row["status"] for row in rows[4:]] == ["not_attempted_unknown"] * 6
+        assert all(row["score"] is None for row in rows[3:])
+        assert all(row["optimizer_target_value"] is None for row in rows[3:])
+        assert all(row["optimizer_walltime_seconds"] is None for row in rows[4:])
+        assert all(row["proposal_source"] == "common_initial_design" for row in rows[:3])
+        assert rows[3]["proposal_source"] is None
+
+        current = campaigns.get_campaign(ablations.OWNER, result["campaign_id"])
+        assert current["state"] == "ready_to_suggest"
+        assert current["consumed_evaluations"] == 3
+        assert current["pending_proposal"] is None
+        assert current["history"] == result["history"]
+        assert [item["score"] for item in current["history"]] == [
+            row["metrics"]["score"] for row in result["evaluations"][:3]
+        ]
+
+        failed_proposal_key = shared._key(
+            plan["arm_operation_sha256"],
+            "campaign",
+            plan["task_id"],
+            plan["seed"],
+            plan["policy"],
+            3,
+            "proposal",
+        )
+        with registry_connection() as con:
+            assert (
+                con.execute(
+                    "SELECT COUNT(*) FROM campaign_proposals WHERE owner=? AND campaign_id=?",
+                    (ablations.OWNER, result["campaign_id"]),
+                ).fetchone()[0]
+                == 3
+            )
+            assert (
+                con.execute(
+                    "SELECT COUNT(*) FROM campaign_consumptions WHERE owner=? AND campaign_id=?",
+                    (ablations.OWNER, result["campaign_id"]),
+                ).fetchone()[0]
+                == 3
+            )
+            assert (
+                con.execute(
+                    "SELECT COUNT(*) FROM experiments WHERE owner=?", (ablations.OWNER,)
+                ).fetchone()[0]
+                == 3
+            )
+            assert (
+                con.execute(
+                    "SELECT COUNT(*) FROM experiment_attempts WHERE owner=?", (ablations.OWNER,)
+                ).fetchone()[0]
+                == 3
+            )
+            assert (
+                con.execute(
+                    "SELECT COUNT(*) FROM registry_receipts WHERE owner=? AND request_key=?",
+                    (ablations.OWNER, failed_proposal_key),
+                ).fetchone()[0]
+                == 0
+            )
+
+
 def test_partial_resume_rejects_backend_drift_and_preserves_known_campaign_data(
     tmp_path, monkeypatch
 ):
