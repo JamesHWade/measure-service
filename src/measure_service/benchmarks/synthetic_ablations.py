@@ -63,6 +63,7 @@ _ALLOWED_ARMS = {
     ("gp-utility-low-noise", "bo_mcp_gp_logei", "historical_utility", "low_noise"),
     ("gp-confirmed-low-noise", "bo_mcp_gp_logei", "confirmed_acceptance_reward", "low_noise"),
 }
+_PREFLIGHT_VALIDATOR_VERSION = 2
 _EVALUATION_CSV_FIELDS = (
     "arm_id",
     "cohort_role",
@@ -1048,11 +1049,19 @@ def _preflight_report_status(
                     isinstance(optimization.get(name), bool)
                     or not isinstance(optimization.get(name), int)
                     or optimization[name] < 1
-                    for name in (
-                        "num_restarts",
-                        "raw_samples",
-                        "configured_num_restarts",
-                        "configured_raw_samples",
+                    for name in ("num_restarts", "raw_samples")
+                )
+                or any(
+                    optimization.get(configured) is not None
+                    and (
+                        isinstance(optimization.get(configured), bool)
+                        or not isinstance(optimization.get(configured), int)
+                        or optimization[configured] < 1
+                        or optimization[configured] != optimization[effective]
+                    )
+                    for configured, effective in (
+                        ("configured_num_restarts", "num_restarts"),
+                        ("configured_raw_samples", "raw_samples"),
                     )
                 )
                 or not isinstance(prior, dict)
@@ -1190,6 +1199,7 @@ def _record_preflight_attempt(
     response = {
         "schema_version": 1,
         "record_type": "ablation_backend_preflight",
+        "validator_version": _PREFLIGHT_VALIDATOR_VERSION,
         "study_sha256": study_sha256,
         "attempt": attempt,
         "request": request,
@@ -1241,6 +1251,8 @@ def _load_preflight_history(study_sha256: str, document: dict[str, Any]) -> list
             raise ValueError("stored preflight receipt request identity is inconsistent")
         if not isinstance(response.get("qualified"), bool):
             raise ValueError("stored preflight receipt has no qualification decision")
+        response = dict(response)
+        response.setdefault("validator_version", 1)
         backend_report = response.get("backend_report")
         if backend_report is None:
             if response["qualified"] or not isinstance(response.get("failure"), dict):
@@ -1255,7 +1267,32 @@ def _load_preflight_history(study_sha256: str, document: dict[str, Any]) -> list
             if response["qualified"] and (not report_qualified or report_error is not None):
                 raise ValueError("stored successful preflight receipt failed report validation")
             if not response["qualified"] and report_qualified and report_error is None:
-                raise ValueError("stored preflight qualification conflicts with its route evidence")
+                failure = response.get("failure")
+                if (
+                    not isinstance(failure, dict)
+                    or not isinstance(failure.get("type"), str)
+                    or not isinstance(failure.get("message"), str)
+                ):
+                    raise ValueError(
+                        "stored failed preflight lacks its historical validation reason"
+                    )
+                # Keep the immutable failure as recorded. A newer validator may
+                # accept its route report, but must not promote the old receipt.
+                response["current_validator_reassessment"] = {
+                    "validator_version": _PREFLIGHT_VALIDATOR_VERSION,
+                    "qualified": True,
+                    "error": None,
+                    "stored_decision_preserved": True,
+                    "stored_failure_retained": True,
+                }
+            elif not response["qualified"]:
+                response["current_validator_reassessment"] = {
+                    "validator_version": _PREFLIGHT_VALIDATOR_VERSION,
+                    "qualified": report_qualified,
+                    "error": report_error,
+                    "stored_decision_preserved": True,
+                    "stored_failure_retained": response.get("failure") is not None,
+                }
             expected_identities = (
                 _preflight_backend_identities(backend_report)
                 if response["qualified"] and report_qualified and report_error is None

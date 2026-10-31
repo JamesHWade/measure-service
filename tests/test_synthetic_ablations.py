@@ -101,10 +101,10 @@ def _backend_report(
                     "default, no custom covar_module"
                 ),
                 "acquisition_optimization": {
-                    "num_restarts": 20,
+                    "num_restarts": 14,
                     "raw_samples": 512,
-                    "configured_num_restarts": 20,
-                    "configured_raw_samples": 512,
+                    "configured_num_restarts": None,
+                    "configured_raw_samples": None,
                 },
                 "backend_state": "stateless; no prior backend state supplied",
                 "replay": "ordered training history is supplied on every call",
@@ -346,6 +346,14 @@ def test_preflight_gate_requires_all_sixteen_model_guided_routes():
     assert ablations._preflight_report_status(
         good, document, digest, campaign_protocol.campaign_protocol_sha256(spec)
     ) == (True, None)
+    explicit_settings = copy.deepcopy(good)
+    for case in explicit_settings["cases"]:
+        optimization = case["backend_provenance"]["settings"]["acquisition_optimization"]
+        optimization["configured_num_restarts"] = optimization["num_restarts"]
+        optimization["configured_raw_samples"] = optimization["raw_samples"]
+    assert ablations._preflight_report_status(
+        explicit_settings, document, digest, campaign_protocol.campaign_protocol_sha256(spec)
+    ) == (True, None)
     assert ablations._preflight_report_status(
         failed, document, digest, campaign_protocol.campaign_protocol_sha256(spec)
     ) == (False, None)
@@ -409,6 +417,44 @@ def test_preflight_gate_requires_all_sixteen_model_guided_routes():
         )[0]
         is False
     )
+
+
+@pytest.mark.parametrize(
+    ("setting", "value"),
+    [
+        ("configured_num_restarts", True),
+        ("configured_num_restarts", 0),
+        ("configured_num_restarts", 15),
+        ("configured_raw_samples", True),
+        ("configured_raw_samples", 0),
+        ("configured_raw_samples", 256),
+        ("num_restarts", True),
+        ("num_restarts", 0),
+        ("raw_samples", True),
+        ("raw_samples", 0),
+    ],
+)
+def test_preflight_rejects_invalid_effective_or_configured_acquisition_values(setting, value):
+    document, digest = ablations._read_study_document()
+    bindings = [
+        {
+            "task_id": task["task_id"],
+            "producer": {"producer_id": f"producer-{task['task_id']}"},
+            "contract": {"contract_id": f"contract-{task['task_id']}"},
+        }
+        for task in document["tasks"]
+    ]
+    spec = ablations._protocol_spec(document, bindings, document["arms"][0])
+    report = _backend_report(spec, digest, succeed=True)
+    optimization = report["cases"][0]["backend_provenance"]["settings"]["acquisition_optimization"]
+    optimization[setting] = value
+
+    valid, error = ablations._preflight_report_status(
+        report, document, digest, campaign_protocol.campaign_protocol_sha256(spec)
+    )
+
+    assert valid is False
+    assert error == "backend preflight route lacks model-guided candidate provenance"
 
 
 def test_campaign_backend_drift_is_rejected_before_experiment_creation(monkeypatch):
@@ -764,6 +810,87 @@ def test_failed_initial_preflight_publishes_all_six_hundred_as_unknown(tmp_path,
             == 0
         )
     assert (output / "complete.json").is_file()
+
+
+def test_old_failed_preflight_receipt_is_preserved_and_retried(tmp_path, monkeypatch):
+    document, digest = ablations._read_study_document()
+    data_dir = tmp_path / "registry"
+    data_dir.mkdir()
+    shared._claim_or_verify_owned_store(
+        data_dir,
+        digest,
+        profile=ablations.STORE_PROFILE,
+        owner=ablations.OWNER,
+        receipt_prefixes=ablations._receipt_scopes(document, digest),
+    )
+    monkeypatch.setenv("MEASURE_MCP_DATA_DIR", str(data_dir))
+    with shared._scoped_data_dir(data_dir):
+        protocols, _, _ = ablations._register_inputs(document, digest)
+        protocol = protocols[document["arms"][0]["arm_id"]]["protocol"]
+        protocol_sha = campaign_protocol.campaign_protocol_sha256(protocol["spec"])
+        request = ablations._preflight_request(digest, 1, protocol_sha)
+        failure = {
+            "type": "InvalidPreflightReport",
+            "message": "backend preflight route lacks model-guided candidate provenance",
+        }
+        historical_response = {
+            "schema_version": 1,
+            "record_type": "ablation_backend_preflight",
+            "study_sha256": digest,
+            "attempt": 1,
+            "request": request,
+            "qualified": False,
+            "backend_report": _backend_report(protocol["spec"], digest, succeed=True),
+            "backend_identities": None,
+            "failure": failure,
+            "runner_elapsed_seconds": 1.25,
+        }
+        key = ablations._preflight_key(digest, 1)
+        from measure_service.storage import registry_mutation
+
+        registry_mutation(ablations.OWNER, key, request, lambda con: historical_response)
+        with registry_connection() as con:
+            before_receipt = con.execute(
+                "SELECT response FROM registry_receipts WHERE owner=? AND request_key=?",
+                (ablations.OWNER, key),
+            ).fetchone()["response"]
+
+    monkeypatch.setattr(
+        "measure_service.optimizer_backend.preflight_ablation_backend",
+        lambda spec: _backend_report(spec, digest, succeed=False),
+    )
+    output = tmp_path / "bundle"
+    report = ablations.run_synthetic_ablations(output, data_dir=data_dir)
+    history = json.loads((output / "preflight.json").read_text())["attempts"]
+
+    assert report["completed"] is False
+    assert report["preflight"]["attempt_count"] == 2
+    assert history[0]["qualified"] is False
+    assert history[0]["failure"] == failure
+    assert history[0]["runner_elapsed_seconds"] == 1.25
+    assert history[0]["current_validator_reassessment"] == {
+        "validator_version": ablations._PREFLIGHT_VALIDATOR_VERSION,
+        "qualified": True,
+        "error": None,
+        "stored_decision_preserved": True,
+        "stored_failure_retained": True,
+    }
+    assert history[1]["attempt"] == 2
+    assert history[1]["qualified"] is False
+    assert report["consumed_evaluation_count"] == 0
+    assert report["completed_simulator_attempt_count"] == 0
+    with registry_connection() as con:
+        after_receipt = con.execute(
+            "SELECT response FROM registry_receipts WHERE owner=? AND request_key=?",
+            (ablations.OWNER, key),
+        ).fetchone()["response"]
+        assert (
+            con.execute(
+                "SELECT COUNT(*) FROM campaign_runs WHERE owner=?", (ablations.OWNER,)
+            ).fetchone()[0]
+            == 0
+        )
+    assert after_receipt == before_receipt
 
 
 def test_registration_failure_with_no_common_design_still_publishes_fixed_unknowns(

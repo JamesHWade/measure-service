@@ -67,10 +67,7 @@ def _model_capture_sidecar(tmp_path: Path) -> tuple[Path, Path]:
     configured_interpreter = Path(os.environ["MEASURE_BO_PYTHON"]).absolute()
     shim = tmp_path / "sidecar-shim"
     shim.mkdir()
-    evidence_root = os.environ.get("MEASURE_BO_PREFLIGHT_EVIDENCE_DIR")
-    capture_directory = Path(evidence_root) if evidence_root else tmp_path
-    capture_directory.mkdir(parents=True, exist_ok=True)
-    capture_path = capture_directory / "actual-models.jsonl"
+    capture_path = tmp_path / "actual-models.jsonl"
     capture_path.unlink(missing_ok=True)
     shim.joinpath("sitecustomize.py").write_text(
         """import importlib
@@ -223,50 +220,48 @@ def test_actual_ablation_prior_routes_match_the_public_fitted_model(tmp_path, mo
 
 
 def test_actual_fixed_ablation_preflight_retains_all_routes(tmp_path, monkeypatch):
-    from measure_service.campaign_protocol import parse_campaign_protocol
+    from measure_service import campaign_protocol
+    from measure_service.benchmarks import synthetic_ablations as ablations
     from measure_service.optimizer_backend import preflight_ablation_backend
 
-    fixture_path = (
-        Path(__file__).resolve().parents[1]
-        / "src"
-        / "measure_service"
-        / "benchmarks"
-        / "reference_data"
-        / "synthetic-isocratic-ablation-v1.json"
-    )
-    fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+    document, study_digest = ablations._read_study_document()
+    task_bindings = [
+        {
+            "task_id": task["task_id"],
+            "producer": {"producer_id": f"preflight-producer-{task['task_id']}"},
+            "contract": {"contract_id": f"preflight-contract-{task['task_id']}"},
+        }
+        for task in document["tasks"]
+    ]
+    protocol = ablations._protocol_spec(document, task_bindings, document["arms"][0])
+
     wrapper, capture_path = _model_capture_sidecar(tmp_path)
     monkeypatch.setenv("MEASURE_BO_PYTHON", str(wrapper))
     monkeypatch.setenv("MEASURE_BO_MODEL_CAPTURE", str(capture_path))
-    protocol = parse_campaign_protocol(
-        {
-            "profile": "synthetic-isocratic-ablation/1",
-            "optimizer_target": "historical_utility",
-            "surrogate_noise_prior": "default",
-            "domain": fixture["domain"],
-            "flow_ml_min": fixture["flow_ml_min"],
-            "constraints": {},
-            "tasks": [
-                {
-                    "task_id": "preflight-task",
-                    "producer_id": "preflight-producer",
-                    "observation_contract_id": "preflight-contract",
-                }
-            ],
-            "seeds": fixture["seeds"],
-            "evaluation_budget": fixture["evaluation_budget"],
-            "initial_design_size": fixture["initial_design_size"],
-            "evaluation_cost": fixture["evaluation_cost"],
-            "evaluation_cost_unit": fixture["evaluation_cost_unit"],
-        }
-    )
     report = preflight_ablation_backend(protocol)
-    evidence_root = os.environ.get("MEASURE_BO_PREFLIGHT_EVIDENCE_DIR")
-    report_path = (
-        Path(evidence_root) / "preflight-report.json"
-        if evidence_root
-        else tmp_path / "preflight-report.json"
+    protocol_sha256 = campaign_protocol.campaign_protocol_sha256(protocol)
+
+    assert isinstance(report, dict)
+    assert report["study_protocol_sha256"] == protocol_sha256
+    route_spec = campaign_protocol.parse_campaign_protocol(report["cases"][0]["request"]["spec"])
+    base_spec_values = route_spec.model_dump(mode="json")
+    base_spec_values.update(
+        {"optimizer_target": "historical_utility", "surrogate_noise_prior": "default"}
     )
+    base_spec = campaign_protocol.parse_campaign_protocol(base_spec_values)
+    assert campaign_protocol.campaign_design_sha256(base_spec) == (
+        campaign_protocol.campaign_design_sha256(protocol)
+    )
+    assert campaign_protocol.campaign_protocol_sha256(base_spec) == protocol_sha256
+    qualified, validation_error = ablations._preflight_report_status(
+        report,
+        document,
+        study_digest,
+        protocol_sha256,
+    )
+    assert qualified, validation_error or "backend preflight report failed the runner gate"
+
+    report_path = tmp_path / "preflight-report.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
@@ -278,22 +273,22 @@ def test_actual_fixed_ablation_preflight_retains_all_routes(tmp_path, monkeypatc
     fitted_models = [json.loads(line) for line in capture_path.read_text().splitlines()]
     assert len(fitted_models) == 16
     for case, record in zip(report["cases"], fitted_models, strict=True):
-        expected_rate = 0.05 if case["noise_prior"] == "default" else 100.0
         if case["success"]:
             assert case["error"] is None
             assert case["backend_provenance"]["generation_method"] == "bo"
             assert math.isfinite(case["candidate"]["strong_solvent_fraction"])
             assert math.isfinite(case["candidate"]["acquisition_duration_min"])
             assert (
-                fixture["domain"]["strong_solvent_fraction"]["lower"]
+                document["domain"]["strong_solvent_fraction"]["lower"]
                 <= case["candidate"]["strong_solvent_fraction"]
-                <= fixture["domain"]["strong_solvent_fraction"]["upper"]
+                <= document["domain"]["strong_solvent_fraction"]["upper"]
             )
             assert (
-                fixture["domain"]["acquisition_duration_min"]["lower"]
+                document["domain"]["acquisition_duration_min"]["lower"]
                 <= case["candidate"]["acquisition_duration_min"]
-                <= fixture["domain"]["acquisition_duration_min"]["upper"]
+                <= document["domain"]["acquisition_duration_min"]["upper"]
             )
+            expected_rate = 0.05 if case["noise_prior"] == "default" else 100.0
             assert record["prior_class"] == "GammaPrior"
             assert math.isclose(record["concentration"], 1.1, rel_tol=1e-6, abs_tol=0.0)
             assert math.isclose(record["rate"], expected_rate, rel_tol=1e-6, abs_tol=0.0)
