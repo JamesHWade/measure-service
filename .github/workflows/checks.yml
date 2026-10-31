@@ -232,7 +232,11 @@ jobs:
         run: |
           set -euo pipefail
           python -m venv "$RUNNER_TEMP/measure-bo-sidecar"
+          # The hosted runner exercises CPU models; avoid the PyPI CUDA bundle.
+          "$RUNNER_TEMP/measure-bo-sidecar/bin/python" -m pip install torch --index-url https://download.pytorch.org/whl/cpu
           "$RUNNER_TEMP/measure-bo-sidecar/bin/python" -m pip install . 'bo-engine @ git+https://github.com/AccelerationConsortium/bo-mcp.git#subdirectory=packages/bo-engine'
+          "$RUNNER_TEMP/measure-bo-sidecar/bin/python" -m pip check
+          "$RUNNER_TEMP/measure-bo-sidecar/bin/python" -c 'import torch; assert torch.version.cuda is None; print("CPU PyTorch:", torch.__version__)'
           echo "MEASURE_BO_PYTHON=$RUNNER_TEMP/measure-bo-sidecar/bin/python" >> "$GITHUB_ENV"
       - name: Exercise actual GP suggestions, exact outcome consumption and restart
         run: python -m pytest -q -m bo_backend
