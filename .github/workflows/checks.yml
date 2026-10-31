@@ -63,6 +63,9 @@ jobs:
           assert "docs/reference-data/synthetic-reference.json" in members
           assert "docs/figures/synthetic-success.png" in members
           assert "docs/figures/synthetic-utility.svg" in members
+          assert "docs/synthetic-ablations.md" in members
+          assert "src/measure_service/benchmarks/synthetic_ablations.py" in members
+          assert "src/measure_service/benchmarks/reference_data/synthetic-isocratic-ablation-v1.json" in members
           PY
       - name: Check upgrade from the standalone method distribution
         run: python scripts/check_distribution_upgrade.py dist/*.whl

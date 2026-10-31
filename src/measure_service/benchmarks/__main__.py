@@ -14,6 +14,7 @@ from .retention_qualification import (
     DEFAULT_TRAJECTORY_ORACLE,
     qualify_retention_inputs,
 )
+from .synthetic_ablations import run_synthetic_ablations
 from .synthetic_campaigns import run_synthetic_campaigns
 
 
@@ -62,6 +63,12 @@ def main() -> None:
     )
     synthetic.add_argument("--data-dir", type=Path, required=True)
     synthetic.add_argument("--output-dir", type=Path, required=True)
+    ablation = commands.add_parser(
+        "run-synthetic-ablations",
+        help="run or resume the fixed optimizer-target and noise-prior comparison",
+    )
+    ablation.add_argument("--data-dir", type=Path, required=True)
+    ablation.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "fetch-moses":
         print(fetch_archive(args.cache_dir))
@@ -105,8 +112,11 @@ def main() -> None:
     elif args.command == "qualify-gaussian-producer":
         qualify_gaussian_producer(args.output_dir, reference_json=args.reference_json)
         print(args.output_dir / "report.md")
-    else:
+    elif args.command == "run-synthetic-campaigns":
         run_synthetic_campaigns(args.output_dir, data_dir=args.data_dir)
+        print(args.output_dir / "report.md")
+    else:
+        run_synthetic_ablations(args.output_dir, data_dir=args.data_dir)
         print(args.output_dir / "report.md")
 
 

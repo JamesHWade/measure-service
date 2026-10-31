@@ -144,3 +144,7 @@ paired tables, not extra independent replication. These constructed tasks
 support descriptive comparisons. Manuscript-filtered mixtures, physical
 retention fits, processed signals, instruments and multi-fidelity execution
 retain their separate qualification requirements.
+
+The [installed fixed-study runner](synthetic-ablations.md) verifies this
+declaration, qualifies the actual runtime, preserves complete planned
+denominators and exports the owned evidence for paired comparisons.
