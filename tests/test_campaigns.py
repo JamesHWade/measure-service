@@ -34,7 +34,16 @@ def isolated_store(tmp_path, monkeypatch):
     return tmp_path
 
 
-def _prepared(*, owner="chemist", key="fixture", evaluation_budget=5, analyte_count=2):
+def _prepared(
+    *,
+    owner="chemist",
+    key="fixture",
+    evaluation_budget=5,
+    analyte_count=2,
+    retention_ln_k0=None,
+    retention_ln_k0_step=0.05,
+    width_min=0.02,
+):
     analyte_ids = (
         ["A", "B"]
         if analyte_count == 2
@@ -49,7 +58,11 @@ def _prepared(*, owner="chemist", key="fixture", evaluation_budget=5, analyte_co
                 {
                     "analyte_id": analyte_id,
                     "model": "linear",
-                    "ln_k0": math.log(2.0 + index * 0.05),
+                    "ln_k0": (
+                        math.log(2.0 + index * 0.05)
+                        if retention_ln_k0 is None
+                        else retention_ln_k0 + index * retention_ln_k0_step
+                    ),
                     "S1": 0.0,
                 }
                 for index, analyte_id in enumerate(analyte_ids)
@@ -68,7 +81,9 @@ def _prepared(*, owner="chemist", key="fixture", evaluation_budget=5, analyte_co
         "Two-analyte synthetic centroid producer",
         model["model_id"],
         {
-            "widths": [{"analyte_id": analyte_id, "fwhm_min": 0.02} for analyte_id in analyte_ids],
+            "widths": [
+                {"analyte_id": analyte_id, "fwhm_min": width_min} for analyte_id in analyte_ids
+            ],
             "width_origin": "synthetic_assumption",
             "width_reference": "Independently specified synthetic widths",
         },
@@ -125,6 +140,25 @@ def _prepared(*, owner="chemist", key="fixture", evaluation_budget=5, analyte_co
         "spec": spec,
         "protocol": protocol,
     }
+
+
+def _registered_ablation_protocol(prepared, *, target, noise_prior, key):
+    spec_data = prepared["spec"].model_dump(mode="json")
+    spec_data.update(
+        {
+            "profile": "synthetic-isocratic-ablation/1",
+            "optimizer_target": target,
+            "surrogate_noise_prior": noise_prior,
+        }
+    )
+    spec = campaign_protocol.parse_campaign_protocol(spec_data)
+    protocol = campaign_protocol_registry.register_campaign_protocol(
+        prepared["owner"],
+        f"Synthetic ablation protocol {key}",
+        spec,
+        f"{key}-ablation-protocol",
+    )
+    return spec, protocol
 
 
 def _record_snapshot(prepared, proposal, *, key, evidence_change=None):
@@ -205,6 +239,21 @@ def _consume_one(prepared, campaign, *, key):
         f"{key}-consume",
     )
     return proposal_response, evidence, consumed
+
+
+def _reseal_consumption_result(consumption_id, update):
+    with registry_connection(write=True) as con:
+        row = con.execute(
+            "SELECT payload FROM campaign_consumptions WHERE id=?", (consumption_id,)
+        ).fetchone()
+        payload = json.loads(row["payload"])
+        update(payload["result"])
+        content = {key: value for key, value in payload.items() if key != "output_sha256"}
+        payload["output_sha256"] = campaigns.sha256(content)
+        con.execute(
+            "UPDATE campaign_consumptions SET payload=?, output_digest=? WHERE id=?",
+            (canonical(payload), payload["output_sha256"], consumption_id),
+        )
 
 
 def test_create_suggest_consume_suggest_preserves_exact_sources_and_receipts():
@@ -313,6 +362,7 @@ def test_create_suggest_consume_suggest_preserves_exact_sources_and_receipts():
         == observation_before["observation"]["assessment"]["runtime_preference_satisfied"]
     )
     assert result["utility"]["status"] == "scored"
+    assert "optimizer_target" not in result
     assert (
         result["utility"]["score"]
         == moses_observation_score(
@@ -862,13 +912,435 @@ def test_backend_candidate_validation_binds_training_and_rejects_out_of_domain_v
         )
 
 
+def test_ablation_reward_keeps_unknown_assessment_and_replays_zero_training_in_order():
+    prepared = _prepared(
+        key="ablation-unknown",
+        evaluation_budget=5,
+        retention_ln_k0=20.0,
+    )
+    ablation_spec, protocol = _registered_ablation_protocol(
+        prepared,
+        target="confirmed_acceptance_reward",
+        noise_prior="low_noise",
+        key="ablation-unknown",
+    )
+    prepared.update(spec=ablation_spec, protocol=protocol)
+    owner = prepared["owner"]
+    campaign = campaigns.create_campaign(
+        owner,
+        protocol["protocol_id"],
+        "two-analytes",
+        17,
+        "bo_mcp_gp_logei",
+        "ablation-unknown-campaign",
+    )
+    proposals = []
+    for ordinal in range(ablation_spec.initial_design_size):
+        suggestion = campaigns.suggest_campaign(
+            owner,
+            campaign["campaign_id"],
+            campaign["revision"],
+            f"ablation-unknown-suggest-{ordinal}",
+        )
+        proposal = suggestion["proposal"]
+        proposals.append(proposal)
+        evidence = _record_snapshot(
+            prepared, proposal, key=f"ablation-unknown-evaluation-{ordinal}"
+        )
+        assert all(
+            item["retention_status"] == "not_eluted"
+            for item in evidence[3]["observation"]["analytes"]
+        )
+        consumed = campaigns.consume_campaign_snapshot(
+            owner,
+            campaign["campaign_id"],
+            proposal["proposal_id"],
+            evidence[-1]["snapshot_id"],
+            suggestion["revision"],
+            f"ablation-unknown-consume-{ordinal}",
+        )
+        result = consumed["consumption"]["result"]
+        assert result["analytical_acceptance"] == "unknown"
+        assert result["utility"]["status"] == "scored"
+        assert result["optimizer_target"] == {
+            "profile": "confirmed-acceptance-lower-bound/1",
+            "name": "confirmed_acceptance_reward",
+            "direction": "maximize",
+            "status": "scored",
+            "value": 0.0,
+        }
+        history_row = consumed["campaign"]["history"][ordinal]
+        assert history_row["analytical_acceptance"] == "unknown"
+        assert history_row["score"] == result["utility"]["score"]
+        assert history_row["optimizer_target"] == result["optimizer_target"]
+        campaign = consumed["campaign"]
+
+    with registry_connection() as con:
+        training, source_members = campaigns._training_context(con, owner, campaign["campaign_id"])
+    assert [item["candidate"] for item in training] == [
+        proposal["candidate"] for proposal in proposals
+    ]
+    assert [item["score"] for item in training] == [0.0, 0.0, 0.0]
+    assert [item["ordinal"] for item in source_members] == [0, 1, 2]
+    assert all(item["optimizer_training_included"] for item in source_members)
+    assert [member["consumption_id"] for member in source_members] == [
+        row["consumption_id"] for row in campaign["history"]
+    ]
+    assert campaign_protocol.optimizer_configuration(ablation_spec)["noise_prior_params"] == [
+        1.1,
+        100.0,
+    ]
+
+
+def test_ablation_accepted_reward_is_separate_from_utility_and_target_tampering_fails():
+    prepared = _prepared(
+        key="ablation-accepted",
+        evaluation_budget=4,
+        retention_ln_k0=math.log(2.0),
+        retention_ln_k0_step=0.5,
+        width_min=0.01,
+    )
+    spec, protocol = _registered_ablation_protocol(
+        prepared,
+        target="confirmed_acceptance_reward",
+        noise_prior="default",
+        key="ablation-accepted",
+    )
+    prepared.update(spec=spec, protocol=protocol)
+    owner = prepared["owner"]
+    campaign = campaigns.create_campaign(
+        owner,
+        protocol["protocol_id"],
+        "two-analytes",
+        17,
+        "random",
+        "ablation-accepted-campaign",
+    )
+    suggestion = campaigns.suggest_campaign(
+        owner, campaign["campaign_id"], 1, "ablation-accepted-suggest"
+    )
+    evidence = _record_snapshot(
+        prepared, suggestion["proposal"], key="ablation-accepted-evaluation"
+    )
+    consumed = campaigns.consume_campaign_snapshot(
+        owner,
+        campaign["campaign_id"],
+        suggestion["proposal"]["proposal_id"],
+        evidence[-1]["snapshot_id"],
+        suggestion["revision"],
+        "ablation-accepted-consume",
+    )
+    result = consumed["consumption"]["result"]
+    assert result["analytical_acceptance"] == "accepted"
+    assert result["optimizer_target"] == {
+        "profile": "confirmed-acceptance-lower-bound/1",
+        "name": "confirmed_acceptance_reward",
+        "direction": "maximize",
+        "status": "scored",
+        "value": 1.0,
+    }
+    assert result["utility"]["profile"] == "moses-botier-1.0.0-binary64/1"
+    history = consumed["campaign"]["history"][0]
+    assert history["score"] == result["utility"]["score"]
+    assert history["optimizer_target"]["value"] == 1.0
+    target_kernel = consumed["consumption"]["implementation_provenance"]["campaign"][
+        "optimizer_target_kernel"
+    ]
+    assert target_kernel["module"] == "measure_methods.observations"
+    assert len(target_kernel["source_sha256"]) == 64
+    assert (
+        campaigns.get_campaign_consumption(owner, consumed["consumption"]["consumption_id"])
+        == consumed["consumption"]
+    )
+    assert (
+        campaigns.consume_campaign_snapshot(
+            owner,
+            campaign["campaign_id"],
+            suggestion["proposal"]["proposal_id"],
+            evidence[-1]["snapshot_id"],
+            suggestion["revision"],
+            "ablation-accepted-consume",
+        )
+        == consumed
+    )
+
+    _reseal_consumption_result(
+        consumed["consumption"]["consumption_id"],
+        lambda result: result["optimizer_target"].update(value=0.0),
+    )
+    with pytest.raises(ValueError, match="optimizer target differs"):
+        campaigns.get_campaign(owner, campaign["campaign_id"])
+
+
+@pytest.mark.parametrize(
+    ("target", "prepared_options"),
+    [
+        ("confirmed_acceptance_reward", {"retention_ln_k0": 20.0}),
+        ("historical_utility", {}),
+    ],
+)
+def test_ablation_consumption_replay_rejects_resealed_target_and_source_outcome(
+    target, prepared_options
+):
+    key = f"ablation-resealed-{target}"
+    prepared = _prepared(key=key, **prepared_options)
+    spec, protocol = _registered_ablation_protocol(
+        prepared,
+        target=target,
+        noise_prior="default",
+        key=key,
+    )
+    prepared.update(spec=spec, protocol=protocol)
+    owner = prepared["owner"]
+    campaign = campaigns.create_campaign(
+        owner, protocol["protocol_id"], "two-analytes", 17, "random", f"{key}-campaign"
+    )
+    _, _, consumed = _consume_one(prepared, campaign, key=f"{key}-evaluation")
+    consumption = consumed["consumption"]
+    result = consumption["result"]
+
+    if target == "confirmed_acceptance_reward":
+        assert result["analytical_acceptance"] == "unknown"
+        assert result["optimizer_target"]["value"] == 0.0
+
+        def rebind_reward(source_result):
+            source_result["analytical_acceptance"] = "accepted"
+            source_result["optimizer_target"]["value"] = 1.0
+
+        update = rebind_reward
+    else:
+        old_utility = result["utility"]["score"]
+        new_utility = 0.25 if old_utility != 0.25 else 0.75
+
+        def rebind_utility(source_result):
+            source_result["utility"]["score"] = new_utility
+            source_result["optimizer_target"]["value"] = new_utility
+
+        update = rebind_utility
+
+    _reseal_consumption_result(consumption["consumption_id"], update)
+    message = "immutable observation source"
+    with pytest.raises(ValueError, match=message):
+        campaigns.get_campaign_consumption(owner, consumption["consumption_id"])
+    with registry_connection() as con:
+        with pytest.raises(ValueError, match=message):
+            campaigns._training_context(con, owner, campaign["campaign_id"])
+    with pytest.raises(ValueError, match=message):
+        campaigns.get_campaign(owner, campaign["campaign_id"])
+
+
+def test_ablation_historical_utility_target_keeps_v1_score_as_optimizer_reward():
+    prepared = _prepared(key="ablation-historical", evaluation_budget=4)
+    spec, protocol = _registered_ablation_protocol(
+        prepared,
+        target="historical_utility",
+        noise_prior="default",
+        key="ablation-historical",
+    )
+    prepared.update(spec=spec, protocol=protocol)
+    owner = prepared["owner"]
+    campaign = campaigns.create_campaign(
+        owner,
+        protocol["protocol_id"],
+        "two-analytes",
+        17,
+        "random",
+        "ablation-historical-campaign",
+    )
+    suggestion = campaigns.suggest_campaign(
+        owner, campaign["campaign_id"], 1, "ablation-historical-suggest"
+    )
+    evidence = _record_snapshot(
+        prepared, suggestion["proposal"], key="ablation-historical-evaluation"
+    )
+    consumed = campaigns.consume_campaign_snapshot(
+        owner,
+        campaign["campaign_id"],
+        suggestion["proposal"]["proposal_id"],
+        evidence[-1]["snapshot_id"],
+        suggestion["revision"],
+        "ablation-historical-consume",
+    )
+    result = consumed["consumption"]["result"]
+    assert result["optimizer_target"] == {
+        "profile": "moses-botier-1.0.0-binary64/1",
+        "name": "utility",
+        "direction": "maximize",
+        "status": result["utility"]["status"],
+        "value": result["utility"]["score"],
+    }
+    assert consumed["campaign"]["history"][0]["score"] == result["utility"]["score"]
+    assert consumed["campaign"]["history"][0]["optimizer_target"] == result["optimizer_target"]
+    with registry_connection() as con:
+        training, _ = campaigns._training_context(con, owner, campaign["campaign_id"])
+    assert training == [
+        {"candidate": suggestion["proposal"]["candidate"], "score": result["utility"]["score"]}
+    ]
+
+
+def test_ablation_optimizer_backend_binds_target_noise_prior_and_accepts_rich_provenance():
+    prepared = _prepared(key="ablation-backend", evaluation_budget=5)
+    spec, _ = _registered_ablation_protocol(
+        prepared,
+        target="confirmed_acceptance_reward",
+        noise_prior="low_noise",
+        key="ablation-backend",
+    )
+    configuration = campaign_protocol.optimizer_configuration(spec)
+    training = [
+        {
+            "candidate": {
+                "strong_solvent_fraction": 0.2 + ordinal * 0.2,
+                "acquisition_duration_min": 2.0 + ordinal,
+            },
+            "score": float(ordinal == 1),
+        }
+        for ordinal in range(3)
+    ]
+    backend = {
+        "backend_id": "bo-engine/BoTorchBackend",
+        "adapter_profile": configuration["adapter_profile"],
+        "backend_name": "bo-mcp",
+        "backend_class": "BoTorchBackend",
+        "generation_method": "bo",
+        "model_type": "SingleTaskGP",
+        "acquisition_method": "expected_improvement",
+        "acquisition_implementation": "qLogExpectedImprovement",
+        "optimization_strategy": "L-BFGS-B with random restarts",
+        "source_revision": "a" * 40,
+        "source_tree_sha256": "b" * 64,
+        "adapter_source_sha256": "c" * 64,
+        "campaign_protocol_source_sha256": "d" * 64,
+        "design_kernel_source_sha256": "e" * 64,
+        "distribution_versions": {"botorch": "synthetic-test-version"},
+        "protocol_sha256": campaign_protocol.campaign_protocol_sha256(spec),
+        "seed": 17,
+        "training_sha256": campaigns.sha256(training),
+        "training_count": len(training),
+        "runtime": {"device": "cpu", "elapsed_seconds": 0.25},
+        "settings": {
+            "objective": {"name": configuration["target_name"], "direction": "maximize"},
+            "noise_prior": {
+                "family": "Gamma",
+                "concentration": 1.1,
+                "rate": 100.0,
+                "space": "standardized_target_variance",
+                "constraint_lower_bound": 0.0001,
+                "learned": True,
+            },
+        },
+        "warnings": [],
+        "suggestion_provenance": {"generation_method": "bo"},
+    }
+    candidate = {"strong_solvent_fraction": 0.45, "acquisition_duration_min": 6.0}
+    accepted_candidate, accepted_backend = campaigns._validate_backend_result(
+        {"candidate": candidate, "backend": backend},
+        spec=spec,
+        seed=17,
+        training=training,
+    )
+    assert accepted_candidate == candidate
+    assert accepted_backend["design_kernel_source_sha256"] == "e" * 64
+
+    wrong_target = copy.deepcopy(backend)
+    wrong_target["settings"]["objective"]["name"] = "utility"
+    with pytest.raises(ValueError, match="objective does not match"):
+        campaigns._validate_backend_result(
+            {"candidate": candidate, "backend": wrong_target},
+            spec=spec,
+            seed=17,
+            training=training,
+        )
+    wrong_prior = copy.deepcopy(backend)
+    wrong_prior["settings"]["noise_prior"]["rate"] = 0.05
+    with pytest.raises(ValueError, match="noise prior does not match"):
+        campaigns._validate_backend_result(
+            {"candidate": candidate, "backend": wrong_prior},
+            spec=spec,
+            seed=17,
+            training=training,
+        )
+
+
+def test_failed_attempt_is_not_consumed_or_added_to_optimizer_training():
+    prepared = _prepared(key="ablation-failed", evaluation_budget=4)
+    spec, protocol = _registered_ablation_protocol(
+        prepared,
+        target="confirmed_acceptance_reward",
+        noise_prior="default",
+        key="ablation-failed",
+    )
+    prepared.update(spec=spec, protocol=protocol)
+    owner = prepared["owner"]
+    campaign = campaigns.create_campaign(
+        owner,
+        protocol["protocol_id"],
+        "two-analytes",
+        17,
+        "random",
+        "ablation-failed-campaign",
+    )
+    suggestion = campaigns.suggest_campaign(
+        owner, campaign["campaign_id"], 1, "ablation-failed-suggest"
+    )
+    method_id = suggestion["proposal"]["method"]["method_id"]
+    experiment = experiments.create_experiment(
+        owner,
+        experiments.ExperimentSpec(
+            title="Failed synthetic evaluation",
+            source="synthetic campaign fixture",
+            executable_method_id=method_id,
+            observation_contract_id=prepared["contract"]["contract_id"],
+            observation_producer_id=prepared["producer"]["producer_id"],
+        ),
+        "ablation-failed-experiment",
+    )
+    failed_attempt = experiments.record_attempt(
+        owner,
+        experiment["experiment_id"],
+        experiments.AttemptSpec(
+            status="failed",
+            evaluator_kind="simulator",
+            fidelity=1.0,
+            executable_method_id=method_id,
+            explanation="Synthetic evaluation failed before observation",
+        ),
+        "ablation-failed-attempt",
+    )
+    prediction = retention.predict_retention(
+        owner,
+        prepared["model"]["model_id"],
+        method_id,
+        "ablation-failed-prediction",
+    )
+    with pytest.raises(ValueError, match="completed"):
+        gaussian_producer.record_gaussian_observation(
+            owner,
+            prepared["producer"]["producer_id"],
+            prediction["prediction_id"],
+            failed_attempt["attempt_id"],
+            failed_attempt["revision"],
+            "ablation-failed-run",
+        )
+    assert campaigns.get_campaign(owner, campaign["campaign_id"])["consumed_evaluations"] == 0
+    with registry_connection() as con:
+        training, source_members = campaigns._training_context(con, owner, campaign["campaign_id"])
+    assert training == []
+    assert source_members == []
+
+
 def test_49_row_bo_proposal_provenance_and_suggestion_shape_fit_record_bound():
     """Stress the persisted proposal shape without claiming a BO run was made."""
     prepared = _prepared(key="bo-size-bound", evaluation_budget=50)
-    spec = prepared["spec"]
+    spec, protocol = _registered_ablation_protocol(
+        prepared,
+        target="confirmed_acceptance_reward",
+        noise_prior="low_noise",
+        key="bo-size-bound",
+    )
     campaign = campaigns.create_campaign(
         prepared["owner"],
-        prepared["protocol"]["protocol_id"],
+        protocol["protocol_id"],
         "two-analytes",
         17,
         "bo_mcp_gp_logei",
@@ -880,14 +1352,15 @@ def test_49_row_bo_proposal_provenance_and_suggestion_shape_fit_record_bound():
                 "strong_solvent_fraction": 0.1 + ordinal * 0.01,
                 "acquisition_duration_min": 2.0 + ordinal * 0.1,
             },
-            "score": ordinal / 49.0,
+            "score": float(ordinal % 2),
         }
         for ordinal in range(49)
     ]
     training_digest = campaigns.sha256(training)
+    configuration = campaign_protocol.optimizer_configuration(spec)
     backend = {
         "backend_id": "bo-engine/BoTorchBackend",
-        "adapter_profile": "bo-mcp/1",
+        "adapter_profile": configuration["adapter_profile"],
         "backend_name": "bo-mcp",
         "backend_class": "BoTorchBackend",
         "generation_method": "bo",
@@ -899,6 +1372,7 @@ def test_49_row_bo_proposal_provenance_and_suggestion_shape_fit_record_bound():
         "source_tree_sha256": "a" * 64,
         "adapter_source_sha256": "c" * 64,
         "campaign_protocol_source_sha256": "d" * 64,
+        "design_kernel_source_sha256": "e" * 64,
         "distribution_versions": {
             "bo-engine": "0.1.0",
             "botorch": "0.16.1",
@@ -919,7 +1393,7 @@ def test_49_row_bo_proposal_provenance_and_suggestion_shape_fit_record_bound():
         },
         "settings": {
             "parameters": ["strong_solvent_fraction", "acquisition_duration_min"],
-            "objective": {"name": "utility", "direction": "maximize"},
+            "objective": {"name": configuration["target_name"], "direction": "maximize"},
             "batch_size": 1,
             "iteration": 49,
             "acquisition_method": "expected_improvement",
@@ -935,6 +1409,14 @@ def test_49_row_bo_proposal_provenance_and_suggestion_shape_fit_record_bound():
             },
             "backend_state": "stateless; no prior backend state supplied",
             "replay": "ordered training history is supplied on every call",
+            "noise_prior": {
+                "family": "Gamma",
+                "concentration": 1.1,
+                "rate": 100.0,
+                "space": "standardized_target_variance",
+                "constraint_lower_bound": 0.0001,
+                "learned": True,
+            },
         },
         "warnings": [],
         "suggestion_provenance": {
@@ -1013,9 +1495,16 @@ def test_49_row_bo_proposal_provenance_and_suggestion_shape_fit_record_bound():
                 "analytical_acceptance": "accepted",
                 "runtime_preference_satisfied": True,
                 "utility_status": "scored",
-                "score": item["score"],
+                "score": ordinal / 49.0,
                 "evaluation_cost": 1.0,
                 "runtime_min": item["candidate"]["acquisition_duration_min"],
+                "optimizer_target": {
+                    "profile": configuration["target_profile"],
+                    "name": configuration["target_name"],
+                    "direction": "maximize",
+                    "status": "scored",
+                    "value": item["score"],
+                },
             }
             for ordinal, item in enumerate(training)
         ],

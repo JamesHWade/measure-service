@@ -66,6 +66,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Generate synthetic Gaussian observation evidence](docs/gaussian-observation-producer.md)
 - [Reproduce the independent Gaussian reference checks](docs/gaussian-reference-benchmark.md)
 - [Declare matched synthetic campaign protocols](docs/synthetic-campaigns.md)
+- [Declare controlled optimizer-target and noise-prior comparisons](docs/ablation-protocol.md)
 - [Run durable synthetic campaigns with optional BO-MCP](docs/campaign-runtime.md)
 - [Reproduce the fixed paired synthetic comparison](docs/synthetic-comparison.md)
 - [Inspect the first checked synthetic comparison](docs/synthetic-reference-results.md)

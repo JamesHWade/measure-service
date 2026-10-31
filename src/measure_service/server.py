@@ -31,7 +31,13 @@ from . import (
     retention,
 )
 from . import experiments as registry
-from .campaign_protocol import CampaignProtocolSpec
+from .campaign_protocol import (
+    ABLATION_CAMPAIGN_PROFILE,
+    CAMPAIGN_PROFILE,
+    SUPPORTED_OPTIMIZER_TARGETS,
+    SUPPORTED_SURROGATE_NOISE_PRIORS,
+    ProtocolSpec,
+)
 from .experiments import AttemptSpec, ExperimentSpec, ResultSpec
 from .gaussian_producer import GaussianProducerSpec
 from .methods import (
@@ -597,8 +603,17 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "gaussian_observation_producer": "predeclared_synthetic_widths_and_exact_prediction_bound_results",
         "synthetic_campaigns": {
             "profile": "synthetic-isocratic-paired/1",
+            "supported_profiles": [CAMPAIGN_PROFILE, ABLATION_CAMPAIGN_PROFILE],
             "execution": "sequential_single_fidelity_simulator_latent",
             "policies": ["random", "bo_mcp_gp_logei"],
+            "supported_optimizer_targets": list(SUPPORTED_OPTIMIZER_TARGETS),
+            "supported_surrogate_noise_priors": list(SUPPORTED_SURROGATE_NOISE_PRIORS),
+            "surrogate_capabilities": {
+                "aggregate_scalar": True,
+                "compoundwise": False,
+                "rbf_ard": True,
+                "matern_5_2": False,
+            },
             "bo_runtime": "optional_administrator_configured_MEASURE_BO_PYTHON",
             "bo_runtime_configured": bool(os.environ.get("MEASURE_BO_PYTHON")),
             "outcome_consumption": "exact_owned_immutable_observation_snapshot",
@@ -920,7 +935,7 @@ def measurement_get_gaussian_observation(run_id: RecordId, ctx: Context) -> dict
 @mcp.tool(annotations=RETRY_WRITE, structured_output=True)
 def measurement_register_campaign_protocol(
     title: Annotated[str, Field(min_length=1, max_length=200)],
-    spec: CampaignProtocolSpec,
+    spec: ProtocolSpec,
     idempotency_key: RequestKey,
     ctx: Context,
 ) -> dict[str, Any]:

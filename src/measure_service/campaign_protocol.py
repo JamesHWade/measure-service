@@ -27,12 +27,16 @@ from .methods import (
 from .storage import canonical, sha256
 
 CAMPAIGN_PROFILE = "synthetic-isocratic-paired/1"
+ABLATION_CAMPAIGN_PROFILE = "synthetic-isocratic-ablation/1"
 UTILITY_PROFILE = "moses-botier-1.0.0-binary64/1"
 UTILITY_INPUT_DEFINITION = "finite-resolution-reference/1"
+CONFIRMED_ACCEPTANCE_PROFILE = "confirmed-acceptance-lower-bound/1"
 ANALYTICAL_SUCCESS_POLICY = "separate-strict-observation-contract"
 RANDOM_POLICY_ID = "random"
 BO_POLICY_ID = "bo_mcp_gp_logei"
 SUPPORTED_POLICY_IDS = (RANDOM_POLICY_ID, BO_POLICY_ID)
+SUPPORTED_OPTIMIZER_TARGETS = ("historical_utility", "confirmed_acceptance_reward")
+SUPPORTED_SURROGATE_NOISE_PRIORS = ("default", "low_noise")
 INITIAL_DESIGN_POLICY = "common_coordinates_counted_per_policy_seed"
 STOPPING_POLICY = "full_budget"
 FIDELITY_VALUE = 1.0
@@ -169,6 +173,17 @@ class CampaignProtocolSpec(StrictModel):
         return self
 
 
+class AblationProtocolSpec(CampaignProtocolSpec):
+    """Versioned protocol adding predeclared optimizer-target and noise-prior factors."""
+
+    profile: Literal["synthetic-isocratic-ablation/1"] = Field(...)
+    optimizer_target: Literal["historical_utility", "confirmed_acceptance_reward"]
+    surrogate_noise_prior: Literal["default", "low_noise"]
+
+
+ProtocolSpec = CampaignProtocolSpec | AblationProtocolSpec
+
+
 class CandidateCoordinates(StrictModel):
     """One candidate with exactly the two declared decision coordinates."""
 
@@ -176,19 +191,32 @@ class CandidateCoordinates(StrictModel):
     acquisition_duration_min: Annotated[FiniteNumber, Field(ge=1)]
 
 
-def _protocol_spec(spec: CampaignProtocolSpec | dict[str, Any]) -> CampaignProtocolSpec:
+def parse_campaign_protocol(spec: ProtocolSpec | dict[str, Any]) -> ProtocolSpec:
+    """Parse either the frozen paired V1 protocol or the explicit ablation V2 profile.
+
+    V1 dictionaries may omit ``profile`` and retain the original V1 defaults. Existing
+    ``CampaignProtocolSpec`` objects are returned as-is, so this dispatcher does not
+    reserialize or otherwise alter their canonical identity.
+    """
+    if isinstance(spec, AblationProtocolSpec):
+        return spec
     if isinstance(spec, CampaignProtocolSpec):
         return spec
-    return CampaignProtocolSpec.model_validate(spec)
+    if not isinstance(spec, dict):
+        raise TypeError("campaign protocol must be a protocol model or a mapping")
+    profile = spec.get("profile", CAMPAIGN_PROFILE)
+    if profile == CAMPAIGN_PROFILE:
+        return CampaignProtocolSpec.model_validate(spec)
+    if profile == ABLATION_CAMPAIGN_PROFILE:
+        return AblationProtocolSpec.model_validate(spec)
+    raise ValueError(f"unsupported campaign protocol profile: {profile!r}")
 
 
 def _candidate_coordinates(candidate: dict[str, Any]) -> CandidateCoordinates:
     return CandidateCoordinates.model_validate(candidate)
 
 
-def _build_declaration(
-    spec: CampaignProtocolSpec, candidate: CandidateCoordinates
-) -> MethodDeclaration:
+def _build_declaration(spec: ProtocolSpec, candidate: CandidateCoordinates) -> MethodDeclaration:
     strong_fraction = candidate.strong_solvent_fraction
     declaration = {
         "time_unit": "min",
@@ -214,7 +242,7 @@ def _build_declaration(
     return MethodDeclaration.model_validate(declaration)
 
 
-def _all_domain_corners_feasible(spec: CampaignProtocolSpec) -> bool:
+def _all_domain_corners_feasible(spec: ProtocolSpec) -> bool:
     strong = spec.domain.strong_solvent_fraction
     duration = spec.domain.acquisition_duration_min
     for strong_fraction in (strong.lower, strong.upper):
@@ -230,30 +258,67 @@ def _all_domain_corners_feasible(spec: CampaignProtocolSpec) -> bool:
     return True
 
 
-def campaign_protocol_sha256(spec: CampaignProtocolSpec | dict[str, Any]) -> str:
+def campaign_protocol_sha256(spec: ProtocolSpec | dict[str, Any]) -> str:
     """Hash the complete JSON-normalized storage binding."""
-    normalized = _protocol_spec(spec).model_dump(mode="json")
+    normalized = parse_campaign_protocol(spec).model_dump(mode="json")
     return sha256(normalized)
 
 
-def campaign_design_sha256(spec: CampaignProtocolSpec | dict[str, Any]) -> str:
+def campaign_design_sha256(spec: ProtocolSpec | dict[str, Any]) -> str:
     """Hash the design while excluding opaque producer and contract IDs.
 
     Logical task IDs remain part of the scientific design identity. Rebinding
     those tasks to producer or observation-contract records in a new database
-    does not change seeded candidate coordinates.
+    does not change seeded candidate coordinates. The ablation profile additionally
+    excludes its two declared optimizer factors so paired arms share coordinates.
     """
-    normalized = _protocol_spec(spec).model_dump(mode="json")
+    protocol = parse_campaign_protocol(spec)
+    normalized = protocol.model_dump(mode="json")
     normalized["tasks"] = [
         {"task_id": task["task_id"]}
         for task in sorted(normalized["tasks"], key=lambda item: item["task_id"])
     ]
+    if isinstance(protocol, AblationProtocolSpec):
+        normalized.pop("optimizer_target")
+        normalized.pop("surrogate_noise_prior")
     return sha256(normalized)
 
 
-def _validate_seed_ordinal(
-    spec: CampaignProtocolSpec, seed: int, ordinal: int, *, initial: bool
-) -> None:
+def optimizer_configuration(spec: ProtocolSpec | dict[str, Any]) -> dict[str, Any]:
+    """Return the frozen objective and backend profile selected by this protocol."""
+    protocol = parse_campaign_protocol(spec)
+    if isinstance(protocol, CampaignProtocolSpec) and not isinstance(
+        protocol, AblationProtocolSpec
+    ):
+        return {
+            "target_name": "utility",
+            "target_profile": UTILITY_PROFILE,
+            "noise_prior_params": None,
+            "adapter_profile": "bo-mcp-gp-logei/1",
+        }
+
+    target_name = (
+        "utility"
+        if protocol.optimizer_target == "historical_utility"
+        else protocol.optimizer_target
+    )
+    target_profile = (
+        UTILITY_PROFILE
+        if protocol.optimizer_target == "historical_utility"
+        else CONFIRMED_ACCEPTANCE_PROFILE
+    )
+    noise_prior_params = (
+        [1.1, 0.05] if protocol.surrogate_noise_prior == "default" else [1.1, 100.0]
+    )
+    return {
+        "target_name": target_name,
+        "target_profile": target_profile,
+        "noise_prior_params": noise_prior_params,
+        "adapter_profile": "bo-mcp-gp-logei-ablation/1",
+    }
+
+
+def _validate_seed_ordinal(spec: ProtocolSpec, seed: int, ordinal: int, *, initial: bool) -> None:
     if isinstance(seed, bool) or not isinstance(seed, int):
         raise TypeError("seed must be an integer")
     if seed not in spec.seeds:
@@ -270,7 +335,7 @@ def _validate_seed_ordinal(
 
 
 def _random_seed(
-    spec: CampaignProtocolSpec,
+    spec: ProtocolSpec,
     *,
     seed: int,
     stream: str,
@@ -288,7 +353,7 @@ def _random_seed(
     return int.from_bytes(digest, "big")
 
 
-def _numeric_design_inputs(spec: CampaignProtocolSpec, seed: int, stream: str, ordinal: int):
+def _numeric_design_inputs(spec: ProtocolSpec, seed: int, stream: str, ordinal: int):
     names = ("strong_solvent_fraction", "acquisition_duration_min")
     bounds = [
         (getattr(spec.domain, name).lower, getattr(spec.domain, name).upper) for name in names
@@ -300,7 +365,7 @@ def _numeric_design_inputs(spec: CampaignProtocolSpec, seed: int, stream: str, o
     return bounds, seeds
 
 
-def _initial_design_is_representable(spec: CampaignProtocolSpec) -> bool:
+def _initial_design_is_representable(spec: ProtocolSpec) -> bool:
     for seed in spec.seeds:
         bounds, dimension_seeds = _numeric_design_inputs(spec, seed, "initial_lhs", 0)
         try:
@@ -313,7 +378,7 @@ def _initial_design_is_representable(spec: CampaignProtocolSpec) -> bool:
 
 
 def initial_candidate(
-    spec: CampaignProtocolSpec | dict[str, Any], seed: int, ordinal: int
+    spec: ProtocolSpec | dict[str, Any], seed: int, ordinal: int
 ) -> dict[str, float]:
     """Return one reproducible point from the shared two-dimensional LHS.
 
@@ -323,7 +388,7 @@ def initial_candidate(
     from a SHA-256-derived standard-library ``random.Random`` seed based on the
     normalized design hash, not opaque producer or contract record IDs.
     """
-    protocol = _protocol_spec(spec)
+    protocol = parse_campaign_protocol(spec)
     _validate_seed_ordinal(protocol, seed, ordinal, initial=True)
     bounds, dimension_seeds = _numeric_design_inputs(protocol, seed, "initial_lhs", 0)
     point = latin_hypercube_design(
@@ -333,7 +398,7 @@ def initial_candidate(
 
 
 def random_candidate(
-    spec: CampaignProtocolSpec | dict[str, Any], seed: int, ordinal: int
+    spec: ProtocolSpec | dict[str, Any], seed: int, ordinal: int
 ) -> dict[str, float]:
     """Return one stateless random-policy candidate for a later ordinal.
 
@@ -341,7 +406,7 @@ def random_candidate(
     ordinal and coordinate name. Replaying a candidate needs no persisted RNG
     state and does not execute an optimizer.
     """
-    protocol = _protocol_spec(spec)
+    protocol = parse_campaign_protocol(spec)
     _validate_seed_ordinal(protocol, seed, ordinal, initial=False)
     bounds, dimension_seeds = _numeric_design_inputs(protocol, seed, "random_policy", ordinal)
     point = uniform_random_point(bounds=bounds, dimension_seeds=dimension_seeds)
@@ -349,7 +414,7 @@ def random_candidate(
 
 
 def method_declaration(
-    spec: CampaignProtocolSpec | dict[str, Any], candidate: dict[str, Any]
+    spec: ProtocolSpec | dict[str, Any], candidate: dict[str, Any]
 ) -> MethodDeclaration:
     """Build and feasibility-check one fixed-flow isocratic method.
 
@@ -359,7 +424,7 @@ def method_declaration(
     Infeasible candidates raise instead of returning a declaration that could
     be mistaken for an executable campaign evaluation.
     """
-    protocol = _protocol_spec(spec)
+    protocol = parse_campaign_protocol(spec)
     coordinates = _candidate_coordinates(candidate)
     strong = protocol.domain.strong_solvent_fraction
     duration = protocol.domain.acquisition_duration_min

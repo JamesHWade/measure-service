@@ -299,3 +299,19 @@ def assess_analytical_observation(
         "per_analyte": rows,
         "diagnostics": top_diagnostics,
     }
+
+
+def confirmed_acceptance_lower_bound(acceptance: str) -> float:
+    """Return the conservative reward supported by a three-valued assessment.
+
+    Only observed confirmation earns one. ``not_accepted`` and ``unknown``
+    both yield zero, so this value is a lower bound on confirmed acceptance,
+    not a classifier probability or a claim that unknown evidence failed.
+    Missing attempts and execution failures are not assessment states and must
+    not be converted to this value by callers.
+    """
+    if not isinstance(acceptance, str):
+        raise TypeError("acceptance must be one of accepted, not_accepted, or unknown")
+    if acceptance not in {"accepted", "not_accepted", "unknown"}:
+        raise ValueError("acceptance must be one of accepted, not_accepted, or unknown")
+    return 1.0 if acceptance == "accepted" else 0.0

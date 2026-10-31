@@ -28,10 +28,13 @@ from typing import Any
 from . import campaign_protocol as _campaign_protocol
 from .campaign_protocol import (
     BO_POLICY_ID,
+    AblationProtocolSpec,
     CampaignProtocolSpec,
     CandidateCoordinates,
     campaign_protocol_sha256,
     method_declaration,
+    optimizer_configuration,
+    parse_campaign_protocol,
 )
 from .storage import canonical, sha256
 
@@ -43,6 +46,16 @@ MAX_REQUEST_BYTES = 1_048_576
 MAX_RESPONSE_BYTES = 1_048_576
 SIDECAR_TIMEOUT_SECONDS = 60
 _CANDIDATE_KEYS = frozenset({"strong_solvent_fraction", "acquisition_duration_min"})
+_NOISE_PRIOR_LOWER_BOUND = 1e-4
+_PREFLIGHT_PROFILE = "measure-service-bo-ablation-preflight/1"
+_PREFLIGHT_FIXTURE_SHA256 = "0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094"
+_PREFLIGHT_MAX_BYTES = 20 * 1024 * 1024
+_PREFLIGHT_FIXTURE_PATH = (
+    Path(__file__).resolve().parent
+    / "benchmarks"
+    / "reference_data"
+    / "synthetic-isocratic-ablation-v1.json"
+)
 _DESIGN_KERNEL_SOURCE_PATH = (
     Path(__file__).resolve().parent.parent / "measure_methods" / "design.py"
 )
@@ -149,11 +162,12 @@ def _finite_number(value: object, *, label: str) -> float:
 
 
 def _normalize_inputs(
-    spec: CampaignProtocolSpec | dict[str, Any],
+    spec: CampaignProtocolSpec | AblationProtocolSpec | dict[str, Any],
     training_data: list[dict[str, Any]],
     seed: int,
-) -> tuple[CampaignProtocolSpec, list[dict[str, Any]], dict[str, Any]]:
-    protocol = CampaignProtocolSpec.model_validate(spec)
+) -> tuple[CampaignProtocolSpec | AblationProtocolSpec, list[dict[str, Any]], dict[str, Any]]:
+    protocol = parse_campaign_protocol(spec)
+    configuration = optimizer_configuration(protocol)
     if BO_POLICY_ID not in protocol.policies:
         raise ValueError("the protocol does not enable the BO policy")
     if isinstance(seed, bool) or not isinstance(seed, int) or seed not in protocol.seeds:
@@ -182,6 +196,13 @@ def _normalize_inputs(
             raise ValueError(f"training_data candidate {index} is outside the declared domain")
         method_declaration(protocol, normalized_candidate)
         score = _finite_number(row["score"], label=f"training_data score {index}")
+        if configuration["target_name"] == "confirmed_acceptance_reward" and score not in (
+            0.0,
+            1.0,
+        ):
+            raise ValueError(
+                f"training_data score {index} for confirmed_acceptance_reward must be exactly 0 or 1"
+            )
         normalized.append({"candidate": normalized_candidate, "score": score})
 
     normalized_spec = protocol.model_dump(mode="json")
@@ -221,7 +242,7 @@ def _runtime_path() -> Path:
 def _validate_backend_response(
     response_value: object,
     *,
-    protocol: CampaignProtocolSpec,
+    protocol: CampaignProtocolSpec | AblationProtocolSpec,
     training_data: list[dict[str, Any]],
     seed: int,
     protocol_digest: str,
@@ -230,6 +251,7 @@ def _validate_backend_response(
     campaign_protocol_source_digest: str,
     design_kernel_source_digest: str,
 ) -> dict[str, Any]:
+    configuration = optimizer_configuration(protocol)
     if not isinstance(response_value, dict) or set(response_value) != {
         "schema",
         "candidate",
@@ -279,7 +301,7 @@ def _validate_backend_response(
         raise OptimizerBackendError("BO sidecar returned incomplete backend provenance")
     if (
         backend["backend_id"] != BACKEND_ID
-        or backend["adapter_profile"] != ADAPTER_PROFILE
+        or backend["adapter_profile"] != configuration["adapter_profile"]
         or backend["backend_name"] != "bo-mcp"
         or backend["backend_class"] != "BoTorchBackend"
     ):
@@ -353,17 +375,52 @@ def _validate_backend_response(
         "backend_state",
         "replay",
     }
+    if configuration["noise_prior_params"] is not None:
+        expected_setting_keys.add("noise_prior")
     if not isinstance(settings, dict) or set(settings) != expected_setting_keys:
         raise OptimizerBackendError("BO sidecar settings are incomplete")
     if (
         settings["parameters"] != ["strong_solvent_fraction", "acquisition_duration_min"]
-        or settings["objective"] != {"name": "utility", "direction": "maximize"}
+        or settings["objective"] != {"name": configuration["target_name"], "direction": "maximize"}
         or settings["batch_size"] != 1
         or settings["iteration"] != len(training_data)
         or settings["acquisition_method"] != "expected_improvement"
         or settings["acquisition_implementation"] != "qLogExpectedImprovement"
     ):
         raise OptimizerBackendError("BO sidecar settings do not match the requested protocol")
+    if configuration["noise_prior_params"] is not None:
+        noise_prior = settings["noise_prior"]
+        expected_prior_keys = {
+            "family",
+            "concentration",
+            "rate",
+            "space",
+            "constraint_lower_bound",
+            "learned",
+        }
+        if not isinstance(noise_prior, dict) or set(noise_prior) != expected_prior_keys:
+            raise OptimizerBackendError("BO sidecar noise-prior settings are incomplete")
+        parameters = configuration["noise_prior_params"]
+        try:
+            actual_concentration = _finite_number(
+                noise_prior["concentration"], label="noise-prior concentration"
+            )
+            actual_rate = _finite_number(noise_prior["rate"], label="noise-prior rate")
+            actual_floor = _finite_number(
+                noise_prior["constraint_lower_bound"], label="noise-prior constraint floor"
+            )
+        except ValueError as error:
+            raise OptimizerBackendError("BO sidecar noise-prior settings are invalid") from error
+        if (
+            noise_prior["family"] != "Gamma"
+            or actual_concentration != parameters[0]
+            or actual_rate != parameters[1]
+            or noise_prior["space"] != "standardized_target_variance"
+            or actual_floor != _NOISE_PRIOR_LOWER_BOUND
+            or type(noise_prior["learned"]) is not bool
+            or noise_prior["learned"] is not True
+        ):
+            raise OptimizerBackendError("BO sidecar noise-prior settings do not match the protocol")
     if not isinstance(settings["acquisition_optimization"], dict) or set(
         settings["acquisition_optimization"]
     ) != {
@@ -408,7 +465,7 @@ def _validate_backend_response(
 
 
 def suggest_candidate(
-    spec: CampaignProtocolSpec | dict[str, Any],
+    spec: CampaignProtocolSpec | AblationProtocolSpec | dict[str, Any],
     training_data: list[dict[str, Any]],
     seed: int,
 ) -> dict[str, Any]:
@@ -489,6 +546,169 @@ def suggest_candidate(
     except (TypeError, ValueError) as error:
         raise OptimizerBackendError("BO sidecar result contains invalid runtime timing") from error
     return result
+
+
+def preflight_ablation_backend(
+    spec: AblationProtocolSpec | dict[str, Any],
+) -> dict[str, Any]:
+    """Exercise the 16 predeclared optimizer routes with fabricated histories.
+
+    This is a backend readiness check only. It does not run analytical tasks,
+    inspect campaign outcomes, or add fabricated rows to campaign history.
+    Every planned route is returned, including failures, so a failed route
+    cannot disappear from the denominator.
+    """
+    protocol = parse_campaign_protocol(spec)
+    if not isinstance(protocol, AblationProtocolSpec):
+        raise ValueError("ablation backend preflight requires the ablation protocol profile")
+
+    fixture_bytes = _PREFLIGHT_FIXTURE_PATH.read_bytes()
+    fixture_digest = hashlib.sha256(fixture_bytes).hexdigest()
+    if fixture_digest != _PREFLIGHT_FIXTURE_SHA256:
+        raise ValueError("the frozen ablation preflight fixture digest does not match")
+    fixture = _loads_strict(fixture_bytes, max_bytes=256 * 1024)
+    if (
+        not isinstance(fixture, dict)
+        or fixture.get("profile") != "synthetic-isocratic-ablation-study/1"
+    ):
+        raise ValueError("the frozen ablation preflight fixture is malformed")
+    declared = fixture.get("preflight")
+    if not isinstance(declared, dict) or declared.get("expected_case_count") != 16:
+        raise ValueError("the frozen ablation preflight case declaration is malformed")
+    if (
+        protocol.seeds != fixture.get("seeds")
+        or protocol.evaluation_budget != fixture.get("evaluation_budget")
+        or protocol.initial_design_size != fixture.get("initial_design_size")
+        or protocol.domain.strong_solvent_fraction.model_dump(mode="json")
+        != fixture.get("domain", {}).get("strong_solvent_fraction")
+        or protocol.domain.acquisition_duration_min.model_dump(mode="json")
+        != fixture.get("domain", {}).get("acquisition_duration_min")
+    ):
+        raise ValueError("the ablation protocol does not match the frozen preflight study design")
+
+    history_lengths = declared.get("history_lengths")
+    if history_lengths != [3, 9]:
+        raise ValueError("the frozen ablation preflight history lengths are unsupported")
+    confirmed_patterns = declared.get("confirmed_reward_patterns")
+    if confirmed_patterns != ["all_zero", "all_one", "alternating_zero_one"]:
+        raise ValueError("the frozen confirmed-reward preflight patterns are unsupported")
+
+    seed = protocol.seeds[0]
+    strong_bounds = protocol.domain.strong_solvent_fraction
+    duration_bounds = protocol.domain.acquisition_duration_min
+    cases: list[dict[str, Any]] = []
+    successful = 0
+    started = time.perf_counter()
+
+    route_specs: list[tuple[str, str, str, int]] = []
+    for prior in ("default", "low_noise"):
+        for history_length in history_lengths:
+            route_specs.extend(
+                ("confirmed_acceptance_reward", prior, pattern, history_length)
+                for pattern in confirmed_patterns
+            )
+            route_specs.append(("historical_utility", prior, "historical_utility", history_length))
+    expected_case_count = declared["expected_case_count"]
+    if len(route_specs) != expected_case_count:
+        raise ValueError("the implemented preflight routes do not match the frozen denominator")
+
+    for target, prior, pattern, history_length in route_specs:
+        case_protocol_data = protocol.model_dump(mode="json")
+        case_protocol_data.update(
+            {
+                "optimizer_target": target,
+                "surrogate_noise_prior": prior,
+            }
+        )
+        case_protocol = parse_campaign_protocol(case_protocol_data)
+
+        rows: list[dict[str, Any]] = []
+        n = history_length
+        strong_span = strong_bounds.upper - strong_bounds.lower
+        duration_span = duration_bounds.upper - duration_bounds.lower
+        for index in range(n):
+            strong = strong_bounds.lower + strong_span * (index + 1) / (n + 1)
+            duration = duration_bounds.lower + duration_span * (((2 * index) % n) + 1) / (n + 1)
+            if pattern == "historical_utility":
+                score = 0.25 + 2.5 * index / (n - 1)
+            elif pattern == "all_zero":
+                score = 0.0
+            elif pattern == "all_one":
+                score = 1.0
+            else:
+                score = float(index % 2)
+            rows.append(
+                {
+                    "candidate": {
+                        "strong_solvent_fraction": strong,
+                        "acquisition_duration_min": duration,
+                    },
+                    "score": score,
+                }
+            )
+
+        case_id = f"{target}:{prior}:{pattern}:n{history_length}"
+        request_summary: dict[str, Any] = {
+            "schema": REQUEST_SCHEMA,
+            "spec": case_protocol.model_dump(mode="json"),
+            "training_data": rows,
+            "seed": seed,
+        }
+        case: dict[str, Any] = {
+            "case_id": case_id,
+            "target": target,
+            "noise_prior": prior,
+            "pattern": pattern,
+            "history_length": history_length,
+            "attempted": True,
+            "request": request_summary,
+            "success": False,
+            "candidate": None,
+            "backend_provenance": None,
+            "proposal_elapsed_seconds": None,
+            "error": None,
+        }
+        try:
+            _, normalized_rows, checked_request = _normalize_inputs(case_protocol, rows, seed)
+            request_summary.update(checked_request)
+            result = suggest_candidate(case_protocol, normalized_rows, seed)
+            candidate = result.get("candidate")
+            backend = result.get("backend")
+            if not isinstance(candidate, dict) or not isinstance(backend, dict):
+                raise OptimizerBackendError("BO preflight returned malformed candidate provenance")
+            case["candidate"] = candidate
+            case["backend_provenance"] = backend
+            elapsed = backend.get("runtime", {}).get("elapsed_seconds")
+            if elapsed is not None:
+                case["proposal_elapsed_seconds"] = elapsed
+            case["success"] = True
+            successful += 1
+        except Exception as error:
+            case["error"] = f"{type(error).__name__}: {str(error)[:500]}"
+        cases.append(case)
+
+    elapsed_total = time.perf_counter() - started
+    report = {
+        "schema_version": 1,
+        "profile": _PREFLIGHT_PROFILE,
+        "fixture_sha256": fixture_digest,
+        "study_protocol_sha256": campaign_protocol_sha256(protocol),
+        "seed": seed,
+        "expected_case_count": expected_case_count,
+        "attempted_case_count": len(cases),
+        "success_count": successful,
+        "failed_count": len(cases) - successful,
+        "qualified": successful == expected_case_count == 16,
+        "preflight_elapsed_seconds": elapsed_total,
+        "cases": cases,
+    }
+    try:
+        encoded = canonical(report).encode("utf-8")
+    except (TypeError, ValueError) as error:
+        raise OptimizerBackendError("BO preflight report contains invalid provenance") from error
+    if len(encoded) > _PREFLIGHT_MAX_BYTES:
+        raise OptimizerBackendError("BO preflight report exceeds the configured size limit")
+    return report
 
 
 def _require_exact_keys(value: object, keys: set[str], *, label: str) -> dict[str, Any]:
@@ -591,6 +811,7 @@ def _sidecar_response(request: dict[str, Any]) -> dict[str, Any]:
     protocol, training, checked_request = _normalize_inputs(
         request["spec"], request["training_data"], request["seed"]
     )
+    configuration = optimizer_configuration(protocol)
     if (
         request["protocol_sha256"] != checked_request["protocol_sha256"]
         or request["training_sha256"] != checked_request["training_sha256"]
@@ -613,8 +834,8 @@ def _sidecar_response(request: dict[str, Any]) -> dict[str, Any]:
 
     strong_bounds = protocol.domain.strong_solvent_fraction
     duration_bounds = protocol.domain.acquisition_duration_min
-    optimizer_spec = OptimizationSpec(
-        parameters=[
+    optimizer_spec_values = {
+        "parameters": [
             ParameterSpec(
                 name="strong_solvent_fraction",
                 type=ParameterType.CONTINUOUS,
@@ -626,16 +847,31 @@ def _sidecar_response(request: dict[str, Any]) -> dict[str, Any]:
                 bounds=(duration_bounds.lower, duration_bounds.upper),
             ),
         ],
-        objectives=[ObjectiveSpec(name="utility", minimize=False)],
-        batch_size=1,
-        initial_design_size=protocol.initial_design_size,
-        random_seed=request["seed"],
-        acquisition_method=AcquisitionMethod.EXPECTED_IMPROVEMENT,
-    )
+        "objectives": [ObjectiveSpec(name=configuration["target_name"], minimize=False)],
+        "batch_size": 1,
+        "initial_design_size": protocol.initial_design_size,
+        "random_seed": request["seed"],
+        "acquisition_method": AcquisitionMethod.EXPECTED_IMPROVEMENT,
+    }
+    noise_prior_params = configuration["noise_prior_params"]
+    noise_prior_floor: float | None = None
+    if noise_prior_params is not None:
+        optimizer_spec_values["noise_prior_params"] = tuple(noise_prior_params)
+        try:
+            constants = importlib.import_module("bo_engine.constants")
+            noise_prior_floor = _finite_number(
+                getattr(constants, "NOISE_PRIOR_MIN_INFERRED", None),
+                label="installed GP noise-prior lower bound",
+            )
+        except (ImportError, ValueError) as error:
+            raise RuntimeError("the installed BoTorch noise-prior floor is unavailable") from error
+        if noise_prior_floor != _NOISE_PRIOR_LOWER_BOUND:
+            raise RuntimeError("the installed BoTorch noise-prior floor differs from the protocol")
+    optimizer_spec = OptimizationSpec(**optimizer_spec_values)
     observations = [
         ObservationData(
             parameter_values=row["candidate"],
-            objective_values={"utility": row["score"]},
+            objective_values={configuration["target_name"]: row["score"]},
             result_id=f"measure-history-{ordinal:04d}",
         )
         for ordinal, row in enumerate(training)
@@ -729,9 +965,40 @@ def _sidecar_response(request: dict[str, Any]) -> dict[str, Any]:
         "random_seed": _field(provenance, "random_seed"),
         "confidence_level": _field(provenance, "confidence_level"),
     }
+    settings = {
+        "parameters": ["strong_solvent_fraction", "acquisition_duration_min"],
+        "objective": {"name": configuration["target_name"], "direction": "maximize"},
+        "batch_size": 1,
+        "iteration": len(training),
+        "acquisition_method": "expected_improvement",
+        "acquisition_implementation": "qLogExpectedImprovement",
+        "input_transform": "BoTorch SingleTaskGP default input normalization",
+        "outcome_transform": "BoTorch SingleTaskGP default outcome standardization",
+        "kernel": (
+            "RBF with automatic relevance determination (ARD); BoTorch SingleTaskGP "
+            "default, no custom covar_module"
+        ),
+        "acquisition_optimization": {
+            "num_restarts": effective_restarts,
+            "raw_samples": effective_raw_samples,
+            "configured_num_restarts": optimizer_spec.acquisition_optimization.num_restarts,
+            "configured_raw_samples": optimizer_spec.acquisition_optimization.raw_samples,
+        },
+        "backend_state": "stateless; no prior backend state supplied",
+        "replay": "ordered training history is supplied on every call",
+    }
+    if noise_prior_params is not None:
+        settings["noise_prior"] = {
+            "family": "Gamma",
+            "concentration": noise_prior_params[0],
+            "rate": noise_prior_params[1],
+            "space": "standardized_target_variance",
+            "constraint_lower_bound": noise_prior_floor,
+            "learned": True,
+        }
     response_backend = {
         "backend_id": BACKEND_ID,
-        "adapter_profile": ADAPTER_PROFILE,
+        "adapter_profile": configuration["adapter_profile"],
         "backend_name": "bo-mcp",
         "backend_class": type(backend).__name__,
         "generation_method": generation_method,
@@ -758,28 +1025,7 @@ def _sidecar_response(request: dict[str, Any]) -> dict[str, Any]:
             "platform": sys.platform,
             "device": "cpu",
         },
-        "settings": {
-            "parameters": ["strong_solvent_fraction", "acquisition_duration_min"],
-            "objective": {"name": "utility", "direction": "maximize"},
-            "batch_size": 1,
-            "iteration": len(training),
-            "acquisition_method": "expected_improvement",
-            "acquisition_implementation": "qLogExpectedImprovement",
-            "input_transform": "BoTorch SingleTaskGP default input normalization",
-            "outcome_transform": "BoTorch SingleTaskGP default outcome standardization",
-            "kernel": (
-                "RBF with automatic relevance determination (ARD); BoTorch SingleTaskGP "
-                "default, no custom covar_module"
-            ),
-            "acquisition_optimization": {
-                "num_restarts": effective_restarts,
-                "raw_samples": effective_raw_samples,
-                "configured_num_restarts": optimizer_spec.acquisition_optimization.num_restarts,
-                "configured_raw_samples": optimizer_spec.acquisition_optimization.raw_samples,
-            },
-            "backend_state": "stateless; no prior backend state supplied",
-            "replay": "ordered training history is supplied on every call",
-        },
+        "settings": settings,
         "warnings": list(warnings),
         "suggestion_provenance": normalized_provenance,
     }

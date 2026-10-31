@@ -22,6 +22,7 @@ from measure_service.campaign_protocol import (
     campaign_protocol_sha256,
     initial_candidate,
     method_declaration,
+    parse_campaign_protocol,
     random_candidate,
 )
 
@@ -76,6 +77,53 @@ def test_protocol_normalizes_supported_profile_defaults_and_links():
     assert spec.initial_evaluations_always_count is True
     assert len(spec.tasks) == 2
     json.dumps(spec.model_dump(mode="json"), allow_nan=False)
+
+
+def test_v1_profile_dispatch_preserves_normalization_hashes_and_candidate_streams():
+    spec = _spec(seeds=[17, 29, 43])
+    legacy_mapping = spec.model_dump(mode="json")
+    legacy_mapping.pop("profile")
+
+    assert parse_campaign_protocol(spec) is spec
+    parsed_legacy = parse_campaign_protocol(legacy_mapping)
+    assert isinstance(parsed_legacy, CampaignProtocolSpec)
+    assert parsed_legacy.model_dump(mode="json") == spec.model_dump(mode="json")
+    assert (
+        campaign_protocol_sha256(spec)
+        == "3e12ee05793dfe3b10237dba335b113e38ce804a70b4bf15711d412334699f00"
+    )
+    assert (
+        campaign_design_sha256(spec)
+        == "c5b95044bfae6f863f9d204e2b04e4f5ecba32ef393d2dc906efc3076d024cca"
+    )
+    assert [initial_candidate(spec, 17, ordinal) for ordinal in range(3)] == [
+        {
+            "strong_solvent_fraction": 0.5698782055393766,
+            "acquisition_duration_min": 9.44226980261875,
+        },
+        {
+            "strong_solvent_fraction": 0.6599206037528836,
+            "acquisition_duration_min": 3.1467130356304747,
+        },
+        {
+            "strong_solvent_fraction": 0.2601158635447917,
+            "acquisition_duration_min": 4.257998017073078,
+        },
+    ]
+    assert [random_candidate(spec, 17, ordinal) for ordinal in (3, 4, 9)] == [
+        {
+            "strong_solvent_fraction": 0.5940468572987686,
+            "acquisition_duration_min": 9.431606057854996,
+        },
+        {
+            "strong_solvent_fraction": 0.4849343427907574,
+            "acquisition_duration_min": 8.486545330731628,
+        },
+        {
+            "strong_solvent_fraction": 0.6780335472387462,
+            "acquisition_duration_min": 5.863893857883884,
+        },
+    ]
 
 
 def test_method_declaration_maps_solvent_b_and_uses_declared_constraints():
