@@ -68,6 +68,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Declare matched synthetic campaign protocols](docs/synthetic-campaigns.md)
 - [Declare controlled optimizer-target and noise-prior comparisons](docs/ablation-protocol.md)
 - [Run the fixed five-arm target and noise-prior study](docs/synthetic-ablations.md)
+- [Inspect the fixed study's results, early stops and tidy reference](docs/synthetic-ablation-results.md)
 - [Run durable synthetic campaigns with optional BO-MCP](docs/campaign-runtime.md)
 - [Reproduce the fixed paired synthetic comparison](docs/synthetic-comparison.md)
 - [Inspect the first checked synthetic comparison](docs/synthetic-reference-results.md)

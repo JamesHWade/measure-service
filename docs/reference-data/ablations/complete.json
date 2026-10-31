@@ -1,0 +1,18 @@
+{
+  "files": {
+    "analytes.csv": {
+      "sha256": "94b248d9ec1eea6964ed95cb5c1736c48eedec4d945639154f30d76e453c1d81",
+      "size_bytes": 833289
+    },
+    "evaluations.csv": {
+      "sha256": "847ee0c19b31ded97bb797cacd296adf93b2fd5db41358746536eb700df45b35",
+      "size_bytes": 884151
+    },
+    "metadata.json": {
+      "sha256": "c463b3d1e8c859e720a48218fd8f98c98cc5407dcec5c1f0c4996a02a5087f33",
+      "size_bytes": 74903
+    }
+  },
+  "profile": "measure-service-synthetic-ablation-reference/1",
+  "schema_version": 1
+}

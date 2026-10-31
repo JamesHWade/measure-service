@@ -7,6 +7,11 @@ priors. The [protocol guide](ablation-protocol.md) defines those treatments and
 their limits. The original [paired reference](synthetic-reference-results.md)
 remains a separate completed experiment.
 
+The [recorded five-arm result](synthetic-ablation-results.md) retains 543
+consumed evaluations and 57 unknown future slots after 19 duplicate-candidate
+stops. Inspect the reported execution status as well as the completion seal;
+sealing an evidence bundle does not mean every campaign finished its budget.
+
 Install the service and its [optional backend runtime](campaign-runtime.md#optional-real-bo-mcp-runtime),
 then run from outside the checkout:
 

@@ -1,1 +1,3 @@
 src/measure_service/benchmarks/reference_data/*.json linguist-generated=true
+# Preserve sealed reference bytes, including standard CSV CRLF line endings.
+docs/reference-data/ablations/*.csv -text whitespace=cr-at-eol
