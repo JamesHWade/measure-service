@@ -14,7 +14,13 @@ from pathlib import Path
 import pytest
 
 from measure_service import optimizer_backend
-from measure_service.campaign_protocol import CampaignProtocolSpec, campaign_protocol_sha256
+from measure_service.campaign_protocol import (
+    AblationProtocolSpec,
+    CampaignProtocolSpec,
+    campaign_protocol_sha256,
+    optimizer_configuration,
+    parse_campaign_protocol,
+)
 from measure_service.optimizer_backend import (
     MAX_REQUEST_BYTES,
     REQUEST_SCHEMA,
@@ -51,6 +57,22 @@ def _spec() -> CampaignProtocolSpec:
     )
 
 
+def _ablation_spec(
+    *,
+    target: str = "historical_utility",
+    noise_prior: str = "default",
+) -> AblationProtocolSpec:
+    payload = _spec().model_dump(mode="json")
+    payload.update(
+        {
+            "profile": "synthetic-isocratic-ablation/1",
+            "optimizer_target": target,
+            "surrogate_noise_prior": noise_prior,
+        }
+    )
+    return parse_campaign_protocol(payload)
+
+
 def _history() -> list[dict[str, object]]:
     return [
         {
@@ -69,12 +91,15 @@ def _install_fake_public_backend(
     *,
     generation_method: str = "bo",
     log_warning: str | None = None,
-) -> None:
+) -> list[object]:
     package = types.ModuleType("bo_engine")
     package.__file__ = "/synthetic/bo_engine/__init__.py"
     package.__path__ = []
     backend_module = types.ModuleType("bo_engine.botorch_backend")
     types_module = types.ModuleType("bo_engine.types")
+    constants_module = types.ModuleType("bo_engine.constants")
+    constants_module.NOISE_PRIOR_MIN_INFERRED = 1e-4
+    optimizer_specs: list[object] = []
 
     class ParameterType(str, Enum):
         CONTINUOUS = "continuous"
@@ -105,6 +130,7 @@ def _install_fake_public_backend(
         def __init__(self, **values):
             self.__dict__.update(values)
             self.acquisition_optimization = AcquisitionOptimizationConfig()
+            optimizer_specs.append(self)
 
     class ObservationData:
         def __init__(self, **values):
@@ -125,7 +151,9 @@ def _install_fake_public_backend(
                 "strong_solvent_fraction",
                 "acquisition_duration_min",
             ]
-            assert spec.objectives[0].name == "utility" and not spec.objectives[0].minimize
+            assert len(spec.objectives) == 1 and not spec.objectives[0].minimize
+            objective_name = spec.objectives[0].name
+            assert all(set(row.objective_values) == {objective_name} for row in observations)
             assert spec.acquisition_method is AcquisitionMethod.EXPECTED_IMPROVEMENT
             assert spec.random_seed == 7
             assert len(observations) == 3
@@ -171,6 +199,7 @@ def _install_fake_public_backend(
     types_module.ObservationData = ObservationData
     backend_module.BoTorchBackend = BoTorchBackend
     monkeypatch.setitem(sys.modules, "bo_engine", package)
+    monkeypatch.setitem(sys.modules, "bo_engine.constants", constants_module)
     monkeypatch.setitem(sys.modules, "bo_engine.botorch_backend", backend_module)
     monkeypatch.setitem(sys.modules, "bo_engine.types", types_module)
     monkeypatch.setattr(optimizer_backend, "_bo_source_tree_digest", lambda _: "a" * 64)
@@ -188,6 +217,7 @@ def _install_fake_public_backend(
             "source_revision": "b" * 40 if name == "bo-engine" else None,
         },
     )
+    return optimizer_specs
 
 
 def _patch_subprocess(
@@ -259,6 +289,7 @@ def test_adapter_uses_public_backend_and_binds_replay_provenance(monkeypatch):
     assert len(backend["design_kernel_source_sha256"]) == 64
     assert backend["distribution_versions"]["bo-engine"] == "0.1.0"
     assert backend["settings"]["objective"] == {"name": "utility", "direction": "maximize"}
+    assert "noise_prior" not in backend["settings"]
     assert backend["warnings"] == [
         "sample warning",
         f"logging.WARNING [bo_engine.acquisition]: {warning_message}",
@@ -268,6 +299,104 @@ def test_adapter_uses_public_backend_and_binds_replay_provenance(monkeypatch):
     assert backend["source_revision"] == "b" * 40
     assert len(calls) == 1
     assert tuple(logging.getLogger().handlers) == root_handlers
+
+
+@pytest.mark.parametrize(
+    ("target", "noise_prior", "expected_target", "expected_noise"),
+    [
+        ("historical_utility", "default", "utility", (1.1, 0.05)),
+        ("historical_utility", "low_noise", "utility", (1.1, 100.0)),
+        (
+            "confirmed_acceptance_reward",
+            "default",
+            "confirmed_acceptance_reward",
+            (1.1, 0.05),
+        ),
+        (
+            "confirmed_acceptance_reward",
+            "low_noise",
+            "confirmed_acceptance_reward",
+            (1.1, 100.0),
+        ),
+    ],
+)
+def test_ablation_profile_maps_objective_and_explicit_noise_prior(
+    monkeypatch, target, noise_prior, expected_target, expected_noise
+):
+    optimizer_specs = _install_fake_public_backend(monkeypatch)
+    monkeypatch.setenv("MEASURE_BO_PYTHON", sys.executable)
+    _patch_subprocess(monkeypatch)
+    protocol = _ablation_spec(target=target, noise_prior=noise_prior)
+    training = _history()
+    if target == "confirmed_acceptance_reward":
+        for row, score in zip(training, (0.0, 1.0, 0.0), strict=True):
+            row["score"] = score
+
+    result = suggest_candidate(protocol, training, 7)
+
+    configuration = optimizer_configuration(protocol)
+    backend = result["backend"]
+    settings = backend["settings"]
+    assert backend["adapter_profile"] == "bo-mcp-gp-logei-ablation/1"
+    assert configuration["target_name"] == expected_target
+    assert settings["objective"] == {"name": expected_target, "direction": "maximize"}
+    assert settings["noise_prior"] == {
+        "family": "Gamma",
+        "concentration": expected_noise[0],
+        "rate": expected_noise[1],
+        "space": "standardized_target_variance",
+        "constraint_lower_bound": 1e-4,
+        "learned": True,
+    }
+    assert optimizer_specs[-1].noise_prior_params == expected_noise
+
+
+def test_ablation_binary_target_rejects_nonbinary_training_scores(monkeypatch):
+    monkeypatch.setenv("MEASURE_BO_PYTHON", sys.executable)
+    training = _history()
+    training[1]["score"] = 0.5
+
+    with pytest.raises(ValueError, match="must be exactly 0 or 1"):
+        suggest_candidate(_ablation_spec(target="confirmed_acceptance_reward"), training, 7)
+
+
+def test_ablation_response_rejects_mismatched_objective_and_prior_provenance(monkeypatch):
+    _install_fake_public_backend(monkeypatch)
+    protocol = _ablation_spec(target="confirmed_acceptance_reward", noise_prior="low_noise")
+    training = _history()
+    for row, score in zip(training, (0.0, 1.0, 0.0), strict=True):
+        row["score"] = score
+    _, normalized, request = optimizer_backend._normalize_inputs(protocol, training, 7)
+
+    response = optimizer_backend._sidecar_response(request)
+    response["backend"]["settings"]["objective"]["name"] = "utility"
+    with pytest.raises(OptimizerBackendError, match="settings do not match"):
+        optimizer_backend._validate_backend_response(
+            response,
+            protocol=protocol,
+            training_data=normalized,
+            seed=7,
+            protocol_digest=request["protocol_sha256"],
+            training_digest=request["training_sha256"],
+            adapter_source_digest=request["adapter_source_sha256"],
+            campaign_protocol_source_digest=request["campaign_protocol_source_sha256"],
+            design_kernel_source_digest=request["design_kernel_source_sha256"],
+        )
+
+    response = optimizer_backend._sidecar_response(request)
+    response["backend"]["settings"]["noise_prior"]["rate"] = 0.05
+    with pytest.raises(OptimizerBackendError, match="noise-prior settings do not match"):
+        optimizer_backend._validate_backend_response(
+            response,
+            protocol=protocol,
+            training_data=normalized,
+            seed=7,
+            protocol_digest=request["protocol_sha256"],
+            training_digest=request["training_sha256"],
+            adapter_source_digest=request["adapter_source_sha256"],
+            campaign_protocol_source_digest=request["campaign_protocol_source_sha256"],
+            design_kernel_source_digest=request["design_kernel_source_sha256"],
+        )
 
 
 def test_adapter_rejects_initial_design_fallback(monkeypatch):

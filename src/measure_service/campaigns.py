@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from measure_methods.moses_objective import moses_observation_score
+from measure_methods.observations import confirmed_acceptance_lower_bound
 
 from . import (
     campaign_protocol,
@@ -54,8 +55,44 @@ def _source_hash(path: str | Path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def _implementation_provenance() -> dict[str, Any]:
-    return {
+def _is_ablation_protocol(spec: campaign_protocol.ProtocolSpec) -> bool:
+    return getattr(spec, "profile", None) == "synthetic-isocratic-ablation/1"
+
+
+def _optimizer_target_record(
+    spec: campaign_protocol.ProtocolSpec, result: dict[str, Any]
+) -> dict[str, Any] | None:
+    """Describe the predeclared target without replacing historical utility."""
+    if not _is_ablation_protocol(spec):
+        return None
+    configuration = campaign_protocol.optimizer_configuration(spec)
+    target_name = configuration["target_name"]
+    if target_name == "utility":
+        utility = result.get("utility")
+        if not isinstance(utility, dict):
+            raise ValueError("Historical utility target is missing its stored score")
+        return {
+            "profile": configuration["target_profile"],
+            "name": "utility",
+            "direction": "maximize",
+            "status": utility.get("status"),
+            "value": utility.get("score"),
+        }
+    if target_name == "confirmed_acceptance_reward":
+        acceptance = result.get("analytical_acceptance")
+        value = confirmed_acceptance_lower_bound(acceptance)
+        return {
+            "profile": configuration["target_profile"],
+            "name": target_name,
+            "direction": "maximize",
+            "status": "scored",
+            "value": value,
+        }
+    raise ValueError("Campaign protocol selected an unsupported optimizer target")
+
+
+def _implementation_provenance(*, include_target_kernel: bool = False) -> dict[str, Any]:
+    provenance = {
         "measure_service": method_backend_info(),
         "campaign_adapter": {
             "module": "measure_service.campaigns",
@@ -72,6 +109,13 @@ def _implementation_provenance() -> dict[str, Any]:
             ),
         },
     }
+    if include_target_kernel:
+        target_kernel = __import__("measure_methods.observations", fromlist=["__file__"])
+        provenance["optimizer_target_kernel"] = {
+            "module": "measure_methods.observations",
+            "source_sha256": _source_hash(target_kernel.__file__),
+        }
+    return provenance
 
 
 def _campaign_row(con: sqlite3.Connection, owner: str, campaign_id: str) -> sqlite3.Row:
@@ -95,7 +139,7 @@ def _task_for_campaign(
     task = next((item for item in protocol["tasks"] if item["task_id"] == row["task_id"]), None)
     if task is None or payload.get("task") != task:
         raise ValueError("Campaign task identity does not match its immutable protocol")
-    spec = campaign_protocol.CampaignProtocolSpec.model_validate(protocol["spec"])
+    spec = campaign_protocol.parse_campaign_protocol(protocol["spec"])
     return protocol, {"spec": spec, "task": task}
 
 
@@ -133,7 +177,15 @@ def _proposal_row(con: sqlite3.Connection, owner: str, proposal_id: str) -> sqli
     return row
 
 
-def _proposal_response(con: sqlite3.Connection, row: sqlite3.Row) -> dict[str, Any]:
+def _proposal_response(
+    con: sqlite3.Connection,
+    row: sqlite3.Row,
+    *,
+    verify_training: bool = True,
+    replayed_training: tuple[list[dict[str, Any]], list[dict[str, Any]]] | None = None,
+    campaign_context: tuple[sqlite3.Row, dict[str, Any], dict[str, Any], dict[str, Any]]
+    | None = None,
+) -> dict[str, Any]:
     try:
         payload = json.loads(row["payload"])
     except (TypeError, json.JSONDecodeError) as error:
@@ -177,9 +229,12 @@ def _proposal_response(con: sqlite3.Connection, row: sqlite3.Row) -> dict[str, A
         raise ValueError("Stored campaign proposal method identity is inconsistent")
     if row["state"] not in ("pending", "consumed"):
         raise ValueError("Stored campaign proposal has an unsupported state")
-    campaign_row = _campaign_row(con, row["owner"], row["campaign_id"])
-    campaign_payload = _verify_campaign_payload(campaign_row)
-    protocol, links = _task_for_campaign(con, row["owner"], campaign_row, campaign_payload)
+    if campaign_context is None:
+        campaign_row = _campaign_row(con, row["owner"], row["campaign_id"])
+        campaign_payload = _verify_campaign_payload(campaign_row)
+        protocol, links = _task_for_campaign(con, row["owner"], campaign_row, campaign_payload)
+    else:
+        campaign_row, campaign_payload, protocol, links = campaign_context
     proposal_input = payload.get("proposal_input")
     if (
         not isinstance(proposal_input, dict)
@@ -231,23 +286,42 @@ def _proposal_response(con: sqlite3.Connection, row: sqlite3.Row) -> dict[str, A
             payload.get("backend"), dict
         ):
             raise ValueError("BO campaign proposal is missing its declared backend provenance")
-    training_data, source_members = _training_context(
-        con, row["owner"], row["campaign_id"], before_ordinal=row["ordinal"]
-    )
-    expected_training = {
-        "count": len(training_data),
-        "sha256": sha256(training_data),
-        "snapshot_members": source_members,
-    }
-    if payload.get("training") != expected_training:
-        raise ValueError("Stored proposal training inputs differ from exact consumed snapshots")
-    if payload.get("proposal_input", {}).get("training_sha256") != expected_training["sha256"]:
-        raise ValueError("Stored proposal training digest differs from replayed campaign history")
-    if (
-        isinstance(payload.get("backend"), dict)
-        and payload["backend"].get("training_sha256") != expected_training["sha256"]
-    ):
-        raise ValueError("Stored BO backend provenance has a different training digest")
+    if verify_training:
+        if replayed_training is None:
+            training_data, source_members = _training_context(
+                con, row["owner"], row["campaign_id"], before_ordinal=row["ordinal"]
+            )
+        else:
+            training_data, source_members = replayed_training
+        expected_training = {
+            "count": len(training_data),
+            "sha256": sha256(training_data),
+            "snapshot_members": source_members,
+        }
+        if payload.get("training") != expected_training:
+            raise ValueError("Stored proposal training inputs differ from exact consumed snapshots")
+        if payload.get("proposal_input", {}).get("training_sha256") != expected_training["sha256"]:
+            raise ValueError(
+                "Stored proposal training digest differs from replayed campaign history"
+            )
+        if (
+            isinstance(payload.get("backend"), dict)
+            and payload["backend"].get("training_sha256") != expected_training["sha256"]
+        ):
+            raise ValueError("Stored BO backend provenance has a different training digest")
+        if (
+            _is_ablation_protocol(protocol_spec)
+            and campaign_row["policy"] == "bo_mcp_gp_logei"
+            and row["ordinal"] >= protocol_spec.initial_design_size
+        ):
+            validated_candidate, _ = _validate_backend_result(
+                {"candidate": candidate, "backend": payload.get("backend")},
+                spec=protocol_spec,
+                seed=campaign_row["seed"],
+                training=training_data,
+            )
+            if validated_candidate != candidate:
+                raise ValueError("Stored BO campaign candidate is not in canonical numeric form")
     result = {
         "schema_version": SCHEMA_VERSION,
         "proposal_id": row["id"],
@@ -374,38 +448,61 @@ def _campaign_response(con: sqlite3.Connection, owner: str, row: sqlite3.Row) ->
     ).fetchall()
     history: list[dict[str, Any]] = []
     consumed_proposal_ids: set[str] = set()
+    ablation_protocol = _is_ablation_protocol(spec)
+    campaign_context = (row, payload, protocol, links)
     for consumed in consumptions:
         record = _consumption_response(consumed)
         if record["proposal_id"] in consumed_proposal_ids:
             raise ValueError("Campaign contains duplicate consumption for a proposal")
         consumed_proposal_ids.add(record["proposal_id"])
         proposal_row = _proposal_row(con, owner, record["proposal_id"])
-        proposal = _proposal_response(con, proposal_row)
-        result = record["result"]
-        history.append(
-            {
-                "ordinal": proposal["ordinal"],
-                "consumption_id": consumed["id"],
-                "proposal_id": proposal["proposal_id"],
-                "snapshot_id": record["snapshot_id"],
-                "candidate": proposal["candidate"],
-                "analytical_acceptance": result["analytical_acceptance"],
-                "runtime_preference_satisfied": result["runtime_preference_satisfied"],
-                "utility_status": result["utility"]["status"],
-                "score": result["utility"]["score"],
-                "evaluation_cost": result["evaluation_cost"],
-                "runtime_min": result["runtime_min"],
-            }
+        proposal = _proposal_response(
+            con,
+            proposal_row,
+            verify_training=not ablation_protocol,
+            campaign_context=campaign_context,
         )
+        result = record["result"]
+        history_row = {
+            "ordinal": proposal["ordinal"],
+            "consumption_id": consumed["id"],
+            "proposal_id": proposal["proposal_id"],
+            "snapshot_id": record["snapshot_id"],
+            "candidate": proposal["candidate"],
+            "analytical_acceptance": result["analytical_acceptance"],
+            "runtime_preference_satisfied": result["runtime_preference_satisfied"],
+            "utility_status": result["utility"]["status"],
+            "score": result["utility"]["score"],
+            "evaluation_cost": result["evaluation_cost"],
+            "runtime_min": result["runtime_min"],
+        }
+        if _is_ablation_protocol(spec):
+            expected_target = _optimizer_target_record(spec, result)
+            if result.get("optimizer_target") != expected_target:
+                raise ValueError("Stored campaign optimizer target differs from its assessment")
+            history_row["optimizer_target"] = expected_target
+        history.append(history_row)
     history.sort(key=lambda item: item["ordinal"])
     consumed_count = len(history)
+    replayed_training = None
+    if ablation_protocol:
+        replayed_training = _training_context(con, owner, row["id"])
     if consumed_count > spec.evaluation_budget:
         raise ValueError("Stored campaign consumption exceeds its declared evaluation budget")
     pending_row = con.execute(
         "SELECT * FROM campaign_proposals WHERE owner=? AND campaign_id=? AND state='pending'",
         (owner, row["id"]),
     ).fetchone()
-    pending = None if pending_row is None else _proposal_response(con, pending_row)
+    pending = (
+        None
+        if pending_row is None
+        else _proposal_response(
+            con,
+            pending_row,
+            replayed_training=replayed_training,
+            campaign_context=campaign_context,
+        )
+    )
     proposals = con.execute(
         "SELECT * FROM campaign_proposals WHERE owner=? AND campaign_id=? ORDER BY ordinal",
         (owner, row["id"]),
@@ -482,7 +579,7 @@ def create_campaign(
     def write(con: sqlite3.Connection) -> dict[str, Any]:
         protocol_row = campaign_protocol_registry._protocol_row(con, owner, protocol_id)
         protocol = campaign_protocol_registry._protocol_response(protocol_row)
-        spec = campaign_protocol.CampaignProtocolSpec.model_validate(protocol["spec"])
+        spec = campaign_protocol.parse_campaign_protocol(protocol["spec"])
         if seed not in spec.seeds:
             raise ValueError("Campaign seed must be declared by its protocol")
         if policy not in spec.policies:
@@ -498,7 +595,9 @@ def create_campaign(
             "initial_design_size": spec.initial_design_size,
             "evaluation_cost": spec.evaluation_cost,
             "evaluation_cost_unit": spec.evaluation_cost_unit,
-            "implementation_provenance": _implementation_provenance(),
+            "implementation_provenance": _implementation_provenance(
+                include_target_kernel=_is_ablation_protocol(spec)
+            ),
         }
         payload["record_sha256"] = sha256(payload)
         _bounded(payload)
@@ -525,7 +624,7 @@ def create_campaign(
 
 
 def _validate_backend_result(
-    result: Any, *, spec: campaign_protocol.CampaignProtocolSpec, seed: int, training: list[dict]
+    result: Any, *, spec: Any, seed: int, training: list[dict]
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     if not isinstance(result, dict) or set(result) != {"candidate", "backend"}:
         raise ValueError("BO-MCP adapter must return exactly candidate and backend")
@@ -628,12 +727,35 @@ def _validate_backend_result(
         raise ValueError(
             "BO-MCP runtime, settings, warnings or suggestion provenance are malformed"
         )
+    if _is_ablation_protocol(spec):
+        configuration = campaign_protocol.optimizer_configuration(spec)
+        expected_adapter_profile = configuration["adapter_profile"]
+        expected_objective = {"name": configuration["target_name"], "direction": "maximize"}
+        if backend.get("adapter_profile") != expected_adapter_profile:
+            raise ValueError("BO-MCP adapter profile does not match the ablation protocol")
+        if backend["settings"].get("objective") != expected_objective:
+            raise ValueError("BO-MCP objective does not match the declared campaign target")
+        noise_prior_params = configuration["noise_prior_params"]
+        if (
+            not isinstance(noise_prior_params, list)
+            or len(noise_prior_params) != 2
+            or backend["settings"].get("noise_prior")
+            != {
+                "family": "Gamma",
+                "concentration": noise_prior_params[0],
+                "rate": noise_prior_params[1],
+                "space": "standardized_target_variance",
+                "constraint_lower_bound": 0.0001,
+                "learned": True,
+            }
+        ):
+            raise ValueError("BO-MCP noise prior does not match the declared ablation protocol")
     _bounded({"candidate": candidate, "backend": backend}, "BO-MCP response")
     return candidate, backend
 
 
 def _bo_candidate(
-    spec: campaign_protocol.CampaignProtocolSpec,
+    spec: Any,
     training: list[dict[str, Any]],
     seed: int,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -663,6 +785,12 @@ def _training_context(
     before_ordinal: int | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Rebuild optimizer inputs and retain every immutable snapshot lineage link."""
+    campaign_row = _campaign_row(con, owner, campaign_id)
+    campaign_payload = _verify_campaign_payload(campaign_row)
+    protocol, links = _task_for_campaign(con, owner, campaign_row, campaign_payload)
+    spec = links["spec"]
+    ablation_target = _is_ablation_protocol(spec)
+    campaign_context = (campaign_row, campaign_payload, protocol, links)
     ordinal_filter = " AND p.ordinal < ?" if before_ordinal is not None else ""
     parameters: tuple[Any, ...] = (owner, campaign_id) + (
         (before_ordinal,) if before_ordinal is not None else ()
@@ -680,6 +808,10 @@ def _training_context(
     source_members: list[dict[str, Any]] = []
     for row in rows:
         consumption = _consumption_response(row)
+        if ablation_target:
+            _verify_ablation_consumption_source(
+                con, owner, row, consumption, campaign_context=campaign_context
+            )
         try:
             proposal_payload = json.loads(row["proposal_payload"])
         except (TypeError, json.JSONDecodeError) as error:
@@ -695,6 +827,30 @@ def _training_context(
             or sha256(proposal_payload["request"]) != row["proposal_input"]
         ):
             raise ValueError("Stored training proposal identity is inconsistent")
+        if ablation_target:
+            expected_prefix = {
+                "count": len(training),
+                "sha256": sha256(training),
+                "snapshot_members": source_members,
+            }
+            if proposal_payload.get("training") != expected_prefix:
+                raise ValueError("Stored proposal training inputs differ from consumed snapshots")
+            proposal_input = proposal_payload.get("proposal_input")
+            if (
+                not isinstance(proposal_input, dict)
+                or proposal_input.get("training_sha256") != expected_prefix["sha256"]
+            ):
+                raise ValueError(
+                    "Stored proposal training digest differs from replayed campaign history"
+                )
+            stored_backend = proposal_payload.get("backend")
+            if (
+                isinstance(stored_backend, dict)
+                and stored_backend.get("training_sha256") != expected_prefix["sha256"]
+            ):
+                raise ValueError(
+                    "Stored BO backend training digest differs from consumed snapshots"
+                )
         candidate = proposal_payload.get("candidate")
         if not isinstance(candidate, dict) or sha256(candidate) != row["candidate_digest"]:
             raise ValueError("Stored training candidate digest does not match its contents")
@@ -706,26 +862,47 @@ def _training_context(
             or method["canonical_program_sha256"] != row["canonical_program_digest"]
         ):
             raise ValueError("Stored training method identity does not match its proposal")
-        utility = consumption["result"]["utility"]
-        included = utility["status"] == "scored"
-        score = utility["score"] if included else None
+        stored_result = consumption["result"]
+        utility = stored_result["utility"]
+        if ablation_target:
+            target = stored_result.get("optimizer_target")
+            expected_target = _optimizer_target_record(spec, stored_result)
+            if target != expected_target:
+                raise ValueError("Stored training target differs from its immutable assessment")
+            included = target["status"] == "scored"
+            score = target["value"] if included else None
+        else:
+            included = utility["status"] == "scored"
+            score = utility["score"] if included else None
         if included and (
             isinstance(score, bool)
             or not isinstance(score, (int, float))
             or not math.isfinite(score)
         ):
             raise ValueError("Stored BO training score must be finite numeric evidence")
-        source_members.append(
-            {
-                "ordinal": row["ordinal"],
-                "consumption_id": row["id"],
-                "candidate_sha256": row["candidate_digest"],
-                "optimizer_training_included": included,
-                "snapshot_id": consumption["snapshot_id"],
-                "snapshot_sha256": consumption["snapshot_sha256"],
-                "consumption_output_sha256": consumption["output_sha256"],
-            }
-        )
+        if (
+            ablation_target
+            and campaign_row["policy"] == "bo_mcp_gp_logei"
+            and row["ordinal"] >= spec.initial_design_size
+        ):
+            validated_candidate, _ = _validate_backend_result(
+                {"candidate": candidate, "backend": stored_backend},
+                spec=spec,
+                seed=campaign_row["seed"],
+                training=training,
+            )
+            if validated_candidate != candidate:
+                raise ValueError("Stored BO campaign candidate is not in canonical numeric form")
+        source_member = {
+            "ordinal": row["ordinal"],
+            "consumption_id": row["id"],
+            "candidate_sha256": row["candidate_digest"],
+            "optimizer_training_included": included,
+            "snapshot_id": consumption["snapshot_id"],
+            "snapshot_sha256": consumption["snapshot_sha256"],
+            "consumption_output_sha256": consumption["output_sha256"],
+        }
+        source_members.append(source_member)
         if included:
             training.append({"candidate": candidate, "score": float(score)})
     return training, source_members
@@ -1286,6 +1463,110 @@ def _score_campaign_run(
     return score_result
 
 
+def _verify_ablation_consumption_source(
+    con: sqlite3.Connection,
+    owner: str,
+    row: sqlite3.Row,
+    consumption: dict[str, Any],
+    *,
+    campaign_context: tuple[sqlite3.Row, dict[str, Any], dict[str, Any], dict[str, Any]]
+    | None = None,
+) -> None:
+    """Rebuild an ablation outcome from its exact immutable snapshot and producer run."""
+    if campaign_context is None:
+        campaign_row = _campaign_row(con, owner, row["campaign_id"])
+        campaign_payload = _verify_campaign_payload(campaign_row)
+        protocol, links = _task_for_campaign(con, owner, campaign_row, campaign_payload)
+        campaign_context = (campaign_row, campaign_payload, protocol, links)
+    campaign_row, campaign_payload, _, links = campaign_context
+    spec = links["spec"]
+    if not _is_ablation_protocol(spec):
+        return
+
+    proposal_row = _proposal_row(con, owner, row["proposal_id"])
+    if proposal_row["campaign_id"] != row["campaign_id"] or proposal_row["state"] != "consumed":
+        raise ValueError(
+            "Stored ablation consumption does not link to a consumed campaign proposal"
+        )
+    proposal = _proposal_response(
+        con,
+        proposal_row,
+        verify_training=False,
+        campaign_context=campaign_context,
+    )
+    payload = json.loads(row["payload"])
+    expected_proposal = {
+        "ordinal": proposal["ordinal"],
+        "candidate": proposal["candidate"],
+        "candidate_sha256": proposal["candidate_sha256"],
+        "method": proposal["method"],
+    }
+    if payload.get("proposal") != expected_proposal:
+        raise ValueError("Stored ablation consumption proposal differs from its immutable source")
+
+    snapshot, observation_row, observation_response, _ = _snapshot_and_observation(
+        con, owner, row["observation_snapshot_id"], links["task"]
+    )
+    if (
+        row["snapshot_digest"] != snapshot["sha256"]
+        or row["observation_id"] != observation_row["id"]
+        or row["attempt_id"] != observation_row["attempt_id"]
+        or row["attempt_revision"] != observation_row["attempt_revision"]
+        or row["observation_input_digest"] != observation_row["input_digest"]
+        or row["evidence_digest"] != observation_row["evidence_digest"]
+        or row["assessment_digest"] != observation_row["assessment_digest"]
+    ):
+        raise ValueError("Stored ablation consumption does not match its frozen snapshot member")
+
+    run, method, source = _verify_campaign_observation(
+        con,
+        owner,
+        links["task"],
+        proposal_row,
+        observation_row,
+        observation_response,
+    )
+    expected_result = _score_campaign_run(run, method, links["task"])
+    assessment = observation_response["observation"]["assessment"]
+    expected_result["analytical_acceptance"] = assessment["analytical_acceptance"]
+    expected_result["feasible"] = assessment["feasible"]
+    expected_result["runtime_preference_satisfied"] = assessment["runtime_preference_satisfied"]
+    expected_result["evaluation_cost"] = campaign_payload["evaluation_cost"]
+    expected_result["evaluation_cost_unit"] = campaign_payload["evaluation_cost_unit"]
+    expected_result["optimizer_target"] = _optimizer_target_record(spec, expected_result)
+    if consumption["result"] != expected_result:
+        raise ValueError(
+            "Stored ablation utility or optimizer target differs from its immutable observation source"
+        )
+
+    expected_source = {
+        "producer_id": source["producer"]["producer_id"],
+        "producer_input_sha256": source["producer"]["input_sha256"],
+        "producer_output_sha256": source["producer"]["output_sha256"],
+        "run_id": run["run_id"],
+        "run_input_sha256": run["input_sha256"],
+        "run_output_sha256": run["output_sha256"],
+        "prediction_id": source["prediction"]["prediction_id"],
+        "prediction_input_sha256": source["prediction"]["input_sha256"],
+        "prediction_output_sha256": source["prediction"]["output_sha256"],
+        "retention_model_id": source["prediction"]["prediction"]["model"]["model_id"],
+        "retention_model_input_sha256": source["prediction"]["prediction"]["model"]["input_sha256"],
+        "producer_evidence_link": source["evidence_link"],
+    }
+    if consumption["source"] != expected_source:
+        raise ValueError("Stored ablation source links differ from the immutable producer run")
+
+    provenance = consumption["implementation_provenance"]
+    campaign_provenance = campaign_payload["implementation_provenance"]
+    if (
+        not isinstance(provenance, dict)
+        or provenance.get("campaign") != campaign_provenance
+        or provenance.get("score_kernel") != campaign_provenance.get("utility_kernel")
+        or "optimizer_target_kernel" not in campaign_provenance
+    ):
+        raise ValueError("Stored ablation scoring provenance differs from its frozen campaign")
+
+
 def consume_campaign_snapshot(
     owner: str,
     campaign_id: str,
@@ -1333,6 +1614,8 @@ def consume_campaign_snapshot(
         result["runtime_preference_satisfied"] = assessment["runtime_preference_satisfied"]
         result["evaluation_cost"] = campaign_payload["evaluation_cost"]
         result["evaluation_cost_unit"] = campaign_payload["evaluation_cost_unit"]
+        if _is_ablation_protocol(links["spec"]):
+            result["optimizer_target"] = _optimizer_target_record(links["spec"], result)
         content: dict[str, Any] = {
             "schema_version": SCHEMA_VERSION,
             "request": request,
@@ -1450,4 +1733,17 @@ def get_campaign_proposal(owner: str, proposal_id: str) -> dict[str, Any]:
 def get_campaign_consumption(owner: str, consumption_id: str) -> dict[str, Any]:
     """Retrieve one immutable campaign consumption by its owned identity."""
     with registry_connection() as con:
-        return _consumption_response(_consumption_row(con, owner, consumption_id))
+        row = _consumption_row(con, owner, consumption_id)
+        consumption = _consumption_response(row)
+        campaign_row = _campaign_row(con, owner, row["campaign_id"])
+        campaign_payload = _verify_campaign_payload(campaign_row)
+        protocol, links = _task_for_campaign(con, owner, campaign_row, campaign_payload)
+        if _is_ablation_protocol(links["spec"]):
+            _verify_ablation_consumption_source(
+                con,
+                owner,
+                row,
+                consumption,
+                campaign_context=(campaign_row, campaign_payload, protocol, links),
+            )
+        return consumption

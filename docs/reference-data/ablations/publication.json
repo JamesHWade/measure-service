@@ -1,0 +1,71 @@
+{
+  "budget_complete_campaigns": 41,
+  "consumed_evaluations": 543,
+  "core_complete_sha256": "c44fd8a936661ac293e2f94098d320efccec2fe09b4bc284ae6549e9482ceebb",
+  "duplicate_rejected_suggestion_attempts": 19,
+  "failed_suggestion_walltime": "unavailable; excluded from persisted proposal walltime totals",
+  "files": {
+    "figures/ablation-endpoints.png": {
+      "sha256": "2d07aa8888377099e7a3aed10b836dc866c56cb6ad371075d2b3f3645707d7b6",
+      "size_bytes": 197786
+    },
+    "figures/ablation-endpoints.svg": {
+      "sha256": "def359d8e0615dedd4aaa3b347f05f8b27d328d2f628dccbc9c03c8b5a08a741",
+      "size_bytes": 252317
+    },
+    "figures/ablation-success.png": {
+      "sha256": "4be907a64417b785d47827adb44364060cdeb831da651698d988aa963d7bb059",
+      "size_bytes": 245293
+    },
+    "figures/ablation-success.svg": {
+      "sha256": "827d5e60bb00734d327b69cc99bb0e13773b1402fd512ef9d91226484ffab68f",
+      "size_bytes": 316942
+    },
+    "reference-data/ablations/analytes.csv": {
+      "sha256": "94b248d9ec1eea6964ed95cb5c1736c48eedec4d945639154f30d76e453c1d81",
+      "size_bytes": 833289
+    },
+    "reference-data/ablations/complete.json": {
+      "sha256": "9b7a3313abfd6a02fe6b92b45e41ee543a999e25a26cdd954480db303bd12916",
+      "size_bytes": 529
+    },
+    "reference-data/ablations/evaluations.csv": {
+      "sha256": "847ee0c19b31ded97bb797cacd296adf93b2fd5db41358746536eb700df45b35",
+      "size_bytes": 884151
+    },
+    "reference-data/ablations/independent-review.json": {
+      "sha256": "0bde648f15edcef79663c67370f363b7a56cf411b44da7e9f4388829ffa0f373",
+      "size_bytes": 70087
+    },
+    "reference-data/ablations/metadata.json": {
+      "sha256": "c463b3d1e8c859e720a48218fd8f98c98cc5407dcec5c1f0c4996a02a5087f33",
+      "size_bytes": 74903
+    },
+    "reference-data/ablations/paired-comparisons.csv": {
+      "sha256": "9a3534eec37ab3843f937783120a446e5fe3460dcd6d4ea9cdf57a3383f958cd",
+      "size_bytes": 79536
+    },
+    "reference-data/ablations/paired-contrast-summary.csv": {
+      "sha256": "8ed97c160955471aac3e24e501ab71f00f82a738dec68aa7c668b2a76845d71d",
+      "size_bytes": 12535
+    },
+    "reference-data/ablations/success-trajectories.csv": {
+      "sha256": "9613192a9b3bdaab9c30c7633f184b7bb05983e2a5449c838182baf121687271",
+      "size_bytes": 36335
+    }
+  },
+  "persisted_gp_proposals": 279,
+  "planned_campaigns": 60,
+  "planned_evaluations": 600,
+  "profile": "measure-service-synthetic-ablation-publication/1",
+  "source_build": {
+    "origin": "external build and execution receipt; installed distribution itself reports null VCS fields",
+    "source_commit": "4ef38c8413a4fa75801723019392ebb8d707e5c0",
+    "source_tree": "56f0e94a2efbf0dd48a73b24d1ddfabe2ff8112f",
+    "wheel_sha256": "0246234c2f51547fc3a6d67766d0d06d648b873bcee0d6b1fd6c65bdec7f5b84"
+  },
+  "study_fixture_sha256": "0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094",
+  "study_profile": "synthetic-isocratic-ablation-study/1",
+  "study_status": "partial_failure",
+  "unresolved_future_slots": 57
+}

@@ -7,6 +7,10 @@ import pytest
 from measure_methods.gaussian_observations import RESOLUTION_DEFINITION
 from measure_service import campaign_protocol_registry as protocols
 from measure_service import gaussian_producer, observations, retention
+from measure_service.campaign_protocol import (
+    ABLATION_CAMPAIGN_PROFILE,
+    optimizer_configuration,
+)
 from measure_service.storage import canonical, registry_connection, sha256
 
 
@@ -176,3 +180,60 @@ def test_protocol_output_hash_covers_bound_tasks_and_provenance():
     assert response["output_sha256"] == sha256(
         {key: response[key] for key in ("spec", "tasks", "implementation_provenance")}
     )
+
+
+def test_ablation_protocol_roundtrip_binds_optimizer_configuration_and_owner():
+    spec = {
+        **_inputs(),
+        "profile": ABLATION_CAMPAIGN_PROFILE,
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+    }
+    response = protocols.register_campaign_protocol(
+        "chemist", "Ablation task", spec, "ablation-protocol"
+    )
+
+    assert response["spec"]["profile"] == ABLATION_CAMPAIGN_PROFILE
+    assert response["spec"]["optimizer_target"] == "confirmed_acceptance_reward"
+    assert response["spec"]["surrogate_noise_prior"] == "low_noise"
+    assert response["optimizer_configuration"] == optimizer_configuration(response["spec"])
+    assert response["output_sha256"] == sha256(
+        {
+            key: response[key]
+            for key in (
+                "spec",
+                "tasks",
+                "implementation_provenance",
+                "optimizer_configuration",
+            )
+        }
+    )
+    assert protocols.get_campaign_protocol("chemist", response["protocol_id"]) == response
+    with pytest.raises(ValueError, match="not found or is not accessible"):
+        protocols.get_campaign_protocol("stranger", response["protocol_id"])
+
+
+def test_ablation_protocol_retrieval_rejects_tampered_optimizer_configuration():
+    response = protocols.register_campaign_protocol(
+        "chemist",
+        "Ablation task",
+        {
+            **_inputs(),
+            "profile": ABLATION_CAMPAIGN_PROFILE,
+            "optimizer_target": "historical_utility",
+            "surrogate_noise_prior": "default",
+        },
+        "ablation-protocol",
+    )
+    with registry_connection(write=True) as con:
+        row = con.execute(
+            "SELECT * FROM campaign_protocols WHERE id=?", (response["protocol_id"],)
+        ).fetchone()
+        payload = json.loads(row["payload"])
+        payload["optimizer_configuration"]["noise_prior_params"] = [1.1, 100.0]
+        con.execute(
+            "UPDATE campaign_protocols SET payload=? WHERE id=?",
+            (canonical(payload), response["protocol_id"]),
+        )
+    with pytest.raises(ValueError, match="optimizer configuration"):
+        protocols.get_campaign_protocol("chemist", response["protocol_id"])

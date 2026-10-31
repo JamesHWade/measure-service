@@ -1,0 +1,274 @@
+{
+  "profile": "synthetic-isocratic-ablation-study/1",
+  "declaration_version": "1",
+  "selection": {
+    "regression": "the original two constructed unfiltered tasks, retained without modification",
+    "held_out": "two independently generated unfiltered tasks; every draw retained without any separation or optimizer screening",
+    "generator": {
+      "implementation": "Python standard-library random.Random; sequential uniform draws rounded to six decimal places",
+      "seed": 20261030,
+      "task_count": 2,
+      "analytes_per_task": 3,
+      "draw_order": "task index, analyte A/B/C, ln_k0 then S1",
+      "ln_k0_bounds": [
+        2.5,
+        6.0
+      ],
+      "S1_bounds": [
+        3.0,
+        10.0
+      ],
+      "generated_count": 2,
+      "retained_count": 2,
+      "rejected_count": 0,
+      "screening_evaluations": 0
+    }
+  },
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "evaluation_budget": 10,
+  "initial_design_size": 3,
+  "stopping_policy": "full_budget",
+  "flow_ml_min": 0.5,
+  "domain": {
+    "strong_solvent_fraction": {
+      "lower": 0.1,
+      "upper": 0.9
+    },
+    "acquisition_duration_min": {
+      "lower": 2.0,
+      "upper": 10.0
+    }
+  },
+  "evaluation_cost": 1.0,
+  "evaluation_cost_unit": "synthetic_evaluation",
+  "geometry": {
+    "column_length_m": 0.1,
+    "effective_area_m2": 2.5e-06,
+    "post_column_volume_ml": 0.0
+  },
+  "contract": {
+    "resolution_threshold": 1.5,
+    "max_acquisition_duration_min": 10.0,
+    "runtime_preference_min": 5.0,
+    "count_threshold": 0.5
+  },
+  "tasks": [
+    {
+      "task_id": "parallel-linear",
+      "analytes": [
+        {
+          "analyte_id": "A",
+          "model": "linear",
+          "ln_k0": 4.0,
+          "S1": 6.0
+        },
+        {
+          "analyte_id": "B",
+          "model": "linear",
+          "ln_k0": 4.6,
+          "S1": 6.0
+        },
+        {
+          "analyte_id": "C",
+          "model": "linear",
+          "ln_k0": 5.2,
+          "S1": 6.0
+        }
+      ],
+      "fwhm_min": 0.15,
+      "cohort_role": "regression"
+    },
+    {
+      "task_id": "crossing-linear",
+      "analytes": [
+        {
+          "analyte_id": "A",
+          "model": "linear",
+          "ln_k0": 3.0,
+          "S1": 4.0
+        },
+        {
+          "analyte_id": "B",
+          "model": "linear",
+          "ln_k0": 4.5,
+          "S1": 7.0
+        },
+        {
+          "analyte_id": "C",
+          "model": "linear",
+          "ln_k0": 6.0,
+          "S1": 10.0
+        }
+      ],
+      "fwhm_min": 0.15,
+      "cohort_role": "regression"
+    },
+    {
+      "task_id": "heldout-linear-01",
+      "cohort_role": "held_out",
+      "analytes": [
+        {
+          "analyte_id": "A",
+          "model": "linear",
+          "ln_k0": 4.408626,
+          "S1": 6.921679
+        },
+        {
+          "analyte_id": "B",
+          "model": "linear",
+          "ln_k0": 5.52926,
+          "S1": 3.261663
+        },
+        {
+          "analyte_id": "C",
+          "model": "linear",
+          "ln_k0": 5.276395,
+          "S1": 7.138038
+        }
+      ],
+      "fwhm_min": 0.15
+    },
+    {
+      "task_id": "heldout-linear-02",
+      "cohort_role": "held_out",
+      "analytes": [
+        {
+          "analyte_id": "A",
+          "model": "linear",
+          "ln_k0": 3.416835,
+          "S1": 4.890301
+        },
+        {
+          "analyte_id": "B",
+          "model": "linear",
+          "ln_k0": 3.687536,
+          "S1": 5.887706
+        },
+        {
+          "analyte_id": "C",
+          "model": "linear",
+          "ln_k0": 5.928464,
+          "S1": 4.03663
+        }
+      ],
+      "fwhm_min": 0.15
+    }
+  ],
+  "arms": [
+    {
+      "arm_id": "random-control",
+      "policy": "random",
+      "optimizer_target": "historical_utility",
+      "surrogate_noise_prior": "default"
+    },
+    {
+      "arm_id": "gp-utility-default",
+      "policy": "bo_mcp_gp_logei",
+      "optimizer_target": "historical_utility",
+      "surrogate_noise_prior": "default"
+    },
+    {
+      "arm_id": "gp-confirmed-default",
+      "policy": "bo_mcp_gp_logei",
+      "optimizer_target": "confirmed_acceptance_reward",
+      "surrogate_noise_prior": "default"
+    },
+    {
+      "arm_id": "gp-utility-low-noise",
+      "policy": "bo_mcp_gp_logei",
+      "optimizer_target": "historical_utility",
+      "surrogate_noise_prior": "low_noise"
+    },
+    {
+      "arm_id": "gp-confirmed-low-noise",
+      "policy": "bo_mcp_gp_logei",
+      "optimizer_target": "confirmed_acceptance_reward",
+      "surrogate_noise_prior": "low_noise"
+    }
+  ],
+  "factors": {
+    "optimizer_target": {
+      "historical_utility": "existing published finite-resolution-reference BoTier utility, maximize",
+      "confirmed_acceptance_reward": "1 iff an observed immutable analytical assessment is accepted; 0 for observed not_accepted or unknown. This is a lower-bound observed-confirmation reward, not a chemical failure label or calibrated probability. Missing/execution failures are not zero-valued training data."
+    },
+    "surrogate_noise_prior": {
+      "default": {
+        "family": "Gamma",
+        "concentration": 1.1,
+        "rate": 0.05,
+        "interpretation": "reference-default prior observed in public backend before declaration; explicitly supplied to preserve this comparison if later defaults change"
+      },
+      "low_noise": {
+        "family": "Gamma",
+        "concentration": 1.1,
+        "rate": 100.0
+      },
+      "space": "standardized target variance",
+      "constraint_lower_bound": 0.0001,
+      "interpretation": "declared inferred-noise regularization stress test; neither prior is measured physical uncertainty or fixed observation noise"
+    },
+    "fixed": "scalar SingleTaskGP with public default ARD RBF kernel, inferred Gaussian likelihood, default outcome standardization/input normalization, qLogExpectedImprovement, one candidate, same acquisition optimization budgets and recorded runtime"
+  },
+  "contrasts": [
+    "target within each noise-prior setting",
+    "noise prior within each optimizer target",
+    "each GP arm versus shared random control, labelled jointly changed policies"
+  ],
+  "preflight": {
+    "expected_case_count": 16,
+    "history_lengths": [
+      3,
+      9
+    ],
+    "confirmed_reward_patterns": [
+      "all_zero",
+      "all_one",
+      "alternating_zero_one"
+    ],
+    "historical_utility_pattern": "0.25 + 2.5*i/(n-1), i=0..n-1",
+    "coordinate_pattern": {
+      "strong_solvent_fraction": "lower + (upper-lower)*(i+1)/(n+1)",
+      "acquisition_duration_min": "lower + (upper-lower)*(((2*i)%n)+1)/(n+1)"
+    },
+    "seed": "first declared study seed",
+    "before_campaigns": "each pattern/length under each prior must return a finite feasible genuine model-guided candidate with no random fallback; otherwise retain all planned study outcomes as unknown without running or retuning",
+    "constant_histories": "Gaussian regression and qLogEI on binary observed-confirmation rewards are an explicitly misspecified optimization heuristic, not classification or calibrated probability",
+    "accounting": "fabricated component-preflight histories are separate from all600analytical evaluations; retain their calls, warnings and walltime separately"
+  },
+  "reporting": {
+    "planned_campaigns_per_arm": 12,
+    "planned_evaluations_per_arm": 120,
+    "total_planned_campaigns": 60,
+    "total_planned_evaluations": 600,
+    "summaries": [
+      "regression cohort separately",
+      "held-out cohort separately",
+      "combined descriptive summary labelled as pooled constructed tasks"
+    ],
+    "success_criteria": [
+      "strict analytical acceptance with unknown retained",
+      "historical utility >=2 with unknown retained"
+    ],
+    "failure_handling": "retain every planned slot, censored/unknown outcome, complete-attempt versus consumed expenditure and failed proposal timing; no success-only averaging",
+    "initialization": "identical coordinates for every arm at each seed; all three evaluations count against every arm budget"
+  },
+  "scope": {
+    "observation_origin": "simulator_latent",
+    "fidelity": 1.0,
+    "noise": "none",
+    "initial_evaluations_count_against_each_arm": true,
+    "manuscript_protocol_match": false,
+    "physical_model_fit": false,
+    "signal_processing_qualified": false,
+    "instrument_qualified": false,
+    "general_optimizer_ranking": false,
+    "compoundwise_surrogate": false,
+    "matern_kernel": false,
+    "multi_fidelity": false
+  },
+  "software_consistency": "record actual software/source identities; require study proposals to match the successful preflight backend source/settings. Completed-store resume can reuse prior evidence without an optimizer runtime. No installation revision restrictions are imposed."
+}

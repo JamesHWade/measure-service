@@ -63,6 +63,26 @@ jobs:
           assert "docs/reference-data/synthetic-reference.json" in members
           assert "docs/figures/synthetic-success.png" in members
           assert "docs/figures/synthetic-utility.svg" in members
+          assert "docs/synthetic-ablations.md" in members
+          assert "src/measure_service/benchmarks/synthetic_ablations.py" in members
+          assert "src/measure_service/benchmarks/reference_data/synthetic-isocratic-ablation-v1.json" in members
+          assert "scripts/export_ablation_reference.py" in members
+          assert "scripts/plot_synthetic_ablations.R" in members
+          assert "tests/test_ablation_publication.py" in members
+          assert "docs/synthetic-ablation-results.md" in members
+          assert "docs/reference-data/ablations/publication.json" in members
+          assert "docs/reference-data/ablations/independent-review.json" in members
+          assert "docs/reference-data/ablations/complete.json" in members
+          assert "docs/reference-data/ablations/metadata.json" in members
+          assert "docs/reference-data/ablations/evaluations.csv" in members
+          assert "docs/reference-data/ablations/analytes.csv" in members
+          assert "docs/reference-data/ablations/success-trajectories.csv" in members
+          assert "docs/reference-data/ablations/paired-comparisons.csv" in members
+          assert "docs/reference-data/ablations/paired-contrast-summary.csv" in members
+          assert "docs/figures/ablation-success.png" in members
+          assert "docs/figures/ablation-success.svg" in members
+          assert "docs/figures/ablation-endpoints.png" in members
+          assert "docs/figures/ablation-endpoints.svg" in members
           PY
       - name: Check upgrade from the standalone method distribution
         run: python scripts/check_distribution_upgrade.py dist/*.whl
@@ -229,7 +249,11 @@ jobs:
         run: |
           set -euo pipefail
           python -m venv "$RUNNER_TEMP/measure-bo-sidecar"
+          # The hosted runner exercises CPU models; avoid the PyPI CUDA bundle.
+          "$RUNNER_TEMP/measure-bo-sidecar/bin/python" -m pip install torch --index-url https://download.pytorch.org/whl/cpu
           "$RUNNER_TEMP/measure-bo-sidecar/bin/python" -m pip install . 'bo-engine @ git+https://github.com/AccelerationConsortium/bo-mcp.git#subdirectory=packages/bo-engine'
+          "$RUNNER_TEMP/measure-bo-sidecar/bin/python" -m pip check
+          "$RUNNER_TEMP/measure-bo-sidecar/bin/python" -c 'import torch; assert torch.version.cuda is None; print("CPU PyTorch:", torch.__version__)'
           echo "MEASURE_BO_PYTHON=$RUNNER_TEMP/measure-bo-sidecar/bin/python" >> "$GITHUB_ENV"
       - name: Exercise actual GP suggestions, exact outcome consumption and restart
         run: python -m pytest -q -m bo_backend

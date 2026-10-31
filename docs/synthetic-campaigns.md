@@ -5,6 +5,10 @@ declaration fixes the search domain, synthetic task identities, seeds,
 initialization, evaluation budget, cost and stopping rule. A later change
 requires another immutable protocol.
 
+The separate [ablation profile](ablation-protocol.md) declares optimizer target
+and inferred-noise prior as controlled factors. It preserves this first
+profile's stored shapes and candidate sequences.
+
 The first profile uses an isocratic mixture of solvent A and strong solvent B
 at constant flow. Its two continuous coordinates are
 `strong_solvent_fraction` (unitless B fraction; A is exactly `1 - B`) and

@@ -12,7 +12,12 @@ from typing import Any
 from measure_methods import design
 
 from . import gaussian_producer, observations, retention
-from .campaign_protocol import CampaignProtocolSpec
+from .campaign_protocol import (
+    AblationProtocolSpec,
+    ProtocolSpec,
+    optimizer_configuration,
+    parse_campaign_protocol,
+)
 from .method_backend import method_backend_info
 from .storage import canonical, now, registry_connection, registry_mutation, sha256
 
@@ -34,10 +39,16 @@ def _protocol_row(con: sqlite3.Connection, owner: str, protocol_id: str) -> sqli
 
 def _protocol_response(row: sqlite3.Row) -> dict[str, Any]:
     payload = json.loads(row["payload"])
-    normalized = CampaignProtocolSpec.model_validate(payload["spec"]).model_dump(mode="json")
+    spec = parse_campaign_protocol(payload["spec"])
+    normalized = spec.model_dump(mode="json")
     request = {"operation": "register_campaign_protocol", "title": row["title"], "spec": normalized}
     if payload["spec"] != normalized or sha256(request) != row["input_digest"]:
         raise ValueError("Stored campaign protocol input digest does not match its contents")
+    if isinstance(spec, AblationProtocolSpec):
+        if payload.get("optimizer_configuration") != optimizer_configuration(spec):
+            raise ValueError("Stored campaign optimizer configuration does not match its protocol")
+    elif "optimizer_configuration" in payload:
+        raise ValueError("Stored V1 campaign protocol has unsupported optimizer configuration")
     if sha256(payload) != row["output_digest"]:
         raise ValueError("Stored campaign protocol output digest does not match its contents")
     return _bounded(
@@ -53,7 +64,7 @@ def _protocol_response(row: sqlite3.Row) -> dict[str, Any]:
     )
 
 
-def _task_links(con: sqlite3.Connection, owner: str, spec: CampaignProtocolSpec) -> list[dict]:
+def _task_links(con: sqlite3.Connection, owner: str, spec: ProtocolSpec) -> list[dict]:
     tasks = []
     for task in spec.tasks:
         producer = gaussian_producer._producer_response(
@@ -115,12 +126,11 @@ def _task_links(con: sqlite3.Connection, owner: str, spec: CampaignProtocolSpec)
 
 
 def register_campaign_protocol(
-    owner: str, title: str, spec: CampaignProtocolSpec | dict[str, Any], key: str
+    owner: str, title: str, spec: ProtocolSpec | dict[str, Any], key: str
 ) -> dict[str, Any]:
     if not isinstance(title, str) or not title.strip() or len(title) > 200:
         raise ValueError("A campaign protocol title of 1 to 200 characters is required")
-    if not isinstance(spec, CampaignProtocolSpec):
-        spec = CampaignProtocolSpec.model_validate(spec)
+    spec = parse_campaign_protocol(spec)
     requested = spec.model_dump(mode="json")
     request = {"operation": "register_campaign_protocol", "title": title, "spec": requested}
 
@@ -141,6 +151,8 @@ def register_campaign_protocol(
                 ).hexdigest(),
             },
         }
+        if isinstance(spec, AblationProtocolSpec):
+            payload["optimizer_configuration"] = optimizer_configuration(spec)
         _bounded(payload)
         protocol_id, created = str(uuid.uuid4()), now()
         con.execute(

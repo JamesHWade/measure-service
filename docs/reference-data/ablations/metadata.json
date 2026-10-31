@@ -1,0 +1,1949 @@
+{
+  "execution_requirement": "This standard-library-only exporter also requires the frozen study declaration from the repository or source archive at src/measure_service/benchmarks/reference_data/synthetic-isocratic-ablation-v1.json.",
+  "interpretation": {
+    "analyte_projection": "prediction_* fields are copied from retention_prediction.prediction.analytes[*].result; gaussian_* fields are copied only from gaussian_observation.observation.analytes; assessment_* and detection fields are copied only from the stored analytical assessment; historical_utility_input_* fields are copied from consumed raw metrics.",
+    "failed_and_future_slots": "The evaluation status and failure fields remain explicit. No outcome or optimizer reward is fabricated.",
+    "missing_values": "Blank cells mean evidence is unavailable or was not recorded; they are not zero.",
+    "scope": "Synthetic latent chromatographic outcomes; no physical-instrument or manuscript-protocol qualification is implied.",
+    "stage_boundary": "A stored retention prediction remains available when later Gaussian production fails. Prediction-stage values never fill Gaussian-centroid fields, and neither stage alone creates analytical assessment, acceptance, historical utility or optimizer reward.",
+    "unconsumed_completed_attempts": "Available attempt, method, simulator and evidence fields are copied while the evaluation status remains unchanged.",
+    "utility_and_reward": "Historical utility, analytical acceptance and the selected optimizer reward are separate columns."
+  },
+  "profile": "measure-service-synthetic-ablation-reference/1",
+  "provenance": {
+    "arm_protocols": [
+      {
+        "arm_id": "random-control",
+        "implementation_provenance": {
+          "design_kernel_module_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+          "measure_service": {
+            "package": "measure-service",
+            "source_ref": null,
+            "source_revision": null,
+            "version": "0.1.0.dev0"
+          },
+          "protocol_module_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74",
+          "registry_module_sha256": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5"
+        }
+      },
+      {
+        "arm_id": "gp-utility-default",
+        "implementation_provenance": {
+          "design_kernel_module_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+          "measure_service": {
+            "package": "measure-service",
+            "source_ref": null,
+            "source_revision": null,
+            "version": "0.1.0.dev0"
+          },
+          "protocol_module_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74",
+          "registry_module_sha256": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5"
+        }
+      },
+      {
+        "arm_id": "gp-confirmed-default",
+        "implementation_provenance": {
+          "design_kernel_module_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+          "measure_service": {
+            "package": "measure-service",
+            "source_ref": null,
+            "source_revision": null,
+            "version": "0.1.0.dev0"
+          },
+          "protocol_module_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74",
+          "registry_module_sha256": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5"
+        }
+      },
+      {
+        "arm_id": "gp-utility-low-noise",
+        "implementation_provenance": {
+          "design_kernel_module_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+          "measure_service": {
+            "package": "measure-service",
+            "source_ref": null,
+            "source_revision": null,
+            "version": "0.1.0.dev0"
+          },
+          "protocol_module_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74",
+          "registry_module_sha256": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5"
+        }
+      },
+      {
+        "arm_id": "gp-confirmed-low-noise",
+        "implementation_provenance": {
+          "design_kernel_module_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+          "measure_service": {
+            "package": "measure-service",
+            "source_ref": null,
+            "source_revision": null,
+            "version": "0.1.0.dev0"
+          },
+          "protocol_module_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74",
+          "registry_module_sha256": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5"
+        }
+      }
+    ],
+    "observed_implementation_provenance": [
+      {
+        "campaign": {
+          "campaign_adapter": {
+            "module": "measure_service.campaigns",
+            "source_sha256": "b698f5c3e41afce0ba87048aef0d0f824f4a450ace343a44e08e99690ecf449b"
+          },
+          "measure_service": {
+            "package": "measure-service",
+            "source_ref": null,
+            "source_revision": null,
+            "version": "0.1.0.dev0"
+          },
+          "optimizer_target_kernel": {
+            "module": "measure_methods.observations",
+            "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+          },
+          "protocol_kernel": {
+            "module": "measure_service.campaign_protocol",
+            "source_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74"
+          },
+          "utility_kernel": {
+            "module": "measure_methods.moses_objective",
+            "source_sha256": "2d5fe86082e02dbb6ac1bdf1a1fb4635c115870c0c394746fab8c1cd972b00f8"
+          }
+        },
+        "score_kernel": {
+          "module": "measure_methods.moses_objective",
+          "source_sha256": "2d5fe86082e02dbb6ac1bdf1a1fb4635c115870c0c394746fab8c1cd972b00f8"
+        }
+      },
+      {
+        "campaign_adapter": {
+          "module": "measure_service.campaigns",
+          "source_sha256": "b698f5c3e41afce0ba87048aef0d0f824f4a450ace343a44e08e99690ecf449b"
+        },
+        "measure_service": {
+          "package": "measure-service",
+          "source_ref": null,
+          "source_revision": null,
+          "version": "0.1.0.dev0"
+        },
+        "optimizer_target_kernel": {
+          "module": "measure_methods.observations",
+          "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+        },
+        "protocol_kernel": {
+          "module": "measure_service.campaign_protocol",
+          "source_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74"
+        },
+        "utility_kernel": {
+          "module": "measure_methods.moses_objective",
+          "source_sha256": "2d5fe86082e02dbb6ac1bdf1a1fb4635c115870c0c394746fab8c1cd972b00f8"
+        }
+      },
+      {
+        "gaussian_kernel": {
+          "module": "measure_methods.gaussian_observations",
+          "source_sha256": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9"
+        },
+        "measure_service": {
+          "package": "measure-service",
+          "source_ref": null,
+          "source_revision": null,
+          "version": "0.1.0.dev0"
+        },
+        "resolution_helper": {
+          "module": "measure_methods.chromatography",
+          "source_sha256": "1824a0a6ddaef062a440cfd5913d3ef89fb45d00bb6f7dc64b741c6d00fbe699"
+        },
+        "service_adapter": {
+          "module": "measure_service.gaussian_producer",
+          "source_sha256": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970"
+        }
+      },
+      {
+        "acceptance_kernel": {
+          "module": "measure_methods.observations",
+          "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+        },
+        "measure_service": {
+          "package": "measure-service",
+          "source_ref": null,
+          "source_revision": null,
+          "version": "0.1.0.dev0"
+        },
+        "utility_definition_module": "measure_methods.moses_objective"
+      },
+      {
+        "measure_service": {
+          "package": "measure-service",
+          "source_ref": null,
+          "source_revision": null,
+          "version": "0.1.0.dev0"
+        },
+        "retention_kernel": {
+          "module": "measure_methods.retention",
+          "source_sha256": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538"
+        },
+        "service_adapter": {
+          "module": "measure_service.retention",
+          "source_sha256": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0"
+        }
+      }
+    ],
+    "optimizer_backend_sources": [
+      {
+        "acquisition_implementation": "qLogExpectedImprovement",
+        "acquisition_method": "expected_improvement",
+        "adapter_profile": "bo-mcp-gp-logei-ablation/1",
+        "adapter_source_sha256": "901e78d66e1e9119abc6b88c547ad266f8426de12206d249d59563b72c246b2e",
+        "backend_class": "BoTorchBackend",
+        "backend_id": "bo-engine/BoTorchBackend",
+        "backend_name": "bo-mcp",
+        "campaign_protocol_source_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74",
+        "design_kernel_source_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+        "distribution_versions": {
+          "bo-engine": "0.1.0",
+          "botorch": "0.18.1",
+          "gpytorch": "1.15.2",
+          "measure-service": "0.1.0.dev0",
+          "torch": "2.15.0"
+        },
+        "generation_method": "bo",
+        "model_type": "SingleTaskGP",
+        "settings": {
+          "acquisition_implementation": "qLogExpectedImprovement",
+          "acquisition_method": "expected_improvement",
+          "acquisition_optimization": {
+            "configured_num_restarts": null,
+            "configured_raw_samples": null,
+            "num_restarts": 14,
+            "raw_samples": 512
+          },
+          "backend_state": "stateless; no prior backend state supplied",
+          "batch_size": 1,
+          "input_transform": "BoTorch SingleTaskGP default input normalization",
+          "kernel": "RBF with automatic relevance determination (ARD); BoTorch SingleTaskGP default, no custom covar_module",
+          "noise_prior": {
+            "concentration": 1.1,
+            "constraint_lower_bound": 0.0001,
+            "family": "Gamma",
+            "learned": true,
+            "rate": 0.05,
+            "space": "standardized_target_variance"
+          },
+          "objective": {
+            "direction": "maximize",
+            "name": "confirmed_acceptance_reward"
+          },
+          "outcome_transform": "BoTorch SingleTaskGP default outcome standardization",
+          "parameters": [
+            "strong_solvent_fraction",
+            "acquisition_duration_min"
+          ],
+          "replay": "ordered training history is supplied on every call"
+        },
+        "source_revision": null,
+        "source_tree_sha256": "f7f9b9003ff61e05e0f93629e07e0a21b0b6947ff9fafbc7428822c1e6887fb9"
+      },
+      {
+        "acquisition_implementation": "qLogExpectedImprovement",
+        "acquisition_method": "expected_improvement",
+        "adapter_profile": "bo-mcp-gp-logei-ablation/1",
+        "adapter_source_sha256": "901e78d66e1e9119abc6b88c547ad266f8426de12206d249d59563b72c246b2e",
+        "backend_class": "BoTorchBackend",
+        "backend_id": "bo-engine/BoTorchBackend",
+        "backend_name": "bo-mcp",
+        "campaign_protocol_source_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74",
+        "design_kernel_source_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+        "distribution_versions": {
+          "bo-engine": "0.1.0",
+          "botorch": "0.18.1",
+          "gpytorch": "1.15.2",
+          "measure-service": "0.1.0.dev0",
+          "torch": "2.15.0"
+        },
+        "generation_method": "bo",
+        "model_type": "SingleTaskGP",
+        "settings": {
+          "acquisition_implementation": "qLogExpectedImprovement",
+          "acquisition_method": "expected_improvement",
+          "acquisition_optimization": {
+            "configured_num_restarts": null,
+            "configured_raw_samples": null,
+            "num_restarts": 14,
+            "raw_samples": 512
+          },
+          "backend_state": "stateless; no prior backend state supplied",
+          "batch_size": 1,
+          "input_transform": "BoTorch SingleTaskGP default input normalization",
+          "kernel": "RBF with automatic relevance determination (ARD); BoTorch SingleTaskGP default, no custom covar_module",
+          "noise_prior": {
+            "concentration": 1.1,
+            "constraint_lower_bound": 0.0001,
+            "family": "Gamma",
+            "learned": true,
+            "rate": 0.05,
+            "space": "standardized_target_variance"
+          },
+          "objective": {
+            "direction": "maximize",
+            "name": "utility"
+          },
+          "outcome_transform": "BoTorch SingleTaskGP default outcome standardization",
+          "parameters": [
+            "strong_solvent_fraction",
+            "acquisition_duration_min"
+          ],
+          "replay": "ordered training history is supplied on every call"
+        },
+        "source_revision": null,
+        "source_tree_sha256": "f7f9b9003ff61e05e0f93629e07e0a21b0b6947ff9fafbc7428822c1e6887fb9"
+      },
+      {
+        "acquisition_implementation": "qLogExpectedImprovement",
+        "acquisition_method": "expected_improvement",
+        "adapter_profile": "bo-mcp-gp-logei-ablation/1",
+        "adapter_source_sha256": "901e78d66e1e9119abc6b88c547ad266f8426de12206d249d59563b72c246b2e",
+        "backend_class": "BoTorchBackend",
+        "backend_id": "bo-engine/BoTorchBackend",
+        "backend_name": "bo-mcp",
+        "campaign_protocol_source_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74",
+        "design_kernel_source_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+        "distribution_versions": {
+          "bo-engine": "0.1.0",
+          "botorch": "0.18.1",
+          "gpytorch": "1.15.2",
+          "measure-service": "0.1.0.dev0",
+          "torch": "2.15.0"
+        },
+        "generation_method": "bo",
+        "model_type": "SingleTaskGP",
+        "settings": {
+          "acquisition_implementation": "qLogExpectedImprovement",
+          "acquisition_method": "expected_improvement",
+          "acquisition_optimization": {
+            "configured_num_restarts": null,
+            "configured_raw_samples": null,
+            "num_restarts": 14,
+            "raw_samples": 512
+          },
+          "backend_state": "stateless; no prior backend state supplied",
+          "batch_size": 1,
+          "input_transform": "BoTorch SingleTaskGP default input normalization",
+          "kernel": "RBF with automatic relevance determination (ARD); BoTorch SingleTaskGP default, no custom covar_module",
+          "noise_prior": {
+            "concentration": 1.1,
+            "constraint_lower_bound": 0.0001,
+            "family": "Gamma",
+            "learned": true,
+            "rate": 100.0,
+            "space": "standardized_target_variance"
+          },
+          "objective": {
+            "direction": "maximize",
+            "name": "confirmed_acceptance_reward"
+          },
+          "outcome_transform": "BoTorch SingleTaskGP default outcome standardization",
+          "parameters": [
+            "strong_solvent_fraction",
+            "acquisition_duration_min"
+          ],
+          "replay": "ordered training history is supplied on every call"
+        },
+        "source_revision": null,
+        "source_tree_sha256": "f7f9b9003ff61e05e0f93629e07e0a21b0b6947ff9fafbc7428822c1e6887fb9"
+      },
+      {
+        "acquisition_implementation": "qLogExpectedImprovement",
+        "acquisition_method": "expected_improvement",
+        "adapter_profile": "bo-mcp-gp-logei-ablation/1",
+        "adapter_source_sha256": "901e78d66e1e9119abc6b88c547ad266f8426de12206d249d59563b72c246b2e",
+        "backend_class": "BoTorchBackend",
+        "backend_id": "bo-engine/BoTorchBackend",
+        "backend_name": "bo-mcp",
+        "campaign_protocol_source_sha256": "6f5c4aaf7fd7ce4df0ed683775540db142d0af689ccd65847e3573a5f9e9aa74",
+        "design_kernel_source_sha256": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+        "distribution_versions": {
+          "bo-engine": "0.1.0",
+          "botorch": "0.18.1",
+          "gpytorch": "1.15.2",
+          "measure-service": "0.1.0.dev0",
+          "torch": "2.15.0"
+        },
+        "generation_method": "bo",
+        "model_type": "SingleTaskGP",
+        "settings": {
+          "acquisition_implementation": "qLogExpectedImprovement",
+          "acquisition_method": "expected_improvement",
+          "acquisition_optimization": {
+            "configured_num_restarts": null,
+            "configured_raw_samples": null,
+            "num_restarts": 14,
+            "raw_samples": 512
+          },
+          "backend_state": "stateless; no prior backend state supplied",
+          "batch_size": 1,
+          "input_transform": "BoTorch SingleTaskGP default input normalization",
+          "kernel": "RBF with automatic relevance determination (ARD); BoTorch SingleTaskGP default, no custom covar_module",
+          "noise_prior": {
+            "concentration": 1.1,
+            "constraint_lower_bound": 0.0001,
+            "family": "Gamma",
+            "learned": true,
+            "rate": 100.0,
+            "space": "standardized_target_variance"
+          },
+          "objective": {
+            "direction": "maximize",
+            "name": "utility"
+          },
+          "outcome_transform": "BoTorch SingleTaskGP default outcome standardization",
+          "parameters": [
+            "strong_solvent_fraction",
+            "acquisition_duration_min"
+          ],
+          "replay": "ordered training history is supplied on every call"
+        },
+        "source_revision": null,
+        "source_tree_sha256": "f7f9b9003ff61e05e0f93629e07e0a21b0b6947ff9fafbc7428822c1e6887fb9"
+      }
+    ],
+    "preflight_attempts": [
+      {
+        "attempt": 1,
+        "failure": {
+          "message": "backend preflight route lacks model-guided candidate provenance",
+          "type": "InvalidPreflightReport"
+        },
+        "preflight_elapsed_seconds": 94.0182567499578,
+        "qualified": false,
+        "report_profile": "measure-service-bo-ablation-preflight/1",
+        "runner_elapsed_seconds": 94.02739033289254
+      },
+      {
+        "attempt": 2,
+        "failure": null,
+        "preflight_elapsed_seconds": 94.40603037504479,
+        "qualified": true,
+        "report_profile": "measure-service-bo-ablation-preflight/1",
+        "runner_elapsed_seconds": 94.4526519998908
+      }
+    ],
+    "registered_task_inputs": [
+      {
+        "cohort_role": "regression",
+        "contract": {
+          "contract_id": "5c684fca-24b1-4bb0-aef3-32b838e695f1",
+          "implementation_provenance": {
+            "acceptance_kernel": {
+              "module": "measure_methods.observations",
+              "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+            },
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "utility_definition_module": "measure_methods.moses_objective"
+          },
+          "input_sha256": "45c6a47ac8fd0089a2c66e9bd3e75c9179621b61c5a6feab7d6c7c8d732c2cb6",
+          "spec": {
+            "count_threshold": 0.5,
+            "max_acquisition_duration_min": 10.0,
+            "profile": "moses-observed-analytical/1",
+            "required_analytes": [
+              "A",
+              "B",
+              "C"
+            ],
+            "resolution_definition": "gaussian-baseline-4sigma-finite-centroids/1",
+            "resolution_threshold": 1.5,
+            "runtime_preference_min": 5.0,
+            "utility_input_definition": "finite-resolution-reference/1",
+            "utility_profile": "moses-botier-1.0.0-binary64/1"
+          },
+          "utility_definition": {
+            "arithmetic": "binary64",
+            "compound_idx": null,
+            "criteria": [
+              {
+                "direction": "minimize",
+                "lower_bound": 0.0,
+                "name": "missing_analytes",
+                "threshold": 0.5,
+                "upper_bound": 10.0
+              },
+              {
+                "direction": "maximize",
+                "lower_bound": 0.0,
+                "name": "critical_resolution",
+                "threshold": 1.5,
+                "upper_bound": 5.0
+              },
+              {
+                "direction": "minimize",
+                "lower_bound": 1.0,
+                "name": "run_time_min",
+                "threshold": 5.0,
+                "upper_bound": 10.0
+              }
+            ],
+            "final_objective": "missing_analytes",
+            "final_rule": "value",
+            "input_definition": "finite-resolution-reference/1",
+            "num_compounds": 3,
+            "objective": "NumPeaks-CritRes",
+            "parameters": {
+              "count_threshold": 0.5,
+              "max_run_time_min": 10.0,
+              "resolution_threshold": 1.5,
+              "run_time_threshold_min": 5.0
+            },
+            "profile": "moses-botier-1.0.0-binary64/1",
+            "smoothing": 100.0
+          }
+        },
+        "producer": {
+          "implementation_provenance": {
+            "gaussian_kernel": {
+              "module": "measure_methods.gaussian_observations",
+              "source_sha256": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9"
+            },
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "resolution_helper": {
+              "module": "measure_methods.chromatography",
+              "source_sha256": "1824a0a6ddaef062a440cfd5913d3ef89fb45d00bb6f7dc64b741c6d00fbe699"
+            },
+            "service_adapter": {
+              "module": "measure_service.gaussian_producer",
+              "source_sha256": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970"
+            }
+          },
+          "input_sha256": "e5b402586ef39b56efa259428c5c97052ea88b9265433a8e38d03e3c17afa571",
+          "output_sha256": "ba3267cda17790137b38291591c72e34ebed426bdeb0061fce812dd8d5453b13",
+          "producer_id": "746be2e7-0e80-4665-8741-4ebd04a8ad38",
+          "spec": {
+            "profile": "ideal-gaussian-centroid/1",
+            "resolution_definition": "gaussian-baseline-4sigma-finite-centroids/1",
+            "width_origin": "synthetic_assumption",
+            "width_reference": "Predeclared synthetic-isocratic-ablation-v1.json sha256=0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094; fixed Gaussian FWHM assumption, not measured or fitted.",
+            "widths": [
+              {
+                "analyte_id": "A",
+                "fwhm_min": 0.15
+              },
+              {
+                "analyte_id": "B",
+                "fwhm_min": 0.15
+              },
+              {
+                "analyte_id": "C",
+                "fwhm_min": 0.15
+              }
+            ]
+          }
+        },
+        "retention_model": {
+          "implementation_provenance": {
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "retention_kernel": {
+              "module": "measure_methods.retention",
+              "source_sha256": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538"
+            },
+            "service_adapter": {
+              "module": "measure_service.retention",
+              "source_sha256": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0"
+            }
+          },
+          "input_sha256": "40939fbbff494079eb5a7df4c6e88e9a5e43efa4506d42dfe98f65b67ee85e73",
+          "model_id": "f072abc9-f322-4339-aa4d-414cbbeaccfd",
+          "source_fit_range_warnings": {
+            "A": [],
+            "B": [],
+            "C": []
+          },
+          "spec": {
+            "analytes": [
+              {
+                "S1": 6.0,
+                "S2": null,
+                "analyte_id": "A",
+                "ln_k0": 4.0,
+                "model": "linear"
+              },
+              {
+                "S1": 6.0,
+                "S2": null,
+                "analyte_id": "B",
+                "ln_k0": 4.6,
+                "model": "linear"
+              },
+              {
+                "S1": 6.0,
+                "S2": null,
+                "analyte_id": "C",
+                "ln_k0": 5.2,
+                "model": "linear"
+              }
+            ],
+            "column_length_m": 0.1,
+            "effective_area_m2": 2.5e-06,
+            "gradient_coordinate": "column_inlet_at_analyte_entry",
+            "parameter_origin": "synthetic",
+            "parameter_reference": "Predeclared synthetic-isocratic-ablation-v1.json sha256=0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094; constructed equations, not fitted physical parameters.",
+            "post_column_volume_ml": 0.0,
+            "profile": "ideal-lc-retention-zeta/1",
+            "strong_solvent": "B",
+            "training_snapshot_id": null
+          }
+        },
+        "task_id": "parallel-linear"
+      },
+      {
+        "cohort_role": "regression",
+        "contract": {
+          "contract_id": "cf07f6e0-752d-4287-bec1-919e716c38b6",
+          "implementation_provenance": {
+            "acceptance_kernel": {
+              "module": "measure_methods.observations",
+              "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+            },
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "utility_definition_module": "measure_methods.moses_objective"
+          },
+          "input_sha256": "9fa1b592c3e32d6f4b56e24c6a6c1bdafa6e7a4eb07a263c737d152e557b3b91",
+          "spec": {
+            "count_threshold": 0.5,
+            "max_acquisition_duration_min": 10.0,
+            "profile": "moses-observed-analytical/1",
+            "required_analytes": [
+              "A",
+              "B",
+              "C"
+            ],
+            "resolution_definition": "gaussian-baseline-4sigma-finite-centroids/1",
+            "resolution_threshold": 1.5,
+            "runtime_preference_min": 5.0,
+            "utility_input_definition": "finite-resolution-reference/1",
+            "utility_profile": "moses-botier-1.0.0-binary64/1"
+          },
+          "utility_definition": {
+            "arithmetic": "binary64",
+            "compound_idx": null,
+            "criteria": [
+              {
+                "direction": "minimize",
+                "lower_bound": 0.0,
+                "name": "missing_analytes",
+                "threshold": 0.5,
+                "upper_bound": 10.0
+              },
+              {
+                "direction": "maximize",
+                "lower_bound": 0.0,
+                "name": "critical_resolution",
+                "threshold": 1.5,
+                "upper_bound": 5.0
+              },
+              {
+                "direction": "minimize",
+                "lower_bound": 1.0,
+                "name": "run_time_min",
+                "threshold": 5.0,
+                "upper_bound": 10.0
+              }
+            ],
+            "final_objective": "missing_analytes",
+            "final_rule": "value",
+            "input_definition": "finite-resolution-reference/1",
+            "num_compounds": 3,
+            "objective": "NumPeaks-CritRes",
+            "parameters": {
+              "count_threshold": 0.5,
+              "max_run_time_min": 10.0,
+              "resolution_threshold": 1.5,
+              "run_time_threshold_min": 5.0
+            },
+            "profile": "moses-botier-1.0.0-binary64/1",
+            "smoothing": 100.0
+          }
+        },
+        "producer": {
+          "implementation_provenance": {
+            "gaussian_kernel": {
+              "module": "measure_methods.gaussian_observations",
+              "source_sha256": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9"
+            },
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "resolution_helper": {
+              "module": "measure_methods.chromatography",
+              "source_sha256": "1824a0a6ddaef062a440cfd5913d3ef89fb45d00bb6f7dc64b741c6d00fbe699"
+            },
+            "service_adapter": {
+              "module": "measure_service.gaussian_producer",
+              "source_sha256": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970"
+            }
+          },
+          "input_sha256": "f9b05f64f4b318a0ad96384f04891aeaf20a659d59904cb441e8382251cdef65",
+          "output_sha256": "9888a12a42f8123651bf7cc9f3cd5b0cc693794e6bf45ac1c05dc43cbae87a10",
+          "producer_id": "5cb1bb65-8637-4383-a98e-20cad8b488e1",
+          "spec": {
+            "profile": "ideal-gaussian-centroid/1",
+            "resolution_definition": "gaussian-baseline-4sigma-finite-centroids/1",
+            "width_origin": "synthetic_assumption",
+            "width_reference": "Predeclared synthetic-isocratic-ablation-v1.json sha256=0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094; fixed Gaussian FWHM assumption, not measured or fitted.",
+            "widths": [
+              {
+                "analyte_id": "A",
+                "fwhm_min": 0.15
+              },
+              {
+                "analyte_id": "B",
+                "fwhm_min": 0.15
+              },
+              {
+                "analyte_id": "C",
+                "fwhm_min": 0.15
+              }
+            ]
+          }
+        },
+        "retention_model": {
+          "implementation_provenance": {
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "retention_kernel": {
+              "module": "measure_methods.retention",
+              "source_sha256": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538"
+            },
+            "service_adapter": {
+              "module": "measure_service.retention",
+              "source_sha256": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0"
+            }
+          },
+          "input_sha256": "303fbdd2923871a197d10adfea2aaf2e32d1a9a3b5e4c3616bcc4143f19391a8",
+          "model_id": "4041b4c9-e9c1-4ae8-abab-cca4ed1eb43a",
+          "source_fit_range_warnings": {
+            "A": [
+              {
+                "code": "outside_source_fitting_range",
+                "effect": "warning_only; value is retained and used without clipping",
+                "parameter": "S1",
+                "source_fitting_range": [
+                  5.0,
+                  250.0
+                ],
+                "value": 4.0
+              }
+            ],
+            "B": [],
+            "C": []
+          },
+          "spec": {
+            "analytes": [
+              {
+                "S1": 4.0,
+                "S2": null,
+                "analyte_id": "A",
+                "ln_k0": 3.0,
+                "model": "linear"
+              },
+              {
+                "S1": 7.0,
+                "S2": null,
+                "analyte_id": "B",
+                "ln_k0": 4.5,
+                "model": "linear"
+              },
+              {
+                "S1": 10.0,
+                "S2": null,
+                "analyte_id": "C",
+                "ln_k0": 6.0,
+                "model": "linear"
+              }
+            ],
+            "column_length_m": 0.1,
+            "effective_area_m2": 2.5e-06,
+            "gradient_coordinate": "column_inlet_at_analyte_entry",
+            "parameter_origin": "synthetic",
+            "parameter_reference": "Predeclared synthetic-isocratic-ablation-v1.json sha256=0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094; constructed equations, not fitted physical parameters.",
+            "post_column_volume_ml": 0.0,
+            "profile": "ideal-lc-retention-zeta/1",
+            "strong_solvent": "B",
+            "training_snapshot_id": null
+          }
+        },
+        "task_id": "crossing-linear"
+      },
+      {
+        "cohort_role": "held_out",
+        "contract": {
+          "contract_id": "28319dfe-0bef-402d-bf38-11ffa0f3e818",
+          "implementation_provenance": {
+            "acceptance_kernel": {
+              "module": "measure_methods.observations",
+              "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+            },
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "utility_definition_module": "measure_methods.moses_objective"
+          },
+          "input_sha256": "1c41cb869e4ac9d670c92adf16b98d6c3e5113dabbdd4359285a310ed3387ea9",
+          "spec": {
+            "count_threshold": 0.5,
+            "max_acquisition_duration_min": 10.0,
+            "profile": "moses-observed-analytical/1",
+            "required_analytes": [
+              "A",
+              "B",
+              "C"
+            ],
+            "resolution_definition": "gaussian-baseline-4sigma-finite-centroids/1",
+            "resolution_threshold": 1.5,
+            "runtime_preference_min": 5.0,
+            "utility_input_definition": "finite-resolution-reference/1",
+            "utility_profile": "moses-botier-1.0.0-binary64/1"
+          },
+          "utility_definition": {
+            "arithmetic": "binary64",
+            "compound_idx": null,
+            "criteria": [
+              {
+                "direction": "minimize",
+                "lower_bound": 0.0,
+                "name": "missing_analytes",
+                "threshold": 0.5,
+                "upper_bound": 10.0
+              },
+              {
+                "direction": "maximize",
+                "lower_bound": 0.0,
+                "name": "critical_resolution",
+                "threshold": 1.5,
+                "upper_bound": 5.0
+              },
+              {
+                "direction": "minimize",
+                "lower_bound": 1.0,
+                "name": "run_time_min",
+                "threshold": 5.0,
+                "upper_bound": 10.0
+              }
+            ],
+            "final_objective": "missing_analytes",
+            "final_rule": "value",
+            "input_definition": "finite-resolution-reference/1",
+            "num_compounds": 3,
+            "objective": "NumPeaks-CritRes",
+            "parameters": {
+              "count_threshold": 0.5,
+              "max_run_time_min": 10.0,
+              "resolution_threshold": 1.5,
+              "run_time_threshold_min": 5.0
+            },
+            "profile": "moses-botier-1.0.0-binary64/1",
+            "smoothing": 100.0
+          }
+        },
+        "producer": {
+          "implementation_provenance": {
+            "gaussian_kernel": {
+              "module": "measure_methods.gaussian_observations",
+              "source_sha256": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9"
+            },
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "resolution_helper": {
+              "module": "measure_methods.chromatography",
+              "source_sha256": "1824a0a6ddaef062a440cfd5913d3ef89fb45d00bb6f7dc64b741c6d00fbe699"
+            },
+            "service_adapter": {
+              "module": "measure_service.gaussian_producer",
+              "source_sha256": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970"
+            }
+          },
+          "input_sha256": "a72c91ba8e575beb09d82eda1bf1c548e5851940795c32602570c005fd88c254",
+          "output_sha256": "c360f1c9aacb0bcba08d4ae25cb6900092a89e6df04fa28131a2b3bb6f0f216c",
+          "producer_id": "f7f47446-9028-466e-9bc5-6e621f282bd3",
+          "spec": {
+            "profile": "ideal-gaussian-centroid/1",
+            "resolution_definition": "gaussian-baseline-4sigma-finite-centroids/1",
+            "width_origin": "synthetic_assumption",
+            "width_reference": "Predeclared synthetic-isocratic-ablation-v1.json sha256=0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094; fixed Gaussian FWHM assumption, not measured or fitted.",
+            "widths": [
+              {
+                "analyte_id": "A",
+                "fwhm_min": 0.15
+              },
+              {
+                "analyte_id": "B",
+                "fwhm_min": 0.15
+              },
+              {
+                "analyte_id": "C",
+                "fwhm_min": 0.15
+              }
+            ]
+          }
+        },
+        "retention_model": {
+          "implementation_provenance": {
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "retention_kernel": {
+              "module": "measure_methods.retention",
+              "source_sha256": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538"
+            },
+            "service_adapter": {
+              "module": "measure_service.retention",
+              "source_sha256": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0"
+            }
+          },
+          "input_sha256": "d6581d23b5931f3d624eed4cdff187555a1af744bb326f10d8dea16bb1a78cd9",
+          "model_id": "61329ba7-0af6-49b5-a0e3-4dc4e92f3112",
+          "source_fit_range_warnings": {
+            "A": [],
+            "B": [
+              {
+                "code": "outside_source_fitting_range",
+                "effect": "warning_only; value is retained and used without clipping",
+                "parameter": "S1",
+                "source_fitting_range": [
+                  5.0,
+                  250.0
+                ],
+                "value": 3.261663
+              }
+            ],
+            "C": []
+          },
+          "spec": {
+            "analytes": [
+              {
+                "S1": 6.921679,
+                "S2": null,
+                "analyte_id": "A",
+                "ln_k0": 4.408626,
+                "model": "linear"
+              },
+              {
+                "S1": 3.261663,
+                "S2": null,
+                "analyte_id": "B",
+                "ln_k0": 5.52926,
+                "model": "linear"
+              },
+              {
+                "S1": 7.138038,
+                "S2": null,
+                "analyte_id": "C",
+                "ln_k0": 5.276395,
+                "model": "linear"
+              }
+            ],
+            "column_length_m": 0.1,
+            "effective_area_m2": 2.5e-06,
+            "gradient_coordinate": "column_inlet_at_analyte_entry",
+            "parameter_origin": "synthetic",
+            "parameter_reference": "Predeclared synthetic-isocratic-ablation-v1.json sha256=0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094; constructed equations, not fitted physical parameters.",
+            "post_column_volume_ml": 0.0,
+            "profile": "ideal-lc-retention-zeta/1",
+            "strong_solvent": "B",
+            "training_snapshot_id": null
+          }
+        },
+        "task_id": "heldout-linear-01"
+      },
+      {
+        "cohort_role": "held_out",
+        "contract": {
+          "contract_id": "13878de7-7d19-4e46-809c-e959afa71b58",
+          "implementation_provenance": {
+            "acceptance_kernel": {
+              "module": "measure_methods.observations",
+              "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+            },
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "utility_definition_module": "measure_methods.moses_objective"
+          },
+          "input_sha256": "346a3e8ab2e5254a13f31f496ad60c2303379e905a9e70ffcce556a557ffa668",
+          "spec": {
+            "count_threshold": 0.5,
+            "max_acquisition_duration_min": 10.0,
+            "profile": "moses-observed-analytical/1",
+            "required_analytes": [
+              "A",
+              "B",
+              "C"
+            ],
+            "resolution_definition": "gaussian-baseline-4sigma-finite-centroids/1",
+            "resolution_threshold": 1.5,
+            "runtime_preference_min": 5.0,
+            "utility_input_definition": "finite-resolution-reference/1",
+            "utility_profile": "moses-botier-1.0.0-binary64/1"
+          },
+          "utility_definition": {
+            "arithmetic": "binary64",
+            "compound_idx": null,
+            "criteria": [
+              {
+                "direction": "minimize",
+                "lower_bound": 0.0,
+                "name": "missing_analytes",
+                "threshold": 0.5,
+                "upper_bound": 10.0
+              },
+              {
+                "direction": "maximize",
+                "lower_bound": 0.0,
+                "name": "critical_resolution",
+                "threshold": 1.5,
+                "upper_bound": 5.0
+              },
+              {
+                "direction": "minimize",
+                "lower_bound": 1.0,
+                "name": "run_time_min",
+                "threshold": 5.0,
+                "upper_bound": 10.0
+              }
+            ],
+            "final_objective": "missing_analytes",
+            "final_rule": "value",
+            "input_definition": "finite-resolution-reference/1",
+            "num_compounds": 3,
+            "objective": "NumPeaks-CritRes",
+            "parameters": {
+              "count_threshold": 0.5,
+              "max_run_time_min": 10.0,
+              "resolution_threshold": 1.5,
+              "run_time_threshold_min": 5.0
+            },
+            "profile": "moses-botier-1.0.0-binary64/1",
+            "smoothing": 100.0
+          }
+        },
+        "producer": {
+          "implementation_provenance": {
+            "gaussian_kernel": {
+              "module": "measure_methods.gaussian_observations",
+              "source_sha256": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9"
+            },
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "resolution_helper": {
+              "module": "measure_methods.chromatography",
+              "source_sha256": "1824a0a6ddaef062a440cfd5913d3ef89fb45d00bb6f7dc64b741c6d00fbe699"
+            },
+            "service_adapter": {
+              "module": "measure_service.gaussian_producer",
+              "source_sha256": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970"
+            }
+          },
+          "input_sha256": "7e8ca5e66005878bafa942515b95b93bcf432bedb806526122542cdd75afdf7c",
+          "output_sha256": "92bed5bd4f707db9c3c36ae1db82834b096e541945046bb9967710ce65798b74",
+          "producer_id": "d340549c-8501-4858-b572-04e190c2d522",
+          "spec": {
+            "profile": "ideal-gaussian-centroid/1",
+            "resolution_definition": "gaussian-baseline-4sigma-finite-centroids/1",
+            "width_origin": "synthetic_assumption",
+            "width_reference": "Predeclared synthetic-isocratic-ablation-v1.json sha256=0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094; fixed Gaussian FWHM assumption, not measured or fitted.",
+            "widths": [
+              {
+                "analyte_id": "A",
+                "fwhm_min": 0.15
+              },
+              {
+                "analyte_id": "B",
+                "fwhm_min": 0.15
+              },
+              {
+                "analyte_id": "C",
+                "fwhm_min": 0.15
+              }
+            ]
+          }
+        },
+        "retention_model": {
+          "implementation_provenance": {
+            "measure_service": {
+              "package": "measure-service",
+              "source_ref": null,
+              "source_revision": null,
+              "version": "0.1.0.dev0"
+            },
+            "retention_kernel": {
+              "module": "measure_methods.retention",
+              "source_sha256": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538"
+            },
+            "service_adapter": {
+              "module": "measure_service.retention",
+              "source_sha256": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0"
+            }
+          },
+          "input_sha256": "54bb3a2b3cbb253f5414536085cedb48f62de988d99a6a0d8627dc6271d9f8d6",
+          "model_id": "e0319c48-2502-4023-9b31-c686ba713b05",
+          "source_fit_range_warnings": {
+            "A": [
+              {
+                "code": "outside_source_fitting_range",
+                "effect": "warning_only; value is retained and used without clipping",
+                "parameter": "S1",
+                "source_fitting_range": [
+                  5.0,
+                  250.0
+                ],
+                "value": 4.890301
+              }
+            ],
+            "B": [],
+            "C": [
+              {
+                "code": "outside_source_fitting_range",
+                "effect": "warning_only; value is retained and used without clipping",
+                "parameter": "S1",
+                "source_fitting_range": [
+                  5.0,
+                  250.0
+                ],
+                "value": 4.03663
+              }
+            ]
+          },
+          "spec": {
+            "analytes": [
+              {
+                "S1": 4.890301,
+                "S2": null,
+                "analyte_id": "A",
+                "ln_k0": 3.416835,
+                "model": "linear"
+              },
+              {
+                "S1": 5.887706,
+                "S2": null,
+                "analyte_id": "B",
+                "ln_k0": 3.687536,
+                "model": "linear"
+              },
+              {
+                "S1": 4.03663,
+                "S2": null,
+                "analyte_id": "C",
+                "ln_k0": 5.928464,
+                "model": "linear"
+              }
+            ],
+            "column_length_m": 0.1,
+            "effective_area_m2": 2.5e-06,
+            "gradient_coordinate": "column_inlet_at_analyte_entry",
+            "parameter_origin": "synthetic",
+            "parameter_reference": "Predeclared synthetic-isocratic-ablation-v1.json sha256=0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094; constructed equations, not fitted physical parameters.",
+            "post_column_volume_ml": 0.0,
+            "profile": "ideal-lc-retention-zeta/1",
+            "strong_solvent": "B",
+            "training_snapshot_id": null
+          }
+        },
+        "task_id": "heldout-linear-02"
+      }
+    ],
+    "report_implementation_provenance": {
+      "measure_service": {
+        "package": "measure-service",
+        "source_ref": null,
+        "source_revision": null,
+        "version": "0.1.0.dev0"
+      },
+      "preflight_receipts": [
+        {
+          "attempt": 1,
+          "qualified": false,
+          "request": {
+            "attempt": 1,
+            "operation": "qualify_synthetic_ablation_backend",
+            "protocol_sha256": "6b6dea431ab111fc24bf4184fc396072a09059dc0d3c6985ee590c2bf3c37035",
+            "study_sha256": "0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094"
+          }
+        },
+        {
+          "attempt": 2,
+          "qualified": true,
+          "request": {
+            "attempt": 2,
+            "operation": "qualify_synthetic_ablation_backend",
+            "protocol_sha256": "6b6dea431ab111fc24bf4184fc396072a09059dc0d3c6985ee590c2bf3c37035",
+            "study_sha256": "0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094"
+          }
+        }
+      ],
+      "preflight_report_profile": "measure-service-bo-ablation-preflight/1",
+      "runner_module_sha256": "8dffb59acf673fcd8ea4b6b90e153a2205b9a0b0c8baa35e0446d38c1eb834a5",
+      "study_input_sha256": "0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094"
+    },
+    "source_revision_policy": "Source revision fields are copied as recorded, including null. The exporter does not infer a Git revision."
+  },
+  "schema_version": 1,
+  "source_bundle": {
+    "complete_json_sha256": "c44fd8a936661ac293e2f94098d320efccec2fe09b4bc284ae6549e9482ceebb",
+    "completed": false,
+    "planned_denominators": {
+      "campaigns_per_arm": 12,
+      "campaigns_total": 60,
+      "evaluation_budget_per_campaign": 10,
+      "evaluations_per_arm": 120,
+      "evaluations_total": 600,
+      "initial_design_size_per_campaign": 3,
+      "stopping_policy": "full_budget"
+    },
+    "profile": "synthetic-isocratic-ablation-study/1",
+    "report_status": "partial_failure",
+    "study_input": {
+      "bundled_path": "reference_data/synthetic-isocratic-ablation-v1.json",
+      "scope": {
+        "compoundwise_surrogate": false,
+        "fidelity": 1.0,
+        "general_optimizer_ranking": false,
+        "initial_evaluations_count_against_each_arm": true,
+        "instrument_qualified": false,
+        "manuscript_protocol_match": false,
+        "matern_kernel": false,
+        "multi_fidelity": false,
+        "noise": "none",
+        "observation_origin": "simulator_latent",
+        "physical_model_fit": false,
+        "signal_processing_qualified": false
+      },
+      "selection": {
+        "generator": {
+          "S1_bounds": [
+            3.0,
+            10.0
+          ],
+          "analytes_per_task": 3,
+          "draw_order": "task index, analyte A/B/C, ln_k0 then S1",
+          "generated_count": 2,
+          "implementation": "Python standard-library random.Random; sequential uniform draws rounded to six decimal places",
+          "ln_k0_bounds": [
+            2.5,
+            6.0
+          ],
+          "rejected_count": 0,
+          "retained_count": 2,
+          "screening_evaluations": 0,
+          "seed": 20261030,
+          "task_count": 2
+        },
+        "held_out": "two independently generated unfiltered tasks; every draw retained without any separation or optimizer screening",
+        "regression": "the original two constructed unfiltered tasks, retained without modification"
+      },
+      "sha256": "0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094"
+    },
+    "verified_files": {
+      "campaigns.jsonl": {
+        "sha256": "a542dd960304754198343aebade4bd6e36fd1e6bf9667df4a30fad21d5dc5629",
+        "size_bytes": 34240755
+      },
+      "evaluations.csv": {
+        "sha256": "52b689bf549555a462b9c9fc3ac006f7b3b3c0e1828b63d4c818f001500ad034",
+        "size_bytes": 1150404
+      },
+      "evaluations.jsonl": {
+        "sha256": "7df6f2b142866ae98363f4448ff2d726bc503512c2567cf39287f89a5ed7fbf3",
+        "size_bytes": 33660192
+      },
+      "measure.sqlite3": {
+        "sha256": "09cf41c72992b91a68bb9b2040c0bc9c1388d8ae38f7afe998e28286df66fbb3",
+        "size_bytes": 59039744
+      },
+      "paired-comparisons.csv": {
+        "sha256": "9a3534eec37ab3843f937783120a446e5fe3460dcd6d4ea9cdf57a3383f958cd",
+        "size_bytes": 79536
+      },
+      "paired-contrast-summary.csv": {
+        "sha256": "8ed97c160955471aac3e24e501ab71f00f82a738dec68aa7c668b2a76845d71d",
+        "size_bytes": 12535
+      },
+      "preflight.json": {
+        "sha256": "065434b7fca67f69335a7c565b0dd47bc70bbd478d6ae5657a419f4fd9d7638e",
+        "size_bytes": 507414
+      },
+      "protocol.json": {
+        "sha256": "6b7c3efe328f9c4e80e17ee16ea65a399167dc1071191fa8b950e1da0b251f8b",
+        "size_bytes": 211253
+      },
+      "report.json": {
+        "sha256": "eed581f68e8d1d3c55158b2bb74bfa90c41285aeccceaaa1e7854b2f5e223ada",
+        "size_bytes": 57750520
+      },
+      "report.md": {
+        "sha256": "925576e72cd5bd7c1e217299d74db9c8fa1176e6ac83f4f7b767059305441281",
+        "size_bytes": 1889
+      },
+      "success-trajectories.csv": {
+        "sha256": "9613192a9b3bdaab9c30c7633f184b7bb05983e2a5449c838182baf121687271",
+        "size_bytes": 36335
+      }
+    }
+  },
+  "source_profile": "synthetic-isocratic-ablation-study/1",
+  "study": {
+    "arms": [
+      {
+        "arm_id": "random-control",
+        "optimizer_target": "historical_utility",
+        "policy": "random",
+        "surrogate_noise_prior": "default"
+      },
+      {
+        "arm_id": "gp-utility-default",
+        "optimizer_target": "historical_utility",
+        "policy": "bo_mcp_gp_logei",
+        "surrogate_noise_prior": "default"
+      },
+      {
+        "arm_id": "gp-confirmed-default",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "policy": "bo_mcp_gp_logei",
+        "surrogate_noise_prior": "default"
+      },
+      {
+        "arm_id": "gp-utility-low-noise",
+        "optimizer_target": "historical_utility",
+        "policy": "bo_mcp_gp_logei",
+        "surrogate_noise_prior": "low_noise"
+      },
+      {
+        "arm_id": "gp-confirmed-low-noise",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "policy": "bo_mcp_gp_logei",
+        "surrogate_noise_prior": "low_noise"
+      }
+    ],
+    "declaration": {
+      "arms": [
+        {
+          "arm_id": "random-control",
+          "optimizer_target": "historical_utility",
+          "policy": "random",
+          "surrogate_noise_prior": "default"
+        },
+        {
+          "arm_id": "gp-utility-default",
+          "optimizer_target": "historical_utility",
+          "policy": "bo_mcp_gp_logei",
+          "surrogate_noise_prior": "default"
+        },
+        {
+          "arm_id": "gp-confirmed-default",
+          "optimizer_target": "confirmed_acceptance_reward",
+          "policy": "bo_mcp_gp_logei",
+          "surrogate_noise_prior": "default"
+        },
+        {
+          "arm_id": "gp-utility-low-noise",
+          "optimizer_target": "historical_utility",
+          "policy": "bo_mcp_gp_logei",
+          "surrogate_noise_prior": "low_noise"
+        },
+        {
+          "arm_id": "gp-confirmed-low-noise",
+          "optimizer_target": "confirmed_acceptance_reward",
+          "policy": "bo_mcp_gp_logei",
+          "surrogate_noise_prior": "low_noise"
+        }
+      ],
+      "contract": {
+        "count_threshold": 0.5,
+        "max_acquisition_duration_min": 10.0,
+        "resolution_threshold": 1.5,
+        "runtime_preference_min": 5.0
+      },
+      "contrasts": [
+        "target within each noise-prior setting",
+        "noise prior within each optimizer target",
+        "each GP arm versus shared random control, labelled jointly changed policies"
+      ],
+      "declaration_version": "1",
+      "domain": {
+        "acquisition_duration_min": {
+          "lower": 2.0,
+          "upper": 10.0
+        },
+        "strong_solvent_fraction": {
+          "lower": 0.1,
+          "upper": 0.9
+        }
+      },
+      "evaluation_budget": 10,
+      "evaluation_cost": 1.0,
+      "evaluation_cost_unit": "synthetic_evaluation",
+      "factors": {
+        "fixed": "scalar SingleTaskGP with public default ARD RBF kernel, inferred Gaussian likelihood, default outcome standardization/input normalization, qLogExpectedImprovement, one candidate, same acquisition optimization budgets and recorded runtime",
+        "optimizer_target": {
+          "confirmed_acceptance_reward": "1 iff an observed immutable analytical assessment is accepted; 0 for observed not_accepted or unknown. This is a lower-bound observed-confirmation reward, not a chemical failure label or calibrated probability. Missing/execution failures are not zero-valued training data.",
+          "historical_utility": "existing published finite-resolution-reference BoTier utility, maximize"
+        },
+        "surrogate_noise_prior": {
+          "constraint_lower_bound": 0.0001,
+          "default": {
+            "concentration": 1.1,
+            "family": "Gamma",
+            "interpretation": "reference-default prior observed in public backend before declaration; explicitly supplied to preserve this comparison if later defaults change",
+            "rate": 0.05
+          },
+          "interpretation": "declared inferred-noise regularization stress test; neither prior is measured physical uncertainty or fixed observation noise",
+          "low_noise": {
+            "concentration": 1.1,
+            "family": "Gamma",
+            "rate": 100.0
+          },
+          "space": "standardized target variance"
+        }
+      },
+      "flow_ml_min": 0.5,
+      "geometry": {
+        "column_length_m": 0.1,
+        "effective_area_m2": 2.5e-06,
+        "post_column_volume_ml": 0.0
+      },
+      "initial_design_size": 3,
+      "preflight": {
+        "accounting": "fabricated component-preflight histories are separate from all600analytical evaluations; retain their calls, warnings and walltime separately",
+        "before_campaigns": "each pattern/length under each prior must return a finite feasible genuine model-guided candidate with no random fallback; otherwise retain all planned study outcomes as unknown without running or retuning",
+        "confirmed_reward_patterns": [
+          "all_zero",
+          "all_one",
+          "alternating_zero_one"
+        ],
+        "constant_histories": "Gaussian regression and qLogEI on binary observed-confirmation rewards are an explicitly misspecified optimization heuristic, not classification or calibrated probability",
+        "coordinate_pattern": {
+          "acquisition_duration_min": "lower + (upper-lower)*(((2*i)%n)+1)/(n+1)",
+          "strong_solvent_fraction": "lower + (upper-lower)*(i+1)/(n+1)"
+        },
+        "expected_case_count": 16,
+        "historical_utility_pattern": "0.25 + 2.5*i/(n-1), i=0..n-1",
+        "history_lengths": [
+          3,
+          9
+        ],
+        "seed": "first declared study seed"
+      },
+      "profile": "synthetic-isocratic-ablation-study/1",
+      "reporting": {
+        "failure_handling": "retain every planned slot, censored/unknown outcome, complete-attempt versus consumed expenditure and failed proposal timing; no success-only averaging",
+        "initialization": "identical coordinates for every arm at each seed; all three evaluations count against every arm budget",
+        "planned_campaigns_per_arm": 12,
+        "planned_evaluations_per_arm": 120,
+        "success_criteria": [
+          "strict analytical acceptance with unknown retained",
+          "historical utility >=2 with unknown retained"
+        ],
+        "summaries": [
+          "regression cohort separately",
+          "held-out cohort separately",
+          "combined descriptive summary labelled as pooled constructed tasks"
+        ],
+        "total_planned_campaigns": 60,
+        "total_planned_evaluations": 600
+      },
+      "scope": {
+        "compoundwise_surrogate": false,
+        "fidelity": 1.0,
+        "general_optimizer_ranking": false,
+        "initial_evaluations_count_against_each_arm": true,
+        "instrument_qualified": false,
+        "manuscript_protocol_match": false,
+        "matern_kernel": false,
+        "multi_fidelity": false,
+        "noise": "none",
+        "observation_origin": "simulator_latent",
+        "physical_model_fit": false,
+        "signal_processing_qualified": false
+      },
+      "seeds": [
+        17,
+        29,
+        43
+      ],
+      "selection": {
+        "generator": {
+          "S1_bounds": [
+            3.0,
+            10.0
+          ],
+          "analytes_per_task": 3,
+          "draw_order": "task index, analyte A/B/C, ln_k0 then S1",
+          "generated_count": 2,
+          "implementation": "Python standard-library random.Random; sequential uniform draws rounded to six decimal places",
+          "ln_k0_bounds": [
+            2.5,
+            6.0
+          ],
+          "rejected_count": 0,
+          "retained_count": 2,
+          "screening_evaluations": 0,
+          "seed": 20261030,
+          "task_count": 2
+        },
+        "held_out": "two independently generated unfiltered tasks; every draw retained without any separation or optimizer screening",
+        "regression": "the original two constructed unfiltered tasks, retained without modification"
+      },
+      "software_consistency": "record actual software/source identities; require study proposals to match the successful preflight backend source/settings. Completed-store resume can reuse prior evidence without an optimizer runtime. No installation revision restrictions are imposed.",
+      "stopping_policy": "full_budget",
+      "tasks": [
+        {
+          "analytes": [
+            {
+              "S1": 6.0,
+              "analyte_id": "A",
+              "ln_k0": 4.0,
+              "model": "linear"
+            },
+            {
+              "S1": 6.0,
+              "analyte_id": "B",
+              "ln_k0": 4.6,
+              "model": "linear"
+            },
+            {
+              "S1": 6.0,
+              "analyte_id": "C",
+              "ln_k0": 5.2,
+              "model": "linear"
+            }
+          ],
+          "cohort_role": "regression",
+          "fwhm_min": 0.15,
+          "task_id": "parallel-linear"
+        },
+        {
+          "analytes": [
+            {
+              "S1": 4.0,
+              "analyte_id": "A",
+              "ln_k0": 3.0,
+              "model": "linear"
+            },
+            {
+              "S1": 7.0,
+              "analyte_id": "B",
+              "ln_k0": 4.5,
+              "model": "linear"
+            },
+            {
+              "S1": 10.0,
+              "analyte_id": "C",
+              "ln_k0": 6.0,
+              "model": "linear"
+            }
+          ],
+          "cohort_role": "regression",
+          "fwhm_min": 0.15,
+          "task_id": "crossing-linear"
+        },
+        {
+          "analytes": [
+            {
+              "S1": 6.921679,
+              "analyte_id": "A",
+              "ln_k0": 4.408626,
+              "model": "linear"
+            },
+            {
+              "S1": 3.261663,
+              "analyte_id": "B",
+              "ln_k0": 5.52926,
+              "model": "linear"
+            },
+            {
+              "S1": 7.138038,
+              "analyte_id": "C",
+              "ln_k0": 5.276395,
+              "model": "linear"
+            }
+          ],
+          "cohort_role": "held_out",
+          "fwhm_min": 0.15,
+          "task_id": "heldout-linear-01"
+        },
+        {
+          "analytes": [
+            {
+              "S1": 4.890301,
+              "analyte_id": "A",
+              "ln_k0": 3.416835,
+              "model": "linear"
+            },
+            {
+              "S1": 5.887706,
+              "analyte_id": "B",
+              "ln_k0": 3.687536,
+              "model": "linear"
+            },
+            {
+              "S1": 4.03663,
+              "analyte_id": "C",
+              "ln_k0": 5.928464,
+              "model": "linear"
+            }
+          ],
+          "cohort_role": "held_out",
+          "fwhm_min": 0.15,
+          "task_id": "heldout-linear-02"
+        }
+      ]
+    },
+    "declaration_source": "src/measure_service/benchmarks/reference_data/synthetic-isocratic-ablation-v1.json",
+    "evaluation_budget": 10,
+    "factors": {
+      "fixed": "scalar SingleTaskGP with public default ARD RBF kernel, inferred Gaussian likelihood, default outcome standardization/input normalization, qLogExpectedImprovement, one candidate, same acquisition optimization budgets and recorded runtime",
+      "optimizer_target": {
+        "confirmed_acceptance_reward": "1 iff an observed immutable analytical assessment is accepted; 0 for observed not_accepted or unknown. This is a lower-bound observed-confirmation reward, not a chemical failure label or calibrated probability. Missing/execution failures are not zero-valued training data.",
+        "historical_utility": "existing published finite-resolution-reference BoTier utility, maximize"
+      },
+      "surrogate_noise_prior": {
+        "constraint_lower_bound": 0.0001,
+        "default": {
+          "concentration": 1.1,
+          "family": "Gamma",
+          "interpretation": "reference-default prior observed in public backend before declaration; explicitly supplied to preserve this comparison if later defaults change",
+          "rate": 0.05
+        },
+        "interpretation": "declared inferred-noise regularization stress test; neither prior is measured physical uncertainty or fixed observation noise",
+        "low_noise": {
+          "concentration": 1.1,
+          "family": "Gamma",
+          "rate": 100.0
+        },
+        "space": "standardized target variance"
+      }
+    },
+    "planned_analyte_row_count": 1800,
+    "planned_campaign_count": 60,
+    "planned_evaluation_count": 600,
+    "seeds": [
+      17,
+      29,
+      43
+    ],
+    "sha256": "0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094",
+    "tasks": [
+      {
+        "analytes": [
+          {
+            "S1": 6.0,
+            "analyte_id": "A",
+            "ln_k0": 4.0,
+            "model": "linear"
+          },
+          {
+            "S1": 6.0,
+            "analyte_id": "B",
+            "ln_k0": 4.6,
+            "model": "linear"
+          },
+          {
+            "S1": 6.0,
+            "analyte_id": "C",
+            "ln_k0": 5.2,
+            "model": "linear"
+          }
+        ],
+        "cohort_role": "regression",
+        "fwhm_min": 0.15,
+        "task_id": "parallel-linear"
+      },
+      {
+        "analytes": [
+          {
+            "S1": 4.0,
+            "analyte_id": "A",
+            "ln_k0": 3.0,
+            "model": "linear"
+          },
+          {
+            "S1": 7.0,
+            "analyte_id": "B",
+            "ln_k0": 4.5,
+            "model": "linear"
+          },
+          {
+            "S1": 10.0,
+            "analyte_id": "C",
+            "ln_k0": 6.0,
+            "model": "linear"
+          }
+        ],
+        "cohort_role": "regression",
+        "fwhm_min": 0.15,
+        "task_id": "crossing-linear"
+      },
+      {
+        "analytes": [
+          {
+            "S1": 6.921679,
+            "analyte_id": "A",
+            "ln_k0": 4.408626,
+            "model": "linear"
+          },
+          {
+            "S1": 3.261663,
+            "analyte_id": "B",
+            "ln_k0": 5.52926,
+            "model": "linear"
+          },
+          {
+            "S1": 7.138038,
+            "analyte_id": "C",
+            "ln_k0": 5.276395,
+            "model": "linear"
+          }
+        ],
+        "cohort_role": "held_out",
+        "fwhm_min": 0.15,
+        "task_id": "heldout-linear-01"
+      },
+      {
+        "analytes": [
+          {
+            "S1": 4.890301,
+            "analyte_id": "A",
+            "ln_k0": 3.416835,
+            "model": "linear"
+          },
+          {
+            "S1": 5.887706,
+            "analyte_id": "B",
+            "ln_k0": 3.687536,
+            "model": "linear"
+          },
+          {
+            "S1": 4.03663,
+            "analyte_id": "C",
+            "ln_k0": 5.928464,
+            "model": "linear"
+          }
+        ],
+        "cohort_role": "held_out",
+        "fwhm_min": 0.15,
+        "task_id": "heldout-linear-02"
+      }
+    ]
+  },
+  "tables": {
+    "analytes.csv": {
+      "columns": [
+        "task_id",
+        "cohort_role",
+        "seed",
+        "arm_id",
+        "policy",
+        "optimizer_target_config",
+        "surrogate_noise_prior",
+        "ordinal",
+        "evaluation_status",
+        "campaign_id",
+        "analyte_id",
+        "retention_model",
+        "ln_k0",
+        "S1",
+        "assumed_fwhm_min",
+        "prediction_evidence_status",
+        "prediction_profile",
+        "prediction_retention_status",
+        "prediction_retention_time_min",
+        "prediction_dead_time_min",
+        "prediction_post_column_transit_min",
+        "prediction_retention_zeta_min",
+        "prediction_right_censor_bound_min",
+        "prediction_numerical_error_estimate_min",
+        "prediction_evaluation_count",
+        "gaussian_centroid_evidence_status",
+        "gaussian_retention_status",
+        "gaussian_centroid_retention_time_min",
+        "gaussian_resolution_status",
+        "gaussian_resolution",
+        "assessment_status",
+        "assessment_retention_status",
+        "assessment_retention_time_min",
+        "detection",
+        "detection_status",
+        "assessment_resolution_status",
+        "assessment_resolution",
+        "resolution_satisfied",
+        "analyte_acceptance_state",
+        "historical_utility_input_retention_status",
+        "historical_utility_input_retention_time_min",
+        "historical_utility_input_resolution_status",
+        "historical_utility_input_peak_resolution",
+        "historical_utility_input_status"
+      ],
+      "exported_rows": 1800,
+      "grain": "one row per planned evaluation and declared analyte",
+      "key": [
+        "task_id",
+        "seed",
+        "arm_id",
+        "ordinal",
+        "analyte_id"
+      ],
+      "planned_rows": 1800,
+      "sha256": "94b248d9ec1eea6964ed95cb5c1736c48eedec4d945639154f30d76e453c1d81",
+      "size_bytes": 833289,
+      "units": {
+        "S1": "1 (dimensionless model parameter)",
+        "assessment_resolution": "1 (dimensionless resolution copied from assessment)",
+        "assessment_retention_time_min": "min (retention evidence copied from assessment)",
+        "assumed_fwhm_min": "min (synthetic width assumption)",
+        "gaussian_centroid_retention_time_min": "min (stored Gaussian-producer centroid)",
+        "gaussian_resolution": "1 (dimensionless Gaussian resolution)",
+        "historical_utility_input_peak_resolution": "1 (dimensionless; copied from consumed raw metrics)",
+        "historical_utility_input_retention_time_min": "min (copied from consumed raw metrics)",
+        "ln_k0": "1 (dimensionless model parameter)",
+        "prediction_dead_time_min": "min (stored ideal-retention prediction)",
+        "prediction_evaluation_count": "count (retention solver evaluations)",
+        "prediction_numerical_error_estimate_min": "min (stored solver error estimate)",
+        "prediction_post_column_transit_min": "min (stored ideal-retention prediction)",
+        "prediction_retention_time_min": "min (stored ideal-retention prediction before Gaussian simulation)",
+        "prediction_retention_zeta_min": "min (stored ideal-retention coordinate)",
+        "prediction_right_censor_bound_min": "min (stored prediction censor bound)"
+      }
+    },
+    "evaluations.csv": {
+      "columns": [
+        "task_id",
+        "cohort_role",
+        "seed",
+        "arm_id",
+        "policy",
+        "optimizer_target_config",
+        "surrogate_noise_prior",
+        "ordinal",
+        "budget",
+        "evaluation_status",
+        "campaign_status",
+        "campaign_id",
+        "attempt_status",
+        "completed_simulator_attempt",
+        "consumed_evaluation",
+        "failure_step",
+        "failure_type",
+        "failure_message",
+        "proposal_source",
+        "strong_solvent_fraction",
+        "proposed_acquisition_duration_min",
+        "flow_ml_min",
+        "method_id",
+        "method_input_sha256",
+        "canonical_program_sha256",
+        "experiment_id",
+        "attempt_id",
+        "attempt_revision",
+        "retention_prediction_id",
+        "retention_prediction_input_sha256",
+        "retention_prediction_output_sha256",
+        "gaussian_run_id",
+        "gaussian_run_input_sha256",
+        "gaussian_run_output_sha256",
+        "observation_id",
+        "observation_input_sha256",
+        "evidence_sha256",
+        "assessment_sha256",
+        "snapshot_id",
+        "snapshot_sha256",
+        "consumption_id",
+        "consumption_input_sha256",
+        "consumption_output_sha256",
+        "analytical_acceptance",
+        "analytical_acceptance_status",
+        "historical_utility_status",
+        "historical_utility_value",
+        "utility_ge_2",
+        "optimizer_reward_name",
+        "optimizer_reward_profile",
+        "optimizer_reward_direction",
+        "optimizer_reward_status",
+        "optimizer_reward_value",
+        "detected_count",
+        "unknown_count",
+        "confirmed_absent_count",
+        "simulated_acquisition_time_min",
+        "runtime_preference_satisfied",
+        "feasible",
+        "planned_evaluation_cost",
+        "planned_evaluation_cost_unit",
+        "completed_attempt_evaluation_cost",
+        "completed_attempt_cost_unit",
+        "declared_solvent_volume_ml",
+        "optimizer_walltime_seconds",
+        "declared_solvent_a_ml",
+        "declared_solvent_b_ml"
+      ],
+      "exported_rows": 600,
+      "grain": "one row per planned (task_id, seed, arm_id, ordinal) slot",
+      "planned_rows": 600,
+      "sha256": "847ee0c19b31ded97bb797cacd296adf93b2fd5db41358746536eb700df45b35",
+      "size_bytes": 884151,
+      "units": {
+        "completed_attempt_evaluation_cost": "synthetic evaluation units; not instrument spend",
+        "declared_solvent_a_ml": "mL (declared method solvent use)",
+        "declared_solvent_b_ml": "mL (declared method solvent use)",
+        "declared_solvent_volume_ml": "mL (declared synthetic method volume)",
+        "flow_ml_min": "mL/min (declared fixed protocol flow)",
+        "historical_utility_value": "profile-defined score; see study declaration",
+        "optimizer_reward_value": "profile-defined maximization target; see study declaration",
+        "optimizer_walltime_seconds": "s (software wall time; not CPU time)",
+        "planned_evaluation_cost": "synthetic evaluation units; not instrument spend",
+        "proposed_acquisition_duration_min": "min (proposed method coordinate)",
+        "simulated_acquisition_time_min": "min (declared synthetic acquisition)",
+        "strong_solvent_fraction": "1 (fraction)"
+      }
+    }
+  }
+}

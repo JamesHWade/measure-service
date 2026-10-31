@@ -36,7 +36,7 @@ from .. import (
     retention,
 )
 from ..method_backend import method_backend_info
-from ..storage import canonical, db_path, sha256
+from ..storage import canonical, db_path, registry_connection, sha256
 from .evidence import file_sha256, staged_bundle
 
 PROFILE = "synthetic-isocratic-paired-comparison/1"
@@ -54,6 +54,23 @@ PLANNED_CAMPAIGN_COUNT = 12
 PLANNED_EVALUATION_COUNT = 120
 _STORE_MARKER_TABLE = "measure_synthetic_campaign_store"
 _STORE_MARKER_SCHEMA_VERSION = 1
+_BACKEND_IDENTITY_FIELDS = (
+    "backend_id",
+    "adapter_profile",
+    "backend_name",
+    "backend_class",
+    "generation_method",
+    "model_type",
+    "acquisition_method",
+    "acquisition_implementation",
+    "optimization_strategy",
+    "source_revision",
+    "source_tree_sha256",
+    "adapter_source_sha256",
+    "campaign_protocol_source_sha256",
+    "design_kernel_source_sha256",
+    "distribution_versions",
+)
 _ALLOWED_DATA_FILES = {
     "measure.sqlite3",
     "measure.sqlite3-shm",
@@ -241,6 +258,39 @@ def _error_record(error: Exception, *, private_paths: tuple[Path, ...] = ()) -> 
     return {"type": type(error).__name__, "message": message[:500]}
 
 
+def _optimizer_backend_identity(backend: Any) -> dict[str, Any] | None:
+    """Normalize source and fixed runtime settings, omitting per-proposal fields."""
+    if not isinstance(backend, dict):
+        return None
+    settings = backend.get("settings")
+    runtime = backend.get("runtime")
+    if not isinstance(settings, dict) or not isinstance(runtime, dict):
+        return None
+    if any(field not in backend for field in _BACKEND_IDENTITY_FIELDS):
+        return None
+    stable_settings = dict(settings)
+    stable_settings.pop("iteration", None)
+    stable_runtime = dict(runtime)
+    stable_runtime.pop("elapsed_seconds", None)
+    return {
+        "profile": "measure-service-bo-backend-identity/1",
+        "backend": {field: backend[field] for field in _BACKEND_IDENTITY_FIELDS},
+        "settings": stable_settings,
+        "runtime": stable_runtime,
+    }
+
+
+def _optimizer_backend_study_identity(backend: Any) -> dict[str, Any] | None:
+    """Normalize identity shared across target and noise-prior study arms."""
+    identity = _optimizer_backend_identity(backend)
+    if identity is None:
+        return None
+    settings = dict(identity["settings"])
+    settings.pop("objective", None)
+    settings.pop("noise_prior", None)
+    return {**identity, "settings": settings}
+
+
 def _preflight_output(output_dir: str | Path) -> Path:
     target = Path(output_dir).expanduser()
     if target.is_symlink():
@@ -316,7 +366,15 @@ def _store_identity_references(value: Any, ids: set[str], attempt_revisions: set
             _store_identity_references(item, ids, attempt_revisions)
 
 
-def _check_owned_store(con: sqlite3.Connection, input_sha256: str, *, allow_empty: bool) -> bool:
+def _check_owned_store(
+    con: sqlite3.Connection,
+    input_sha256: str,
+    *,
+    allow_empty: bool,
+    profile: str = PROFILE,
+    owner: str = OWNER,
+    receipt_prefixes: tuple[str, ...] | None = None,
+) -> bool:
     """Verify the marker and every stored service principal/reference.
 
     Return False only for an entirely empty SQLite schema that may be claimed.
@@ -348,7 +406,7 @@ def _check_owned_store(con: sqlite3.Connection, input_sha256: str, *, allow_empt
         f"SELECT marker_id, schema_version, profile, input_sha256, owner "
         f'FROM "{_STORE_MARKER_TABLE}"'
     ).fetchall()
-    if marker_rows != [(1, _STORE_MARKER_SCHEMA_VERSION, PROFILE, input_sha256, OWNER)]:
+    if marker_rows != [(1, _STORE_MARKER_SCHEMA_VERSION, profile, input_sha256, owner)]:
         raise ValueError("isolated data_dir ownership marker does not match this frozen runner")
 
     table_names = {name for object_type, name in objects if object_type == "table"}
@@ -356,22 +414,26 @@ def _check_owned_store(con: sqlite3.Connection, input_sha256: str, *, allow_empt
         if table not in table_names:
             continue
         foreign_row = con.execute(
-            f'SELECT 1 FROM "{table}" WHERE owner IS NULL OR owner != ? LIMIT 1', (OWNER,)
+            f'SELECT 1 FROM "{table}" WHERE owner IS NULL OR owner != ? LIMIT 1', (owner,)
         ).fetchone()
         if foreign_row is not None:
             raise ValueError(f"isolated data_dir contains a foreign principal in {table}")
 
-    receipt_prefix = f"syn-cmp-{input_sha256}-"
+    allowed_receipt_prefixes = receipt_prefixes or (f"syn-cmp-{input_sha256}-",)
+    if not allowed_receipt_prefixes or any(
+        not isinstance(prefix, str) or not prefix for prefix in allowed_receipt_prefixes
+    ):
+        raise ValueError("isolated data_dir requires explicit registry receipt namespaces")
     receipt_ids: set[str] = set()
     attempt_revisions: set[tuple[str, int]] = set()
     if "registry_receipts" in table_names:
         receipts = con.execute(
             "SELECT request_key, response FROM registry_receipts "
             "WHERE owner=? ORDER BY request_key",
-            (OWNER,),
+            (owner,),
         ).fetchall()
         for request_key, response in receipts:
-            if not request_key.startswith(receipt_prefix):
+            if not any(request_key.startswith(prefix) for prefix in allowed_receipt_prefixes):
                 raise ValueError("isolated data_dir contains a receipt outside this frozen runner")
             try:
                 decoded = json.loads(response)
@@ -389,7 +451,7 @@ def _check_owned_store(con: sqlite3.Connection, input_sha256: str, *, allow_empt
         columns = {row[1] for row in con.execute(f'PRAGMA table_info("{table}")')}
         if "id" not in columns:
             continue
-        for (record_id,) in con.execute(f'SELECT id FROM "{table}" WHERE owner=?', (OWNER,)):
+        for (record_id,) in con.execute(f'SELECT id FROM "{table}" WHERE owner=?', (owner,)):
             if record_id not in receipt_ids:
                 raise ValueError(f"isolated data_dir contains an unreceipted record in {table}")
 
@@ -397,7 +459,7 @@ def _check_owned_store(con: sqlite3.Connection, input_sha256: str, *, allow_empt
         members = con.execute(
             "SELECT snapshot_id, observation_id, attempt_id FROM observation_snapshot_members "
             "WHERE owner=?",
-            (OWNER,),
+            (owner,),
         ).fetchall()
         if any(
             snapshot_id not in receipt_ids
@@ -426,7 +488,13 @@ def _check_owned_store(con: sqlite3.Connection, input_sha256: str, *, allow_empt
     return True
 
 
-def _insert_store_marker(con: sqlite3.Connection, input_sha256: str) -> None:
+def _insert_store_marker(
+    con: sqlite3.Connection,
+    input_sha256: str,
+    *,
+    profile: str = PROFILE,
+    owner: str = OWNER,
+) -> None:
     con.execute(
         f'CREATE TABLE "{_STORE_MARKER_TABLE}" ('
         "marker_id INTEGER PRIMARY KEY CHECK(marker_id=1), "
@@ -436,11 +504,18 @@ def _insert_store_marker(con: sqlite3.Connection, input_sha256: str) -> None:
     con.execute(
         f'INSERT INTO "{_STORE_MARKER_TABLE}" '
         "(marker_id, schema_version, profile, input_sha256, owner) VALUES (1, ?, ?, ?, ?)",
-        (_STORE_MARKER_SCHEMA_VERSION, PROFILE, input_sha256, OWNER),
+        (_STORE_MARKER_SCHEMA_VERSION, profile, input_sha256, owner),
     )
 
 
-def _claim_or_verify_owned_store(data_path: Path, input_sha256: str) -> None:
+def _claim_or_verify_owned_store(
+    data_path: Path,
+    input_sha256: str,
+    *,
+    profile: str = PROFILE,
+    owner: str = OWNER,
+    receipt_prefixes: tuple[str, ...] | None = None,
+) -> None:
     """Claim an absent/empty store or validate an existing frozen-run store."""
     database = data_path / "measure.sqlite3"
     sidecars = [data_path / "measure.sqlite3-shm", data_path / "measure.sqlite3-wal"]
@@ -450,7 +525,14 @@ def _claim_or_verify_owned_store(data_path: Path, input_sha256: str) -> None:
     if database.exists():
         try:
             with sqlite3.connect(f"{database.resolve().as_uri()}?mode=ro", uri=True) as con:
-                if _check_owned_store(con, input_sha256, allow_empty=True):
+                if _check_owned_store(
+                    con,
+                    input_sha256,
+                    allow_empty=True,
+                    profile=profile,
+                    owner=owner,
+                    receipt_prefixes=receipt_prefixes,
+                ):
                     return
         except sqlite3.DatabaseError as error:
             raise ValueError("isolated data_dir is not a readable SQLite runner store") from error
@@ -458,21 +540,49 @@ def _claim_or_verify_owned_store(data_path: Path, input_sha256: str) -> None:
     try:
         with sqlite3.connect(str(database), timeout=30) as con:
             con.execute("BEGIN IMMEDIATE")
-            if not _check_owned_store(con, input_sha256, allow_empty=True):
-                _insert_store_marker(con, input_sha256)
-            _check_owned_store(con, input_sha256, allow_empty=False)
+            if not _check_owned_store(
+                con,
+                input_sha256,
+                allow_empty=True,
+                profile=profile,
+                owner=owner,
+                receipt_prefixes=receipt_prefixes,
+            ):
+                _insert_store_marker(con, input_sha256, profile=profile, owner=owner)
+            _check_owned_store(
+                con,
+                input_sha256,
+                allow_empty=False,
+                profile=profile,
+                owner=owner,
+                receipt_prefixes=receipt_prefixes,
+            )
             con.commit()
     except sqlite3.DatabaseError as error:
         raise ValueError("isolated data_dir could not be safely initialized") from error
 
 
-def _verify_owned_store(data_path: Path, input_sha256: str) -> None:
+def _verify_owned_store(
+    data_path: Path,
+    input_sha256: str,
+    *,
+    profile: str = PROFILE,
+    owner: str = OWNER,
+    receipt_prefixes: tuple[str, ...] | None = None,
+) -> None:
     database = data_path / "measure.sqlite3"
     if not database.is_file() or database.is_symlink():
         raise ValueError("isolated data_dir runner database is unavailable")
     try:
         with sqlite3.connect(f"{database.resolve().as_uri()}?mode=ro", uri=True) as con:
-            _check_owned_store(con, input_sha256, allow_empty=False)
+            _check_owned_store(
+                con,
+                input_sha256,
+                allow_empty=False,
+                profile=profile,
+                owner=owner,
+                receipt_prefixes=receipt_prefixes,
+            )
     except sqlite3.DatabaseError as error:
         raise ValueError("isolated data_dir is not a readable SQLite runner store") from error
 
@@ -651,6 +761,8 @@ def _execute_evaluation(
     ordinal: int,
     expected_revision: int,
     row: dict[str, Any],
+    expected_backend_identity: dict[str, Any] | None = None,
+    require_backend_identity: bool = False,
 ) -> dict[str, Any]:
     """Execute one proposal pipeline, mutating row as durable steps complete."""
     row["failure_step"] = None
@@ -686,6 +798,20 @@ def _execute_evaluation(
             "canonical_program_sha256": method["canonical_program_sha256"],
         }
     )
+    if require_backend_identity:
+        actual_identity = _optimizer_backend_identity(proposal.get("backend"))
+        matches = actual_identity == expected_backend_identity
+        row["preflight_backend_validation"] = {
+            "profile": "synthetic-ablation-preflight-backend-match/1",
+            "matches_selected_gate": matches,
+            "expected_sha256": sha256(expected_backend_identity),
+            "actual_sha256": None if actual_identity is None else sha256(actual_identity),
+        }
+        if not matches:
+            row["failure_step"] = "preflight_backend_consistency"
+            raise ValueError(
+                "BO proposal source or fixed settings differ from the selected qualified preflight"
+            )
     task_record = suggestion["campaign"]["task"]
     producer = task_record["producer"]
     contract = task_record["contract"]
@@ -1101,6 +1227,38 @@ def _recover_pending_proposal(
     return recovery
 
 
+def _stored_experiment_attempt_for_proposal(
+    owner: str, proposal_id: str
+) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+    """Read the one exact experiment and attempt linked to a pending proposal."""
+    with registry_connection() as con:
+        rows = con.execute(
+            "SELECT id, payload FROM experiments WHERE owner=? ORDER BY id", (owner,)
+        ).fetchall()
+    matches = []
+    for row in rows:
+        try:
+            payload = json.loads(row["payload"])
+        except (TypeError, json.JSONDecodeError) as error:
+            raise ValueError("Stored experiment payload is malformed") from error
+        if payload.get("proposal_reference") == proposal_id:
+            matches.append(row["id"])
+    if len(matches) > 1:
+        raise ValueError("Pending campaign proposal links to multiple stored experiments")
+    if not matches:
+        return None, None
+    experiment = experiments.get_experiment(owner, matches[0])
+    page = experiments.list_attempts(owner, matches[0], limit=20)
+    if page.get("count") != len(page.get("items", [])):
+        raise ValueError("Stored experiment attempt page is incomplete")
+    if page["count"] > 1:
+        raise ValueError("Pending campaign proposal links to multiple simulator attempts")
+    if page["count"] == 0:
+        return experiment, None
+    item = page["items"][0]
+    return experiment, experiments.get_attempt(owner, item["attempt_id"], item["revision"])
+
+
 def _recover_durable_consumption(
     owner: str, campaign_id: str, evaluation: dict[str, Any]
 ) -> dict[str, Any] | None:
@@ -1165,6 +1323,8 @@ def _execute_campaign(
     default_sha256: str,
     planned_budget: int = 10,
     private_paths: tuple[Path, ...] = (),
+    recovery_only: bool = False,
+    expected_backend_identity: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run or resume one campaign using its original request receipts."""
     evaluations: list[dict[str, Any]] = []
@@ -1242,6 +1402,66 @@ def _execute_campaign(
         evaluation["runtime_preference_min"] = task_link["contract"]["spec"][
             "runtime_preference_min"
         ]
+        if recovery_only:
+            stored_campaign = campaigns.get_campaign(owner, campaign_id)
+            if ordinal >= stored_campaign["consumed_evaluations"]:
+                pending = stored_campaign.get("pending_proposal")
+                if not isinstance(pending, dict) or pending.get("ordinal") != ordinal:
+                    message = "No stored proposal exists for this unevaluated ordinal."
+                    evaluation["status"] = "preflight_blocked_unknown"
+                    evaluation["failure_step"] = "recovery_only_preflight_gate"
+                    evaluation["failure"] = {
+                        "type": "PreflightNotQualified",
+                        "message": message,
+                    }
+                    evaluation["metrics"] = _evaluation_metrics(evaluation)
+                    evaluations.append(evaluation)
+                    failure = {
+                        "ordinal": ordinal,
+                        "step": "recovery_only_preflight_gate",
+                        "type": "PreflightNotQualified",
+                        "message": message,
+                    }
+                    break
+                _recover_pending_proposal(owner, campaign_id, ordinal, evaluation)
+                stored_experiment, stored_attempt = _stored_experiment_attempt_for_proposal(
+                    owner, pending["proposal_id"]
+                )
+                if stored_experiment is not None:
+                    evaluation["experiment"] = stored_experiment
+                if stored_attempt is not None:
+                    evaluation["attempt"] = stored_attempt
+                if not _completed_simulator_attempt(evaluation):
+                    evaluation["status"] = "preflight_blocked_unknown"
+                    evaluation["failure_step"] = "recovery_only_preflight_gate"
+                    evaluation["failure"] = {
+                        "type": "PreflightNotQualified",
+                        "message": (
+                            "The stored pending proposal has no completed simulator attempt; "
+                            "recovery did not start a new evaluation."
+                        ),
+                    }
+                    try:
+                        evaluation["metrics"] = _evaluation_metrics(evaluation)
+                    except Exception as metrics_error:
+                        evaluation["metrics_error"] = _error_record(
+                            metrics_error, private_paths=private_paths
+                        )
+                    evaluations.append(evaluation)
+                    failure = {
+                        "ordinal": ordinal,
+                        "step": "recovery_only_preflight_gate",
+                        **evaluation["failure"],
+                    }
+                    break
+        require_backend_identity = False
+        if (
+            expected_backend_identity is not None
+            and policy == "bo_mcp_gp_logei"
+            and ordinal >= protocol_spec["initial_design_size"]
+        ):
+            current_campaign = campaigns.get_campaign(owner, campaign_id)
+            require_backend_identity = ordinal >= current_campaign["consumed_evaluations"]
         try:
             _execute_evaluation(
                 owner=owner,
@@ -1253,6 +1473,8 @@ def _execute_campaign(
                 ordinal=ordinal,
                 expected_revision=2 * ordinal + 1,
                 row=evaluation,
+                expected_backend_identity=expected_backend_identity,
+                require_backend_identity=require_backend_identity,
             )
             evaluations.append(evaluation)
         except Exception as error:
