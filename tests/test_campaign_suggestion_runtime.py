@@ -722,7 +722,10 @@ def test_resealed_returned_backend_source_identity_must_match_prepared_request(m
     assert len(calls) == 1
 
 
-def test_near_limit_duplicate_backend_is_terminally_retained_by_digest(monkeypatch):
+@pytest.mark.parametrize("target_response_bytes", [63_850, 64_001, 1_000_000])
+def test_large_duplicate_backend_is_terminally_retained_by_digest(
+    monkeypatch, target_response_bytes
+):
     prepared, campaign, proposals, training, _ = _campaign_after_initial_pipeline(
         "bounded-terminal-evidence"
     )
@@ -731,7 +734,6 @@ def test_near_limit_duplicate_backend_is_terminally_retained_by_digest(monkeypat
     duplicate = proposals[0]["candidate"]
     calls = []
     returned = []
-    target_response_bytes = 63_850
 
     def suggest(spec, observed, seed):
         calls.append((spec, observed, seed))
@@ -750,6 +752,7 @@ def test_near_limit_duplicate_backend_is_terminally_retained_by_digest(monkeypat
         assert remaining > 0
         backend["padding"] = "x" * remaining
         assert len(canonical(result).encode("utf-8")) == target_response_bytes
+        assert target_response_bytes <= optimizer_backend.MAX_RESPONSE_BYTES
         returned.append(backend)
         return result
 
@@ -761,9 +764,8 @@ def test_near_limit_duplicate_backend_is_terminally_retained_by_digest(monkeypat
         )
     attempt_id = first.value.suggestion_attempt_id
     assert len(calls) == 1
-    returned_size = len(canonical({"candidate": duplicate, "backend": returned[0]}).encode("utf-8"))
-    assert 63_800 <= returned_size < 64_000
     assert _resource_counts(owner, campaign_id) == before
+    assert campaigns.get_campaign(owner, campaign_id)["revision"] == campaign["revision"]
 
     record = campaigns.get_campaign_suggestion_attempt(owner, attempt_id)
     outcome = record["outcome"]
@@ -771,6 +773,7 @@ def test_near_limit_duplicate_backend_is_terminally_retained_by_digest(monkeypat
     assert outcome["status"] == "rejected"
     assert outcome["candidate"] == duplicate
     assert outcome["backend"] is None
+    assert outcome["adapter_subprocess_elapsed_seconds"] == 7.0
     assert outcome["retention"]["reason"] == "full_returned_evidence_not_retained"
     retained_backend = outcome["retention"]["backend"]
     assert retained_backend["sha256"] == sha256(returned[0])
@@ -792,6 +795,86 @@ def test_near_limit_duplicate_backend_is_terminally_retained_by_digest(monkeypat
     assert str(retry.value) == str(first.value)
     assert len(calls) == 1
     assert _resource_counts(owner, campaign_id) == before
+    assert campaigns.get_campaign(owner, campaign_id)["revision"] == campaign["revision"]
+    with registry_connection() as con:
+        assert (
+            con.execute(
+                "SELECT 1 FROM registry_receipts WHERE owner=? AND request_key=?",
+                (owner, "bounded-terminal-evidence-key"),
+            ).fetchone()
+            is None
+        )
+
+
+def test_large_unique_backend_rolls_back_proposal_and_retains_terminal_evidence(monkeypatch):
+    prepared, campaign, _, training, _ = _campaign_after_initial_pipeline(
+        "large-unique-terminal-evidence"
+    )
+    owner = prepared["owner"]
+    campaign_id = campaign["campaign_id"]
+    key = "large-unique-terminal-evidence-key"
+    candidate = {"strong_solvent_fraction": 0.46, "acquisition_duration_min": 7.2}
+    calls = []
+    returned = []
+
+    def suggest(spec, observed, seed):
+        calls.append((spec, observed, seed))
+        backend = _valid_backend(spec, observed, seed)
+        backend["runtime"]["elapsed_seconds"] = 7.0
+        request = optimizer_backend.suggestion_request_evidence(spec, observed, seed)
+        for source_key in (
+            "adapter_source_sha256",
+            "campaign_protocol_source_sha256",
+            "design_kernel_source_sha256",
+        ):
+            backend[source_key] = request[source_key]
+        backend["padding"] = ""
+        result = {"candidate": dict(candidate), "backend": backend}
+        response_size = 1_000_000
+        backend["padding"] = "x" * (response_size - len(canonical(result).encode("utf-8")))
+        assert len(canonical(result).encode("utf-8")) == response_size
+        assert response_size <= optimizer_backend.MAX_RESPONSE_BYTES
+        returned.append(backend)
+        return result
+
+    monkeypatch.setattr(optimizer_backend, "suggest_candidate", suggest)
+    before = _resource_counts(owner, campaign_id)
+    with pytest.raises(
+        ValueError, match="Campaign proposal exceeds the 64,000-byte limit"
+    ) as first:
+        campaigns.suggest_campaign(owner, campaign_id, campaign["revision"], key)
+    attempt_id = first.value.suggestion_attempt_id
+    assert len(calls) == 1
+    assert _resource_counts(owner, campaign_id) == before
+    assert campaigns.get_campaign(owner, campaign_id)["revision"] == campaign["revision"]
+
+    record = campaigns.get_campaign_suggestion_attempt(owner, attempt_id)
+    outcome = record["outcome"]
+    assert record["state"] == "rejected"
+    assert outcome["status"] == "rejected"
+    assert outcome["phase"] == "proposal_validation"
+    assert outcome["candidate"] == candidate
+    assert outcome["backend"] is None
+    assert outcome["adapter_subprocess_elapsed_seconds"] == 7.0
+    retained_backend = outcome["retention"]["backend"]
+    assert retained_backend["sha256"] == sha256(returned[0])
+    assert retained_backend["size_bytes"] == len(canonical(returned[0]).encode("utf-8"))
+    assert retained_backend["request_identity"]["training_sha256"] == sha256(training)
+
+    with pytest.raises(ValueError) as retry:
+        campaigns.suggest_campaign(owner, campaign_id, campaign["revision"], key)
+    assert retry.value.suggestion_attempt_id == attempt_id
+    assert str(retry.value) == str(first.value)
+    assert len(calls) == 1
+    assert _resource_counts(owner, campaign_id) == before
+    assert campaigns.get_campaign(owner, campaign_id)["revision"] == campaign["revision"]
+    with registry_connection() as con:
+        assert (
+            con.execute(
+                "SELECT 1 FROM registry_receipts WHERE owner=? AND request_key=?", (owner, key)
+            ).fetchone()
+            is None
+        )
 
 
 def test_adapter_child_elapsed_is_retained_separately_from_host_elapsed(monkeypatch):

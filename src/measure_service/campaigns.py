@@ -753,7 +753,6 @@ def _validate_backend_result(
             }
         ):
             raise ValueError("BO-MCP noise prior does not match the declared ablation protocol")
-    _bounded({"candidate": candidate, "backend": backend}, "BO-MCP response")
     return candidate, backend
 
 
@@ -788,7 +787,6 @@ def _bo_candidate(
             else None
         )
     backend["runtime"] = {**backend["runtime"], "elapsed_seconds": elapsed_seconds}
-    _bounded({"candidate": candidate, "backend": backend}, "BO-MCP response")
     return candidate, backend
 
 
