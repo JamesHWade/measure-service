@@ -76,6 +76,11 @@ jobs:
           assert "tests/test_replicate_protocol.py" in members
           assert "tests/test_replication_mcp.py" in members
           assert "tests/test_replication_history_bounds.py" in members
+          assert "docs/suggestion-sequence-qualification.md" in members
+          assert "src/measure_service/benchmarks/suggestion_sequences.py" in members
+          assert "tests/test_suggestion_sequences.py" in members
+          for name in ("candidate-declaration.json", "fixture-oracle.json", "initial-design.json", "independent_oracle.py.txt"):
+              assert "src/measure_service/benchmarks/reference_data/suggestion_sequences_v1/" + name in members
           assert "src/measure_service/benchmarks/synthetic_ablations.py" in members
           assert "src/measure_service/benchmarks/reference_data/synthetic-isocratic-ablation-v1.json" in members
           assert "scripts/export_ablation_reference.py" in members

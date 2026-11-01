@@ -72,6 +72,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Run durable synthetic campaigns with optional BO-MCP](docs/campaign-runtime.md)
 - [Inspect failed suggestions, retry evidence and interruption recovery](docs/suggestion-attempt-evidence.md)
 - [Declare duplicate rejection or separately executed replication](docs/campaign-replication.md)
+- [Qualify sequential suggestions and fresh replication before another study](docs/suggestion-sequence-qualification.md)
 - [Reproduce the fixed paired synthetic comparison](docs/synthetic-comparison.md)
 - [Inspect the first checked synthetic comparison](docs/synthetic-reference-results.md)
 - [Retention equations, units and qualification scope](docs/retention-model-qualification.md)

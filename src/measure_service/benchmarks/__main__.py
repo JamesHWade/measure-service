@@ -1,4 +1,4 @@
-"""Explicit download and offline replay commands for named reference data."""
+"""Reference-data replay, synthetic campaign execution and qualification commands."""
 
 import argparse
 import json
@@ -14,6 +14,7 @@ from .retention_qualification import (
     DEFAULT_TRAJECTORY_ORACLE,
     qualify_retention_inputs,
 )
+from .suggestion_sequences import DEFAULT_DECLARATION, run_suggestion_sequence_qualification
 from .synthetic_ablations import run_synthetic_ablations
 from .synthetic_campaigns import run_synthetic_campaigns
 
@@ -69,6 +70,13 @@ def main() -> None:
     )
     ablation.add_argument("--data-dir", type=Path, required=True)
     ablation.add_argument("--output-dir", type=Path, required=True)
+    sequences = commands.add_parser(
+        "qualify-suggestion-sequences",
+        help="qualify the fixed sequential BO and duplicate-policy cases in a new store",
+    )
+    sequences.add_argument("--data-dir", type=Path, required=True)
+    sequences.add_argument("--output-dir", type=Path, required=True)
+    sequences.add_argument("--declaration-json", type=Path, default=DEFAULT_DECLARATION)
     args = parser.parse_args()
     if args.command == "fetch-moses":
         print(fetch_archive(args.cache_dir))
@@ -115,8 +123,15 @@ def main() -> None:
     elif args.command == "run-synthetic-campaigns":
         run_synthetic_campaigns(args.output_dir, data_dir=args.data_dir)
         print(args.output_dir / "report.md")
-    else:
+    elif args.command == "run-synthetic-ablations":
         run_synthetic_ablations(args.output_dir, data_dir=args.data_dir)
+        print(args.output_dir / "report.md")
+    else:
+        run_suggestion_sequence_qualification(
+            args.output_dir,
+            data_dir=args.data_dir,
+            declaration_path=args.declaration_json,
+        )
         print(args.output_dir / "report.md")
 
 

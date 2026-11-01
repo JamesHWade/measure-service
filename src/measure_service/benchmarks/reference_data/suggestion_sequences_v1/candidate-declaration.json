@@ -1,0 +1,716 @@
+{
+  "profile": "measure-service-suggestion-sequence-qualification/1",
+  "candidate_status": "scientific_design_candidate_for_primary_freeze_before_any_backend_calls",
+  "declaration_date": "2026-11-01",
+  "purpose": "qualify sequential public-backend readiness, explicit duplicate-policy behavior, immutable evidence, and attempt accounting; not an optimizer-comparison study",
+  "selection": {
+    "fixture_origin": "deliberately designed analytical state fixtures; not held-out or representative chemical tasks",
+    "outcome_screening": "only closed-form fixture and fixed-LHS checks before any backend calls; no optimization-based fixture selection",
+    "measurement_noise": false,
+    "replicate_interpretation": "fresh deterministic latent executions with separate spend; not independent noise samples"
+  },
+  "protocol_template": {
+    "profile": "synthetic-isocratic-ablation/2",
+    "domain": {
+      "strong_solvent_fraction": {
+        "lower": 0.1,
+        "upper": 0.9
+      },
+      "acquisition_duration_min": {
+        "lower": 2.0,
+        "upper": 10.0
+      }
+    },
+    "flow_ml_min": 0.5,
+    "constraints": {
+      "min_segment_duration_min": null,
+      "max_acquisition_duration_min": null,
+      "max_occupancy_duration_min": null,
+      "max_flow_ml_min": null,
+      "max_abs_fraction_slope_per_min": null,
+      "solvent_bounds": [],
+      "equipment_constraints": []
+    },
+    "tasks": [
+      {
+        "task_id": "qualify-all-confirmed",
+        "producer_id": "pending-producer-0",
+        "observation_contract_id": "pending-contract-0"
+      },
+      {
+        "task_id": "qualify-all-not-accepted",
+        "producer_id": "pending-producer-1",
+        "observation_contract_id": "pending-contract-1"
+      },
+      {
+        "task_id": "qualify-all-censored",
+        "producer_id": "pending-producer-2",
+        "observation_contract_id": "pending-contract-2"
+      },
+      {
+        "task_id": "qualify-mixed-initial",
+        "producer_id": "pending-producer-3",
+        "observation_contract_id": "pending-contract-3"
+      }
+    ],
+    "seeds": [
+      17
+    ],
+    "evaluation_budget": 10,
+    "initial_design_size": 3,
+    "policies": [
+      "random",
+      "bo_mcp_gp_logei"
+    ],
+    "initial_design_policy": "common_coordinates_counted_per_policy_seed",
+    "stopping_policy": "full_budget",
+    "fidelity": 1.0,
+    "fidelity_role": "high",
+    "observation_origin": "simulator_latent",
+    "evaluation_cost": 1.0,
+    "evaluation_cost_unit": "synthetic_evaluation",
+    "initial_evaluations_always_count": true,
+    "utility_profile": "moses-botier-1.0.0-binary64/1",
+    "utility_input_definition": "finite-resolution-reference/1",
+    "analytical_success_policy": "separate-strict-observation-contract",
+    "optimizer_target": "confirmed_acceptance_reward",
+    "surrogate_noise_prior": "default",
+    "duplicate_policy": "replicate"
+  },
+  "opaque_binding_rule": "Replace only pending producer/contract IDs with frozen owned records before requests. Keep all four logical task IDs in each protocol. Task selection for a campaign does not change its protocol task list.",
+  "declared_campaign_policy": "bo_mcp_gp_logei only; protocol schema also lists supported random policy, but no random campaigns are planned",
+  "initial_design": {
+    "seed": 17,
+    "coordinates": [
+      {
+        "strong_solvent_fraction": 0.48349881655330484,
+        "acquisition_duration_min": 7.54897224762647
+      },
+      {
+        "strong_solvent_fraction": 0.7832216549547181,
+        "acquisition_duration_min": 2.440073295364153
+      },
+      {
+        "strong_solvent_fraction": 0.13611031914245575,
+        "acquisition_duration_min": 6.97704856585468
+      }
+    ],
+    "campaign_design_sha256": "93bd69abbfa5d985831474639e7132c5a3dff0224d79bf1a987c9f9e70a5f69d",
+    "all_eight_treatment_streams_equal": true
+  },
+  "geometry": {
+    "column_length_m": 0.1,
+    "effective_area_m2": 1e-06,
+    "post_column_volume_ml": 0.0
+  },
+  "flow_ml_min": 0.5,
+  "evaluation_cost": 1.0,
+  "evaluation_cost_unit": "synthetic_evaluation",
+  "contract": {
+    "resolution_threshold": 1.5,
+    "max_acquisition_duration_min": 10.0,
+    "runtime_preference_min": 5.0,
+    "count_threshold": 0.5
+  },
+  "fixtures": [
+    {
+      "task_id": "qualify-all-confirmed",
+      "designed_state": "accepted_for_entire_domain",
+      "fwhm_min": 0.02,
+      "analytes": [
+        {
+          "analyte_id": "A",
+          "model": "linear",
+          "ln_k0": 0.0,
+          "S1": 0.0
+        },
+        {
+          "analyte_id": "B",
+          "model": "linear",
+          "ln_k0": 1.3862943611198906,
+          "S1": 0.0
+        }
+      ]
+    },
+    {
+      "task_id": "qualify-all-not-accepted",
+      "designed_state": "not_accepted_for_entire_domain",
+      "fwhm_min": 0.2,
+      "analytes": [
+        {
+          "analyte_id": "A",
+          "model": "linear",
+          "ln_k0": 0.6931471805599453,
+          "S1": 0.0
+        },
+        {
+          "analyte_id": "B",
+          "model": "linear",
+          "ln_k0": 0.6981347220709843,
+          "S1": 0.0
+        }
+      ]
+    },
+    {
+      "task_id": "qualify-all-censored",
+      "designed_state": "unknown_for_entire_domain",
+      "fwhm_min": 0.02,
+      "analytes": [
+        {
+          "analyte_id": "A",
+          "model": "linear",
+          "ln_k0": 10.0,
+          "S1": 0.0
+        },
+        {
+          "analyte_id": "B",
+          "model": "linear",
+          "ln_k0": 10.5,
+          "S1": 0.0
+        }
+      ]
+    },
+    {
+      "task_id": "qualify-mixed-initial",
+      "designed_state": "mixed_confirmed_rewards_at_frozen_initial_coordinates",
+      "fwhm_min": 0.04,
+      "analytes": [
+        {
+          "analyte_id": "A",
+          "model": "linear",
+          "ln_k0": 0.6931471805599453,
+          "S1": 0.0
+        },
+        {
+          "analyte_id": "B",
+          "model": "linear",
+          "ln_k0": 1.1931471805599454,
+          "S1": 1.0
+        }
+      ]
+    }
+  ],
+  "component_sequences": {
+    "case_count": 12,
+    "cases": [
+      {
+        "case_id": "historical_utility:default:all_zero",
+        "optimizer_target": "historical_utility",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "case_id": "historical_utility:default:all_one",
+        "optimizer_target": "historical_utility",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "case_id": "historical_utility:default:mixed",
+        "optimizer_target": "historical_utility",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "case_id": "historical_utility:low_noise:all_zero",
+        "optimizer_target": "historical_utility",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "case_id": "historical_utility:low_noise:all_one",
+        "optimizer_target": "historical_utility",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "case_id": "historical_utility:low_noise:mixed",
+        "optimizer_target": "historical_utility",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "case_id": "confirmed_acceptance_reward:default:all_zero",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "case_id": "confirmed_acceptance_reward:default:all_one",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "case_id": "confirmed_acceptance_reward:default:mixed",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "case_id": "confirmed_acceptance_reward:low_noise:all_zero",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "case_id": "confirmed_acceptance_reward:low_noise:all_one",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "case_id": "confirmed_acceptance_reward:low_noise:mixed",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "seed": 17,
+        "fabricated_score_sequence_by_training_ordinal": [
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0
+        ]
+      }
+    ],
+    "initial_fabricated_coordinates": [
+      {
+        "strong_solvent_fraction": 0.25,
+        "acquisition_duration_min": 4.0
+      },
+      {
+        "strong_solvent_fraction": 0.75,
+        "acquisition_duration_min": 8.0
+      },
+      {
+        "strong_solvent_fraction": 0.25,
+        "acquisition_duration_min": 4.0
+      }
+    ],
+    "initial_rows": 3,
+    "call_ordinals": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "planned_backend_calls": 84,
+    "append_rule": "After a valid response at ordinal n, append its exact returned candidate with predeclared fabricated score[n]. Never deduplicate rows. Fabricated scores may disagree at identical coordinates; they are numerical stress inputs, not analytical evidence.",
+    "failure_rule": "Record the failing attempted slot and leave remaining slots in this sequence not attempted/unknown. Continue other declared independent cases; no fallback, jitter, retried fitting or tuning.",
+    "store_rule": "Dedicated component evidence only; do not register these fabricated histories as experiments, observations or campaign consumptions."
+  },
+  "durable_campaigns": {
+    "cases": [
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "task_id": "qualify-all-confirmed",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "reject",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "task_id": "qualify-all-confirmed",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "task_id": "qualify-all-confirmed",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "reject",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "task_id": "qualify-all-confirmed",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "task_id": "qualify-all-not-accepted",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "reject",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "task_id": "qualify-all-not-accepted",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "task_id": "qualify-all-not-accepted",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "reject",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "task_id": "qualify-all-not-accepted",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "task_id": "qualify-all-censored",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "reject",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "task_id": "qualify-all-censored",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "task_id": "qualify-all-censored",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "reject",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "task_id": "qualify-all-censored",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "task_id": "qualify-mixed-initial",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "reject",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "task_id": "qualify-mixed-initial",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "default",
+        "duplicate_policy": "replicate",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "task_id": "qualify-mixed-initial",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "reject",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "task_id": "qualify-mixed-initial",
+        "optimizer_target": "confirmed_acceptance_reward",
+        "surrogate_noise_prior": "low_noise",
+        "duplicate_policy": "replicate",
+        "policy": "bo_mcp_gp_logei",
+        "seed": 17,
+        "evaluation_budget": 10,
+        "initial_design_size": 3
+      }
+    ],
+    "campaign_count": 16,
+    "replicate_campaign_count": 8,
+    "reject_campaign_count": 8,
+    "planned_analytical_slots": 160,
+    "planned_initial_analytical_slots": 48,
+    "planned_gp_suggestion_slots": 112,
+    "planned_analyte_slots": 320,
+    "restart_schedule": "Restart the service process after consumption of ordinal2 and ordinal6, then recover from the owned store. Re-read/retry the preceding receipt with its original key before continuing.",
+    "receipt_retry_schedule": "After each durable suggestion terminal response, repeat the same idempotency request and verify no new backend attempt, proposal, revision or analytical spend. Do not create a new key to bypass failure.",
+    "failure_rule": "Reject-policy duplicate rejection is expected policy-compliant termination with unexecuted future slots unknown; no analytic spend for the rejected slot. Any replicate-policy duplicate rejection is a failure. Other backend/admission/execution/consumption failures remain explicit; every completed attempt counts even if consumption fails.",
+    "replicate_identity_rule": "An admitted duplicate keeps exactly equal canonical coordinates/program values but obtains a fresh proposal, method, experiment, attempt, prediction, generated results, analytical observation, snapshot and consumption. Shared model/producer/contract records are expected. Never reuse or copy prior measured outcomes.",
+    "training_rule": "Ordered training contains every consumed row including replicates; observed unknown/not_accepted both reward0 but retain distinct analytical states. Missing/failed slots have no training row."
+  },
+  "planned_totals": {
+    "component_backend_call_slots": 84,
+    "campaign_gp_suggestion_slots": 112,
+    "maximum_backend_calls_without_retries": 196,
+    "analytical_evaluation_slots": 160,
+    "analyte_slots": 320
+  },
+  "qualification_criteria": {
+    "component_readiness": "All12 sequences complete7 finite in-domain actual public-backend proposals with exact ordered history/target/prior/seed/source binding, including repeated initial X. All84 planned calls represented.",
+    "durable_policy_compliance": "Every observed reject/replicate admission matches the explicit frozen rule; all owned IDs, result/snapshot lineage, retries, revisions, ledger records and spend reconcile. No unexpected failure or integrity discrepancy.",
+    "replicate_budget_completion": "All8 replicate campaigns consume10 evaluations each; all80 slots have fresh evidence.",
+    "reject_budget_completion": "Descriptive only; not required after correct duplicate rejection. Report full denominator80 slots and8 campaigns separately.",
+    "real_duplicate_coverage": "At least one actually repeated candidate is admitted with new execution evidence under replicate for each prior, and at least one actually repeated candidate is rejected with a durable failure receipt under reject for each prior. Otherwise mark that branch not_exercised; do not declare full qualification and do not add runs or inject candidates.",
+    "numerical_validation": "All available analytical outcomes and confirmed rewards agree with independent oracle and full required cohort. Record near-boundary cases separately; unresolved boundary cases prevent full qualification.",
+    "overall": "qualifies only when component_readiness, durable_policy_compliance, replicate_budget_completion, real_duplicate_coverage and numerical_validation all pass. Publish separate booleans and failed/unknown/not_exercised states; no success-rate or superiority inference."
+  },
+  "evidence_contract": {
+    "per_call": "predeclared case/ordinal, exact ordered inputs and digests, target/prior/policy/seed/iteration, source/distribution/settings identity, wallclock start/end, finite monotonic elapsed seconds, all bounded warnings, status/error, returned candidate when available, duplicate lineage and admission outcome",
+    "candidate_unavailable": "For timeout/transport/decode failures record null candidate and explicit availability; never invent candidate or duplicate identity. Host failure timing remains separate from unavailable child timing.",
+    "accounting": "Separate planned/attempted/backend-returned/admitted/duplicate-rejected/failed/interrupted/unattempted suggestion slots; completed analytical attempts versus consumed evaluations; known versus unknown times. Component histories consume zero analytical cost. Every completed replicate costs1 and its actual declared duration/volume.",
+    "publication": "Publish complete fixed denominators, per-case outcomes and receipts, source hashes/settings and an atomic sealed bundle. Completion seal means artifact publication, not all scientific or policy criteria passing.",
+    "identity_freeze": "Before first backend call record immutable declaration byte SHA256, runner/oracle/protocol/backend module hashes and actual installed versions/source identities. Same frozen software/settings throughout; changes require a new versioned qualification, not a continuation disguised as the same run.",
+    "preservation": "Dedicated new marked store/output; original543/600study, both old gates, old receipts and unknown rejected-call timing remain byte unchanged.",
+    "post_qualification": "No new optimization comparison is part of this declaration. Its separate study declaration is frozen only after qualification and primary acceptance."
+  },
+  "oracle": {
+    "precision_decimal_digits": 70,
+    "input_semantics": "Decimal.from_float for every parsed binary64 input; no production kernel/helper supplies expected values",
+    "required_cohort_size": "len(fixture.analytes), currently2; never reuse prior three-analyte hardcoding",
+    "formulae": [
+      "t0=L_m*area_m2*1000000/flow_ml_min",
+      "tR=t0*(1+exp(ln_k0-S1*phi))+post_column_volume_ml/flow_ml_min",
+      "eluted iff tR<=declared acquisition duration; censored is unknown detection",
+      "adjacent finite-centroid Rs=delta_t/(2*(fwhm_left/2.3548+fwhm_right/2.3548)); full cohort retained",
+      "accepted iff every required analyte is detected with observed Rs>=1.5; confirmed reward1 iff accepted else0 for observed assessment only",
+      "historical utility checked independently under the frozen profile as an auxiliary value, never used as hidden tie-breaker for confirmed reward"
+    ],
+    "absolute_tolerances": {
+      "retention_min": 1e-07,
+      "resolution": 1e-06,
+      "utility": 1e-12,
+      "aggregate": 1e-09
+    },
+    "threshold_rule": "inclusive exact-reference decisions; no tolerance relaxation of thresholds; near-boundary disagreements remain explicit pending independent adjudication",
+    "provenance_source": "initial-design.json records installed protocol/design API provenance; independent_oracle.py has no production imports"
+  },
+  "backend_configuration": {
+    "implementation": "Actual public BO-MCP BoTorchBackend.generate_suggestions through the reviewed installed sidecar; no alternate optimizer engine",
+    "model": "SingleTaskGP with RBF ARD covariance and inferred Gaussian noise",
+    "acquisition": "qLogExpectedImprovement, maximize, batch size1",
+    "noise_prior_parameters": {
+      "default": [
+        1.1,
+        0.05
+      ],
+      "low_noise": [
+        1.1,
+        100.0
+      ]
+    },
+    "noise_constraint_lower_bound": 0.0001,
+    "configured_acquisition_overrides": {
+      "num_restarts": null,
+      "raw_samples": null
+    },
+    "effective_defaults_rule": "Use the installed public backend defaults, record positive integer effective values and bind them in the pre-call software/settings manifest; never change them after observing results. Explicit configured null is not an invalid value.",
+    "seed": 17,
+    "iteration_rule": "exact ordered consumed/fabricated training row count,3 through9; do not reset iteration on restart",
+    "runtime": "existing adapter timeout and finite monotonic elapsed-time validation; no timeout extension, retry or fallback after an outcome"
+  }
+}
