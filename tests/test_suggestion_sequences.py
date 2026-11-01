@@ -701,14 +701,24 @@ def test_worker_output_limit_fails_without_parsing_unbounded_spool(monkeypatch, 
     assert result["stdout_bytes"] == 4096
 
 
-def test_worker_interrupt_terminates_child_and_preserves_journal_prefix(monkeypatch, tmp_path):
+def test_worker_interrupt_kills_term_ignoring_descendant_and_preserves_journal_prefix(
+    monkeypatch, tmp_path
+):
     original_popen = sequences.subprocess.Popen
     original_sleep = sequences.time.sleep
+    ready = tmp_path / "descendant-ready.txt"
     sentinel = tmp_path / "late-child-write.txt"
+    descendant_program = (
+        "import os,pathlib,signal,time;"
+        "signal.signal(signal.SIGTERM,signal.SIG_IGN);"
+        f"pathlib.Path({str(ready)!r}).write_text(str(os.getpid()));"
+        "time.sleep(1.0);"
+        f"pathlib.Path({str(sentinel)!r}).write_text('late')"
+    )
     child_program = (
-        "import pathlib,time; time.sleep(0.5); pathlib.Path("
-        + repr(str(sentinel))
-        + ").write_text('late')"
+        "import subprocess,sys,time;"
+        f"subprocess.Popen([sys.executable,'-c',{descendant_program!r}]);"
+        "time.sleep(30)"
     )
     children = []
     popen_options = []
@@ -723,6 +733,11 @@ def test_worker_interrupt_terminates_child_and_preserves_journal_prefix(monkeypa
         return child
 
     def interrupt_parent(_seconds):
+        deadline = sequences.time.monotonic() + 3.0
+        while not ready.exists() and sequences.time.monotonic() < deadline:
+            original_sleep(0.01)
+        if not ready.exists():
+            raise AssertionError("the SIGTERM-ignoring descendant did not become ready")
         raise KeyboardInterrupt
 
     monkeypatch.setattr(sequences.subprocess, "Popen", launch_harmless_child)
@@ -757,7 +772,7 @@ def test_worker_interrupt_terminates_child_and_preserves_journal_prefix(monkeypa
             },
         )
 
-    original_sleep(0.7)
+    original_sleep(1.2)
     records = sequences._journal_records(journal, "case-a")
 
     assert popen_options == [True]
@@ -798,6 +813,23 @@ def test_journal_malformed_tail_retains_validated_fsynced_prefix(tmp_path):
     sequences._retain_journal_tail_error(case, records, worker_record)
     assert case["worker_journal_tail_error"] == records.tail_error
     assert worker_record["journal_tail_error"] == records.tail_error
+
+
+def test_missing_journal_returns_explicit_empty_evidence_without_attribute_error(tmp_path):
+    records = sequences._journal_records(tmp_path / "missing-worker.jsonl", "case-a")
+    case = {"slots": [{"ordinal": 0, "status": "not_attempted_unknown"}]}
+    worker_record = {}
+
+    sequences._retain_journal_tail_error(case, records, worker_record)
+
+    assert records == []
+    assert records.missing is True
+    assert records.tail_error is None
+    assert case["slots"][0]["status"] == "not_attempted_unknown"
+    assert case["worker_journal_error"]["profile"] == (
+        "measure-service-suggestion-sequence-journal-missing/1"
+    )
+    assert worker_record["journal_error"] == case["worker_journal_error"]
 
 
 def test_database_reconciliation_counts_lost_ack_spend_without_changing_status(monkeypatch):

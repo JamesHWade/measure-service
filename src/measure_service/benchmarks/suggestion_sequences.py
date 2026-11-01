@@ -2707,42 +2707,59 @@ def _invoke_worker(
 def _terminate_worker_process(process: Any, *, process_group_id: int | None) -> None:
     """Terminate and reap a worker, including a sidecar child in its process group."""
 
-    def signal_worker(sig: int) -> None:
-        if process_group_id is not None:
-            try:
-                os.killpg(process_group_id, sig)
-                return
-            except ProcessLookupError:
-                pass
-            except OSError:
-                pass
-        if process.poll() is not None:
-            return
+    def signal_group(sig: int) -> bool:
+        if process_group_id is None:
+            return False
         try:
-            if sig == signal.SIGTERM:
-                process.terminate()
-            else:
-                process.kill()
+            os.killpg(process_group_id, sig)
+            return True
+        except ProcessLookupError:
+            return False
+        except OSError:
+            return False
+
+    if not signal_group(signal.SIGTERM) and process.poll() is None:
+        try:
+            process.terminate()
         except (AttributeError, OSError, ProcessLookupError):
             pass
-
-    signal_worker(signal.SIGTERM)
     try:
-        process.wait(timeout=1.0)
+        process.wait(timeout=0.25)
     except subprocess.TimeoutExpired:
-        signal_worker(signal.SIGKILL)
+        pass
+    finally:
+        # The leader may exit on SIGTERM while an optimizer descendant ignores
+        # it. Escalate the private session group even after reaping the leader.
+        if not signal_group(signal.SIGKILL) and process.poll() is None:
+            try:
+                process.kill()
+            except (AttributeError, OSError, ProcessLookupError):
+                pass
+        try:
+            process.wait(timeout=1.0)
+        except subprocess.TimeoutExpired:
+            if not signal_group(signal.SIGKILL):
+                process.kill()
         process.wait()
 
 
 class _JournalRecords(list[dict[str, Any]]):
     def __init__(self):
         super().__init__()
+        self.missing = False
+        self.missing_error: dict[str, Any] | None = None
         self.tail_error: dict[str, Any] | None = None
 
 
 def _journal_records(path: Path, case_id: str) -> list[dict[str, Any]]:
     if not path.exists():
-        return []
+        records = _JournalRecords()
+        records.missing = True
+        records.missing_error = {
+            "profile": "measure-service-suggestion-sequence-journal-missing/1",
+            "message": "durable worker did not create its expected journal file",
+        }
+        return records
     if (
         path.is_symlink()
         or not path.is_file()
@@ -2792,6 +2809,11 @@ def _retain_journal_tail_error(
     records: list[dict[str, Any]],
     process_record: dict[str, Any] | None = None,
 ) -> None:
+    missing_error = getattr(records, "missing_error", None)
+    if missing_error is not None:
+        case["worker_journal_error"] = missing_error
+        if process_record is not None:
+            process_record["journal_error"] = missing_error
     tail_error = getattr(records, "tail_error", None)
     if tail_error is None:
         return
@@ -3393,6 +3415,8 @@ def _run_durable_case(
                 process_record["worker_failure"] = worker_response.get("failure")
             records = _journal_records(journal_path, case["case_id"])
             _retain_journal_tail_error(case, records, process_record)
+            if records.missing:
+                raise ValueError("durable worker journal is missing; no slot rows were accepted")
             if records.tail_error is not None:
                 raise ValueError(
                     "durable worker journal has an incomplete trailing row; validated prefix retained"
