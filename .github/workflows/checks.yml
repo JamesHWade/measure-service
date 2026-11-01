@@ -73,6 +73,8 @@ jobs:
           assert "tests/test_campaign_schema_migration.py" in members
           assert "tests/test_campaign_replication.py" in members
           assert "tests/test_replicate_protocol.py" in members
+          assert "tests/test_replication_mcp.py" in members
+          assert "tests/test_replication_history_bounds.py" in members
           assert "src/measure_service/benchmarks/synthetic_ablations.py" in members
           assert "src/measure_service/benchmarks/reference_data/synthetic-isocratic-ablation-v1.json" in members
           assert "scripts/export_ablation_reference.py" in members
