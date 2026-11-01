@@ -86,6 +86,7 @@ _CANDIDATE_INDEX_SQL = (
     "CREATE INDEX campaign_proposals_candidate "
     "ON campaign_proposals(campaign_id, candidate_digest, ordinal)"
 )
+_SIMPLE_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
 
 
 def ensure_proposal_repetition_schema(con: sqlite3.Connection) -> None:
@@ -411,20 +412,78 @@ def _assert_no_foreign_key_violations(con: sqlite3.Connection) -> None:
 
 
 def _normalize_sql(sql: str) -> str:
-    # SQL keywords and identifiers are case insensitive; string literals are
-    # not. In particular, state='PENDING' must never pass as state='pending'.
-    parts = re.split(r"('(?:[^']|'')*')", sql)
-    return "".join(
-        part
-        if index % 2
-        else "".join(part.split())
-        .replace('"', "")
-        .replace("`", "")
-        .replace("[", "")
-        .replace("]", "")
-        .casefold()
-        for index, part in enumerate(parts)
-    ).rstrip(";")
+    """Normalize SQL tokens without changing quoted-literal semantics.
+
+    SQLite accepts several identifier quote styles. A quoted token is folded
+    to an unquoted identifier only when its full contents are a simple
+    identifier; quoted expressions, spaces, and embedded quotes remain opaque
+    tokens and therefore cannot normalize into trusted SQL syntax.
+    """
+    tokens: list[str] = []
+    index = 0
+    while index < len(sql):
+        character = sql[index]
+        if character.isspace():
+            index += 1
+            continue
+
+        if character == "'":
+            end = index + 1
+            while end < len(sql):
+                if sql[end] == "'":
+                    if end + 1 < len(sql) and sql[end + 1] == "'":
+                        end += 2
+                        continue
+                    end += 1
+                    break
+                end += 1
+            else:
+                tokens.append(f"invalid-literal:{sql[index:]}")
+                break
+            tokens.append(f"literal:{sql[index:end]}")
+            index = end
+            continue
+
+        if character in {'"', "`", "["}:
+            closing = "]" if character == "[" else character
+            end = index + 1
+            while end < len(sql):
+                if sql[end] == closing:
+                    if closing != "]" and end + 1 < len(sql) and sql[end + 1] == closing:
+                        end += 2
+                        continue
+                    end += 1
+                    break
+                end += 1
+            else:
+                tokens.append(f"invalid-identifier:{sql[index:]}")
+                break
+
+            raw = sql[index:end]
+            contents = raw[1:-1]
+            if closing != "]":
+                contents = contents.replace(closing * 2, closing)
+            if _SIMPLE_IDENTIFIER.fullmatch(contents):
+                tokens.append(f"atom:{contents.casefold()}")
+            else:
+                tokens.append(f"quoted:{raw}")
+            index = end
+            continue
+
+        if character == "_" or character.isalnum() or character == "$":
+            end = index + 1
+            while end < len(sql) and (sql[end] == "_" or sql[end].isalnum() or sql[end] == "$"):
+                end += 1
+            tokens.append(f"atom:{sql[index:end].casefold()}")
+            index = end
+            continue
+
+        tokens.append(f"symbol:{character}")
+        index += 1
+
+    while tokens and tokens[-1] == "symbol:;":
+        tokens.pop()
+    return " ".join(tokens)
 
 
 def _quote_identifier(identifier: str) -> str:

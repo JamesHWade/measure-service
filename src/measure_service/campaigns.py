@@ -241,6 +241,11 @@ def _proposal_response(
 ) -> dict[str, Any]:
     if verified_proposals is None:
         verified_proposals = {}
+    # Callers share this memo only within one registry read snapshot. Training
+    # checks are intentionally rerun when verify_training=True.
+    cached = verified_proposals.get(row["id"])
+    if cached is not None and not verify_training:
+        return cached
     try:
         payload = json.loads(row["payload"])
     except (TypeError, json.JSONDecodeError) as error:
@@ -542,6 +547,7 @@ def _consumption_response(row: sqlite3.Row) -> dict[str, Any]:
 
 
 def _campaign_response(con: sqlite3.Connection, owner: str, row: sqlite3.Row) -> dict[str, Any]:
+    """Rebuild one campaign response with proposal checks memoized per snapshot."""
     payload = _verify_campaign_payload(row)
     protocol, links = _task_for_campaign(con, owner, row, payload)
     spec = links["spec"]
@@ -555,6 +561,7 @@ def _campaign_response(con: sqlite3.Connection, owner: str, row: sqlite3.Row) ->
     consumed_proposal_ids: set[str] = set()
     ablation_protocol = _is_ablation_protocol(spec)
     campaign_context = (row, payload, protocol, links)
+    verified_proposals: dict[str, dict[str, Any]] = {}
     for consumed in consumptions:
         record = _consumption_response(consumed)
         if record["proposal_id"] in consumed_proposal_ids:
@@ -566,6 +573,7 @@ def _campaign_response(con: sqlite3.Connection, owner: str, row: sqlite3.Row) ->
             proposal_row,
             verify_training=not ablation_protocol,
             campaign_context=campaign_context,
+            verified_proposals=verified_proposals,
         )
         result = record["result"]
         history_row = {
@@ -593,7 +601,9 @@ def _campaign_response(con: sqlite3.Connection, owner: str, row: sqlite3.Row) ->
     consumed_count = len(history)
     replayed_training = None
     if ablation_protocol:
-        replayed_training = _training_context(con, owner, row["id"])
+        replayed_training = _training_context(
+            con, owner, row["id"], verified_proposals=verified_proposals
+        )
     if consumed_count > spec.evaluation_budget:
         raise ValueError("Stored campaign consumption exceeds its declared evaluation budget")
     pending_row = con.execute(
@@ -608,6 +618,7 @@ def _campaign_response(con: sqlite3.Connection, owner: str, row: sqlite3.Row) ->
             pending_row,
             replayed_training=replayed_training,
             campaign_context=campaign_context,
+            verified_proposals=verified_proposals,
         )
     )
     proposals = con.execute(
@@ -900,8 +911,11 @@ def _training_context(
     campaign_id: str,
     *,
     before_ordinal: int | None = None,
+    verified_proposals: dict[str, dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Rebuild optimizer inputs and retain every immutable snapshot lineage link."""
+    if verified_proposals is None:
+        verified_proposals = {}
     campaign_row = _campaign_row(con, owner, campaign_id)
     campaign_payload = _verify_campaign_payload(campaign_row)
     protocol, links = _task_for_campaign(con, owner, campaign_row, campaign_payload)
@@ -927,7 +941,12 @@ def _training_context(
         consumption = _consumption_response(row)
         if ablation_target:
             _verify_ablation_consumption_source(
-                con, owner, row, consumption, campaign_context=campaign_context
+                con,
+                owner,
+                row,
+                consumption,
+                campaign_context=campaign_context,
+                verified_proposals=verified_proposals,
             )
         try:
             proposal_payload = json.loads(row["proposal_payload"])
@@ -2297,6 +2316,7 @@ def _verify_ablation_consumption_source(
     *,
     campaign_context: tuple[sqlite3.Row, dict[str, Any], dict[str, Any], dict[str, Any]]
     | None = None,
+    verified_proposals: dict[str, dict[str, Any]] | None = None,
 ) -> None:
     """Rebuild an ablation outcome from its exact immutable snapshot and producer run."""
     if campaign_context is None:
@@ -2319,6 +2339,7 @@ def _verify_ablation_consumption_source(
         proposal_row,
         verify_training=False,
         campaign_context=campaign_context,
+        verified_proposals=verified_proposals,
     )
     payload = json.loads(row["payload"])
     expected_proposal = {

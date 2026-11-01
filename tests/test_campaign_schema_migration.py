@@ -234,6 +234,126 @@ def test_pending_index_string_literal_semantics_are_not_normalized(database, lit
     con.close()
 
 
+@pytest.mark.parametrize(
+    ("quoted", "identifier"),
+    [
+        ('"campaign_proposals"', "campaign_proposals"),
+        ("`campaign_proposals`", "campaign_proposals"),
+        ("[campaign_proposals]", "campaign_proposals"),
+    ],
+)
+def test_normalizer_accepts_only_simple_quoted_identifier_equivalence(quoted, identifier):
+    assert schema._normalize_sql(f"SELECT {quoted}") == schema._normalize_sql(
+        f"SELECT {identifier}"
+    )
+
+
+@pytest.mark.parametrize(
+    "quoted",
+    [
+        "\"state='pending'\"",
+        "`state='pending'`",
+        "[state='pending']",
+        '"campaign proposals"',
+        '"state""pending"',
+    ],
+)
+def test_normalizer_keeps_compound_quoted_tokens_opaque(quoted):
+    assert schema._normalize_sql(f"WHERE {quoted}") != schema._normalize_sql(
+        "WHERE state='pending'"
+    )
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    ["\"state='pending'\"", '"state"', "`state`", "[state]"],
+)
+def test_unsupported_quoted_predicate_with_two_pending_rows_is_refused_without_rebuild(
+    database, predicate
+):
+    original_rows = _seed_legacy_database(database)
+    con = _connect()
+    con.execute("DROP INDEX campaign_one_pending")
+    con.execute(
+        "CREATE UNIQUE INDEX campaign_one_pending "
+        "ON campaign_proposals(owner, campaign_id) WHERE " + predicate
+    )
+    # The malformed predicates evaluate false for the text state values, so
+    # SQLite accepts two pending proposals under the misleading index name.
+    _insert_proposal(
+        con,
+        proposal_id="proposal-3",
+        ordinal=2,
+        candidate_digest="digest-c",
+        state="pending",
+    )
+    con.commit()
+    assert (
+        con.execute("SELECT COUNT(*) FROM campaign_proposals WHERE state='pending'").fetchone()[0]
+        == 2
+    )
+    before_rows = [
+        tuple(row) for row in con.execute("SELECT rowid, * FROM campaign_proposals ORDER BY rowid")
+    ]
+    before_sql = con.execute(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='campaign_proposals'"
+    ).fetchone()[0]
+    before_index_sql = con.execute(
+        "SELECT sql FROM sqlite_master WHERE type='index' AND name='campaign_one_pending'"
+    ).fetchone()[0]
+    assert before_rows[: len(original_rows)] == original_rows
+
+    with pytest.raises(ValueError, match="pending-proposal index"):
+        schema.ensure_proposal_repetition_schema(con)
+
+    assert not con.in_transaction
+    assert con.execute("PRAGMA foreign_keys").fetchone()[0] == 1
+    assert [
+        tuple(row) for row in con.execute("SELECT rowid, * FROM campaign_proposals ORDER BY rowid")
+    ] == before_rows
+    assert (
+        con.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='campaign_proposals'"
+        ).fetchone()[0]
+        == before_sql
+    )
+    assert (
+        con.execute(
+            "SELECT sql FROM sqlite_master WHERE type='index' AND name='campaign_one_pending'"
+        ).fetchone()[0]
+        == before_index_sql
+    )
+    assert _candidate_uniques(con)
+    assert con.execute("PRAGMA foreign_key_check").fetchall() == []
+    con.close()
+
+
+def test_alter_table_quoted_names_migrate_and_repeat_startup(database):
+    original_rows = _seed_legacy_database(database)
+    con = _connect()
+    con.execute("ALTER TABLE campaign_proposals RENAME TO proposal_rename_tmp")
+    con.execute('ALTER TABLE proposal_rename_tmp RENAME TO "campaign_proposals"')
+    con.commit()
+    stored_table_sql = con.execute(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='campaign_proposals'"
+    ).fetchone()[0]
+    stored_index_sql = con.execute(
+        "SELECT sql FROM sqlite_master WHERE type='index' AND name='campaign_one_pending'"
+    ).fetchone()[0]
+    assert '"campaign_proposals"' in stored_table_sql
+    assert '"campaign_proposals"' in stored_index_sql
+
+    schema.ensure_proposal_repetition_schema(con)
+    schema.ensure_proposal_repetition_schema(con)
+    assert [
+        tuple(row) for row in con.execute("SELECT rowid, * FROM campaign_proposals ORDER BY rowid")
+    ] == original_rows
+    assert not _candidate_uniques(con)
+    assert con.execute("PRAGMA foreign_key_check").fetchall() == []
+    assert con.execute("PRAGMA foreign_keys").fetchone()[0] == 1
+    con.close()
+
+
 def test_shape_inspection_uses_one_read_snapshot_during_concurrent_migration(database):
     _seed_legacy_database(database)
     read_started = threading.Event()

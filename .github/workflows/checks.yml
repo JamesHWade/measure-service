@@ -71,6 +71,7 @@ jobs:
           assert "docs/campaign-replication.md" in members
           assert "src/measure_service/campaign_schema.py" in members
           assert "tests/test_campaign_schema_migration.py" in members
+          assert "tests/test_campaign_history_cache.py" in members
           assert "tests/test_campaign_replication.py" in members
           assert "tests/test_replicate_protocol.py" in members
           assert "tests/test_replication_mcp.py" in members
