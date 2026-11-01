@@ -266,6 +266,20 @@ def registry_mutation(
                     "Idempotency key was already used for a different registry request"
                 )
             return json.loads(receipt["response"])
+        # A durable suggestion claim reserves the same namespace as ordinary
+        # receipts, including while its external computation is unresolved.
+        claims_exist = con.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='campaign_suggestion_attempts'"
+        ).fetchone()
+        if (
+            claims_exist is not None
+            and con.execute(
+                "SELECT 1 FROM campaign_suggestion_attempts WHERE owner=? AND request_key=?",
+                (owner, key),
+            ).fetchone()
+            is not None
+        ):
+            raise ValueError("Idempotency key is reserved by a campaign suggestion attempt")
         response = action(con)
         con.execute(
             "INSERT INTO registry_receipts VALUES (?, ?, ?, ?, ?)",

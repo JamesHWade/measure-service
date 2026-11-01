@@ -617,6 +617,12 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
             "bo_runtime": "optional_administrator_configured_MEASURE_BO_PYTHON",
             "bo_runtime_configured": bool(os.environ.get("MEASURE_BO_PYTHON")),
             "outcome_consumption": "exact_owned_immutable_observation_snapshot",
+            "suggestion_attempts": {
+                "profile": "campaign-suggestion-attempt/1",
+                "retry": "same_key_replays_without_recomputation",
+                "recovery": "explicit_abandoned_unknown_with_late_result_fencing",
+                "historical_missing_timing": "unavailable_not_backfilled",
+            },
             "generic_bo_service": False,
         },
         "limits": {
@@ -625,6 +631,8 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
             "conditions_per_set": 64,
             "measurements_per_attempt": 32,
             "results_per_batch": 50,
+            "suggestion_attempt_record_bytes": 256_000,
+            "suggestion_attempt_page_size": 20,
         },
     }
 
@@ -972,6 +980,39 @@ def measurement_get_campaign(campaign_id: RecordId, ctx: Context) -> dict[str, A
     return campaigns.get_campaign(identity(ctx), campaign_id)
 
 
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_campaign_suggestion_attempt(
+    suggestion_attempt_id: RecordId, ctx: Context
+) -> dict[str, Any]:
+    """Read an owned suggestion claim, immutable terminal or late evidence, exact requested training and available timing; a claim does not prove the optimizer started."""
+    return campaigns.get_campaign_suggestion_attempt(identity(ctx), suggestion_attempt_id)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_list_campaign_suggestion_attempts(
+    campaign_id: RecordId,
+    ctx: Context,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 10,
+    after: RecordId | None = None,
+) -> dict[str, Any]:
+    """List bounded owned suggestion-attempt summaries in stable order; after is a suggestion-attempt ID from the same campaign, and historical missing telemetry stays absent."""
+    return campaigns.list_campaign_suggestion_attempts(identity(ctx), campaign_id, limit, after)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_abandon_campaign_suggestion_attempt(
+    suggestion_attempt_id: RecordId,
+    expected_start_sha256: Annotated[str, Field(pattern="^[0-9a-f]{64}$")],
+    reason: Annotated[str, Field(min_length=1, max_length=500)],
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Explicitly reconcile an unresolved owned suggestion as abandoned_unknown; this does not assert failure, kill a process or invent timing, and any late computation cannot create a proposal."""
+    return campaigns.abandon_campaign_suggestion_attempt(
+        identity(ctx), suggestion_attempt_id, expected_start_sha256, reason, idempotency_key
+    )
+
+
 @mcp.tool(annotations=RETRY_WRITE, structured_output=True)
 def measurement_suggest_campaign(
     campaign_id: RecordId,
@@ -979,7 +1020,7 @@ def measurement_suggest_campaign(
     idempotency_key: RequestKey,
     ctx: Context,
 ) -> dict[str, Any]:
-    """Atomically retain one feasible synthetic proposal and its exact training-snapshot identities; uses common initialization, deterministic random sampling or the optional BO-MCP runtime without fallback."""
+    """Durably claim and finalize one synthetic suggestion with exact training evidence and failure timing; same-key retries never rerun a claimed computation, and no fallback replaces a failed candidate."""
     return campaigns.suggest_campaign(
         identity(ctx), campaign_id, expected_revision, idempotency_key
     )

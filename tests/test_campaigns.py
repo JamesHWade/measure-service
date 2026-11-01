@@ -676,7 +676,13 @@ def test_failed_state_transitions_roll_back_records_methods_revision_and_receipt
             == 0
         )
 
-    suggestion = campaigns.suggest_campaign(owner, campaign["campaign_id"], 1, "rollback-suggest")
+    # The failed computation now has an immutable terminal receipt. Retrying
+    # transport replays that failure; a new key deliberately starts fresh work.
+    with pytest.raises(RuntimeError, match="injected response serialization failure"):
+        campaigns.suggest_campaign(owner, campaign["campaign_id"], 1, "rollback-suggest")
+    suggestion = campaigns.suggest_campaign(
+        owner, campaign["campaign_id"], 1, "rollback-suggest-new-computation"
+    )
     evidence = _record_snapshot(prepared, suggestion["proposal"], key="rollback-evaluation")
     monkeypatch.setattr(campaigns, "_campaign_response", fail_response)
     with pytest.raises(RuntimeError, match="injected response serialization failure"):

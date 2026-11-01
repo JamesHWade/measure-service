@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import math
 import os
@@ -28,6 +29,7 @@ from measure_service.optimizer_backend import (
     OptimizerBackendError,
     _loads_strict,
     suggest_candidate,
+    suggestion_request_evidence,
 )
 from measure_service.storage import canonical, sha256
 
@@ -235,6 +237,8 @@ def _patch_subprocess(
         assert kwargs["env"].get("PYTHONHOME") is None
         assert kwargs["env"].get("HOME") == os.environ.get("HOME")
         assert kwargs["env"]["BO_ENGINE_DEVICE"] == "cpu"
+        assert kwargs["text"] is False
+        assert isinstance(kwargs["input"], bytes)
         assert kwargs["cwd"] != str(Path(__file__).resolve().parents[1])
         request = _loads_strict(kwargs["input"], max_bytes=MAX_REQUEST_BYTES)
         assert request["schema"] == REQUEST_SCHEMA
@@ -246,13 +250,310 @@ def _patch_subprocess(
         except Exception as error:
             if expected_failure:
                 return subprocess.CompletedProcess(
-                    args, 1, "", f"BO sidecar failed ({type(error).__name__})\n"
+                    args,
+                    1,
+                    b"",
+                    f"BO sidecar failed ({type(error).__name__})\n".encode("utf-8"),
                 )
             raise
-        return subprocess.CompletedProcess(args, 0, canonical(response) + "\n", "")
+        return subprocess.CompletedProcess(args, 0, (canonical(response) + "\n").encode(), b"")
 
     monkeypatch.setattr(optimizer_backend.subprocess, "run", run)
     return calls
+
+
+def _assert_failure_evidence(
+    error: OptimizerBackendError,
+    request: dict[str, object],
+    *,
+    phase: str,
+    category: str,
+    elapsed: float | None,
+    returncode: int | None = None,
+    response: bytes | None = None,
+    stderr: bytes | None = None,
+) -> None:
+    evidence = error.diagnostics
+    assert evidence is not None
+    assert evidence["profile"] == "measure-service-bo-suggestion-failure/1"
+    assert evidence["phase"] == phase
+    assert evidence["category"] == category
+    assert evidence["request_sha256"] == sha256(request)
+    assert evidence["protocol_sha256"] == request["protocol_sha256"]
+    assert evidence["training_sha256"] == request["training_sha256"]
+    assert evidence["source_sha256"] == {
+        "optimizer_adapter": request["adapter_source_sha256"],
+        "campaign_protocol": request["campaign_protocol_source_sha256"],
+        "design_kernel": request["design_kernel_source_sha256"],
+    }
+    assert evidence["subprocess_elapsed_seconds"] == elapsed
+    assert evidence["returncode"] == returncode
+    assert evidence["response_bytes"] == (None if response is None else len(response))
+    assert evidence["stderr_bytes"] == (None if stderr is None else len(stderr))
+    assert evidence["response_sha256"] == (
+        None if response is None else hashlib.sha256(response).hexdigest()
+    )
+    assert set(evidence) == {
+        "profile",
+        "phase",
+        "category",
+        "request_sha256",
+        "protocol_sha256",
+        "training_sha256",
+        "source_sha256",
+        "subprocess_elapsed_seconds",
+        "returncode",
+        "response_bytes",
+        "stderr_bytes",
+        "response_sha256",
+    }
+
+
+def test_suggestion_request_evidence_is_exact_normalized_payload_without_runtime_lookup(
+    monkeypatch,
+):
+    protocol = _ablation_spec(target="confirmed_acceptance_reward", noise_prior="low_noise")
+    training = _history()
+    for row, score in zip(training, (0.0, 1.0, 0.0), strict=True):
+        row["score"] = score
+    expected = optimizer_backend._normalize_inputs(protocol, training, 7)[2]
+    monkeypatch.setattr(
+        optimizer_backend,
+        "_runtime_path",
+        lambda: pytest.fail("request evidence must not resolve a sidecar runtime"),
+    )
+    monkeypatch.setattr(
+        optimizer_backend.subprocess,
+        "run",
+        lambda *args, **kwargs: pytest.fail("request evidence must not launch a process"),
+    )
+
+    evidence = suggestion_request_evidence(protocol, training, 7)
+
+    assert evidence == expected
+    assert evidence["spec"]["optimizer_target"] == "confirmed_acceptance_reward"
+    assert evidence["spec"]["surrogate_noise_prior"] == "low_noise"
+    assert evidence["training_data"] == expected["training_data"]
+    assert all(
+        len(evidence[name]) == 64
+        for name in (
+            "protocol_sha256",
+            "training_sha256",
+            "adapter_source_sha256",
+            "campaign_protocol_source_sha256",
+            "design_kernel_source_sha256",
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    ("configured_runtime", "phase", "category", "message"),
+    [
+        (
+            None,
+            "runtime_resolution",
+            "runtime_missing",
+            "BO backend is unavailable: configure MEASURE_BO_PYTHON to an installed sidecar interpreter",
+        ),
+        (
+            "/missing/bo-python",
+            "runtime_resolution",
+            "runtime_invalid",
+            "MEASURE_BO_PYTHON must name an absolute executable file",
+        ),
+    ],
+)
+def test_runtime_resolution_errors_include_request_evidence_without_process(
+    monkeypatch, configured_runtime, phase, category, message
+):
+    if configured_runtime is None:
+        monkeypatch.delenv("MEASURE_BO_PYTHON", raising=False)
+    else:
+        monkeypatch.setenv("MEASURE_BO_PYTHON", configured_runtime)
+    calls = []
+    monkeypatch.setattr(
+        optimizer_backend.subprocess,
+        "run",
+        lambda *args, **kwargs: calls.append((args, kwargs)),
+    )
+    request = suggestion_request_evidence(_spec(), _history(), 7)
+
+    with pytest.raises(OptimizerBackendError) as captured:
+        suggest_candidate(_spec(), _history(), 7)
+
+    assert captured.value.args == (message,)
+    assert str(captured.value) == message
+    assert calls == []
+    _assert_failure_evidence(
+        captured.value,
+        request,
+        phase=phase,
+        category=category,
+        elapsed=None,
+    )
+
+
+def test_backend_error_keeps_legacy_constructor_and_filters_diagnostics():
+    request = suggestion_request_evidence(_spec(), _history(), 7)
+    legacy = OptimizerBackendError("legacy failure")
+    diagnostics = optimizer_backend._failure_diagnostics(
+        request,
+        phase="runtime_resolution",
+        category="runtime_missing",
+    )
+    diagnostics.update({"stdout": "secret response", "private_path": "/home/person/file"})
+    enriched = OptimizerBackendError("same failure", diagnostics=diagnostics)
+
+    assert legacy.args == ("legacy failure",)
+    assert str(legacy) == "legacy failure"
+    assert legacy.diagnostics is None
+    assert enriched.args == ("same failure",)
+    assert "stdout" not in enriched.diagnostics
+    assert "private_path" not in enriched.diagnostics
+    assert len(canonical(enriched.diagnostics).encode("utf-8")) <= 4096
+
+
+@pytest.mark.parametrize(
+    ("case", "phase", "category", "elapsed", "returncode", "response", "stderr"),
+    [
+        (
+            "launch",
+            "process_launch",
+            "launch_error",
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "timeout",
+            "process_timeout",
+            "timeout",
+            0.75,
+            None,
+            b"partial-sidecar-output",
+            b"private timeout detail",
+        ),
+        (
+            "nonzero",
+            "process_exit",
+            "nonzero_exit",
+            0.25,
+            7,
+            b"opaque sidecar response",
+            b"private sidecar stderr",
+        ),
+    ],
+)
+def test_launch_timeout_and_exit_errors_record_bounded_process_evidence(
+    monkeypatch, case, phase, category, elapsed, returncode, response, stderr
+):
+    monkeypatch.setenv("MEASURE_BO_PYTHON", sys.executable)
+    request = suggestion_request_evidence(_spec(), _history(), 7)
+    output_bytes = response
+    stderr_bytes = stderr
+
+    def run(args, **kwargs):
+        if case == "launch":
+            raise FileNotFoundError("private /home/person/bo-runtime")
+        if case == "timeout":
+            raise subprocess.TimeoutExpired(
+                args, kwargs["timeout"], output=output_bytes, stderr=stderr_bytes
+            )
+        return subprocess.CompletedProcess(args, returncode, output_bytes, stderr_bytes)
+
+    monkeypatch.setattr(optimizer_backend.subprocess, "run", run)
+    ticks = iter((4.0, 4.75) if case == "timeout" else (4.0, 4.25))
+    monkeypatch.setattr(optimizer_backend.time, "perf_counter", lambda: next(ticks))
+
+    with pytest.raises(OptimizerBackendError) as captured:
+        suggest_candidate(_spec(), _history(), 7)
+
+    assert "/home/person" not in str(captured.value)
+    _assert_failure_evidence(
+        captured.value,
+        request,
+        phase=phase,
+        category=category,
+        elapsed=elapsed,
+        returncode=returncode,
+        response=response,
+        stderr=stderr,
+    )
+
+
+@pytest.mark.parametrize(
+    ("stdout", "phase", "category", "message", "elapsed"),
+    [
+        (
+            b"x" * (optimizer_backend.MAX_RESPONSE_BYTES + 1),
+            "response_size",
+            "oversized_response",
+            "response exceeds",
+            0.5,
+        ),
+        (b"\xffinvalid-utf8", "response_decode", "invalid_utf8", "malformed JSON", 0.0),
+        (b"{invalid-json", "response_parse", "invalid_json", "malformed JSON", 0.5),
+        (
+            b'{"schema":"unsupported"}',
+            "response_validation",
+            "invalid_response",
+            "invalid response shape",
+            0.5,
+        ),
+    ],
+)
+def test_response_failures_record_hashes_and_actual_elapsed_time(
+    monkeypatch, stdout, phase, category, message, elapsed
+):
+    monkeypatch.setenv("MEASURE_BO_PYTHON", sys.executable)
+    request = suggestion_request_evidence(_spec(), _history(), 7)
+    stderr = b"private response detail"
+    monkeypatch.setattr(
+        optimizer_backend.subprocess,
+        "run",
+        lambda args, **kwargs: subprocess.CompletedProcess(args, 0, stdout, stderr),
+    )
+    ticks = iter((8.0, 8.0 + elapsed))
+    monkeypatch.setattr(optimizer_backend.time, "perf_counter", lambda: next(ticks))
+
+    with pytest.raises(OptimizerBackendError, match=message) as captured:
+        suggest_candidate(_spec(), _history(), 7)
+
+    _assert_failure_evidence(
+        captured.value,
+        request,
+        phase=phase,
+        category=category,
+        elapsed=elapsed,
+        returncode=0,
+        response=stdout,
+        stderr=stderr,
+    )
+    assert "private response detail" not in repr(captured.value.diagnostics)
+
+
+def test_invalid_subprocess_clock_is_not_serialized_as_elapsed_time(monkeypatch):
+    _install_fake_public_backend(monkeypatch)
+    monkeypatch.setenv("MEASURE_BO_PYTHON", sys.executable)
+    _patch_subprocess(monkeypatch)
+    request = suggestion_request_evidence(_spec(), _history(), 7)
+    ticks = iter((10.0, 9.0))
+    monkeypatch.setattr(optimizer_backend.time, "perf_counter", lambda: next(ticks))
+
+    with pytest.raises(OptimizerBackendError, match="elapsed time") as captured:
+        suggest_candidate(_spec(), _history(), 7)
+
+    _assert_failure_evidence(
+        captured.value,
+        request,
+        phase="process_timing",
+        category="invalid_elapsed_time",
+        elapsed=None,
+        returncode=0,
+        response=canonical(optimizer_backend._sidecar_response(request)).encode("utf-8") + b"\n",
+        stderr=b"",
+    )
 
 
 def test_adapter_uses_public_backend_and_binds_replay_provenance(monkeypatch):

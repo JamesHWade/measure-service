@@ -30,6 +30,9 @@ from . import (
     observations,
     retention,
 )
+from . import (
+    campaign_suggestion_attempts as suggestion_attempts,
+)
 from .method_backend import method_backend_info
 from .methods import MethodConstraints, evaluate_method
 from .storage import canonical, now, registry_connection, registry_mutation, sha256
@@ -758,6 +761,8 @@ def _bo_candidate(
     spec: Any,
     training: list[dict[str, Any]],
     seed: int,
+    *,
+    elapsed_evidence: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     try:
         adapter = importlib.import_module("measure_service.optimizer_backend")
@@ -772,6 +777,16 @@ def _bo_candidate(
     result = suggest(spec, training, seed)
     elapsed_seconds = time.perf_counter() - started
     candidate, backend = _validate_backend_result(result, spec=spec, seed=seed, training=training)
+    if elapsed_evidence is not None:
+        child_elapsed = backend["runtime"].get("elapsed_seconds")
+        elapsed_evidence["adapter_subprocess_elapsed_seconds"] = (
+            child_elapsed
+            if not isinstance(child_elapsed, bool)
+            and isinstance(child_elapsed, (int, float))
+            and math.isfinite(child_elapsed)
+            and child_elapsed >= 0
+            else None
+        )
     backend["runtime"] = {**backend["runtime"], "elapsed_seconds": elapsed_seconds}
     _bounded({"candidate": candidate, "backend": backend}, "BO-MCP response")
     return candidate, backend
@@ -943,30 +958,756 @@ def _insert_campaign_method(
     return _record(_owned_method(con, owner, method_id))
 
 
+def _insert_suggested_proposal(
+    con: sqlite3.Connection,
+    owner: str,
+    campaign_id: str,
+    expected_revision: int,
+    row: sqlite3.Row,
+    protocol_response: dict[str, Any],
+    spec: campaign_protocol.ProtocolSpec,
+    ordinal: int,
+    training_record: dict[str, Any],
+    candidate: dict[str, Any],
+    backend: dict[str, Any] | None,
+    request: dict[str, Any],
+) -> dict[str, Any]:
+    """Insert a validated candidate only inside the terminal transaction."""
+    training_digest = training_record["sha256"]
+    proposal_source = _suggestion_generation_kind(spec, row["policy"], ordinal)
+    declaration = campaign_protocol.method_declaration(spec, candidate)
+    method = _insert_campaign_method(
+        con, owner, campaign_id, ordinal, declaration, spec.constraints
+    )
+    candidate_digest = sha256(candidate)
+    duplicate = con.execute(
+        "SELECT id FROM campaign_proposals WHERE campaign_id=? AND candidate_digest=?",
+        (campaign_id, candidate_digest),
+    ).fetchone()
+    if duplicate is not None:
+        raise ValueError("Campaign candidate duplicates a prior proposal")
+    proposal_id, created = str(uuid.uuid4()), now()
+    proposal_input = {
+        "protocol_input_sha256": protocol_response["input_sha256"],
+        "campaign_id": campaign_id,
+        "seed": row["seed"],
+        "policy": row["policy"],
+        "ordinal": ordinal,
+        "candidate": candidate,
+        "training_sha256": training_digest,
+        "backend": backend,
+    }
+    input_digest = sha256(request)
+    proposal_payload: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "request": request,
+        "proposal_input": proposal_input,
+        "candidate": candidate,
+        "policy": row["policy"],
+        "proposal_source": proposal_source,
+        "training": training_record,
+        "backend": backend,
+        "method": {
+            "method_id": method["method_id"],
+            "input_sha256": method["input_sha256"],
+            "canonical_program_sha256": method["canonical_program_sha256"],
+        },
+    }
+    proposal_payload["record_sha256"] = sha256(proposal_payload)
+    _bounded(proposal_payload, "Campaign proposal")
+    con.execute(
+        """INSERT INTO campaign_proposals (
+          id, owner, campaign_id, ordinal, state, candidate_digest,
+          executable_method_id, method_input_digest, canonical_program_digest,
+          payload, input_digest, created_at
+        ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            proposal_id,
+            owner,
+            campaign_id,
+            ordinal,
+            candidate_digest,
+            method["method_id"],
+            method["input_sha256"],
+            method["canonical_program_sha256"],
+            canonical(proposal_payload),
+            input_digest,
+            created,
+        ),
+    )
+    updated = con.execute(
+        "UPDATE campaign_runs SET revision=revision+1 WHERE id=? AND owner=? AND revision=?",
+        (campaign_id, owner, expected_revision),
+    )
+    if updated.rowcount != 1:
+        raise ValueError("Campaign revision conflict")
+    fresh = _campaign_row(con, owner, campaign_id)
+    proposal = _proposal_response(con, _proposal_row(con, owner, proposal_id))
+    return _bounded(
+        {
+            "schema_version": SCHEMA_VERSION,
+            "campaign_id": campaign_id,
+            "revision": fresh["revision"],
+            "proposal": proposal,
+            "campaign": _campaign_response(con, owner, fresh),
+        }
+    )
+
+
+class SuggestionInProgressError(RuntimeError):
+    """A durable claim exists but its external execution is unresolved."""
+
+    def __init__(self, suggestion_attempt_id: str):
+        self.suggestion_attempt_id = suggestion_attempt_id
+        super().__init__(
+            "Campaign suggestion is already claimed; inspect or explicitly reconcile "
+            f"suggestion attempt {suggestion_attempt_id} before starting another computation"
+        )
+
+
+def _suggestion_generation_kind(
+    spec: campaign_protocol.ProtocolSpec, policy: str, ordinal: int
+) -> str:
+    if ordinal < spec.initial_design_size:
+        return "common_initial_design"
+    return "random_policy" if policy == "random" else "bo_mcp_gp_logei"
+
+
+def _suggestion_context(
+    row: sqlite3.Row,
+    protocol: dict[str, Any],
+    spec: campaign_protocol.ProtocolSpec,
+    ordinal: int,
+    training: list[dict[str, Any]],
+    source_members: list[dict[str, Any]],
+) -> dict[str, Any]:
+    kind = _suggestion_generation_kind(spec, row["policy"], ordinal)
+    generation: dict[str, Any] = {
+        "kind": kind,
+        "request": None,
+        "request_status": "not_required",
+        "implementation_provenance": _implementation_provenance(
+            include_target_kernel=_is_ablation_protocol(spec)
+        ),
+    }
+    if kind == "bo_mcp_gp_logei":
+        try:
+            adapter = importlib.import_module("measure_service.optimizer_backend")
+            generation["request"] = adapter.suggestion_request_evidence(spec, training, row["seed"])
+            generation["request_status"] = "prepared"
+        except Exception as error:
+            # The failed preparation is still an observable suggestion attempt.
+            # The computation will report the same invalid-input/unavailable route.
+            generation["request_status"] = "unavailable"
+            generation["request_failure"] = _suggestion_failure(error)
+    return {
+        "campaign": {
+            "campaign_id": row["id"],
+            "expected_revision": row["revision"],
+            "ordinal": ordinal,
+            "protocol_id": protocol["protocol_id"],
+            "protocol_input_sha256": protocol["input_sha256"],
+            "protocol_output_sha256": protocol["output_sha256"],
+            "task_id": row["task_id"],
+            "seed": row["seed"],
+            "policy": row["policy"],
+        },
+        "spec": spec.model_dump(mode="json"),
+        "duplicate_policy": "reject",
+        "training": {
+            "count": len(training),
+            "sha256": sha256(training),
+            "records": training,
+            "snapshot_members": source_members,
+        },
+        "generation": generation,
+    }
+
+
+def _suggestion_failure(error: Exception) -> dict[str, str]:
+    error_type = type(error).__name__[:128] or "Exception"
+    try:
+        message = str(error).strip()
+    except Exception:
+        message = ""
+    return {
+        "type": error_type,
+        "message": (message or f"{error_type} during suggestion computation")[:1000],
+    }
+
+
+def _suggestion_diagnostics(error: Exception | None) -> dict[str, Any] | None:
+    try:
+        value = getattr(error, "diagnostics", None)
+        if isinstance(value, dict) and len(canonical(value).encode("utf-8")) <= 4096:
+            return json.loads(canonical(value))
+    except Exception:
+        pass
+    return None
+
+
+def _fit_suggestion_outcome(outcome: dict[str, Any]) -> dict[str, Any]:
+    """Keep terminal failure evidence even when full returned metadata will not fit."""
+    limit = suggestion_attempts.MAX_OUTCOME_BYTES - 2048
+    try:
+        if len(canonical(outcome).encode("utf-8")) <= limit:
+            return outcome
+    except (TypeError, ValueError):
+        pass
+    if outcome.get("status") == "accepted":
+        raise ValueError("Returned suggestion evidence exceeds its retained-envelope limit")
+    retained = dict(outcome)
+    evidence: dict[str, Any] = {"reason": "full_returned_evidence_not_retained"}
+    for name in ("candidate", "backend", "untrusted_returned_evidence"):
+        value = outcome.get(name)
+        if value is None:
+            continue
+        try:
+            encoded = canonical(value).encode("utf-8")
+            evidence[name] = {"sha256": sha256(value), "size_bytes": len(encoded)}
+        except (TypeError, ValueError):
+            evidence[name] = {"sha256": None, "size_bytes": None, "status": "not_serializable"}
+            retained[name] = None
+            continue
+        if name == "backend" and isinstance(value, dict):
+            evidence[name]["request_identity"] = {
+                key: value[key]
+                for key in (
+                    "protocol_sha256",
+                    "training_sha256",
+                    "seed",
+                    "training_count",
+                    "adapter_source_sha256",
+                    "campaign_protocol_source_sha256",
+                    "design_kernel_source_sha256",
+                )
+                if key in value
+            }
+            retained[name] = None
+        elif name == "backend":
+            retained[name] = None
+        elif (
+            name == "untrusted_returned_evidence"
+            or not isinstance(value, dict)
+            or len(encoded) > 1024
+        ):
+            retained[name] = None
+    retained["retention"] = evidence
+    return retained
+
+
+def _untrusted_suggestion_outcome(outcome: dict[str, Any], error: Exception) -> dict[str, Any]:
+    """Retain contradictory returned data without labelling it verified provenance."""
+    return _fit_suggestion_outcome(
+        {
+            **outcome,
+            "status": "rejected",
+            "phase": "returned_evidence_validation",
+            "backend": None,
+            "adapter_subprocess_elapsed_seconds": None,
+            "diagnostics": None,
+            "failure": _suggestion_failure(error),
+            "untrusted_returned_evidence": {
+                "backend": outcome.get("backend"),
+                "diagnostics": outcome.get("diagnostics"),
+                "adapter_subprocess_elapsed_seconds": outcome.get(
+                    "adapter_subprocess_elapsed_seconds"
+                ),
+                "original_failure": outcome.get("failure"),
+            },
+        }
+    )
+
+
+def _admit_suggestion_evidence(record: dict[str, Any], outcome: dict[str, Any]) -> dict[str, Any]:
+    context = record["context"]
+    try:
+        _verify_suggestion_request_identity(
+            {**record, "outcome": outcome, "late_result": None},
+            campaign_protocol.parse_campaign_protocol(context["spec"]),
+            context["training"]["records"],
+            context["campaign"]["seed"],
+        )
+    except ValueError as error:
+        return _untrusted_suggestion_outcome(outcome, error)
+    return outcome
+
+
+def _verify_suggestion_request_identity(
+    record: dict[str, Any],
+    spec: campaign_protocol.ProtocolSpec,
+    training: list[dict[str, Any]],
+    seed: int,
+) -> None:
+    """Cross-bind requested sources to available adapter or failure evidence."""
+    generation = record["context"]["generation"]
+    base_keys = {"kind", "request", "request_status", "implementation_provenance"}
+    status = generation.get("request_status")
+    requested = generation.get("request")
+    if generation["kind"] != "bo_mcp_gp_logei":
+        if set(generation) != base_keys or status != "not_required" or requested is not None:
+            raise ValueError("Stored non-BO suggestion has unexpected request evidence")
+        return
+    if status == "unavailable":
+        failure = generation.get("request_failure")
+        if (
+            set(generation) != base_keys | {"request_failure"}
+            or requested is not None
+            or not isinstance(failure, dict)
+            or set(failure) != {"type", "message"}
+            or not all(isinstance(value, str) and value.strip() for value in failure.values())
+        ):
+            raise ValueError("Stored unavailable BO request evidence is malformed")
+    elif status == "prepared":
+        required = {
+            "schema",
+            "spec",
+            "training_data",
+            "seed",
+            "protocol_sha256",
+            "training_sha256",
+            "adapter_source_sha256",
+            "campaign_protocol_source_sha256",
+            "design_kernel_source_sha256",
+        }
+        if (
+            set(generation) != base_keys
+            or not isinstance(requested, dict)
+            or set(requested) != required
+        ):
+            raise ValueError("Stored prepared BO request evidence is malformed")
+        if (
+            requested["schema"] != "measure-service-bo-request/1"
+            or canonical(requested["spec"]) != canonical(spec.model_dump(mode="json"))
+            or canonical(requested["training_data"]) != canonical(training)
+            or requested["seed"] != seed
+            or requested["training_sha256"] != sha256(training)
+            or requested["protocol_sha256"] != campaign_protocol.campaign_protocol_sha256(spec)
+        ):
+            raise ValueError("Stored BO request differs from its frozen protocol and training")
+        for name in (
+            "adapter_source_sha256",
+            "campaign_protocol_source_sha256",
+            "design_kernel_source_sha256",
+        ):
+            value = requested[name]
+            if (
+                not isinstance(value, str)
+                or len(value) != 64
+                or any(char not in "0123456789abcdef" for char in value)
+            ):
+                raise ValueError("Stored BO request has an invalid source identity")
+        provenance = generation["implementation_provenance"]
+        if (
+            not isinstance(provenance, dict)
+            or provenance.get("protocol_kernel", {}).get("source_sha256")
+            != requested["campaign_protocol_source_sha256"]
+        ):
+            raise ValueError(
+                "Requested protocol source differs from retained implementation evidence"
+            )
+    else:
+        raise ValueError("Stored BO request has an unsupported preparation status")
+
+    observations = [record.get("outcome"), record.get("late_result")]
+    for observed in observations:
+        if not isinstance(observed, dict):
+            continue
+        # A late event is stored with its immutable event envelope.
+        if isinstance(observed.get("result"), dict):
+            observed = observed["result"]
+        backend = observed.get("backend")
+        retention_identity = (
+            observed.get("retention", {}).get("backend", {}).get("request_identity")
+        )
+        for identity in (backend, retention_identity):
+            if not isinstance(identity, dict):
+                continue
+            if not isinstance(requested, dict):
+                raise ValueError("Returned backend evidence has no matching prepared request")
+            expectations = {
+                "protocol_sha256": requested["protocol_sha256"],
+                "training_sha256": requested["training_sha256"],
+                "seed": seed,
+                "training_count": len(training),
+                "adapter_source_sha256": requested["adapter_source_sha256"],
+                "campaign_protocol_source_sha256": requested["campaign_protocol_source_sha256"],
+                "design_kernel_source_sha256": requested["design_kernel_source_sha256"],
+            }
+            if any(
+                identity[name] != value for name, value in expectations.items() if name in identity
+            ):
+                raise ValueError("Returned backend identity differs from its retained request")
+        diagnostic = observed.get("diagnostics")
+        if (
+            not isinstance(diagnostic, dict)
+            or diagnostic.get("profile") != "measure-service-bo-suggestion-failure/1"
+        ):
+            continue
+        if (
+            not isinstance(requested, dict)
+            or diagnostic.get("request_sha256") != sha256(requested)
+            or diagnostic.get("protocol_sha256") != requested["protocol_sha256"]
+            or diagnostic.get("training_sha256") != requested["training_sha256"]
+            or diagnostic.get("source_sha256")
+            != {
+                "optimizer_adapter": requested["adapter_source_sha256"],
+                "campaign_protocol": requested["campaign_protocol_source_sha256"],
+                "design_kernel": requested["design_kernel_source_sha256"],
+            }
+            or observed.get("adapter_subprocess_elapsed_seconds")
+            != diagnostic.get("subprocess_elapsed_seconds")
+        ):
+            raise ValueError("Stored failure diagnostics differ from the retained BO request")
+
+
+def _verify_suggestion_context(
+    con: sqlite3.Connection,
+    owner: str,
+    record: dict[str, Any],
+    *,
+    replay_cache: dict[int, tuple[list[dict[str, Any]], list[dict[str, Any]]]] | None = None,
+) -> None:
+    """Rebind retained requests to the immutable protocol and consumed prefix."""
+    context = record["context"]
+    claimed = context.get("campaign")
+    if not isinstance(claimed, dict):
+        raise ValueError("Stored suggestion campaign context is malformed")
+    row = _campaign_row(con, owner, record["campaign_id"])
+    payload = _verify_campaign_payload(row)
+    protocol, links = _task_for_campaign(con, owner, row, payload)
+    spec = links["spec"]
+    ordinal = record["ordinal"]
+    expected = {
+        "campaign_id": row["id"],
+        "expected_revision": record["expected_revision"],
+        "ordinal": ordinal,
+        "protocol_id": protocol["protocol_id"],
+        "protocol_input_sha256": protocol["input_sha256"],
+        "protocol_output_sha256": protocol["output_sha256"],
+        "task_id": row["task_id"],
+        "seed": row["seed"],
+        "policy": row["policy"],
+    }
+    if (
+        canonical(claimed) != canonical(expected)
+        or record["expected_revision"] != 1 + 2 * ordinal
+        or not 0 <= ordinal < spec.evaluation_budget
+        or canonical(context.get("spec")) != canonical(spec.model_dump(mode="json"))
+        or context.get("duplicate_policy") != "reject"
+    ):
+        raise ValueError("Stored suggestion context differs from the frozen campaign")
+    if replay_cache is not None and ordinal in replay_cache:
+        training, members = replay_cache[ordinal]
+    else:
+        training, members = _training_context(con, owner, row["id"], before_ordinal=ordinal)
+        if replay_cache is not None:
+            replay_cache[ordinal] = training, members
+    retained_training = context.get("training")
+    if canonical(retained_training) != canonical(
+        {
+            "count": len(training),
+            "sha256": sha256(training),
+            "records": training,
+            "snapshot_members": members,
+        }
+    ):
+        raise ValueError("Stored suggestion training differs from exact consumed snapshots")
+    generation = context.get("generation")
+    if not isinstance(generation, dict) or generation.get("kind") != _suggestion_generation_kind(
+        spec, row["policy"], ordinal
+    ):
+        raise ValueError("Stored suggestion generation route differs from its campaign")
+    _verify_suggestion_request_identity(record, spec, training, row["seed"])
+    outcome = record.get("outcome")
+    observed_results = [outcome, record.get("late_result")]
+    for observed in observed_results:
+        if not isinstance(observed, dict):
+            continue
+        observed = observed.get("result", observed)
+        if not isinstance(observed, dict):
+            raise ValueError("Stored late suggestion evidence is malformed")
+        for name in ("candidate_generation_elapsed_seconds", "adapter_subprocess_elapsed_seconds"):
+            value = observed.get(name)
+            if value is not None and (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                or value < 0
+            ):
+                raise ValueError(
+                    "Stored suggestion timing must be finite and nonnegative or unavailable"
+                )
+        if generation["kind"] != "bo_mcp_gp_logei" and (
+            observed.get("backend") is not None
+            or observed.get("adapter_subprocess_elapsed_seconds") is not None
+        ):
+            raise ValueError("A non-BO suggestion cannot contain child-backend evidence")
+        if isinstance(observed.get("backend"), dict):
+            proposed = observed.get("candidate")
+            if not isinstance(proposed, dict):
+                raise ValueError("Returned backend evidence requires a candidate")
+            validated, _ = _validate_backend_result(
+                {"candidate": dict(proposed), "backend": observed["backend"]},
+                spec=spec,
+                seed=row["seed"],
+                training=training,
+            )
+            if canonical(validated) != canonical(proposed):
+                raise ValueError("Stored returned candidate is not in canonical numeric form")
+    if isinstance(outcome, dict) and outcome.get("status") == "accepted":
+        proposal = _proposal_response(con, _proposal_row(con, owner, outcome["proposal_id"]))
+        if (
+            proposal["campaign_id"] != row["id"]
+            or proposal["ordinal"] != ordinal
+            or proposal["training"]["sha256"] != sha256(training)
+            or proposal["candidate"] != outcome.get("candidate")
+            or proposal.get("backend") != outcome.get("backend")
+        ):
+            raise ValueError("Accepted suggestion outcome differs from its immutable proposal")
+
+
+def _replay_suggestion_attempt(
+    con: sqlite3.Connection, owner: str, key: str, record: dict[str, Any]
+) -> dict[str, Any]:
+    _verify_suggestion_context(con, owner, record)
+    state = record["state"]
+    if state == "claimed":
+        raise SuggestionInProgressError(record["suggestion_attempt_id"])
+    if state == "accepted":
+        receipt = con.execute(
+            "SELECT response FROM registry_receipts WHERE owner=? AND request_key=?", (owner, key)
+        ).fetchone()
+        if receipt is None:
+            raise ValueError("Accepted suggestion is missing its retry receipt")
+        return json.loads(receipt["response"])
+    failure = record["outcome"].get("failure") or {
+        "type": "RuntimeError",
+        "message": "Suggestion execution was explicitly reconciled as unknown",
+    }
+    if failure["type"] == "OptimizerBackendError":
+        adapter = importlib.import_module("measure_service.optimizer_backend")
+        error = adapter.OptimizerBackendError(failure["message"])
+    elif failure["type"] == "ValueError":
+        error = ValueError(failure["message"])
+    else:
+        error = RuntimeError(failure["message"])
+    error.suggestion_attempt_id = record["suggestion_attempt_id"]
+    raise error
+
+
+def get_campaign_suggestion_attempt(owner: str, suggestion_attempt_id: str) -> dict[str, Any]:
+    with registry_connection() as con:
+        record = suggestion_attempts.get(con, owner, suggestion_attempt_id)
+        _verify_suggestion_context(con, owner, record)
+        return record
+
+
+def list_campaign_suggestion_attempts(
+    owner: str, campaign_id: str, limit: int = 10, after: str | None = None
+) -> dict[str, Any]:
+    with registry_connection() as con:
+        _campaign_row(con, owner, campaign_id)
+        page = suggestion_attempts.list_records(con, owner, campaign_id, limit=limit, after=after)
+        cache: dict[int, tuple[list[dict[str, Any]], list[dict[str, Any]]]] = {}
+        for summary in page["records"]:
+            record = suggestion_attempts.get(con, owner, summary["suggestion_attempt_id"])
+            _verify_suggestion_context(con, owner, record, replay_cache=cache)
+        return page
+
+
+def abandon_campaign_suggestion_attempt(
+    owner: str, suggestion_attempt_id: str, expected_start_sha256: str, reason: str, key: str
+) -> dict[str, Any]:
+    request = {
+        "operation": "abandon_campaign_suggestion_attempt",
+        "suggestion_attempt_id": suggestion_attempt_id,
+        "expected_start_sha256": expected_start_sha256,
+        "reason": reason,
+    }
+
+    def write(con: sqlite3.Connection) -> dict[str, Any]:
+        record = suggestion_attempts.get(con, owner, suggestion_attempt_id)
+        _verify_suggestion_context(con, owner, record)
+        return suggestion_attempts.abandon(
+            con, owner, suggestion_attempt_id, expected_start_sha256, reason
+        )
+
+    return registry_mutation(owner, key, request, write)
+
+
+def _finish_suggestion(
+    owner: str,
+    key: str,
+    claim: dict[str, Any],
+    candidate: dict[str, Any] | None,
+    backend: dict[str, Any] | None,
+    elapsed: float | None,
+    generation_error: Exception | None,
+    elapsed_evidence: dict[str, Any],
+) -> dict[str, Any]:
+    started_record = claim["record"]
+    suggestion_id = started_record["suggestion_attempt_id"]
+    token = claim["execution_token"]
+    context = started_record["context"]
+    base_outcome = {
+        "candidate": candidate,
+        "backend": backend,
+        "candidate_generation_elapsed_seconds": elapsed,
+        "adapter_subprocess_elapsed_seconds": elapsed_evidence.get(
+            "adapter_subprocess_elapsed_seconds"
+        ),
+        "proposal_id": None,
+        "failure": elapsed_evidence.get("failure"),
+        "diagnostics": elapsed_evidence.get("diagnostics"),
+    }
+    with registry_connection(write=True) as con:
+        current = suggestion_attempts.get(con, owner, suggestion_id)
+        reservation = suggestion_attempts.lookup(con, owner, key, current["request"])
+        if (
+            reservation is None
+            or reservation["kind"] != "attempt"
+            or reservation["execution_token"] != token
+            or current["start_sha256"] != started_record["start_sha256"]
+            or current["context_sha256"] != started_record["context_sha256"]
+        ):
+            raise ValueError("Suggestion claim identity changed during computation")
+        if current["state"] == "abandoned_unknown":
+            return suggestion_attempts.record_late_result(
+                con,
+                owner,
+                suggestion_id,
+                token,
+                _fit_suggestion_outcome(
+                    _admit_suggestion_evidence(
+                        current,
+                        {
+                            **base_outcome,
+                            "phase": "candidate_generation",
+                            "computation_status": "failed"
+                            if generation_error is not None
+                            else "returned",
+                        },
+                    )
+                ),
+            )
+        if current["state"] != "claimed":
+            return current
+        _verify_suggestion_context(con, owner, current)
+        admitted = _admit_suggestion_evidence(current, base_outcome)
+        if admitted is not base_outcome:
+            return suggestion_attempts.finalize(con, owner, suggestion_id, token, admitted)
+        response = None
+        if generation_error is not None:
+            outcome = {**base_outcome, "status": "failed", "phase": "candidate_generation"}
+        else:
+            con.execute("SAVEPOINT campaign_suggestion_proposal")
+            try:
+                row = _campaign_row(con, owner, current["campaign_id"])
+                payload = _verify_campaign_payload(row)
+                protocol, links = _task_for_campaign(con, owner, row, payload)
+                if row["revision"] != current["expected_revision"]:
+                    raise ValueError("Campaign revision conflict during suggestion finalization")
+                if (
+                    con.execute(
+                        "SELECT 1 FROM campaign_proposals WHERE owner=? AND campaign_id=? AND state='pending'",
+                        (owner, row["id"]),
+                    ).fetchone()
+                    is not None
+                ):
+                    raise ValueError("Campaign already has a pending proposal")
+                training, members = _training_context(
+                    con, owner, row["id"], before_ordinal=current["ordinal"]
+                )
+                if context["training"] != {
+                    "count": len(training),
+                    "sha256": sha256(training),
+                    "records": training,
+                    "snapshot_members": members,
+                }:
+                    raise ValueError("Campaign training changed during suggestion execution")
+                response = _insert_suggested_proposal(
+                    con,
+                    owner,
+                    row["id"],
+                    current["expected_revision"],
+                    row,
+                    protocol,
+                    links["spec"],
+                    current["ordinal"],
+                    {k: v for k, v in context["training"].items() if k != "records"},
+                    candidate,
+                    backend,
+                    current["request"],
+                )
+                _fit_suggestion_outcome(
+                    {
+                        **base_outcome,
+                        "status": "accepted",
+                        "phase": "proposal_committed",
+                        "proposal_id": response["proposal"]["proposal_id"],
+                    }
+                )
+            except Exception as error:
+                con.execute("ROLLBACK TO SAVEPOINT campaign_suggestion_proposal")
+                con.execute("RELEASE SAVEPOINT campaign_suggestion_proposal")
+                response = None
+                outcome = {
+                    **base_outcome,
+                    "status": "rejected",
+                    "phase": "proposal_validation",
+                    "failure": _suggestion_failure(error),
+                }
+            else:
+                con.execute("RELEASE SAVEPOINT campaign_suggestion_proposal")
+                outcome = {
+                    **base_outcome,
+                    "status": "accepted",
+                    "phase": "proposal_committed",
+                    "proposal_id": response["proposal"]["proposal_id"],
+                }
+        return suggestion_attempts.finalize(
+            con,
+            owner,
+            suggestion_id,
+            token,
+            _fit_suggestion_outcome(outcome),
+            successful_response=response,
+        )
+
+
 def suggest_campaign(
     owner: str, campaign_id: str, expected_revision: int, key: str
 ) -> dict[str, Any]:
+    """Claim durably, compute outside a write lock, and finalize once without fallback."""
     _positive_integer(expected_revision, "expected_revision")
     request = {
         "operation": "suggest_campaign",
         "campaign_id": campaign_id,
         "expected_revision": expected_revision,
     }
-
-    def write(con: sqlite3.Connection) -> dict[str, Any]:
+    with registry_connection(write=True) as con:
+        retained = suggestion_attempts.lookup(con, owner, key, request)
+        if retained is not None:
+            if retained["kind"] == "legacy":
+                return retained["response"]
+            return _replay_suggestion_attempt(con, owner, key, retained["record"])
         row = _campaign_row(con, owner, campaign_id)
         payload = _verify_campaign_payload(row)
-        protocol_response, links = _task_for_campaign(con, owner, row, payload)
-        spec: campaign_protocol.CampaignProtocolSpec = links["spec"]
+        protocol, links = _task_for_campaign(con, owner, row, payload)
+        spec = links["spec"]
         if row["revision"] != expected_revision:
             raise ValueError("Campaign revision conflict")
-        existing = con.execute(
+        active = suggestion_attempts.active(con, owner, campaign_id)
+        if active is not None:
+            raise SuggestionInProgressError(active["suggestion_attempt_id"])
+        pending = con.execute(
             "SELECT * FROM campaign_proposals WHERE owner=? AND campaign_id=? AND state='pending'",
             (owner, campaign_id),
         ).fetchone()
-        if existing is not None:
-            proposal = _proposal_response(con, existing)
-            return _bounded(
+        if pending is not None:
+            proposal = _proposal_response(con, pending)
+            response = _bounded(
                 {
                     "schema_version": SCHEMA_VERSION,
                     "campaign_id": campaign_id,
@@ -975,111 +1716,56 @@ def suggest_campaign(
                     "campaign": _campaign_response(con, owner, row),
                 }
             )
-        prior = con.execute(
+            con.execute(
+                "INSERT INTO registry_receipts VALUES (?, ?, ?, ?, ?)",
+                (owner, key, sha256(request), canonical(response), now()),
+            )
+            return response
+        ordinal = con.execute(
             "SELECT COUNT(*) FROM campaign_consumptions WHERE owner=? AND campaign_id=?",
             (owner, campaign_id),
         ).fetchone()[0]
-        if prior >= spec.evaluation_budget:
+        if ordinal >= spec.evaluation_budget:
             raise ValueError("Campaign has consumed its full declared evaluation budget")
-        ordinal = prior
-        training, source_members = _training_context(
-            con, owner, campaign_id, before_ordinal=ordinal
-        )
-        training_digest = sha256(training)
-        training_record = {
-            "count": len(training),
-            "sha256": training_digest,
-            "snapshot_members": source_members,
-        }
-        backend = None
+        training, members = _training_context(con, owner, campaign_id, before_ordinal=ordinal)
+        context = _suggestion_context(row, protocol, spec, ordinal, training, members)
+        claim = suggestion_attempts.claim(con, owner, key, request, context)
+    candidate = backend = None
+    generation_error = None
+    elapsed_evidence: dict[str, Any] = {}
+    started = time.perf_counter()
+    try:
         if ordinal < spec.initial_design_size:
             candidate = campaign_protocol.initial_candidate(spec, row["seed"], ordinal)
-            proposal_source = "common_initial_design"
         elif row["policy"] == "random":
             candidate = campaign_protocol.random_candidate(spec, row["seed"], ordinal)
-            proposal_source = "random_policy"
         else:
-            candidate, backend = _bo_candidate(spec, training, row["seed"])
-            proposal_source = "bo_mcp_gp_logei"
-        declaration = campaign_protocol.method_declaration(spec, candidate)
-        method = _insert_campaign_method(
-            con, owner, campaign_id, ordinal, declaration, spec.constraints
-        )
-        candidate_digest = sha256(candidate)
-        duplicate = con.execute(
-            "SELECT id FROM campaign_proposals WHERE campaign_id=? AND candidate_digest=?",
-            (campaign_id, candidate_digest),
-        ).fetchone()
-        if duplicate is not None:
-            raise ValueError("Campaign candidate duplicates a prior proposal")
-        proposal_id, created = str(uuid.uuid4()), now()
-        proposal_input = {
-            "protocol_input_sha256": protocol_response["input_sha256"],
-            "campaign_id": campaign_id,
-            "seed": row["seed"],
-            "policy": row["policy"],
-            "ordinal": ordinal,
-            "candidate": candidate,
-            "training_sha256": training_digest,
-            "backend": backend,
-        }
-        input_digest = sha256(request)
-        proposal_payload: dict[str, Any] = {
-            "schema_version": SCHEMA_VERSION,
-            "request": request,
-            "proposal_input": proposal_input,
-            "candidate": candidate,
-            "policy": row["policy"],
-            "proposal_source": proposal_source,
-            "training": training_record,
-            "backend": backend,
-            "method": {
-                "method_id": method["method_id"],
-                "input_sha256": method["input_sha256"],
-                "canonical_program_sha256": method["canonical_program_sha256"],
-            },
-        }
-        proposal_payload["record_sha256"] = sha256(proposal_payload)
-        _bounded(proposal_payload, "Campaign proposal")
-        con.execute(
-            """INSERT INTO campaign_proposals (
-              id, owner, campaign_id, ordinal, state, candidate_digest,
-              executable_method_id, method_input_digest, canonical_program_digest,
-              payload, input_digest, created_at
-            ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)""",
-            (
-                proposal_id,
-                owner,
-                campaign_id,
-                ordinal,
-                candidate_digest,
-                method["method_id"],
-                method["input_sha256"],
-                method["canonical_program_sha256"],
-                canonical(proposal_payload),
-                input_digest,
-                created,
-            ),
-        )
-        updated = con.execute(
-            "UPDATE campaign_runs SET revision=revision+1 WHERE id=? AND owner=? AND revision=?",
-            (campaign_id, owner, expected_revision),
-        )
-        if updated.rowcount != 1:
-            raise ValueError("Campaign revision conflict")
-        fresh = _campaign_row(con, owner, campaign_id)
-        proposal = _proposal_response(con, _proposal_row(con, owner, proposal_id))
-        return _bounded(
-            {
-                "schema_version": SCHEMA_VERSION,
-                "campaign_id": campaign_id,
-                "revision": fresh["revision"],
-                "proposal": proposal,
-                "campaign": _campaign_response(con, owner, fresh),
-            }
-        )
-
-    return registry_mutation(owner, key, request, write)
+            candidate, backend = _bo_candidate(
+                spec, training, row["seed"], elapsed_evidence=elapsed_evidence
+            )
+    except Exception as error:
+        generation_error = error
+        diagnostic = _suggestion_diagnostics(error)
+        elapsed_evidence["failure"] = _suggestion_failure(error)
+        elapsed_evidence["diagnostics"] = diagnostic
+        if diagnostic is not None:
+            elapsed_evidence["adapter_subprocess_elapsed_seconds"] = diagnostic.get(
+                "subprocess_elapsed_seconds"
+            )
+    elapsed = time.perf_counter() - started
+    elapsed = elapsed if math.isfinite(elapsed) and elapsed >= 0 else None
+    # Only retry a database finalization; the candidate is never recomputed.
+    for retry in range(2):
+        try:
+            record = _finish_suggestion(
+                owner, key, claim, candidate, backend, elapsed, generation_error, elapsed_evidence
+            )
+            break
+        except sqlite3.OperationalError:
+            if retry:
+                raise
+    with registry_connection() as con:
+        return _replay_suggestion_attempt(con, owner, key, record)
 
 
 def _snapshot_and_observation(
