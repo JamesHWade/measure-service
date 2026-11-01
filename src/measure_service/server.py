@@ -24,6 +24,7 @@ from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
 from . import (
     campaign_protocol_registry,
+    campaign_suggestion_attempts,
     campaigns,
     gaussian_producer,
     method_registry,
@@ -34,6 +35,7 @@ from . import experiments as registry
 from .campaign_protocol import (
     ABLATION_CAMPAIGN_PROFILE,
     CAMPAIGN_PROFILE,
+    REPLICATION_CAMPAIGN_PROFILE,
     SUPPORTED_OPTIMIZER_TARGETS,
     SUPPORTED_SURROGATE_NOISE_PRIORS,
     ProtocolSpec,
@@ -603,7 +605,18 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "gaussian_observation_producer": "predeclared_synthetic_widths_and_exact_prediction_bound_results",
         "synthetic_campaigns": {
             "profile": "synthetic-isocratic-paired/1",
-            "supported_profiles": [CAMPAIGN_PROFILE, ABLATION_CAMPAIGN_PROFILE],
+            "supported_profiles": [
+                CAMPAIGN_PROFILE,
+                ABLATION_CAMPAIGN_PROFILE,
+                REPLICATION_CAMPAIGN_PROFILE,
+            ],
+            "duplicate_candidates": {
+                "legacy_profiles": "reject",
+                "explicit_profile": REPLICATION_CAMPAIGN_PROFILE,
+                "required_policy": ["reject", "replicate"],
+                "equality": "exact_normalized_candidate_sha256",
+                "replicate_evidence": "fresh_execution_and_consumption_counted_per_ordinal",
+            },
             "execution": "sequential_single_fidelity_simulator_latent",
             "policies": ["random", "bo_mcp_gp_logei"],
             "supported_optimizer_targets": list(SUPPORTED_OPTIMIZER_TARGETS),
@@ -631,8 +644,9 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
             "conditions_per_set": 64,
             "measurements_per_attempt": 32,
             "results_per_batch": 50,
-            "suggestion_attempt_record_bytes": 256_000,
+            "suggestion_attempt_record_bytes": campaign_suggestion_attempts.MAX_PUBLIC_BYTES,
             "suggestion_attempt_page_size": 20,
+            "campaign_composite_response_bytes": campaign_suggestion_attempts.MAX_SUCCESS_RESPONSE_BYTES,
         },
     }
 

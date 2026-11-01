@@ -89,6 +89,10 @@ as `untrusted_returned_evidence`, not presented as verified provenance, and
 cannot create a proposal. This keeps the rejection readable without granting
 trust to the data it rejected.
 
+Successful response receipts allow at most 128,000 bytes, including the
+combined new-profile proposal and campaign response. This does not enlarge
+individual stored proposal, method, consumption or campaign records.
+
 The original request is bounded at 64,000 bytes, context at 128,000, terminal
 or late-event data at 64,000, and a full public record at 256,000. If complete
 returned metadata cannot fit the terminal envelope, the rejection retains the

@@ -28,6 +28,7 @@ from .storage import canonical, sha256
 
 CAMPAIGN_PROFILE = "synthetic-isocratic-paired/1"
 ABLATION_CAMPAIGN_PROFILE = "synthetic-isocratic-ablation/1"
+REPLICATION_CAMPAIGN_PROFILE = "synthetic-isocratic-ablation/2"
 UTILITY_PROFILE = "moses-botier-1.0.0-binary64/1"
 UTILITY_INPUT_DEFINITION = "finite-resolution-reference/1"
 CONFIRMED_ACCEPTANCE_PROFILE = "confirmed-acceptance-lower-bound/1"
@@ -181,7 +182,14 @@ class AblationProtocolSpec(CampaignProtocolSpec):
     surrogate_noise_prior: Literal["default", "low_noise"]
 
 
-ProtocolSpec = CampaignProtocolSpec | AblationProtocolSpec
+class ReplicationProtocolSpec(AblationProtocolSpec):
+    """Versioned duplicate-admission policy for an otherwise matched campaign."""
+
+    profile: Literal["synthetic-isocratic-ablation/2"] = Field(...)
+    duplicate_policy: Literal["reject", "replicate"]
+
+
+ProtocolSpec = ReplicationProtocolSpec | AblationProtocolSpec | CampaignProtocolSpec
 
 
 class CandidateCoordinates(StrictModel):
@@ -192,12 +200,14 @@ class CandidateCoordinates(StrictModel):
 
 
 def parse_campaign_protocol(spec: ProtocolSpec | dict[str, Any]) -> ProtocolSpec:
-    """Parse either the frozen paired V1 protocol or the explicit ablation V2 profile.
+    """Parse a frozen paired V1 or explicitly versioned ablation profile.
 
     V1 dictionaries may omit ``profile`` and retain the original V1 defaults. Existing
     ``CampaignProtocolSpec`` objects are returned as-is, so this dispatcher does not
     reserialize or otherwise alter their canonical identity.
     """
+    if isinstance(spec, ReplicationProtocolSpec):
+        return spec
     if isinstance(spec, AblationProtocolSpec):
         return spec
     if isinstance(spec, CampaignProtocolSpec):
@@ -209,6 +219,8 @@ def parse_campaign_protocol(spec: ProtocolSpec | dict[str, Any]) -> ProtocolSpec
         return CampaignProtocolSpec.model_validate(spec)
     if profile == ABLATION_CAMPAIGN_PROFILE:
         return AblationProtocolSpec.model_validate(spec)
+    if profile == REPLICATION_CAMPAIGN_PROFILE:
+        return ReplicationProtocolSpec.model_validate(spec)
     raise ValueError(f"unsupported campaign protocol profile: {profile!r}")
 
 
@@ -269,8 +281,9 @@ def campaign_design_sha256(spec: ProtocolSpec | dict[str, Any]) -> str:
 
     Logical task IDs remain part of the scientific design identity. Rebinding
     those tasks to producer or observation-contract records in a new database
-    does not change seeded candidate coordinates. The ablation profile additionally
-    excludes its two declared optimizer factors so paired arms share coordinates.
+    does not change seeded candidate coordinates. The V2 ablation profile
+    excludes its two optimizer factors. The replication profile also excludes
+    duplicate admission so its paired arms share coordinates.
     """
     protocol = parse_campaign_protocol(spec)
     normalized = protocol.model_dump(mode="json")
@@ -278,7 +291,11 @@ def campaign_design_sha256(spec: ProtocolSpec | dict[str, Any]) -> str:
         {"task_id": task["task_id"]}
         for task in sorted(normalized["tasks"], key=lambda item: item["task_id"])
     ]
-    if isinstance(protocol, AblationProtocolSpec):
+    if isinstance(protocol, ReplicationProtocolSpec):
+        normalized.pop("optimizer_target")
+        normalized.pop("surrogate_noise_prior")
+        normalized.pop("duplicate_policy")
+    elif isinstance(protocol, AblationProtocolSpec):
         normalized.pop("optimizer_target")
         normalized.pop("surrogate_noise_prior")
     return sha256(normalized)

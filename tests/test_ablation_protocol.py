@@ -242,18 +242,26 @@ def test_v2_factor_fields_without_new_profile_are_not_silently_accepted_as_v1():
         parse_campaign_protocol(value)
 
 
-def test_mcp_protocol_schema_exposes_both_profiles_and_v2_factors():
+def test_mcp_protocol_schema_exposes_original_factors_and_explicit_replication():
     from measure_service.server import mcp
 
     parameters = mcp._tool_manager.get_tool("measurement_register_campaign_protocol").parameters
     spec_schema = parameters["properties"]["spec"]
-    assert len(spec_schema["anyOf"]) == 2
+    assert len(spec_schema["anyOf"]) == 3
     definitions = parameters["$defs"]
     assert "CampaignProtocolSpec" in definitions
     assert "AblationProtocolSpec" in definitions
     v2 = definitions["AblationProtocolSpec"]
     assert set(v2["required"]) >= {"optimizer_target", "surrogate_noise_prior"}
     assert "profile" in v2["required"]
+    replication = definitions["ReplicationProtocolSpec"]
+    assert set(replication["required"]) >= {
+        "profile",
+        "optimizer_target",
+        "surrogate_noise_prior",
+        "duplicate_policy",
+    }
+    assert replication["properties"]["duplicate_policy"]["enum"] == ["reject", "replicate"]
 
 
 def test_registry_capabilities_preserve_v1_and_advertise_limited_v2(monkeypatch):
@@ -267,7 +275,15 @@ def test_registry_capabilities_preserve_v1_and_advertise_limited_v2(monkeypatch)
     assert capabilities["supported_profiles"] == [
         "synthetic-isocratic-paired/1",
         ABLATION_CAMPAIGN_PROFILE,
+        "synthetic-isocratic-ablation/2",
     ]
+    assert capabilities["duplicate_candidates"] == {
+        "legacy_profiles": "reject",
+        "explicit_profile": "synthetic-isocratic-ablation/2",
+        "required_policy": ["reject", "replicate"],
+        "equality": "exact_normalized_candidate_sha256",
+        "replicate_evidence": "fresh_execution_and_consumption_counted_per_ordinal",
+    }
     assert capabilities["supported_optimizer_targets"] == [
         "historical_utility",
         "confirmed_acceptance_reward",

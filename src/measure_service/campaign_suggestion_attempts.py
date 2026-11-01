@@ -20,6 +20,7 @@ from .storage import canonical, now, sha256
 SCHEMA_VERSION = "1.0"
 PROFILE = "campaign-suggestion-attempt/1"
 MAX_REQUEST_BYTES = 64_000
+MAX_SUCCESS_RESPONSE_BYTES = 128_000
 MAX_CONTEXT_BYTES = 128_000
 MAX_OUTCOME_BYTES = 64_000
 MAX_PUBLIC_BYTES = 256_000
@@ -429,7 +430,9 @@ def _verify_accepted_binding(
     ).fetchone()
     if receipt is None or receipt["digest"] != attempt_row["input_digest"]:
         raise ValueError("Accepted suggestion attempt is missing its successful retry receipt")
-    response = _parse_object(receipt["response"], "suggestion success receipt", MAX_REQUEST_BYTES)
+    response = _parse_object(
+        receipt["response"], "suggestion success receipt", MAX_SUCCESS_RESPONSE_BYTES
+    )
     if sha256(response) != outcome.get("response_sha256"):
         raise ValueError("Accepted suggestion receipt does not match its outcome digest")
     response_proposal = response.get("proposal")
@@ -564,7 +567,7 @@ def lookup(
                     "Idempotency key was already used for a different registry request"
                 )
             response = _parse_object(
-                receipt["response"], "legacy suggestion receipt", MAX_REQUEST_BYTES
+                receipt["response"], "legacy suggestion receipt", MAX_SUCCESS_RESPONSE_BYTES
             )
             return {"kind": "legacy", "response": response}
     return None
@@ -814,7 +817,7 @@ def _accepted_response(
     if not isinstance(successful_response, dict):
         raise ValueError("Accepted suggestion requires a successful response object")
     response, _ = _validate_json(
-        successful_response, "Successful suggestion response", MAX_REQUEST_BYTES
+        successful_response, "Successful suggestion response", MAX_SUCCESS_RESPONSE_BYTES
     )
     if outcome.get("failure") is not None or outcome.get("proposal_id") is None:
         raise ValueError("Accepted suggestion requires a proposal link and no failure")

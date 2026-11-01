@@ -42,10 +42,18 @@ MAX_RECORD_BYTES = 64_000
 _CAMPAIGN_POLICIES = {"random", "bo_mcp_gp_logei"}
 
 
-def _bounded(value: Any, label: str = "Campaign record") -> Any:
-    if len(canonical(value).encode("utf-8")) > MAX_RECORD_BYTES:
-        raise ValueError(f"{label} exceeds the 64,000-byte limit")
+def _bounded(
+    value: Any, label: str = "Campaign record", *, max_bytes: int = MAX_RECORD_BYTES
+) -> Any:
+    if len(canonical(value).encode("utf-8")) > max_bytes:
+        raise ValueError(f"{label} exceeds the {max_bytes:,}-byte limit")
     return value
+
+
+def _composite_response_limit(spec: campaign_protocol.ProtocolSpec) -> int:
+    if isinstance(spec, campaign_protocol.ReplicationProtocolSpec):
+        return suggestion_attempts.MAX_SUCCESS_RESPONSE_BYTES
+    return MAX_RECORD_BYTES
 
 
 def _positive_integer(value: Any, name: str) -> int:
@@ -59,7 +67,13 @@ def _source_hash(path: str | Path) -> str:
 
 
 def _is_ablation_protocol(spec: campaign_protocol.ProtocolSpec) -> bool:
-    return getattr(spec, "profile", None) == "synthetic-isocratic-ablation/1"
+    return isinstance(spec, campaign_protocol.AblationProtocolSpec)
+
+
+def _duplicate_policy_for_spec(spec: campaign_protocol.ProtocolSpec) -> str:
+    if isinstance(spec, campaign_protocol.ReplicationProtocolSpec):
+        return spec.duplicate_policy
+    return "reject"
 
 
 def _optimizer_target_record(
@@ -180,6 +194,41 @@ def _proposal_row(con: sqlite3.Connection, owner: str, proposal_id: str) -> sqli
     return row
 
 
+def _matching_prior_proposals(
+    con: sqlite3.Connection,
+    owner: str,
+    campaign_id: str,
+    ordinal: int,
+    candidate: dict[str, Any],
+    campaign_context: tuple[sqlite3.Row, dict[str, Any], dict[str, Any], dict[str, Any]],
+    verified_proposals: dict[str, dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """Verify prior same-candidate proposal rows and return their ordered identities."""
+    rows = con.execute(
+        """SELECT * FROM campaign_proposals
+        WHERE owner=? AND campaign_id=? AND ordinal<? AND candidate_digest=?
+        ORDER BY ordinal""",
+        (owner, campaign_id, ordinal, sha256(candidate)),
+    ).fetchall()
+    if verified_proposals is None:
+        verified_proposals = {}
+    matches = []
+    for prior_row in rows:
+        prior = verified_proposals.get(prior_row["id"])
+        if prior is None:
+            prior = _proposal_response(
+                con,
+                prior_row,
+                verify_training=False,
+                campaign_context=campaign_context,
+                verified_proposals=verified_proposals,
+            )
+        if canonical(prior["candidate"]) != canonical(candidate):
+            raise ValueError("Campaign candidate digest collision in prior proposal history")
+        matches.append({"proposal_id": prior["proposal_id"], "ordinal": prior["ordinal"]})
+    return matches
+
+
 def _proposal_response(
     con: sqlite3.Connection,
     row: sqlite3.Row,
@@ -188,7 +237,10 @@ def _proposal_response(
     replayed_training: tuple[list[dict[str, Any]], list[dict[str, Any]]] | None = None,
     campaign_context: tuple[sqlite3.Row, dict[str, Any], dict[str, Any], dict[str, Any]]
     | None = None,
+    verified_proposals: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    if verified_proposals is None:
+        verified_proposals = {}
     try:
         payload = json.loads(row["payload"])
     except (TypeError, json.JSONDecodeError) as error:
@@ -258,6 +310,39 @@ def _proposal_response(
     }:
         raise ValueError("Stored campaign proposal source is unsupported")
     protocol_spec = links["spec"]
+    matching_prior = _matching_prior_proposals(
+        con,
+        row["owner"],
+        row["campaign_id"],
+        row["ordinal"],
+        candidate,
+        (campaign_row, campaign_payload, protocol, links),
+        verified_proposals,
+    )
+    if isinstance(protocol_spec, campaign_protocol.ReplicationProtocolSpec):
+        reused_method = con.execute(
+            """SELECT id FROM campaign_proposals
+            WHERE owner=? AND campaign_id=? AND executable_method_id=? AND id<>?
+            LIMIT 1""",
+            (row["owner"], row["campaign_id"], row["executable_method_id"], row["id"]),
+        ).fetchone()
+        if reused_method is not None:
+            raise ValueError("Replication campaign proposals require distinct executable methods")
+        repetition = {
+            "policy": protocol_spec.duplicate_policy,
+            "is_repeat": bool(matching_prior),
+            "first_proposal_id": (None if not matching_prior else matching_prior[0]["proposal_id"]),
+            "matching_prior_proposals": matching_prior,
+        }
+        if canonical(payload.get("repetition")) != canonical(repetition):
+            raise ValueError("Stored proposal repetition evidence differs from prior proposals")
+        if matching_prior and protocol_spec.duplicate_policy == "reject":
+            raise ValueError("Campaign candidate duplicates a prior proposal")
+    else:
+        if "repetition" in payload:
+            raise ValueError("Legacy campaign proposal has unsupported repetition evidence")
+        if matching_prior:
+            raise ValueError("Campaign candidate duplicates a prior proposal")
     expected_declaration = campaign_protocol.method_declaration(protocol_spec, candidate)
     if method["evaluation"]["declaration"] != expected_declaration.model_dump(mode="json"):
         raise ValueError("Stored campaign method does not implement its declared candidate")
@@ -341,13 +426,27 @@ def _proposal_response(
         "input_sha256": row["input_digest"],
         "created_at": row["created_at"],
     }
-    return _bounded(result, "Campaign proposal")
+    if isinstance(protocol_spec, campaign_protocol.ReplicationProtocolSpec):
+        result["repetition"] = repetition
+    result = _bounded(result, "Campaign proposal")
+    verified_proposals[row["id"]] = result
+    return result
+
+
+def _repetition_summary(repetition: dict[str, Any]) -> dict[str, Any]:
+    """Bound campaign history without repeating every proposal's full lineage."""
+    return {
+        "policy": repetition["policy"],
+        "is_repeat": repetition["is_repeat"],
+        "first_proposal_id": repetition["first_proposal_id"],
+        "matching_prior_proposal_count": len(repetition["matching_prior_proposals"]),
+    }
 
 
 def _proposal_summary(proposal: dict[str, Any] | None) -> dict[str, Any] | None:
     if proposal is None:
         return None
-    return {
+    result = {
         "proposal_id": proposal["proposal_id"],
         "ordinal": proposal["ordinal"],
         "state": proposal["state"],
@@ -360,6 +459,9 @@ def _proposal_summary(proposal: dict[str, Any] | None) -> dict[str, Any] | None:
         },
         "input_sha256": proposal["input_sha256"],
     }
+    if "repetition" in proposal:
+        result["repetition"] = _repetition_summary(proposal["repetition"])
+    return result
 
 
 def _consumption_row(con: sqlite3.Connection, owner: str, consumption_id: str) -> sqlite3.Row:
@@ -479,6 +581,8 @@ def _campaign_response(con: sqlite3.Connection, owner: str, row: sqlite3.Row) ->
             "evaluation_cost": result["evaluation_cost"],
             "runtime_min": result["runtime_min"],
         }
+        if isinstance(spec, campaign_protocol.ReplicationProtocolSpec):
+            history_row["repetition"] = _repetition_summary(proposal["repetition"])
         if _is_ablation_protocol(spec):
             expected_target = _optimizer_target_record(spec, result)
             if result.get("optimizer_target") != expected_target:
@@ -975,17 +1079,24 @@ def _insert_suggested_proposal(
     """Insert a validated candidate only inside the terminal transaction."""
     training_digest = training_record["sha256"]
     proposal_source = _suggestion_generation_kind(spec, row["policy"], ordinal)
+    candidate_digest = sha256(candidate)
+    duplicate_policy = _duplicate_policy_for_spec(spec)
+    campaign_payload = _verify_campaign_payload(row)
+    _, task_links = _task_for_campaign(con, owner, row, campaign_payload)
+    matching_prior = _matching_prior_proposals(
+        con,
+        owner,
+        campaign_id,
+        ordinal,
+        candidate,
+        (row, campaign_payload, protocol_response, task_links),
+    )
+    if matching_prior and duplicate_policy == "reject":
+        raise ValueError("Campaign candidate duplicates a prior proposal")
     declaration = campaign_protocol.method_declaration(spec, candidate)
     method = _insert_campaign_method(
         con, owner, campaign_id, ordinal, declaration, spec.constraints
     )
-    candidate_digest = sha256(candidate)
-    duplicate = con.execute(
-        "SELECT id FROM campaign_proposals WHERE campaign_id=? AND candidate_digest=?",
-        (campaign_id, candidate_digest),
-    ).fetchone()
-    if duplicate is not None:
-        raise ValueError("Campaign candidate duplicates a prior proposal")
     proposal_id, created = str(uuid.uuid4()), now()
     proposal_input = {
         "protocol_input_sha256": protocol_response["input_sha256"],
@@ -1013,6 +1124,13 @@ def _insert_suggested_proposal(
             "canonical_program_sha256": method["canonical_program_sha256"],
         },
     }
+    if isinstance(spec, campaign_protocol.ReplicationProtocolSpec):
+        proposal_payload["repetition"] = {
+            "policy": duplicate_policy,
+            "is_repeat": bool(matching_prior),
+            "first_proposal_id": (None if not matching_prior else matching_prior[0]["proposal_id"]),
+            "matching_prior_proposals": matching_prior,
+        }
     proposal_payload["record_sha256"] = sha256(proposal_payload)
     _bounded(proposal_payload, "Campaign proposal")
     con.execute(
@@ -1050,7 +1168,9 @@ def _insert_suggested_proposal(
             "revision": fresh["revision"],
             "proposal": proposal,
             "campaign": _campaign_response(con, owner, fresh),
-        }
+        },
+        "Campaign suggestion response",
+        max_bytes=_composite_response_limit(spec),
     )
 
 
@@ -1113,7 +1233,7 @@ def _suggestion_context(
             "policy": row["policy"],
         },
         "spec": spec.model_dump(mode="json"),
-        "duplicate_policy": "reject",
+        "duplicate_policy": _duplicate_policy_for_spec(spec),
         "training": {
             "count": len(training),
             "sha256": sha256(training),
@@ -1394,7 +1514,7 @@ def _verify_suggestion_context(
         or record["expected_revision"] != 1 + 2 * ordinal
         or not 0 <= ordinal < spec.evaluation_budget
         or canonical(context.get("spec")) != canonical(spec.model_dump(mode="json"))
-        or context.get("duplicate_policy") != "reject"
+        or context.get("duplicate_policy") != _duplicate_policy_for_spec(spec)
     ):
         raise ValueError("Stored suggestion context differs from the frozen campaign")
     if replay_cache is not None and ordinal in replay_cache:
@@ -1714,7 +1834,9 @@ def suggest_campaign(
                     "revision": row["revision"],
                     "proposal": proposal,
                     "campaign": _campaign_response(con, owner, row),
-                }
+                },
+                "Campaign suggestion response",
+                max_bytes=_composite_response_limit(spec),
             )
             con.execute(
                 "INSERT INTO registry_receipts VALUES (?, ?, ?, ?, ?)",
@@ -1834,6 +1956,26 @@ def _snapshot_and_observation(
         observation,
         snapshot_payload,
     )
+
+
+def _verify_fresh_replication_experiment(
+    con: sqlite3.Connection,
+    owner: str,
+    campaign_id: str,
+    proposal_id: str,
+    experiment_id: str,
+) -> None:
+    prior = con.execute(
+        """SELECT c.proposal_id FROM campaign_consumptions AS c
+        JOIN analytical_observations AS o ON o.id=c.observation_id AND o.owner=c.owner
+        WHERE c.owner=? AND c.campaign_id=? AND c.proposal_id<>? AND o.experiment_id=?
+        LIMIT 1""",
+        (owner, campaign_id, proposal_id, experiment_id),
+    ).fetchone()
+    if prior is not None:
+        raise ValueError(
+            "Replication campaign consumption requires a fresh experiment for every proposal"
+        )
 
 
 def _verify_campaign_observation(
@@ -2187,12 +2329,22 @@ def _verify_ablation_consumption_source(
         "candidate_sha256": proposal["candidate_sha256"],
         "method": proposal["method"],
     }
-    if payload.get("proposal") != expected_proposal:
+    if isinstance(spec, campaign_protocol.ReplicationProtocolSpec):
+        expected_proposal["repetition"] = proposal["repetition"]
+    if canonical(payload.get("proposal")) != canonical(expected_proposal):
         raise ValueError("Stored ablation consumption proposal differs from its immutable source")
 
     snapshot, observation_row, observation_response, _ = _snapshot_and_observation(
         con, owner, row["observation_snapshot_id"], links["task"]
     )
+    if isinstance(spec, campaign_protocol.ReplicationProtocolSpec):
+        _verify_fresh_replication_experiment(
+            con,
+            owner,
+            row["campaign_id"],
+            row["proposal_id"],
+            observation_row["experiment_id"],
+        )
     if (
         row["snapshot_digest"] != snapshot["sha256"]
         or row["observation_id"] != observation_row["id"]
@@ -2283,6 +2435,14 @@ def consume_campaign_snapshot(
         snapshot, observation_row, observation_response, _ = _snapshot_and_observation(
             con, owner, snapshot_id, links["task"]
         )
+        if isinstance(links["spec"], campaign_protocol.ReplicationProtocolSpec):
+            _verify_fresh_replication_experiment(
+                con,
+                owner,
+                campaign_id,
+                proposal_id,
+                observation_row["experiment_id"],
+            )
         if (
             observation_row["attempt_id"] != snapshot["members"][0]["attempt_id"]
             or observation_row["attempt_revision"] != snapshot["members"][0]["attempt_revision"]
@@ -2302,6 +2462,14 @@ def consume_campaign_snapshot(
         result["evaluation_cost_unit"] = campaign_payload["evaluation_cost_unit"]
         if _is_ablation_protocol(links["spec"]):
             result["optimizer_target"] = _optimizer_target_record(links["spec"], result)
+        proposal_content = {
+            "ordinal": proposal["ordinal"],
+            "candidate": proposal["candidate"],
+            "candidate_sha256": proposal["candidate_sha256"],
+            "method": proposal["method"],
+        }
+        if isinstance(links["spec"], campaign_protocol.ReplicationProtocolSpec):
+            proposal_content["repetition"] = proposal["repetition"]
         content: dict[str, Any] = {
             "schema_version": SCHEMA_VERSION,
             "request": request,
@@ -2315,12 +2483,7 @@ def consume_campaign_snapshot(
             "observation_input_sha256": observation_row["input_digest"],
             "evidence_sha256": observation_row["evidence_digest"],
             "assessment_sha256": observation_row["assessment_digest"],
-            "proposal": {
-                "ordinal": proposal["ordinal"],
-                "candidate": proposal["candidate"],
-                "candidate_sha256": proposal["candidate_sha256"],
-                "method": proposal["method"],
-            },
+            "proposal": proposal_content,
             "source": {
                 "producer_id": source["producer"]["producer_id"],
                 "producer_input_sha256": source["producer"]["input_sha256"],
@@ -2400,7 +2563,9 @@ def consume_campaign_snapshot(
                 "revision": fresh_campaign["revision"],
                 "consumption": consumption,
                 "campaign": _campaign_response(con, owner, fresh_campaign),
-            }
+            },
+            "Campaign consumption response",
+            max_bytes=_composite_response_limit(links["spec"]),
         )
 
     return registry_mutation(owner, key, request, write)

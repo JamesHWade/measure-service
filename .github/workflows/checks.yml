@@ -68,6 +68,11 @@ jobs:
           assert "examples/suggestion_recovery.py" in members
           assert "src/measure_service/campaign_suggestion_attempts.py" in members
           assert "tests/test_suggestion_recovery_example.py" in members
+          assert "docs/campaign-replication.md" in members
+          assert "src/measure_service/campaign_schema.py" in members
+          assert "tests/test_campaign_schema_migration.py" in members
+          assert "tests/test_campaign_replication.py" in members
+          assert "tests/test_replicate_protocol.py" in members
           assert "src/measure_service/benchmarks/synthetic_ablations.py" in members
           assert "src/measure_service/benchmarks/reference_data/synthetic-isocratic-ablation-v1.json" in members
           assert "scripts/export_ablation_reference.py" in members

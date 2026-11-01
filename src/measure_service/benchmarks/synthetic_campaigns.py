@@ -109,6 +109,7 @@ _SERVICE_INDEXES = {
     "attempts_owner_experiment",
     "campaign_one_pending",
     "campaign_protocols_owner_order",
+    "campaign_proposals_candidate",
     "campaign_runs_owner_order",
     "campaign_suggestion_one_active",
     "campaign_suggestion_owner_campaign_order",
