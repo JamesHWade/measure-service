@@ -1,0 +1,2214 @@
+{
+  "profile": "independent-suggestion-sequence-execution-audit/1",
+  "evidence_status": "audited",
+  "qualified": true,
+  "criteria": {
+    "durable_policy_compliance": "pass",
+    "replicate_budget_completion": "pass",
+    "real_duplicate_coverage": "pass",
+    "component_readiness": "pass",
+    "numerical_validation": "pass"
+  },
+  "declaration_sha256": "d85f83d19076e266e4e159253d35e7baa9baea2cde32db225b1be9d7bfc4f4ef",
+  "oracle_source_sha256": "093a7a269a70f9ffd11a8cb31572112e627234aebbad7329b56907bfde228789",
+  "precall_manifest_sha256": "e76f841fe63e0df26f7d9ece4d32d251daf9d5b04b6a921e36ce189233daf08f",
+  "complete_sha256": "8d30f3014076352f138e9b884b99a224b07ee65542ddaab57ba22cf808b765a0",
+  "precall_software_identity": {
+    "measure_methods_distribution": {
+      "source_revision": null,
+      "version": null
+    },
+    "measure_service_distribution": {
+      "source_revision": null,
+      "version": "0.1.0.dev0"
+    },
+    "module_sha256": {
+      "measure_methods.__source_files__": {
+        "__init__.py": "b32a7d28870bdc473b685126e43861f55451d3058e17468db2f49a98f491a166",
+        "chromatography.py": "1824a0a6ddaef062a440cfd5913d3ef89fb45d00bb6f7dc64b741c6d00fbe699",
+        "design.py": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+        "gaussian_observations.py": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9",
+        "metric_candidates.py": "30c5218b2337633ce3f3894d683d19a96021a0355c51a4f81470e06091852606",
+        "moses_objective.py": "2d5fe86082e02dbb6ac1bdf1a1fb4635c115870c0c394746fab8c1cd972b00f8",
+        "objectives.py": "ac649d339bbeb60e54ebeb738c4d31e28111ec511d3d92219f837cad496fdce1",
+        "observations.py": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f",
+        "retention.py": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538",
+        "trajectories.py": "17ee10247239ac4c8faf4266ab92d21763e348c5118496db1416c418cdc09815",
+        "volume.py": "280262b13b7d26c0dcb8cd18c987713af2f79d27437ee4ea7da6ac4554343221"
+      },
+      "measure_methods.__source_tree__": "61a16f25ce9e5d3edfb200f23ca613ca672b288e43239aa2b80ce80ee069cc2a",
+      "measure_methods.design": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+      "measure_methods.gaussian_observations": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9",
+      "measure_methods.moses_objective": "2d5fe86082e02dbb6ac1bdf1a1fb4635c115870c0c394746fab8c1cd972b00f8",
+      "measure_methods.observations": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f",
+      "measure_methods.retention": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538",
+      "measure_service.__source_files__": {
+        "__init__.py": "e5700ed5be1d33881c6e64fe73027651986ed523151763b69656d80f281c91d1",
+        "__main__.py": "3c7b28e5b7170a6b6c83ccd6fcde24623958031d899ca385f9c6762dbe8ee6e9",
+        "benchmarks/__init__.py": "f405de642c5e1c53d7955f388db39bcb16dbf72fe1369f231515a13b2ec5389b",
+        "benchmarks/__main__.py": "abfca88f15e104f0f6c2b9886c2cfb611108c58477fa1a57a39cc24387ee9d45",
+        "benchmarks/evidence.py": "ce71b554b234946825178fd2872fc89b4c4b019d447dc9282b73e4dc15332435",
+        "benchmarks/gaussian_qualification.py": "f2f8bf2182fb5fc36a1bdab26e45fddada95b4f78cfab61fdb18cddcc6834a38",
+        "benchmarks/moses_archive.py": "2ea50c33404fc336fe7adfc8cb68c8b283f35e22522a36fff6420cd452d411a1",
+        "benchmarks/moses_replay.py": "3ad35b5a346097086738db538e567790b8774cbca86992a6efee7fd1d97b9558",
+        "benchmarks/moses_sensitivity.py": "ea61ffc71385ca79eebe5b59fe9a1acf0c39fb2ff3461331896212c583c58546",
+        "benchmarks/pickle_records.py": "e62119def51fe109e4b6a4d0fbd007fb7953f772c4e8f8fc06e493817363ab39",
+        "benchmarks/retention_qualification.py": "09bb7da54ffa2f8f6e5a836d503aa33cf3dd275f7f3efd17eb1fe1f2e9be7bbd",
+        "benchmarks/sensitivity_summary.py": "b05cc5ff144fcacc38fff68eb0838a082bb8c06bc2ab0fa655aed8d6dddabda6",
+        "benchmarks/suggestion_sequences.py": "cb006ea51066c85a5acca990fc61d5a5b4bdc48b347fe4613ebffe911a0cf9ba",
+        "benchmarks/synthetic_ablations.py": "8dffb59acf673fcd8ea4b6b90e153a2205b9a0b0c8baa35e0446d38c1eb834a5",
+        "benchmarks/synthetic_campaigns.py": "6dac4351afa2c0443739722c1c0baa274f7278088a8c4d672dc24d2f7eb7efe4",
+        "campaign_protocol.py": "4420bc4e469cbe73178b4b44147a863976487df3a2e8256fde76d4abf9d7479e",
+        "campaign_protocol_registry.py": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5",
+        "campaign_schema.py": "033738aabe10932371a4b2d1492d021a4743b9edb03fffcd77d58df0db86be0a",
+        "campaign_suggestion_attempts.py": "005e5ecae312638aea1594c700bf25bc808d018c1ebf592ce9c7320c5633fcc8",
+        "campaigns.py": "110615d7658a452f97aec2312478f17707dbd4bff27c79e617534502e365385b",
+        "experiments.py": "a4b37f28af5f5beaa006e50042e9b62b0bbebd389469353bb3f5b4733b4ca52f",
+        "gaussian_producer.py": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970",
+        "method_backend.py": "2e8a3a3dfde1f781e2e15a0874263bb66678dd081dcb5c119330e10702422aec",
+        "method_registry.py": "1df612779079dbe7eafadbb3c15536de855d04f280fcb50aa56b8e503d05295d",
+        "methods.py": "925650c3d1aed5ca8c5b536a258a56f13c040aa34e5a8d4e057ff8cbe24e4859",
+        "moses_score_qualification.py": "1f81445de376bfe2973288c14959831eac108b96ef5ed8c98afdead3780b9ef9",
+        "observations.py": "1fb023f0ed57defc7d3bb35adff53eefeb3dc8acc42e2580c18152ddbf52a45d",
+        "optimizer_backend.py": "0a4a97efeccfced7983d7e8dc93ef0112d42ac40e42e1aaf8270778438718f62",
+        "retention.py": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0",
+        "server.py": "133c672359165ba60086d2355a831a35eae8627b81cb8afb57944f5fbe90d09c",
+        "storage.py": "0bab7801582fa76bfce411addb9995c57f3b00579d72aff11523bc70ca402cab"
+      },
+      "measure_service.__source_tree__": "d3706cac136d490c36ec335e355d4af2680c7bce360b691d91823750e9f3c611",
+      "measure_service.benchmarks.evidence": "ce71b554b234946825178fd2872fc89b4c4b019d447dc9282b73e4dc15332435",
+      "measure_service.benchmarks.suggestion_sequences": "cb006ea51066c85a5acca990fc61d5a5b4bdc48b347fe4613ebffe911a0cf9ba",
+      "measure_service.campaign_protocol": "4420bc4e469cbe73178b4b44147a863976487df3a2e8256fde76d4abf9d7479e",
+      "measure_service.campaign_protocol_registry": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5",
+      "measure_service.campaign_schema": "033738aabe10932371a4b2d1492d021a4743b9edb03fffcd77d58df0db86be0a",
+      "measure_service.campaign_suggestion_attempts": "005e5ecae312638aea1594c700bf25bc808d018c1ebf592ce9c7320c5633fcc8",
+      "measure_service.campaigns": "110615d7658a452f97aec2312478f17707dbd4bff27c79e617534502e365385b",
+      "measure_service.experiments": "a4b37f28af5f5beaa006e50042e9b62b0bbebd389469353bb3f5b4733b4ca52f",
+      "measure_service.gaussian_producer": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970",
+      "measure_service.method_registry": "1df612779079dbe7eafadbb3c15536de855d04f280fcb50aa56b8e503d05295d",
+      "measure_service.methods": "925650c3d1aed5ca8c5b536a258a56f13c040aa34e5a8d4e057ff8cbe24e4859",
+      "measure_service.observations": "1fb023f0ed57defc7d3bb35adff53eefeb3dc8acc42e2580c18152ddbf52a45d",
+      "measure_service.optimizer_backend": "0a4a97efeccfced7983d7e8dc93ef0112d42ac40e42e1aaf8270778438718f62",
+      "measure_service.retention": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0",
+      "measure_service.storage": "0bab7801582fa76bfce411addb9995c57f3b00579d72aff11523bc70ca402cab"
+    },
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python_implementation": "CPython",
+    "python_version": "3.13.11"
+  },
+  "precall_backend_identity": {
+    "acquisition_optimization": {
+      "configured_num_restarts": null,
+      "configured_raw_samples": null,
+      "dimensions": 2,
+      "num_restarts": 14,
+      "raw_samples": 512,
+      "source": "public AcquisitionOptimizationConfig.resolve(2); no generation call"
+    },
+    "bo_engine_source_tree_sha256": "f7f9b9003ff61e05e0f93629e07e0a21b0b6947ff9fafbc7428822c1e6887fb9",
+    "distributions": {
+      "bo-engine": {
+        "source_revision": null,
+        "version": "0.1.0"
+      },
+      "botorch": {
+        "source_revision": null,
+        "version": "0.18.1"
+      },
+      "gpytorch": {
+        "source_revision": null,
+        "version": "1.15.2"
+      },
+      "measure-service": {
+        "source_revision": null,
+        "version": "0.1.0.dev0"
+      },
+      "numpy": {
+        "source_revision": null,
+        "version": "2.5.4"
+      },
+      "scipy": {
+        "source_revision": null,
+        "version": "1.18.1"
+      },
+      "torch": {
+        "source_revision": null,
+        "version": "2.15.0"
+      }
+    },
+    "profile": "measure-service-bo-metadata-only/1",
+    "python_implementation": "CPython",
+    "python_version": "3.13.11",
+    "status": "available"
+  },
+  "component": {
+    "planned": 84,
+    "succeeded": 84,
+    "component_readiness": true
+  },
+  "component_timings": {
+    "host_request_seconds": {
+      "known_count": 84,
+      "unknown_count": 0,
+      "known_sum": 435.3917945753783,
+      "complete": true
+    },
+    "child_seconds": {
+      "known_count": 84,
+      "unknown_count": 0,
+      "known_sum": 434.74008641019464,
+      "complete": true
+    }
+  },
+  "journal_closure": {
+    "component_journal_rows": 84,
+    "durable_journal_rows": 148
+  },
+  "durable": {
+    "counts": {
+      "suggestion_attempts": 148,
+      "suggestion_retries_verified": 142,
+      "admitted_proposals": 142,
+      "completed_attempts": 142,
+      "consumed_evaluations": 142,
+      "consumption_retries_verified": 142,
+      "gp_attempts": 100,
+      "duplicate_rejected": 6,
+      "terminal_retries_verified": 6,
+      "not_attempted_unknown": 12,
+      "restart_receipts_verified": 32,
+      "late_suggestion_results": 0
+    },
+    "completed_evaluation_cost": 142.0,
+    "consumed_by_case": {
+      "qualify-all-confirmed:default:reject": 7,
+      "qualify-all-confirmed:default:replicate": 10,
+      "qualify-all-confirmed:low_noise:reject": 7,
+      "qualify-all-confirmed:low_noise:replicate": 10,
+      "qualify-all-not-accepted:default:reject": 7,
+      "qualify-all-not-accepted:default:replicate": 10,
+      "qualify-all-not-accepted:low_noise:reject": 7,
+      "qualify-all-not-accepted:low_noise:replicate": 10,
+      "qualify-all-censored:default:reject": 7,
+      "qualify-all-censored:default:replicate": 10,
+      "qualify-all-censored:low_noise:reject": 7,
+      "qualify-all-censored:low_noise:replicate": 10,
+      "qualify-mixed-initial:default:reject": 10,
+      "qualify-mixed-initial:default:replicate": 10,
+      "qualify-mixed-initial:low_noise:reject": 10,
+      "qualify-mixed-initial:low_noise:replicate": 10
+    },
+    "duplicate_coverage": {
+      "default": {
+        "replicate": [
+          "qualify-all-confirmed:default:replicate:7",
+          "qualify-all-confirmed:default:replicate:8",
+          "qualify-all-confirmed:default:replicate:9",
+          "qualify-all-not-accepted:default:replicate:7",
+          "qualify-all-not-accepted:default:replicate:8",
+          "qualify-all-not-accepted:default:replicate:9",
+          "qualify-all-censored:default:replicate:7",
+          "qualify-all-censored:default:replicate:8",
+          "qualify-all-censored:default:replicate:9"
+        ],
+        "reject": [
+          "qualify-all-confirmed:default:reject:7",
+          "qualify-all-not-accepted:default:reject:7",
+          "qualify-all-censored:default:reject:7"
+        ]
+      },
+      "low_noise": {
+        "replicate": [
+          "qualify-all-confirmed:low_noise:replicate:7",
+          "qualify-all-confirmed:low_noise:replicate:8",
+          "qualify-all-confirmed:low_noise:replicate:9",
+          "qualify-all-not-accepted:low_noise:replicate:7",
+          "qualify-all-not-accepted:low_noise:replicate:8",
+          "qualify-all-not-accepted:low_noise:replicate:9",
+          "qualify-all-censored:low_noise:replicate:7",
+          "qualify-all-censored:low_noise:replicate:8",
+          "qualify-all-censored:low_noise:replicate:9"
+        ],
+        "reject": [
+          "qualify-all-confirmed:low_noise:reject:7",
+          "qualify-all-not-accepted:low_noise:reject:7",
+          "qualify-all-censored:low_noise:reject:7"
+        ]
+      }
+    },
+    "duplicate_coverage_status": {
+      "default": {
+        "replicate": "pass",
+        "reject": "pass"
+      },
+      "low_noise": {
+        "replicate": "pass",
+        "reject": "pass"
+      }
+    },
+    "criteria": {
+      "durable_policy_compliance": true,
+      "replicate_budget_completion": true,
+      "real_duplicate_coverage": true
+    },
+    "issues": [],
+    "slot_records": [
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 0,
+        "proposal_id": "6b2c95dd-59be-4d85-aa2c-f7ce5640e76e",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "1d44982d-d1b5-4e11-905c-633792ed08e1"
+        ],
+        "consumption_id": "3d47d29f-c44b-4c80-acfa-78398c0ad7fd",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 1,
+        "proposal_id": "debdda99-5737-4a2a-bfd3-cd1e44e324c4",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "9c764075-5722-47cb-9704-b0f33828cba5"
+        ],
+        "consumption_id": "95de42b1-42ad-475d-adb4-8dfcafa6dbd0",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 2,
+        "proposal_id": "840a4374-2115-4e7e-a613-212aa2799d6d",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "4ad3b33a-d1aa-4c58-b213-3a4402dcf674"
+        ],
+        "consumption_id": "087a284a-dc38-4bc2-9f26-e799e6ac1eea",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 3,
+        "proposal_id": "c0bb2f68-8480-47e8-8ced-258b3e2158df",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d69b29e5-219f-4f3c-a5ad-99b60afc482c"
+        ],
+        "consumption_id": "f30fbf8c-795b-4399-9497-95021188c034",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 4,
+        "proposal_id": "86ee0b9d-a33d-477c-b2b9-b652341efc04",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "f464f9db-f3bf-492f-b332-a4fab02df769"
+        ],
+        "consumption_id": "93b8c547-f17d-4b3e-a380-2055f0359ac3",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 5,
+        "proposal_id": "92c9680a-471a-41ca-ad22-e2760ad65d15",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "c73e9192-1235-4280-b3ab-7001a6b50460"
+        ],
+        "consumption_id": "fb44d3c3-c956-45b9-9a47-7d3168811609",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 6,
+        "proposal_id": "7939876f-6810-4b55-8be7-c694f73d70e3",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "9c910026-c80c-4906-8c91-c0e0ec0a2ca0"
+        ],
+        "consumption_id": "f0519c3b-3a95-4b6c-87c5-d370b53eec84",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 7,
+        "proposal_id": null,
+        "suggestion_state": "rejected",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 8,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:reject",
+        "ordinal": 9,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 0,
+        "proposal_id": "a22bf86a-de20-4b0f-879b-171bdfdb22a9",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "e9b226e9-2536-4755-9602-3d0a49658b6f"
+        ],
+        "consumption_id": "c8da8ea6-162b-49a8-b126-40fb1a5237a4",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 1,
+        "proposal_id": "6e1dfe28-67b8-419e-b24d-4b2d99b4da5c",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "904765de-790d-42e9-acb8-d954103c3855"
+        ],
+        "consumption_id": "1bf5e57a-980f-4e01-b401-b9b404fbfa1b",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 2,
+        "proposal_id": "d1f23a4d-579d-4d87-8a3d-71b46e82aaf1",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "e8800282-8d26-4843-abdf-61a08b6a62ff"
+        ],
+        "consumption_id": "fb717787-8fba-4e3e-ba8f-630c951cc91d",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 3,
+        "proposal_id": "1cb7ef80-2cde-4c13-bdd2-b96e29431a5a",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "46e0e3f4-31fb-41a2-b3bc-ed5398fa5a9f"
+        ],
+        "consumption_id": "30173488-de47-45eb-8712-f094aa5fccb9",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 4,
+        "proposal_id": "d8c347f9-a884-4e93-b0ee-17d8121aefbd",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "3ec93a50-ab25-4431-bc16-add39eb456e2"
+        ],
+        "consumption_id": "5253e766-eae1-4daa-bf9e-1dc33542782b",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 5,
+        "proposal_id": "a1b68bcc-89d1-44a0-a35a-3c7cb4ff3edb",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "02a59679-f231-46cd-929f-73818779933b"
+        ],
+        "consumption_id": "8dbc7c30-f958-4be8-bdb3-06ef6315456d",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 6,
+        "proposal_id": "3fd1d8ce-c4c0-46b6-866d-ce39803eb8fe",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "695d7748-579e-41b2-89da-10212b2b6304"
+        ],
+        "consumption_id": "090bc266-bb5a-467c-a471-f94a2cccdeb3",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 7,
+        "proposal_id": "c2b1b07a-d68e-48b3-86fe-dd0cd5ce1642",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "e6652632-a8c9-41c7-af55-7774f37088a9"
+        ],
+        "consumption_id": "15a98d0d-3263-4c79-b295-0d64331bf494",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 8,
+        "proposal_id": "d6e3b020-3e85-4b8b-af6c-99b1fc2c70ba",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "316ebbc9-f4b9-406b-8752-0aa1ea8d7ad4"
+        ],
+        "consumption_id": "a18bc5d5-da7d-4e0d-800c-b081b35b689d",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:default:replicate",
+        "ordinal": 9,
+        "proposal_id": "9c5a5a01-3294-45d7-be8b-ac57e08a2b3e",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d393d92f-91c6-4685-8534-395bfb432264"
+        ],
+        "consumption_id": "40266600-8503-40b3-8174-2e19ad416140",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 0,
+        "proposal_id": "e12df46b-f914-46a3-bfe0-aeb3eb6a1bd9",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d5e9508b-c734-4303-8781-c9cdf48a59d5"
+        ],
+        "consumption_id": "7ed297a2-5060-487e-b52a-6e33279915f5",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 1,
+        "proposal_id": "337072e4-1283-421f-b98b-345db704ab84",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "77920606-20de-4788-ad2e-bc0f836687c1"
+        ],
+        "consumption_id": "142318a4-b266-4347-9185-0ff2609f3ac0",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 2,
+        "proposal_id": "b070a1d9-623c-4b0e-adef-7f9a966a08e6",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "c3eb37a1-84bf-4f5e-9aa8-f474bdc20b01"
+        ],
+        "consumption_id": "3452069a-0e01-4cc4-9342-b96310d3c3b6",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 3,
+        "proposal_id": "8debb559-a0e1-419e-86de-61431d32453a",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "cdd1972e-30e8-4fe6-b970-3707ce9adff8"
+        ],
+        "consumption_id": "d0456466-74c8-4a20-8568-14bb992f8ba0",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 4,
+        "proposal_id": "3582f856-5420-49a6-be54-78aaad32bbd7",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "2e79d09e-52d1-40a6-92ef-6637d6c447ed"
+        ],
+        "consumption_id": "3d5dbaa8-227f-4744-9f91-8456860cbc5d",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 5,
+        "proposal_id": "b3e0e825-1270-46d8-a9d2-6b909006b8f3",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "46269562-23ed-4622-8139-86510cb49808"
+        ],
+        "consumption_id": "3b6d81e2-999c-49e2-9508-31de56866a16",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 6,
+        "proposal_id": "6f6ffdc7-afcf-4ee3-88e0-3e337cf46c0a",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "29a50a5e-891b-46ea-8555-181763d891f0"
+        ],
+        "consumption_id": "ca891cd6-b77d-410c-a247-bfa83559bd3f",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 7,
+        "proposal_id": null,
+        "suggestion_state": "rejected",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 8,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:reject",
+        "ordinal": 9,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 0,
+        "proposal_id": "602276c1-4c4a-474b-afb6-5b678c61ce11",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "a13e4879-a172-424a-bd6e-afcddbb7d1d0"
+        ],
+        "consumption_id": "e4980136-8300-4970-a608-19c591bfc957",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 1,
+        "proposal_id": "84f354d3-f29c-4810-9799-183d7e33d079",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "726de6d9-b1d3-401b-b247-eab08e31ae9d"
+        ],
+        "consumption_id": "ef07dd72-4af0-4c8c-ba99-9d6fe262072f",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 2,
+        "proposal_id": "e44c6787-f36f-4ff2-aef5-0e2d351143b2",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "e7d26dba-5ba7-413c-b9d2-7bd59a5dcd8f"
+        ],
+        "consumption_id": "bcf5188e-ad70-4b88-aa1d-fa522ea9250e",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 3,
+        "proposal_id": "d76c1eb2-06f6-4d66-a0ed-e1518a8b4eb8",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "91e1627d-706f-47a2-9f2b-167ecd609ba7"
+        ],
+        "consumption_id": "3224e268-21f9-47c7-a17f-b2e70790f22e",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 4,
+        "proposal_id": "36a748b6-651b-451d-8464-52dfd55d08a5",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "666fb45d-2689-4fc7-af97-b70cca04aa8d"
+        ],
+        "consumption_id": "75007039-4106-4a57-a0e6-02e00226e45a",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 5,
+        "proposal_id": "228c0a7d-3d5b-4b87-b9e9-557c682f1a74",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "e638aa07-0934-4e74-a997-894f1b9f2cc5"
+        ],
+        "consumption_id": "7a7a5acf-740a-4164-8cbb-340be514c32f",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 6,
+        "proposal_id": "5f3e8e21-724d-4ccd-9ddb-75407b204b42",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "3313a915-3a93-47ae-aab2-da011b47a461"
+        ],
+        "consumption_id": "d747e9fa-0148-443c-9677-b4646509d8ff",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 7,
+        "proposal_id": "cfd50cd6-c6e7-4a73-bddb-61684c513e23",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "bfc08b59-f645-47df-a559-95f4d87f2aa3"
+        ],
+        "consumption_id": "72552610-53c7-4a0e-ac82-2312a24a3dac",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 8,
+        "proposal_id": "ed69a4eb-0562-46b6-a022-e4e1da26348c",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "2f33cb7e-bdf0-4461-9acc-166cbe1e7b48"
+        ],
+        "consumption_id": "ae1c88c0-dce3-42e9-a1fe-9969585882f8",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-confirmed:low_noise:replicate",
+        "ordinal": 9,
+        "proposal_id": "11da47f7-7bce-42b9-b19c-cfc932ba93ab",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d9a2a7c1-b7af-4201-926b-39236135500e"
+        ],
+        "consumption_id": "e8f4a2c9-9755-44c1-bd2e-5f97b5fc647e",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 0,
+        "proposal_id": "ccce7d38-b900-41c7-9560-db7a31a8d606",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "06a18504-ed66-430d-ab68-1564723373c6"
+        ],
+        "consumption_id": "10e498bf-e5e0-4f80-9603-9da4afcb7282",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 1,
+        "proposal_id": "d41d96b3-a8c3-40ac-8e50-5a0bd0f2be43",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "dbc6c760-9ab1-49ec-9f2d-e2ec44dd9981"
+        ],
+        "consumption_id": "6ec7da14-ea69-41a0-9a87-4d30892ba1cb",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 2,
+        "proposal_id": "270a4ccf-fb19-4c92-aac7-96bd86827574",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "a75e121e-fc19-4a46-84ae-0351236805af"
+        ],
+        "consumption_id": "c3940e42-afae-42a3-bd4d-6a81c03ac3ac",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 3,
+        "proposal_id": "e1ad8729-2a61-4f33-af69-ca9abee2cefc",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d549d30f-01bd-41b5-a03f-cdb8501bb23c"
+        ],
+        "consumption_id": "d1168498-d5cb-4349-87aa-fc9c645044d7",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 4,
+        "proposal_id": "5d346858-2d20-4e96-aca9-85d5f7425a89",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "dff6b623-53f7-46c2-8a67-9383128a2a9a"
+        ],
+        "consumption_id": "54e274a8-7dfb-4598-91e7-410ebb650e3b",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 5,
+        "proposal_id": "e02add1e-8afd-49cf-81a6-daad2aa1c0ef",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "924f44ef-18ca-4039-8b90-4b923114c8f5"
+        ],
+        "consumption_id": "6a632429-a212-4943-a775-bcaa486f773b",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 6,
+        "proposal_id": "3a9f04f2-9e36-4594-bd09-2ccc3eff5f1b",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "a41e1d13-f009-4010-bcee-7f21d0e85774"
+        ],
+        "consumption_id": "7352442c-a17d-4904-a542-b99ffaf78807",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 7,
+        "proposal_id": null,
+        "suggestion_state": "rejected",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 8,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:reject",
+        "ordinal": 9,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 0,
+        "proposal_id": "cb021f9c-077b-4b2e-af95-55d666fe0126",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "01affcba-c249-4ef8-aefd-46a69692e988"
+        ],
+        "consumption_id": "40c30604-9a76-4f90-822f-c1237f7ec0a6",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 1,
+        "proposal_id": "62f05e5c-21bd-40ab-af76-e981c5cf87ba",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "535fde43-7a99-4c79-8a3f-9ee484a5811f"
+        ],
+        "consumption_id": "888c0237-b6b1-4506-8b68-519edf1f8d4f",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 2,
+        "proposal_id": "bd5147a2-a546-4c94-8b7d-10e5d8a27ef8",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "fe62c518-59a6-455f-a37d-d8c70ad9b8aa"
+        ],
+        "consumption_id": "95612ab9-23a2-4c9b-8a8e-d92cbdccb49d",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 3,
+        "proposal_id": "394bda2b-a756-44b7-818b-32e1fb1d7823",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "b0856626-edd9-47a5-b0cb-8c3bfe40b48e"
+        ],
+        "consumption_id": "ea4f06e6-94c2-4dd0-86e7-9cf8098f22c3",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 4,
+        "proposal_id": "41bfad66-90a5-41de-908c-1df756ab4371",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "5cb225e2-343e-468d-a9f8-24fc8c075914"
+        ],
+        "consumption_id": "e13eeb95-eb27-4470-b0dd-99a9e72852bb",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 5,
+        "proposal_id": "ea028d9d-e311-4a5c-99fe-52552f8fceda",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "cf93ddda-7984-4b15-9f55-809bc2bd1162"
+        ],
+        "consumption_id": "0dfd50ff-ad6b-4f90-b608-a361f5f6a082",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 6,
+        "proposal_id": "e8b6165d-1a9f-49a2-aac1-b23cfd742628",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "10f2f981-9585-4f8c-be2c-fdc7428f7cfd"
+        ],
+        "consumption_id": "aeb8bd0c-ee07-45d0-b12b-c9da87c0ee75",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 7,
+        "proposal_id": "8bc6f1fe-8246-4b93-a77d-3994497b151d",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "f774c1ee-de4b-4a9e-b444-19d9f996fe15"
+        ],
+        "consumption_id": "02344d08-556f-431d-9922-8afe5a189429",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 8,
+        "proposal_id": "77c62d22-261b-43ec-9081-f37f47d2783b",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "54f3b483-0e38-40e5-8c26-45abc8bae8cb"
+        ],
+        "consumption_id": "91741ca6-0c24-424c-88e5-4231397a7348",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:default:replicate",
+        "ordinal": 9,
+        "proposal_id": "6f2e30aa-212f-477e-a742-73ec84a1f476",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "898c82d9-14e2-4398-adc3-0fb017fc756e"
+        ],
+        "consumption_id": "ac99b9ba-b57c-462d-822c-117153ebc77a",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 0,
+        "proposal_id": "d90973e4-f700-42d1-8440-015a45ea049f",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "9658d597-645b-425e-abf1-c31618ed028d"
+        ],
+        "consumption_id": "f5c94480-af9b-434c-b33f-a7099796d45d",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 1,
+        "proposal_id": "eabd00a4-cf03-46d2-a5a1-7bf2926063c4",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "83a567a0-2939-4dd0-afb8-34d3a9f9102a"
+        ],
+        "consumption_id": "dcd1085b-ca22-40ac-8982-dfb6afe67596",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 2,
+        "proposal_id": "1045279e-d49e-433f-ac38-d075af186783",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "c282f77d-4b40-49a4-a9c9-f03a01412fa9"
+        ],
+        "consumption_id": "be9da697-1eb0-4716-8533-c15f42c80064",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 3,
+        "proposal_id": "d1201a28-2172-481a-b5a5-462f156cd5ea",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "70a9be5e-08fd-41d9-bb71-e6a83c8868e6"
+        ],
+        "consumption_id": "5a6a082e-ab26-4290-a731-194a2548ca97",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 4,
+        "proposal_id": "76656c8f-9bdf-41f0-90b7-1aac552d40f5",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d356aa60-bfb0-44f1-a337-f06ab065f6e5"
+        ],
+        "consumption_id": "3ff46ece-a5df-4bb3-85a4-fd7ae16b91c0",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 5,
+        "proposal_id": "2f7fef8e-73a9-481c-9ee0-f120c8ff1eca",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "40eba3b9-74d6-4b39-82a1-43f2ec072545"
+        ],
+        "consumption_id": "9f1ffa1a-0af9-493d-a1bf-1b5c9289a243",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 6,
+        "proposal_id": "47a69ba3-50cd-41b6-96a9-2740555eda40",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d6d8ed59-b674-4000-a72c-fd67531e75f1"
+        ],
+        "consumption_id": "78a22b29-307c-4866-8299-f4698f8b56a6",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 7,
+        "proposal_id": null,
+        "suggestion_state": "rejected",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 8,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:reject",
+        "ordinal": 9,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 0,
+        "proposal_id": "5595449d-2a8a-415d-ab70-f30f285ed3d8",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "dc7b6cb0-1404-44f7-8459-3033c3c23ea1"
+        ],
+        "consumption_id": "ae765597-9cd6-4e89-b5c1-05d43032e3e3",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 1,
+        "proposal_id": "4e7c792e-0f36-42fd-89e0-798376b0a5a2",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "bc6b4f8c-68f7-480a-96e8-fa7b4120bc76"
+        ],
+        "consumption_id": "d05e4689-3eb2-4d4b-870b-e55cc533a6df",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 2,
+        "proposal_id": "e2816476-5bab-4c38-804c-393e2e212eca",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "9c0b62cf-5b8f-4e7f-a500-cf9a54c4eb7c"
+        ],
+        "consumption_id": "32e2d7e2-c7ff-47c2-b504-f2c021f227e3",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 3,
+        "proposal_id": "8b485df3-f844-4858-9ed2-d4773ec8a8f4",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "ceffc1fb-3642-492f-b2e0-e6d6ec84ebaa"
+        ],
+        "consumption_id": "23de9c03-20bd-40ce-9dae-ab95d54e2bdd",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 4,
+        "proposal_id": "2c9c1163-14ac-4dc3-8723-d52bfec6bb1c",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "ac9f61b2-47bb-47c9-8035-46f9be5fdc14"
+        ],
+        "consumption_id": "54f445dd-3029-48e7-8e61-ea04328385ed",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 5,
+        "proposal_id": "188edfdf-3408-4548-8a36-b8976fb08f3f",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "e9e22805-86d4-4656-b027-adc8b6c6364e"
+        ],
+        "consumption_id": "a42168f4-4fa8-401a-b16d-9cdd067291bd",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 6,
+        "proposal_id": "26744db1-0170-4604-bc6f-46b7be5b77b1",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "064e7ed5-5737-452d-8874-e8ddf8a0a3ae"
+        ],
+        "consumption_id": "953ecf0b-77f8-443a-bcc9-d3431b4c5e4e",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 7,
+        "proposal_id": "34797e81-4d60-4c64-bff8-7ccf78a205b3",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d24023e8-6022-434d-becc-440cf0ab6a28"
+        ],
+        "consumption_id": "e4744035-71e1-4e62-bf4a-491afeff2e51",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 8,
+        "proposal_id": "4c794948-7d5a-4fa4-ac6a-e9dd498486c9",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "9304db9d-8943-4517-bead-8f963dc4662c"
+        ],
+        "consumption_id": "4efb376f-7f43-4865-a192-34f1a23ae870",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-not-accepted:low_noise:replicate",
+        "ordinal": 9,
+        "proposal_id": "aec45b92-7dad-4842-ba13-b46612429fb6",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "91cbb5fd-80ab-4e75-9881-fe3c19623d05"
+        ],
+        "consumption_id": "2d337b81-0e83-4ddb-afee-c6d517ff82fa",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 0,
+        "proposal_id": "cf6abf9d-66ee-4a36-93a4-99860900ebe8",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "c894df38-299e-47a3-b6bf-dab5ecc5a639"
+        ],
+        "consumption_id": "e93c19db-7a57-475a-a594-dfe2ff4b271c",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 1,
+        "proposal_id": "161c8ce8-ff55-4786-89a1-1b4e73244dd7",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "b4b05f9f-1faa-489a-9c51-7c083c750a1c"
+        ],
+        "consumption_id": "b2283c3c-2d9d-4f7b-9182-4425172d0f5d",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 2,
+        "proposal_id": "c7cfe881-ee4c-4185-834d-36517c9a672c",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "37c3a3bf-568f-47ec-8394-4222f5ddc1d1"
+        ],
+        "consumption_id": "7d922ecc-be2b-4a37-ae97-6f34f98a9bf5",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 3,
+        "proposal_id": "98dca98c-34ff-4ab2-980d-0c0af939b24a",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "40213647-f4c0-49ab-9c2f-f0d1c4a09a12"
+        ],
+        "consumption_id": "c838fd77-ac00-4eed-b5d4-71b0ad1ec665",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 4,
+        "proposal_id": "12945aac-22ab-4262-b0b1-ba3f12d5db83",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "811f8eef-4ad6-4249-ad45-2e7f49bcfa86"
+        ],
+        "consumption_id": "67c024f9-92fc-4d96-a4a9-504b92199328",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 5,
+        "proposal_id": "a84b9238-5b76-4e46-8d64-bdcd8da39f81",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "2b47f1b2-5356-44e3-bf06-fc4b168c5da2"
+        ],
+        "consumption_id": "c46fe17f-7c17-4560-afa2-bae26bbea6e2",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 6,
+        "proposal_id": "63e727ef-741e-4075-9a34-6e3cc17e90f7",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "5eafb64a-b8c6-488b-a5cb-edd2c3781269"
+        ],
+        "consumption_id": "fe5b348f-ba9b-4fdb-a21c-f5aad181db1f",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 7,
+        "proposal_id": null,
+        "suggestion_state": "rejected",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 8,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-censored:default:reject",
+        "ordinal": 9,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 0,
+        "proposal_id": "2c5b9f30-479b-4ea7-abc4-e4014b54586b",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d1bd6fd7-f7ba-4644-b50d-1c8285ea70ad"
+        ],
+        "consumption_id": "e1ef6bc3-ce3d-409d-a7e8-56369e8684e7",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 1,
+        "proposal_id": "ffaecdad-3d7e-4972-b6f0-c080c6a951a0",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "15f7228b-1cfc-4ff6-9a77-202f09ce1f6e"
+        ],
+        "consumption_id": "07b36cb4-2e5a-4e7d-9e6f-0ddd650b1e54",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 2,
+        "proposal_id": "a376e7db-c600-40ef-968e-1a9f82ba6d2e",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "25ceed22-ba21-4ff9-a657-02a4fef5c2da"
+        ],
+        "consumption_id": "83396e28-cba6-4933-80f6-7a0200a10328",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 3,
+        "proposal_id": "9e91a444-bbd0-4bcc-b272-9228e5bb592c",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "98cd619e-3e76-47b5-8c0b-68e7ec9773ef"
+        ],
+        "consumption_id": "ec0df353-467b-4abc-b3f4-49d7f4888e22",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 4,
+        "proposal_id": "2f5bfffe-4b2e-46e3-b833-d583a067b36e",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "4b32a6d5-178f-4ff0-956d-a17b743027ab"
+        ],
+        "consumption_id": "13bca22c-63cc-436a-9a87-ce174ae2ce1a",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 5,
+        "proposal_id": "a18e9609-4d09-418b-a655-53b6fe947613",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "373ab758-8ec2-455b-aed3-006e10b3e2b2"
+        ],
+        "consumption_id": "eae82a72-c98d-4037-8313-03bd2a04c9ab",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 6,
+        "proposal_id": "56d4251b-12af-4513-95e0-f64aaf65ab76",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "b3768f9d-991c-4990-8607-9b23b142f427"
+        ],
+        "consumption_id": "0bb77fb7-9aff-4b27-8110-0ff52c3d514d",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 7,
+        "proposal_id": "95c4572b-78a6-4825-b35f-6b1bbaac72d1",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "66c95920-fe0c-452c-bf89-02fb172fdecc"
+        ],
+        "consumption_id": "a5fbecbe-0f5b-48af-b0a2-dcc78b774385",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 8,
+        "proposal_id": "600cdb6c-30bc-492f-88aa-a111b74f7a2b",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "104657e4-737c-4fba-b899-78a4c4835e75"
+        ],
+        "consumption_id": "e20fa859-af5b-4a9e-b98b-25769a90f307",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:default:replicate",
+        "ordinal": 9,
+        "proposal_id": "8f3eaaef-6969-4696-b2b9-be59354e35d9",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "dba2d775-8c4b-4595-9821-604b77e13763"
+        ],
+        "consumption_id": "3f2a2aa0-b921-4887-869a-58db10904f1e",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 0,
+        "proposal_id": "d01e0069-858c-4d29-a82d-f68e2f676072",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "66ba54aa-99be-4a1b-8a59-221fde85188a"
+        ],
+        "consumption_id": "164dddb7-c35a-4993-9f40-bda974969e8c",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 1,
+        "proposal_id": "9ca46dff-047d-4c36-aeab-38972529c482",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "37913d1d-d8d6-4e30-bcb6-d3b917711f86"
+        ],
+        "consumption_id": "b656ed31-4999-4986-a04e-61e08b7f68fb",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 2,
+        "proposal_id": "73e941d3-ec62-4414-b2b3-6738e432188d",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "e56c2bd4-13ae-40c0-b08c-3321286cf721"
+        ],
+        "consumption_id": "5ef9b829-cb84-4d24-9610-ab685ab7bbfb",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 3,
+        "proposal_id": "172e560d-4028-4344-8f8c-f299b680992e",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "45dac933-50cd-4a90-a1c4-8dcf02461f6e"
+        ],
+        "consumption_id": "dd9af1b1-0d10-4289-87c0-51d6cb9ff88e",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 4,
+        "proposal_id": "0ad77707-b0f8-43b3-b021-1eed930485fe",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "c5d1537d-452b-46f5-9f4b-a9046129dfc1"
+        ],
+        "consumption_id": "81e64d85-8cda-4311-bf5e-08e631be119f",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 5,
+        "proposal_id": "2df441a5-3f5d-43e1-b0e3-bd7d8b7a2add",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "fcf6e2c5-9658-4c8a-b3b9-ebf546b91dba"
+        ],
+        "consumption_id": "d2478ae7-0885-48ef-831d-57415acebf25",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 6,
+        "proposal_id": "9d3f78cd-6185-400f-b9a7-4832e63b2692",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "fb963d69-e0a4-4c4b-949a-3784501ec377"
+        ],
+        "consumption_id": "d9b89c73-bdbf-4116-b11c-897feaa8f6e3",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 7,
+        "proposal_id": null,
+        "suggestion_state": "rejected",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 8,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:reject",
+        "ordinal": 9,
+        "proposal_id": null,
+        "suggestion_state": "not_attempted_unknown",
+        "completed_attempt_ids": [],
+        "consumption_id": null,
+        "candidate_available": false
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 0,
+        "proposal_id": "d7f877e1-3132-442e-b665-58ad70221b0a",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "369ec6b3-9820-43c0-95c6-2c66d394b48d"
+        ],
+        "consumption_id": "6f3c30d2-ab56-44af-9a72-c87c1cafa84c",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 1,
+        "proposal_id": "a82e3a0d-ad12-474c-8bce-20a698b15889",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "599db933-2c91-44aa-b449-656dffc91690"
+        ],
+        "consumption_id": "1eb02703-d953-44c4-a553-1c7d45c89c9c",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 2,
+        "proposal_id": "f2203246-dba4-4d75-8b00-27b923426d96",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "7ef6beef-fc85-4389-8d29-acb52c281ab3"
+        ],
+        "consumption_id": "56501ce4-0477-4e08-91a1-2a76b2e1c0ca",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 3,
+        "proposal_id": "62f37c2b-2e42-40f0-a6f0-088a4b008dc8",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "b9aa9351-8d1e-43a1-8b89-ebfa0d984184"
+        ],
+        "consumption_id": "6251636a-d488-4edb-8125-e3141cc552b6",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 4,
+        "proposal_id": "d4f3feb9-f07d-4b6a-bba5-ed1fd6c7afdf",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "b7fc716d-7e7d-4984-9fb7-f02061ad2af2"
+        ],
+        "consumption_id": "5a613387-d591-48d8-bad1-e1fbc36276f2",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 5,
+        "proposal_id": "9a6b621f-2397-4d5d-b9fb-ffb064560f82",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "dea21e56-09d4-4d86-90ea-3b1f3e3beb88"
+        ],
+        "consumption_id": "c58573cd-ece1-4c30-af64-5ecdb9b79cb6",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 6,
+        "proposal_id": "693ab6a6-1749-43b5-a6b7-338df971bdeb",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "ceea6ff0-3bb8-47ee-9488-013ba7d742b3"
+        ],
+        "consumption_id": "03b24774-55b6-467d-a812-513785cc0cee",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 7,
+        "proposal_id": "09ff27c2-4cc2-4dc3-88dc-63046b1217e6",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "a8755ead-677d-4cd1-8479-a4de4ecec051"
+        ],
+        "consumption_id": "83ce3081-cbbf-4314-baed-4a119ba37a57",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 8,
+        "proposal_id": "b1d2c4e8-3419-4903-9948-bfec3efbfc46",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "3b2296dd-9f25-480b-86de-355a3b33eac3"
+        ],
+        "consumption_id": "e95dfd48-3ffe-4cfa-b10e-b733680ebe53",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-all-censored:low_noise:replicate",
+        "ordinal": 9,
+        "proposal_id": "2540acef-2f64-4014-818e-a706b675da0d",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "2cc9a614-7ff6-4762-9ceb-c347c9f67383"
+        ],
+        "consumption_id": "c2327981-d398-4db1-8b45-631cccec09d6",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 0,
+        "proposal_id": "0280f3c4-70da-4bd3-a1f6-57c606405cf3",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "07bd4add-0dda-4c9e-8d6e-5141d02769ae"
+        ],
+        "consumption_id": "031d2419-508c-45a0-8c2b-b89618182031",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 1,
+        "proposal_id": "77f91b66-2a73-4bee-b2ac-356e10760443",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "2bc5bda4-5506-4385-81ab-7b9b5149ccbe"
+        ],
+        "consumption_id": "5df7661c-7eb1-4474-ae9b-a39f57e214f4",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 2,
+        "proposal_id": "5f62411e-cfb4-4335-9a18-49a73c324b5f",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "9c60ec91-7fb8-4153-87c6-b394e51a418b"
+        ],
+        "consumption_id": "b58a0165-8c20-4793-ba48-f489a0115526",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 3,
+        "proposal_id": "a3c33d8c-b820-4a19-8841-0aafc5ee24fd",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "8076d9bb-c076-4690-8dce-a3fe8d5a98a7"
+        ],
+        "consumption_id": "6522d499-5400-4f76-81b0-b218bd7f7e68",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 4,
+        "proposal_id": "98226604-e830-42bf-aa82-343192465cfc",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "32a0f94b-cf72-4621-90f1-7d45a0a251ab"
+        ],
+        "consumption_id": "56c8341a-be5e-4f1d-b173-dd4dd00b1c37",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 5,
+        "proposal_id": "529897cf-d836-46e0-9f24-78ec83c081b4",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "3136b54c-c931-44bf-953e-8f1e295e4459"
+        ],
+        "consumption_id": "50f55ae5-fe94-496d-978e-8c9a428366be",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 6,
+        "proposal_id": "720627cf-1b1c-4148-84ac-06315f96ebc0",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "20966d71-9807-41db-84dc-ab3ca4d854e7"
+        ],
+        "consumption_id": "0113ed61-6662-4742-8359-98d3b3613aaf",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 7,
+        "proposal_id": "4b9ed3be-ccbe-4f1a-9d6c-41abae797510",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "d289187d-360a-407e-9e08-95f4b156863c"
+        ],
+        "consumption_id": "86323e6c-04e9-4da8-a221-793a3d504093",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 8,
+        "proposal_id": "78b35816-c2c5-4d3c-972b-d2e51d45ff70",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "6a55d4ee-97af-4a77-b4be-ba794357c968"
+        ],
+        "consumption_id": "00b4b745-acca-4f97-83de-8ca59bf41629",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:reject",
+        "ordinal": 9,
+        "proposal_id": "64e5211c-94fb-438b-89b6-03551d92a72d",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "ba230244-2bdd-41ae-a8f5-3644fd02d74a"
+        ],
+        "consumption_id": "e8f452ff-2ed1-4120-818e-6f972fb06f74",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 0,
+        "proposal_id": "a13a56ed-404a-4649-a764-d957391ef2e2",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "9c4c3383-5da5-4fa0-b79f-e9cd3517d9bc"
+        ],
+        "consumption_id": "d09b3ec4-ffd2-481d-86b0-2441db103e9f",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 1,
+        "proposal_id": "9424557e-453c-43a7-b95b-33a850ddfba6",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "2c0d8ff3-bfee-4f5a-952d-8859210e0eda"
+        ],
+        "consumption_id": "05d97375-75fd-47ce-8d06-868f3f7b5bbf",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 2,
+        "proposal_id": "27578ca4-aa9b-4e8a-8102-e3746065b8dd",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "b5fc7d95-2b40-4669-92cc-df98986ff934"
+        ],
+        "consumption_id": "ab1e118e-8966-4e76-ad80-6541b02f388e",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 3,
+        "proposal_id": "ae790800-d8fa-4b7a-8342-037ef5e3d6c1",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "a2a06c1d-0dd5-4c3d-9f88-7096abff3237"
+        ],
+        "consumption_id": "5fa5554b-47ce-40e4-a73a-34c71318da1b",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 4,
+        "proposal_id": "63680b61-fee6-4503-9505-47f7047d9991",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "b0b15d9b-ba3c-4c07-a82b-503cae6e21a5"
+        ],
+        "consumption_id": "3237a229-7082-4961-a07c-cb5b59f94982",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 5,
+        "proposal_id": "a9aac7bf-d7a0-4753-8da2-5e5ee9429220",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "3b464f05-8afb-4a58-883a-a47c3f8b84e4"
+        ],
+        "consumption_id": "ef2994b9-5877-443e-975c-78c1d4542fb2",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 6,
+        "proposal_id": "1de6b1cb-bbbb-4cba-9302-d1c86c3ff863",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "e6f9bfcb-3082-46a9-8777-14a044e68014"
+        ],
+        "consumption_id": "22be2448-7e0d-4658-b08e-2c85131bc047",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 7,
+        "proposal_id": "44980c4b-72fa-4ff4-b969-7b2aaf441f96",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "73fe3028-ba42-4cda-9737-f424971aaf7b"
+        ],
+        "consumption_id": "b004f9ca-a11a-4360-8d3e-ceb9f0589e8b",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 8,
+        "proposal_id": "8ccc3d4d-80b0-46e5-bc51-8792029dc12d",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "a8997bf6-30f9-4e44-8747-753d6401af5e"
+        ],
+        "consumption_id": "14b0449d-5833-4464-82f3-c18483c13934",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:default:replicate",
+        "ordinal": 9,
+        "proposal_id": "c8067f86-8ae7-44f3-afe6-ce6c57ef8d18",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "850febac-2896-46ec-9ad9-9faa91f1d36b"
+        ],
+        "consumption_id": "b7c0ebc5-e1a2-4f1c-9d91-9ed0232956cf",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 0,
+        "proposal_id": "69c4cd79-ab29-42b7-96ae-5c3189418aa5",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "adc3c70e-5600-4dba-8fc1-1683d920bb96"
+        ],
+        "consumption_id": "d02f5e31-9376-44af-af48-3dde6de6e4bb",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 1,
+        "proposal_id": "57b6175a-b54c-4d40-a1be-bc2b51340873",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "943cdffd-6c67-4d77-9ca5-f11ff354b8a0"
+        ],
+        "consumption_id": "2538099c-50f6-48d4-81d0-92dfc1733e67",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 2,
+        "proposal_id": "141bc388-166f-483b-bfcf-479be2965e78",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "e12af8ed-f9e2-45e5-83eb-0698d0a20635"
+        ],
+        "consumption_id": "0a1ed85e-fe84-49d3-bd5b-52a414e4070a",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 3,
+        "proposal_id": "91bf6639-4bde-4443-a8b5-e35610f22862",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "8ab839d8-87d7-4bce-b2ef-965bdb149cd2"
+        ],
+        "consumption_id": "fb01718b-d74c-4d05-a442-98d37f05946a",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 4,
+        "proposal_id": "3a371a8e-b66a-4f67-9f50-ee053ab4e8a6",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "08f1b8e9-c38e-4d43-9d1c-f868f64b8a09"
+        ],
+        "consumption_id": "4e10bc2e-46dd-4c01-bfd9-fce5eda5af8d",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 5,
+        "proposal_id": "7f2975bf-b075-4171-90f7-26066a228632",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "08d7f517-8ce5-44e6-ac14-767c1dda8f69"
+        ],
+        "consumption_id": "3728f96c-6220-4ab1-b401-6720f3b5621c",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 6,
+        "proposal_id": "fc519437-792f-4484-8cb6-ed7eeb7cf152",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "3364650a-d98c-434e-b882-33a043da4745"
+        ],
+        "consumption_id": "83d67fad-aa8e-419c-bb92-ee93484c648b",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 7,
+        "proposal_id": "d5389a05-b417-45cc-9bce-2a14e12ebca3",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "1b4f71f1-a55b-4dbe-9dce-7005947b085a"
+        ],
+        "consumption_id": "0e1c4f2c-1e64-48a3-ad68-43a59b4ac13a",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 8,
+        "proposal_id": "497933ea-714c-4fc1-ac78-68db430d2313",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "5a648e42-23b1-4b27-af69-bc7cd5042591"
+        ],
+        "consumption_id": "19c83990-f90a-4f4f-af7f-3c1ca3afde40",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:reject",
+        "ordinal": 9,
+        "proposal_id": "8544d2ec-f752-4ba0-9bb5-e7deeec7bcc4",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "1d99b3bf-baf0-4987-8090-6250ce231b6f"
+        ],
+        "consumption_id": "32ea1a5e-5ae9-4080-a0ad-ecc0e3af3168",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 0,
+        "proposal_id": "238c4dfd-9300-42d9-807e-0ff07aba2c1f",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "29f42d4a-0d96-46d0-a2b1-5bfa2064dfdb"
+        ],
+        "consumption_id": "48ae3115-353a-458f-bee7-52a36d4c64fa",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 1,
+        "proposal_id": "bb145b8b-2b18-4cc3-b9ee-adc7d76ad240",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "79b0d5a0-9468-4793-9683-42b441885211"
+        ],
+        "consumption_id": "ea06d1c9-70dc-4346-8015-8b766d262ad4",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 2,
+        "proposal_id": "71115358-1883-4aa0-9749-e6a0c1a18fa7",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "30f030c8-3bd4-4041-a6e5-e4fa630f0c32"
+        ],
+        "consumption_id": "027909d9-9006-4795-8540-23e43da8a5c1",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 3,
+        "proposal_id": "b977ce93-c08c-401c-b631-970c99e0cba8",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "f7f3b55b-8631-41d2-a2f6-404e6923d4f8"
+        ],
+        "consumption_id": "64ed1f3d-83dd-494a-9518-9f2352b14f3a",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 4,
+        "proposal_id": "b371c43d-8bdb-46e9-b5b6-3e7490675782",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "c0516eb9-0b1e-4ca9-9652-75916a4f9857"
+        ],
+        "consumption_id": "3c5d682f-69dd-495d-8f5c-16acaa383aa9",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 5,
+        "proposal_id": "5939981f-db4a-4dc8-9039-9454759036ea",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "6a377945-ba9b-4258-b886-fca69644e9f0"
+        ],
+        "consumption_id": "44e3fc78-0a42-474d-8bf5-5c219dcef8f8",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 6,
+        "proposal_id": "fa461656-5f21-4fb8-ad53-942d30633d06",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "bbc8be70-9cd4-44fe-a0ed-06eab8b49c25"
+        ],
+        "consumption_id": "0c9ed1c3-9fc3-4da6-9e77-de80f238992a",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 7,
+        "proposal_id": "f3cc5317-55c3-4dee-8feb-79a178bf3b40",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "eda8e248-8753-42f4-bb3d-e30aebed24a0"
+        ],
+        "consumption_id": "499083dc-5bf4-4fed-8569-b8a022aa49b3",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 8,
+        "proposal_id": "8eb414ff-354f-4609-a1a6-10db894f0914",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "a31e0a22-589e-4923-8d04-ea3b8f1da0f8"
+        ],
+        "consumption_id": "017d8de2-8961-4b2b-8084-ddc9c8a53aa3",
+        "candidate_available": true
+      },
+      {
+        "case_id": "qualify-mixed-initial:low_noise:replicate",
+        "ordinal": 9,
+        "proposal_id": "da7b96d3-048a-4728-93e7-e6a99ed82157",
+        "suggestion_state": "accepted",
+        "completed_attempt_ids": [
+          "59681132-0d9e-44ba-843a-01954382a553"
+        ],
+        "consumption_id": "c24d780d-08fe-4fe9-a97f-4cee68bdf335",
+        "candidate_available": true
+      }
+    ],
+    "timings": {
+      "completed_declared_duration_min": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 871.499354735741,
+        "complete": true
+      },
+      "completed_declared_solvent_ml": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 435.7496773678705,
+        "complete": true
+      },
+      "planned_analytical_duration_min": {
+        "known_count": 142,
+        "unknown_count": 18,
+        "known_sum": 871.499354735741,
+        "complete": false
+      },
+      "planned_analytical_solvent_ml": {
+        "known_count": 142,
+        "unknown_count": 18,
+        "known_sum": 435.7496773678705,
+        "complete": false
+      },
+      "step_suggest_campaign_seconds": {
+        "known_count": 148,
+        "unknown_count": 0,
+        "known_sum": 542.5967837516218,
+        "complete": true
+      },
+      "step_create_experiment_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.3345215441659093,
+        "complete": true
+      },
+      "step_record_simulator_attempt_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.2952834190800786,
+        "complete": true
+      },
+      "step_predict_retention_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.40909786988049746,
+        "complete": true
+      },
+      "step_record_gaussian_observation_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.6671000318601727,
+        "complete": true
+      },
+      "step_evaluate_analytical_observation_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.5517009533941746,
+        "complete": true
+      },
+      "step_create_observation_snapshot_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.28764783218503,
+        "complete": true
+      },
+      "step_read_observation_snapshot_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.1516548367217183,
+        "complete": true
+      },
+      "step_consume_campaign_snapshot_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 5.571834418922663,
+        "complete": true
+      },
+      "durable_candidate_generation_seconds": {
+        "known_count": 100,
+        "unknown_count": 12,
+        "known_sum": 524.4803035371006,
+        "complete": false
+      },
+      "durable_child_seconds": {
+        "known_count": 100,
+        "unknown_count": 12,
+        "known_sum": 524.4685015073046,
+        "complete": false
+      }
+    }
+  },
+  "numeric": {
+    "predictions": 142,
+    "gaussian_runs": 142,
+    "consumptions": 142,
+    "analyte_prediction_rows": 284,
+    "raw_metric_rows": 568,
+    "near_boundary": [],
+    "numerical_disagreements": [],
+    "raw_stage_records_checked": 426
+  },
+  "raw_integrity": {
+    "owner_fk_edges": 26,
+    "payload_hashes": {
+      "experiment_results": 568,
+      "campaign_proposals": 142,
+      "gaussian_observations": 142,
+      "attempt_revisions": 142,
+      "experiments": 142,
+      "campaign_runs": 16,
+      "retention_predictions": 142,
+      "campaign_consumptions": 284,
+      "analytical_observations": 284,
+      "observation_snapshots": 142
+    },
+    "ledger": {
+      "attempts": 148,
+      "states": {
+        "accepted": 142,
+        "rejected": 6
+      }
+    },
+    "training": {
+      "5d0bbd46-9112-4a5e-9c21-431d464da559": {
+        "consumed": 7,
+        "training_sha256": "5e68e8246d85666fd9c79942e7ad3fd9ea1e34a240709c725d6fb6ef81a80a8d"
+      },
+      "01a26d28-2626-45bd-9c21-74f419d364ac": {
+        "consumed": 10,
+        "training_sha256": "61f52f4afb04a924a8cee84162410bc2fa7eb3dae793693d076bec112782b500"
+      },
+      "b21ad58c-dd12-4e90-95fe-55684e95ea33": {
+        "consumed": 7,
+        "training_sha256": "5e68e8246d85666fd9c79942e7ad3fd9ea1e34a240709c725d6fb6ef81a80a8d"
+      },
+      "a6969987-6e5d-420e-90de-0e3db309cc4a": {
+        "consumed": 10,
+        "training_sha256": "61f52f4afb04a924a8cee84162410bc2fa7eb3dae793693d076bec112782b500"
+      },
+      "1d34fbb7-6273-47a4-9739-8916a1b48d37": {
+        "consumed": 7,
+        "training_sha256": "22c9fe1188d4a3c29e84fe10996ce474145cb2ded76cb9e8b64cbe40717dff98"
+      },
+      "39c36bd3-71ab-473a-9805-cc439ff7d168": {
+        "consumed": 10,
+        "training_sha256": "f4690db8e3f1849cf85de3ba2cbe309b3b8f39cb9467606b2c0a67366c20e615"
+      },
+      "1d52ae16-a8d7-41b7-ac4c-162e98420d2a": {
+        "consumed": 7,
+        "training_sha256": "22c9fe1188d4a3c29e84fe10996ce474145cb2ded76cb9e8b64cbe40717dff98"
+      },
+      "f8a69cb6-ae35-49eb-bf5c-3f9273e2ca53": {
+        "consumed": 10,
+        "training_sha256": "f4690db8e3f1849cf85de3ba2cbe309b3b8f39cb9467606b2c0a67366c20e615"
+      },
+      "73267354-51e4-4a39-9487-56d68ae0310c": {
+        "consumed": 7,
+        "training_sha256": "22c9fe1188d4a3c29e84fe10996ce474145cb2ded76cb9e8b64cbe40717dff98"
+      },
+      "eaa5252b-4744-43aa-985f-8fbe943bf92c": {
+        "consumed": 10,
+        "training_sha256": "f4690db8e3f1849cf85de3ba2cbe309b3b8f39cb9467606b2c0a67366c20e615"
+      },
+      "d41a2f1a-c75e-463d-a5a3-b99496efd2ac": {
+        "consumed": 7,
+        "training_sha256": "22c9fe1188d4a3c29e84fe10996ce474145cb2ded76cb9e8b64cbe40717dff98"
+      },
+      "15f27815-a514-4ef1-a71a-e66416b8e4e0": {
+        "consumed": 10,
+        "training_sha256": "f4690db8e3f1849cf85de3ba2cbe309b3b8f39cb9467606b2c0a67366c20e615"
+      },
+      "b7b13151-9f08-4072-b006-2c5437ffdc1e": {
+        "consumed": 10,
+        "training_sha256": "419496cd437f789504d67781f1d0904e21fd35c6194a29c3b7954d79a5e4a20e"
+      },
+      "b2c8f0ae-e30d-4703-83d1-ca9b9f097c91": {
+        "consumed": 10,
+        "training_sha256": "419496cd437f789504d67781f1d0904e21fd35c6194a29c3b7954d79a5e4a20e"
+      },
+      "2d4f0f1b-1043-4701-8c98-56672f9d8617": {
+        "consumed": 10,
+        "training_sha256": "298666dc059fb306e321e9bc1f16d1e7c796b0b33c3d614fcd15587299864c36"
+      },
+      "9bfe4c86-9e65-4367-ab4b-605347657ebc": {
+        "consumed": 10,
+        "training_sha256": "298666dc059fb306e321e9bc1f16d1e7c796b0b33c3d614fcd15587299864c36"
+      }
+    },
+    "source_graph": {
+      "consumption_source_graphs": 142
+    }
+  },
+  "bindings": {
+    "protocol_count": 4,
+    "registered_routes": [
+      [
+        "default",
+        "reject"
+      ],
+      [
+        "default",
+        "replicate"
+      ],
+      [
+        "low_noise",
+        "reject"
+      ],
+      [
+        "low_noise",
+        "replicate"
+      ]
+    ]
+  },
+  "source_identity_nodes_checked": 2242,
+  "csv_rows_checked": 160,
+  "reported_qualified": true,
+  "reported_result_agrees": true,
+  "artifact_accepted": true,
+  "limitations": [
+    "No physical qualification, population inference or optimizer comparison is established.",
+    "Process/replay evidence demonstrates recorded requests and persistent effects; unrecorded external work cannot be excluded by a sealed artifact alone.",
+    "Component attempted requests include pre-dispatch failures. Missing child/process times remain unknown; no total-duration estimate substitutes zero.",
+    "Independent source artifacts and wheel hashes are retained in the pre-call manifest; primary supplies external before/after source-tree verification."
+  ],
+  "auditor_source_sha256": {
+    "audit_qualification.py": "1fe8d057f4c534d893029c49619f293a7a9910d88da75955b194e2541b884967",
+    "execution_closure.py": "a2a0608e43424a3e2bc39daafbbeea86d26d87b4a3b048941952cec9cad81237",
+    "bundle_decoder.py": "2aae48ee18947fa58b8bb783171999c895484c57073f5ce62aa356a7358d0b05",
+    "auditor.py": "523f1fff0ff2e79300538be3134aed697de438e3f3d42f914cd1967c10bd7f30",
+    "independent_oracle.py": "093a7a269a70f9ffd11a8cb31572112e627234aebbad7329b56907bfde228789"
+  }
+}

@@ -7,6 +7,11 @@ evidence and the explicit duplicate policies in
 qualification with deliberately designed fixtures. It does not estimate which
 optimizer is better or reproduce the manuscript's task cohort.
 
+The [recorded qualification](suggestion-sequence-results.md) passes independent
+execution review: 84 component calls returned, all eight replicate campaigns
+completed, and both priors exercised actual repeated admission and rejection.
+Its 12 future unknown analytical slots remain visible.
+
 The declaration bytes have SHA256
 `d85f83d19076e266e4e159253d35e7baa9baea2cde32db225b1be9d7bfc4f4ef`.
 The initial coordinate streams and 70-digit Decimal references were checked

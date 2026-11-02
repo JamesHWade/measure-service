@@ -1,0 +1,298 @@
+{
+  "status": "accepted_for_declared_suggestion_sequence_qualification",
+  "checked_at": "2026-11-02T00:54:26.216115+00:00",
+  "qualified": true,
+  "artifact_accepted": true,
+  "reported_result_agrees": true,
+  "issues": [],
+  "criteria": {
+    "durable_policy_compliance": "pass",
+    "replicate_budget_completion": "pass",
+    "real_duplicate_coverage": "pass",
+    "component_readiness": "pass",
+    "numerical_validation": "pass"
+  },
+  "source_identity": {
+    "source_commit": "f6e86f3df206c5ace379fdee50692f57753c2799",
+    "source_tree": "599d4a27b65792a1abc64c3a4cb6d11658d83b4e",
+    "pre_native_build_commit": "49131f5abd96c09dc17b5a873f07ea14e8f0b60d",
+    "runner_sha256": "cb006ea51066c85a5acca990fc61d5a5b4bdc48b347fe4613ebffe911a0cf9ba",
+    "wheel_sha256": "d0eeef91c95b055633d6636d3cbd11a430d87b273137ebd75ee3b67f645236fc"
+  },
+  "external_freeze_sha256": "293d5cda39072821d8e7c78450283dc7e7dc29d24b17c3dd09ffeb26281f88d4",
+  "precall_manifest_sha256": "e76f841fe63e0df26f7d9ece4d32d251daf9d5b04b6a921e36ce189233daf08f",
+  "complete_sha256": "8d30f3014076352f138e9b884b99a224b07ee65542ddaab57ba22cf808b765a0",
+  "frozen_declaration_sha256": "d85f83d19076e266e4e159253d35e7baa9baea2cde32db225b1be9d7bfc4f4ef",
+  "frozen_oracle_sha256": "093a7a269a70f9ffd11a8cb31572112e627234aebbad7329b56907bfde228789",
+  "independent_test_count": 47,
+  "planned_denominators": {
+    "component_cases": 12,
+    "component_backend_slots": 84,
+    "durable_campaigns": 16,
+    "analytical_slots": 160,
+    "analyte_slots": 320,
+    "durable_GP_slots": 112
+  },
+  "component": {
+    "planned": 84,
+    "succeeded": 84,
+    "component_readiness": true
+  },
+  "durable_counts": {
+    "suggestion_attempts": 148,
+    "suggestion_retries_verified": 142,
+    "admitted_proposals": 142,
+    "completed_attempts": 142,
+    "consumed_evaluations": 142,
+    "consumption_retries_verified": 142,
+    "gp_attempts": 100,
+    "duplicate_rejected": 6,
+    "terminal_retries_verified": 6,
+    "not_attempted_unknown": 12,
+    "restart_receipts_verified": 32,
+    "late_suggestion_results": 0
+  },
+  "completed_evaluation_cost": 142.0,
+  "consumed_by_case": {
+    "qualify-all-confirmed:default:reject": 7,
+    "qualify-all-confirmed:default:replicate": 10,
+    "qualify-all-confirmed:low_noise:reject": 7,
+    "qualify-all-confirmed:low_noise:replicate": 10,
+    "qualify-all-not-accepted:default:reject": 7,
+    "qualify-all-not-accepted:default:replicate": 10,
+    "qualify-all-not-accepted:low_noise:reject": 7,
+    "qualify-all-not-accepted:low_noise:replicate": 10,
+    "qualify-all-censored:default:reject": 7,
+    "qualify-all-censored:default:replicate": 10,
+    "qualify-all-censored:low_noise:reject": 7,
+    "qualify-all-censored:low_noise:replicate": 10,
+    "qualify-mixed-initial:default:reject": 10,
+    "qualify-mixed-initial:default:replicate": 10,
+    "qualify-mixed-initial:low_noise:reject": 10,
+    "qualify-mixed-initial:low_noise:replicate": 10
+  },
+  "independently_verified_backend_responses": 184,
+  "duplicate_coverage_counts": {
+    "default": {
+      "replicate": 9,
+      "reject": 3
+    },
+    "low_noise": {
+      "replicate": 9,
+      "reject": 3
+    }
+  },
+  "operational": {
+    "case_status_counts": {
+      "stopped_expected_duplicate_rejection": 6,
+      "budget_complete": 10
+    },
+    "worker_count": 48,
+    "checkpoint_count": 48,
+    "case_checkpoint_counts": {
+      "qualify-all-confirmed:default:reject": 3,
+      "qualify-all-confirmed:default:replicate": 3,
+      "qualify-all-confirmed:low_noise:reject": 3,
+      "qualify-all-confirmed:low_noise:replicate": 3,
+      "qualify-all-not-accepted:default:reject": 3,
+      "qualify-all-not-accepted:default:replicate": 3,
+      "qualify-all-not-accepted:low_noise:reject": 3,
+      "qualify-all-not-accepted:low_noise:replicate": 3,
+      "qualify-all-censored:default:reject": 3,
+      "qualify-all-censored:default:replicate": 3,
+      "qualify-all-censored:low_noise:reject": 3,
+      "qualify-all-censored:low_noise:replicate": 3,
+      "qualify-mixed-initial:default:reject": 3,
+      "qualify-mixed-initial:default:replicate": 3,
+      "qualify-mixed-initial:low_noise:reject": 3,
+      "qualify-mixed-initial:low_noise:replicate": 3
+    },
+    "worker_status_counts": {
+      "returned": 48
+    },
+    "worker_pids_unique": 48,
+    "restart_events": 32,
+    "preceding_suggestion_and_consumption_receipt_pairs": 32,
+    "worker_elapsed_seconds_sum": 601.5690178787336
+  },
+  "unknown_accounting": {
+    "planned_analytical_slots": 160,
+    "planned_analyte_slots": 320,
+    "completed_analytical_slots": 142,
+    "observed_analyte_slots": 284,
+    "slots_with_no_analytical_observation": 18,
+    "analyte_slots_with_no_analytical_observation": 36,
+    "rejected_suggestion_slots": 6,
+    "future_unattempted_slots": 12,
+    "distinction": "Six rejected suggestion candidates are known but have no analytical attempt; twelve later candidates/outcomes remain unknown. None count as analytical failures or zero-valued observations."
+  },
+  "numeric": {
+    "finite_value_comparisons": 2188,
+    "maximum_absolute_errors": {
+      "retention_time_min": 1.4760911421914762e-16,
+      "resolution": 3.3859371046873997e-15,
+      "historical_utility": 4.272953031204171e-15,
+      "declared_runtime_min": 0.0
+    },
+    "raw_stage_records": 426,
+    "analyte_prediction_rows": 284,
+    "raw_metric_rows": 568,
+    "near_boundary_cases": 0,
+    "disagreements": [],
+    "comparison_count_definition": "2188 finite-value comparisons across prediction, Gaussian, selected raw-result and consumed-result projections; repeated projections are included, not independent observations. Additional exact status/null/cohort/reward/identity checks are not included in this numerical count."
+  },
+  "resources": {
+    "campaign_protocols": 4,
+    "campaign_runs": 16,
+    "campaign_proposals": 142,
+    "executable_methods": 142,
+    "experiments": 142,
+    "experiment_attempts": 142,
+    "retention_predictions": 142,
+    "gaussian_observations": 142,
+    "experiment_results": 568,
+    "analytical_observations": 142,
+    "observation_snapshots": 142,
+    "campaign_consumptions": 142,
+    "campaign_suggestion_attempts": 148,
+    "campaign_suggestion_attempt_outcomes": 148
+  },
+  "timing_grains": {
+    "component": {
+      "host_request_seconds": {
+        "known_count": 84,
+        "unknown_count": 0,
+        "known_sum": 435.3917945753783,
+        "complete": true
+      },
+      "child_seconds": {
+        "known_count": 84,
+        "unknown_count": 0,
+        "known_sum": 434.74008641019464,
+        "complete": true
+      }
+    },
+    "durable": {
+      "completed_declared_duration_min": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 871.499354735741,
+        "complete": true
+      },
+      "completed_declared_solvent_ml": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 435.7496773678705,
+        "complete": true
+      },
+      "planned_analytical_duration_min": {
+        "known_count": 142,
+        "unknown_count": 18,
+        "known_sum": 871.499354735741,
+        "complete": false
+      },
+      "planned_analytical_solvent_ml": {
+        "known_count": 142,
+        "unknown_count": 18,
+        "known_sum": 435.7496773678705,
+        "complete": false
+      },
+      "step_suggest_campaign_seconds": {
+        "known_count": 148,
+        "unknown_count": 0,
+        "known_sum": 542.5967837516218,
+        "complete": true
+      },
+      "step_create_experiment_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.3345215441659093,
+        "complete": true
+      },
+      "step_record_simulator_attempt_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.2952834190800786,
+        "complete": true
+      },
+      "step_predict_retention_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.40909786988049746,
+        "complete": true
+      },
+      "step_record_gaussian_observation_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.6671000318601727,
+        "complete": true
+      },
+      "step_evaluate_analytical_observation_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.5517009533941746,
+        "complete": true
+      },
+      "step_create_observation_snapshot_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.28764783218503,
+        "complete": true
+      },
+      "step_read_observation_snapshot_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 0.1516548367217183,
+        "complete": true
+      },
+      "step_consume_campaign_snapshot_seconds": {
+        "known_count": 142,
+        "unknown_count": 0,
+        "known_sum": 5.571834418922663,
+        "complete": true
+      },
+      "durable_candidate_generation_seconds": {
+        "known_count": 100,
+        "unknown_count": 12,
+        "known_sum": 524.4803035371006,
+        "complete": false
+      },
+      "durable_child_seconds": {
+        "known_count": 100,
+        "unknown_count": 12,
+        "known_sum": 524.4685015073046,
+        "complete": false
+      }
+    },
+    "worker_elapsed_seconds_sum": 601.5690178787336
+  },
+  "raw_source_identity_nodes_checked": 2242,
+  "all_planned_csv_rows_checked": 160,
+  "source_sha256": {
+    "audit_qualification.py": "1fe8d057f4c534d893029c49619f293a7a9910d88da75955b194e2541b884967",
+    "execution_closure.py": "a2a0608e43424a3e2bc39daafbbeea86d26d87b4a3b048941952cec9cad81237",
+    "bundle_decoder.py": "2aae48ee18947fa58b8bb783171999c895484c57073f5ce62aa356a7358d0b05",
+    "auditor.py": "523f1fff0ff2e79300538be3134aed697de438e3f3d42f914cd1967c10bd7f30",
+    "independent_oracle.py": "093a7a269a70f9ffd11a8cb31572112e627234aebbad7329b56907bfde228789",
+    "actual_supplement.py": "f2dd5444a598f0f91b50d9fd9199e88b45a3066d66bd2571c5fbc9f5cd95b6b9",
+    "test_auditor.py": "30ec14fb64aadedf280579c1430cc796798a08a91e83f4d54362a527a38481ab",
+    "test_decoder.py": "932fe92a4dd11986ca726039c4ea4c4ffb19d75272b7b84b7505421d939bde4a",
+    "test_execution_closure.py": "53cce9c194dae21c43c87fdc568ec4988c9ab3d9f56aeff9b15f5f6981b9728e",
+    "test_cli.py": "aacdd5237ce7b83404a01bdc5385498983cb8e3ed9992ee89ce28a567e7abd9e"
+  },
+  "evidence_sha256": {
+    "actual-audit.json": "0067e54d67de1536baad1cea63e10b861bcabda4ed9dd07750fd2dde07aacf80",
+    "actual-supplement.json": "f2c0f4a8ec90042207761f8ddb3f69b2a2e70de72d425554aca5d4524c0ee25e",
+    "actual-auditor-tests.log": "2bfddc70016168c3dea42a2929f7246d93a2326019702345ab1f69b0006954ab",
+    "actual-execution-freeze-copy.json": "293d5cda39072821d8e7c78450283dc7e7dc29d24b17c3dd09ffeb26281f88d4",
+    "actual-freeze-readiness.json": "49f607348dc4ad6f689c2c97a1e294673b07e5d0e092226053e9c60bc38ad9b5"
+  },
+  "limits": [
+    "Read-only audit of the sealed copy only; no optimizer rerun or original-store access.",
+    "Wheel hash bound through the external pre-call freeze; primary independently owns wheel installation and after-run source verification. All 42 manifest-listed Python files independently match the frozen Git tree.",
+    "Twelve future candidates/outcomes are unknown; six known rejected candidates have no analytical attempt. The 160/320 planned denominators remain fixed.",
+    "Repeated deterministic latent outcomes are fresh budget/evidence executions, not independent noisy measurements.",
+    "This qualifies declared component readiness and duplicate/restart/accounting policy on designed synthetic fixtures; it establishes no physical qualification, held-out generalization, optimizer ranking or superiority.",
+    "Artifact evidence cannot independently exclude unrecorded work outside its journals/store. Timing layers overlap and must not be summed as independent total runtime."
+  ]
+}
