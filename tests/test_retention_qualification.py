@@ -534,12 +534,7 @@ def test_existing_output_is_preserved(tmp_path, monkeypatch):
 
 
 def test_v2_decimal_intent_endpoint_status_is_not_reclassified_by_tolerance():
-    path = Path(
-        "/tmp/moses-retention-independent/reviewed-binary64-inputs-v3/retention_oracle.json"
-    )
-    if not path.is_file():
-        pytest.skip("reviewed external v3 oracle is not present in this checkout")
-    document = json.loads(path.read_text())
+    document = json.loads(qualification.DEFAULT_TRAJECTORY_ORACLE.read_text())
     case = next(
         case
         for case in document["cases"]
