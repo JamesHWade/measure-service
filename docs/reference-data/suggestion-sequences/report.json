@@ -1,0 +1,1167 @@
+{
+  "claim_scope": {
+    "not_qualified": [
+      "fresh optimizer fit, physical parameter validation, chromatogram or noise behavior, instrument performance, transfer to unselected tasks, optimizer superiority, or a success-rate estimate"
+    ],
+    "qualified": "fixed-sequence public-backend operation, durable service request/receipt and duplicate-policy accounting, immutable synthetic execution lineage, and agreement with the independent idealized retention/Gaussian oracle",
+    "simulation_interpretation": "Every analytical outcome is a deterministic synthetic latent retention and Gaussian-centroid execution under the declared fixtures. Repeated candidates create separate executions and spend; they are not independent measurement noise."
+  },
+  "component": {
+    "attempted_calls": 84,
+    "case_count": 12,
+    "cases": [
+      {
+        "attempted_calls": 7,
+        "case_id": "confirmed_acceptance_reward:default:all_one",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "confirmed_acceptance_reward:default:all_zero",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "confirmed_acceptance_reward:default:mixed",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "confirmed_acceptance_reward:low_noise:all_one",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "confirmed_acceptance_reward:low_noise:all_zero",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "confirmed_acceptance_reward:low_noise:mixed",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "historical_utility:default:all_one",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "historical_utility:default:all_zero",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "historical_utility:default:mixed",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "historical_utility:low_noise:all_one",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "historical_utility:low_noise:all_zero",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      },
+      {
+        "attempted_calls": 7,
+        "case_id": "historical_utility:low_noise:mixed",
+        "complete": true,
+        "first_failure": null,
+        "planned_calls": 7,
+        "returned_calls": 7
+      }
+    ],
+    "complete_case_count": 12,
+    "component_readiness": true,
+    "fabricated_scores_registered_as_observations": false,
+    "failed_calls": 0,
+    "planned_calls": 84,
+    "returned_calls": 84,
+    "status": "pass",
+    "unattempted_unknown_calls": 0
+  },
+  "copied_verified_inputs": {
+    "declaration.json": {
+      "sha256": "d85f83d19076e266e4e159253d35e7baa9baea2cde32db225b1be9d7bfc4f4ef",
+      "size_bytes": 26934
+    },
+    "fixture-oracle.json": {
+      "sha256": "067b276933e5f434e52a47936a8cfa8041042a71f8c52fec1903f907a9a02b79",
+      "size_bytes": 53369
+    },
+    "independent_oracle.py.txt": {
+      "sha256": "093a7a269a70f9ffd11a8cb31572112e627234aebbad7329b56907bfde228789",
+      "size_bytes": 3606
+    },
+    "initial-design.json": {
+      "sha256": "5c705d93fce23acd29279c8edde1217396c280176a444a96ccb1ab029455b664",
+      "size_bytes": 2928
+    }
+  },
+  "criteria": {
+    "component_readiness": true,
+    "durable_policy_compliance": true,
+    "numerical_validation": true,
+    "real_duplicate_coverage": true,
+    "replicate_budget_completion": true,
+    "store_reconciliation_complete": true
+  },
+  "declaration_sha256": "d85f83d19076e266e4e159253d35e7baa9baea2cde32db225b1be9d7bfc4f4ef",
+  "duplicate_policy_note": "Reject-policy budget completion is descriptive and not required after a correctly recorded duplicate rejection. Replicate-policy campaigns must consume all ten slots.",
+  "durable": {
+    "analytical_observation_count": 142,
+    "attempted_suggestion_slots": 148,
+    "completed_simulator_attempt_count": 142,
+    "completed_simulator_attempts_without_consumption": 0,
+    "consumed_evaluations": 142,
+    "consumed_evaluations_by_case": {
+      "qualify-all-censored:default:reject": 7,
+      "qualify-all-censored:default:replicate": 10,
+      "qualify-all-censored:low_noise:reject": 7,
+      "qualify-all-censored:low_noise:replicate": 10,
+      "qualify-all-confirmed:default:reject": 7,
+      "qualify-all-confirmed:default:replicate": 10,
+      "qualify-all-confirmed:low_noise:reject": 7,
+      "qualify-all-confirmed:low_noise:replicate": 10,
+      "qualify-all-not-accepted:default:reject": 7,
+      "qualify-all-not-accepted:default:replicate": 10,
+      "qualify-all-not-accepted:low_noise:reject": 7,
+      "qualify-all-not-accepted:low_noise:replicate": 10,
+      "qualify-mixed-initial:default:reject": 10,
+      "qualify-mixed-initial:default:replicate": 10,
+      "qualify-mixed-initial:low_noise:reject": 10,
+      "qualify-mixed-initial:low_noise:replicate": 10
+    },
+    "consumed_evaluations_by_status": 142,
+    "consumed_status_slot_count": 142,
+    "correctly_rejected_duplicate_slots": 6,
+    "declared_restart_schedule": {
+      "after_consumed_ordinals": [
+        2,
+        6
+      ],
+      "fresh_process_chunks": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          7,
+          8,
+          9
+        ]
+      ]
+    },
+    "durable_attempt_and_consumption_accounting_source": "union of fsynced slot evidence and independently queried owned SQLite source records",
+    "durable_policy_compliance": true,
+    "failed_or_interrupted_slots": 0,
+    "fresh_process_restart_evidence": true,
+    "interrupted_unknown_slots": 0,
+    "known_consumed_evaluation_cost_count": 142,
+    "known_consumed_evaluation_cost_total": 142.0,
+    "near_boundary_comparisons": 0,
+    "not_attempted_unknown_slots": 12,
+    "numerical_comparisons_available": 142,
+    "numerical_comparisons_failed": 0,
+    "numerical_comparisons_passed": 142,
+    "numerical_validation": true,
+    "operational_completion": true,
+    "operational_completion_by_case": {
+      "qualify-all-censored:default:reject": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "stopped_expected_duplicate_rejection",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-censored:default:replicate": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-censored:low_noise:reject": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "stopped_expected_duplicate_rejection",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-censored:low_noise:replicate": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-confirmed:default:reject": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "stopped_expected_duplicate_rejection",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-confirmed:default:replicate": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-confirmed:low_noise:reject": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "stopped_expected_duplicate_rejection",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-confirmed:low_noise:replicate": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-not-accepted:default:reject": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "stopped_expected_duplicate_rejection",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-not-accepted:default:replicate": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-not-accepted:low_noise:reject": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "stopped_expected_duplicate_rejection",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-all-not-accepted:low_noise:replicate": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-mixed-initial:default:reject": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-mixed-initial:default:replicate": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-mixed-initial:low_noise:reject": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      },
+      "qualify-mixed-initial:low_noise:replicate": {
+        "case_failure_absent": true,
+        "passed": true,
+        "terminal_status": "budget_complete",
+        "terminal_status_matches_persisted_spend": true,
+        "terminal_status_valid": true,
+        "worker_deliveries_complete": true,
+        "worker_journal_valid": true
+      }
+    },
+    "planned_analyte_slots": 320,
+    "planned_campaigns": 16,
+    "planned_gp_suggestion_slots": 112,
+    "planned_suggestion_slots": 160,
+    "proposal_identifiers_complete_for_consumed": true,
+    "recorded_campaigns": 16,
+    "reject_budget_complete_campaigns": 2,
+    "reject_budget_completion_status": "descriptive_only",
+    "reject_campaigns": 8,
+    "reject_expected_duplicate_stop_campaigns": 6,
+    "reject_repeat_receipts": 6,
+    "repeat_coverage": true,
+    "repeat_coverage_by_prior": {
+      "default": {
+        "reject_coverage": true,
+        "reject_durable_rejection_count": 3,
+        "reject_examples": [
+          {
+            "candidate_available": true,
+            "case_id": "qualify-all-confirmed:default:reject",
+            "no_proposal_or_analysis_side_effect": true,
+            "ordinal": 7,
+            "same_failure_replayed": true
+          },
+          {
+            "candidate_available": true,
+            "case_id": "qualify-all-not-accepted:default:reject",
+            "no_proposal_or_analysis_side_effect": true,
+            "ordinal": 7,
+            "same_failure_replayed": true
+          },
+          {
+            "candidate_available": true,
+            "case_id": "qualify-all-censored:default:reject",
+            "no_proposal_or_analysis_side_effect": true,
+            "ordinal": 7,
+            "same_failure_replayed": true
+          }
+        ],
+        "replicate_admitted_repeat_count": 9,
+        "replicate_coverage": true,
+        "replicate_examples": [
+          {
+            "case_id": "qualify-all-confirmed:default:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 7,
+            "proposal_id": "c2b1b07a-d68e-48b3-86fe-dd0cd5ce1642"
+          },
+          {
+            "case_id": "qualify-all-confirmed:default:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 8,
+            "proposal_id": "d6e3b020-3e85-4b8b-af6c-99b1fc2c70ba"
+          },
+          {
+            "case_id": "qualify-all-confirmed:default:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 9,
+            "proposal_id": "9c5a5a01-3294-45d7-be8b-ac57e08a2b3e"
+          },
+          {
+            "case_id": "qualify-all-not-accepted:default:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 7,
+            "proposal_id": "8bc6f1fe-8246-4b93-a77d-3994497b151d"
+          },
+          {
+            "case_id": "qualify-all-not-accepted:default:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 8,
+            "proposal_id": "77c62d22-261b-43ec-9081-f37f47d2783b"
+          },
+          {
+            "case_id": "qualify-all-not-accepted:default:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 9,
+            "proposal_id": "6f2e30aa-212f-477e-a742-73ec84a1f476"
+          },
+          {
+            "case_id": "qualify-all-censored:default:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 7,
+            "proposal_id": "95c4572b-78a6-4825-b35f-6b1bbaac72d1"
+          },
+          {
+            "case_id": "qualify-all-censored:default:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 8,
+            "proposal_id": "600cdb6c-30bc-492f-88aa-a111b74f7a2b"
+          },
+          {
+            "case_id": "qualify-all-censored:default:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 9,
+            "proposal_id": "8f3eaaef-6969-4696-b2b9-be59354e35d9"
+          }
+        ]
+      },
+      "low_noise": {
+        "reject_coverage": true,
+        "reject_durable_rejection_count": 3,
+        "reject_examples": [
+          {
+            "candidate_available": true,
+            "case_id": "qualify-all-confirmed:low_noise:reject",
+            "no_proposal_or_analysis_side_effect": true,
+            "ordinal": 7,
+            "same_failure_replayed": true
+          },
+          {
+            "candidate_available": true,
+            "case_id": "qualify-all-not-accepted:low_noise:reject",
+            "no_proposal_or_analysis_side_effect": true,
+            "ordinal": 7,
+            "same_failure_replayed": true
+          },
+          {
+            "candidate_available": true,
+            "case_id": "qualify-all-censored:low_noise:reject",
+            "no_proposal_or_analysis_side_effect": true,
+            "ordinal": 7,
+            "same_failure_replayed": true
+          }
+        ],
+        "replicate_admitted_repeat_count": 9,
+        "replicate_coverage": true,
+        "replicate_examples": [
+          {
+            "case_id": "qualify-all-confirmed:low_noise:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 7,
+            "proposal_id": "cfd50cd6-c6e7-4a73-bddb-61684c513e23"
+          },
+          {
+            "case_id": "qualify-all-confirmed:low_noise:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 8,
+            "proposal_id": "ed69a4eb-0562-46b6-a022-e4e1da26348c"
+          },
+          {
+            "case_id": "qualify-all-confirmed:low_noise:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 9,
+            "proposal_id": "11da47f7-7bce-42b9-b19c-cfc932ba93ab"
+          },
+          {
+            "case_id": "qualify-all-not-accepted:low_noise:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 7,
+            "proposal_id": "34797e81-4d60-4c64-bff8-7ccf78a205b3"
+          },
+          {
+            "case_id": "qualify-all-not-accepted:low_noise:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 8,
+            "proposal_id": "4c794948-7d5a-4fa4-ac6a-e9dd498486c9"
+          },
+          {
+            "case_id": "qualify-all-not-accepted:low_noise:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 9,
+            "proposal_id": "aec45b92-7dad-4842-ba13-b46612429fb6"
+          },
+          {
+            "case_id": "qualify-all-censored:low_noise:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 7,
+            "proposal_id": "09ff27c2-4cc2-4dc3-88dc-63046b1217e6"
+          },
+          {
+            "case_id": "qualify-all-censored:low_noise:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 8,
+            "proposal_id": "b1d2c4e8-3419-4903-9948-bfec3efbfc46"
+          },
+          {
+            "case_id": "qualify-all-censored:low_noise:replicate",
+            "identity_fields_complete": true,
+            "ordinal": 9,
+            "proposal_id": "2540acef-2f64-4014-818e-a706b675da0d"
+          }
+        ]
+      }
+    },
+    "replicate_budget_complete_campaigns": 8,
+    "replicate_budget_completion": true,
+    "replicate_campaigns": 8,
+    "replicate_repeat_admissions": 18,
+    "restart_evidence_by_case": {
+      "qualify-all-censored:default:reject": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-censored:default:replicate": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-censored:low_noise:reject": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-censored:low_noise:replicate": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-confirmed:default:reject": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-confirmed:default:replicate": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-confirmed:low_noise:reject": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-confirmed:low_noise:replicate": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-not-accepted:default:reject": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-not-accepted:default:replicate": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-not-accepted:low_noise:reject": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-all-not-accepted:low_noise:replicate": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-mixed-initial:default:reject": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-mixed-initial:default:replicate": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-mixed-initial:low_noise:reject": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      },
+      "qualify-mixed-initial:low_noise:replicate": {
+        "boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "fresh_processes": true,
+        "reached_ordinals": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "receipt_replays_passed": true,
+        "required_boundaries_before": [
+          0,
+          3,
+          7
+        ],
+        "required_reached_boundaries": true
+      }
+    },
+    "store_reconciliation_by_case": {
+      "qualify-all-censored:default:reject": "reconciled",
+      "qualify-all-censored:default:replicate": "reconciled",
+      "qualify-all-censored:low_noise:reject": "reconciled",
+      "qualify-all-censored:low_noise:replicate": "reconciled",
+      "qualify-all-confirmed:default:reject": "reconciled",
+      "qualify-all-confirmed:default:replicate": "reconciled",
+      "qualify-all-confirmed:low_noise:reject": "reconciled",
+      "qualify-all-confirmed:low_noise:replicate": "reconciled",
+      "qualify-all-not-accepted:default:reject": "reconciled",
+      "qualify-all-not-accepted:default:replicate": "reconciled",
+      "qualify-all-not-accepted:low_noise:reject": "reconciled",
+      "qualify-all-not-accepted:low_noise:replicate": "reconciled",
+      "qualify-mixed-initial:default:reject": "reconciled",
+      "qualify-mixed-initial:default:replicate": "reconciled",
+      "qualify-mixed-initial:low_noise:reject": "reconciled",
+      "qualify-mixed-initial:low_noise:replicate": "reconciled"
+    },
+    "store_reconciliation_complete": true,
+    "unknown_consumed_evaluation_cost_count": 0,
+    "unknown_slots_are_only_post_expected_rejects": true
+  },
+  "first_backend_call_marker_sha256": "e335d6ce95d96ae931a506d96ee0ccef9cb8f7520e7c795930c3072c1ff47422",
+  "persistent_run_evidence_directory": "/private/tmp/measure-suggestion-actual-store-20261101/suggestion-sequence-run-evidence",
+  "planned_denominators": {
+    "analyte_slots": 320,
+    "component_backend_call_slots": 84,
+    "component_cases": 12,
+    "durable_campaigns": 16,
+    "durable_gp_suggestion_slots": 112,
+    "durable_reject_policy_slots": 80,
+    "durable_replicate_policy_slots": 80,
+    "durable_suggestion_slots": 160,
+    "maximum_backend_calls_without_retries": 196
+  },
+  "precall_software_manifest": {
+    "bo_sidecar": {
+      "acquisition_optimization": {
+        "configured_num_restarts": null,
+        "configured_raw_samples": null,
+        "dimensions": 2,
+        "num_restarts": 14,
+        "raw_samples": 512,
+        "source": "public AcquisitionOptimizationConfig.resolve(2); no generation call"
+      },
+      "bo_engine_source_tree_sha256": "f7f9b9003ff61e05e0f93629e07e0a21b0b6947ff9fafbc7428822c1e6887fb9",
+      "distributions": {
+        "bo-engine": {
+          "source_revision": null,
+          "version": "0.1.0"
+        },
+        "botorch": {
+          "source_revision": null,
+          "version": "0.18.1"
+        },
+        "gpytorch": {
+          "source_revision": null,
+          "version": "1.15.2"
+        },
+        "measure-service": {
+          "source_revision": null,
+          "version": "0.1.0.dev0"
+        },
+        "numpy": {
+          "source_revision": null,
+          "version": "2.5.4"
+        },
+        "scipy": {
+          "source_revision": null,
+          "version": "1.18.1"
+        },
+        "torch": {
+          "source_revision": null,
+          "version": "2.15.0"
+        }
+      },
+      "profile": "measure-service-bo-metadata-only/1",
+      "python_implementation": "CPython",
+      "python_version": "3.13.11",
+      "status": "available"
+    },
+    "created_at": "2026-11-02T00:34:17.087845+00:00",
+    "declaration_sha256": "d85f83d19076e266e4e159253d35e7baa9baea2cde32db225b1be9d7bfc4f4ef",
+    "fixed_backend_configuration": {
+      "acquisition": "qLogExpectedImprovement, maximize, batch size1",
+      "configured_acquisition_overrides": {
+        "num_restarts": null,
+        "raw_samples": null
+      },
+      "effective_defaults_rule": "Use the installed public backend defaults, record positive integer effective values and bind them in the pre-call software/settings manifest; never change them after observing results. Explicit configured null is not an invalid value.",
+      "implementation": "Actual public BO-MCP BoTorchBackend.generate_suggestions through the reviewed installed sidecar; no alternate optimizer engine",
+      "iteration_rule": "exact ordered consumed/fabricated training row count,3 through9; do not reset iteration on restart",
+      "model": "SingleTaskGP with RBF ARD covariance and inferred Gaussian noise",
+      "noise_constraint_lower_bound": 0.0001,
+      "noise_prior_parameters": {
+        "default": [
+          1.1,
+          0.05
+        ],
+        "low_noise": [
+          1.1,
+          100.0
+        ]
+      },
+      "runtime": "existing adapter timeout and finite monotonic elapsed-time validation; no timeout extension, retry or fallback after an outcome",
+      "seed": 17
+    },
+    "fixture_oracle_sha256": "067b276933e5f434e52a47936a8cfa8041042a71f8c52fec1903f907a9a02b79",
+    "host": {
+      "measure_methods_distribution": {
+        "source_revision": null,
+        "version": null
+      },
+      "measure_service_distribution": {
+        "source_revision": null,
+        "version": "0.1.0.dev0"
+      },
+      "module_sha256": {
+        "measure_methods.__source_files__": {
+          "__init__.py": "b32a7d28870bdc473b685126e43861f55451d3058e17468db2f49a98f491a166",
+          "chromatography.py": "1824a0a6ddaef062a440cfd5913d3ef89fb45d00bb6f7dc64b741c6d00fbe699",
+          "design.py": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+          "gaussian_observations.py": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9",
+          "metric_candidates.py": "30c5218b2337633ce3f3894d683d19a96021a0355c51a4f81470e06091852606",
+          "moses_objective.py": "2d5fe86082e02dbb6ac1bdf1a1fb4635c115870c0c394746fab8c1cd972b00f8",
+          "objectives.py": "ac649d339bbeb60e54ebeb738c4d31e28111ec511d3d92219f837cad496fdce1",
+          "observations.py": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f",
+          "retention.py": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538",
+          "trajectories.py": "17ee10247239ac4c8faf4266ab92d21763e348c5118496db1416c418cdc09815",
+          "volume.py": "280262b13b7d26c0dcb8cd18c987713af2f79d27437ee4ea7da6ac4554343221"
+        },
+        "measure_methods.__source_tree__": "61a16f25ce9e5d3edfb200f23ca613ca672b288e43239aa2b80ce80ee069cc2a",
+        "measure_methods.design": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+        "measure_methods.gaussian_observations": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9",
+        "measure_methods.moses_objective": "2d5fe86082e02dbb6ac1bdf1a1fb4635c115870c0c394746fab8c1cd972b00f8",
+        "measure_methods.observations": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f",
+        "measure_methods.retention": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538",
+        "measure_service.__source_files__": {
+          "__init__.py": "e5700ed5be1d33881c6e64fe73027651986ed523151763b69656d80f281c91d1",
+          "__main__.py": "3c7b28e5b7170a6b6c83ccd6fcde24623958031d899ca385f9c6762dbe8ee6e9",
+          "benchmarks/__init__.py": "f405de642c5e1c53d7955f388db39bcb16dbf72fe1369f231515a13b2ec5389b",
+          "benchmarks/__main__.py": "abfca88f15e104f0f6c2b9886c2cfb611108c58477fa1a57a39cc24387ee9d45",
+          "benchmarks/evidence.py": "ce71b554b234946825178fd2872fc89b4c4b019d447dc9282b73e4dc15332435",
+          "benchmarks/gaussian_qualification.py": "f2f8bf2182fb5fc36a1bdab26e45fddada95b4f78cfab61fdb18cddcc6834a38",
+          "benchmarks/moses_archive.py": "2ea50c33404fc336fe7adfc8cb68c8b283f35e22522a36fff6420cd452d411a1",
+          "benchmarks/moses_replay.py": "3ad35b5a346097086738db538e567790b8774cbca86992a6efee7fd1d97b9558",
+          "benchmarks/moses_sensitivity.py": "ea61ffc71385ca79eebe5b59fe9a1acf0c39fb2ff3461331896212c583c58546",
+          "benchmarks/pickle_records.py": "e62119def51fe109e4b6a4d0fbd007fb7953f772c4e8f8fc06e493817363ab39",
+          "benchmarks/retention_qualification.py": "09bb7da54ffa2f8f6e5a836d503aa33cf3dd275f7f3efd17eb1fe1f2e9be7bbd",
+          "benchmarks/sensitivity_summary.py": "b05cc5ff144fcacc38fff68eb0838a082bb8c06bc2ab0fa655aed8d6dddabda6",
+          "benchmarks/suggestion_sequences.py": "cb006ea51066c85a5acca990fc61d5a5b4bdc48b347fe4613ebffe911a0cf9ba",
+          "benchmarks/synthetic_ablations.py": "8dffb59acf673fcd8ea4b6b90e153a2205b9a0b0c8baa35e0446d38c1eb834a5",
+          "benchmarks/synthetic_campaigns.py": "6dac4351afa2c0443739722c1c0baa274f7278088a8c4d672dc24d2f7eb7efe4",
+          "campaign_protocol.py": "4420bc4e469cbe73178b4b44147a863976487df3a2e8256fde76d4abf9d7479e",
+          "campaign_protocol_registry.py": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5",
+          "campaign_schema.py": "033738aabe10932371a4b2d1492d021a4743b9edb03fffcd77d58df0db86be0a",
+          "campaign_suggestion_attempts.py": "005e5ecae312638aea1594c700bf25bc808d018c1ebf592ce9c7320c5633fcc8",
+          "campaigns.py": "110615d7658a452f97aec2312478f17707dbd4bff27c79e617534502e365385b",
+          "experiments.py": "a4b37f28af5f5beaa006e50042e9b62b0bbebd389469353bb3f5b4733b4ca52f",
+          "gaussian_producer.py": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970",
+          "method_backend.py": "2e8a3a3dfde1f781e2e15a0874263bb66678dd081dcb5c119330e10702422aec",
+          "method_registry.py": "1df612779079dbe7eafadbb3c15536de855d04f280fcb50aa56b8e503d05295d",
+          "methods.py": "925650c3d1aed5ca8c5b536a258a56f13c040aa34e5a8d4e057ff8cbe24e4859",
+          "moses_score_qualification.py": "1f81445de376bfe2973288c14959831eac108b96ef5ed8c98afdead3780b9ef9",
+          "observations.py": "1fb023f0ed57defc7d3bb35adff53eefeb3dc8acc42e2580c18152ddbf52a45d",
+          "optimizer_backend.py": "0a4a97efeccfced7983d7e8dc93ef0112d42ac40e42e1aaf8270778438718f62",
+          "retention.py": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0",
+          "server.py": "133c672359165ba60086d2355a831a35eae8627b81cb8afb57944f5fbe90d09c",
+          "storage.py": "0bab7801582fa76bfce411addb9995c57f3b00579d72aff11523bc70ca402cab"
+        },
+        "measure_service.__source_tree__": "d3706cac136d490c36ec335e355d4af2680c7bce360b691d91823750e9f3c611",
+        "measure_service.benchmarks.evidence": "ce71b554b234946825178fd2872fc89b4c4b019d447dc9282b73e4dc15332435",
+        "measure_service.benchmarks.suggestion_sequences": "cb006ea51066c85a5acca990fc61d5a5b4bdc48b347fe4613ebffe911a0cf9ba",
+        "measure_service.campaign_protocol": "4420bc4e469cbe73178b4b44147a863976487df3a2e8256fde76d4abf9d7479e",
+        "measure_service.campaign_protocol_registry": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5",
+        "measure_service.campaign_schema": "033738aabe10932371a4b2d1492d021a4743b9edb03fffcd77d58df0db86be0a",
+        "measure_service.campaign_suggestion_attempts": "005e5ecae312638aea1594c700bf25bc808d018c1ebf592ce9c7320c5633fcc8",
+        "measure_service.campaigns": "110615d7658a452f97aec2312478f17707dbd4bff27c79e617534502e365385b",
+        "measure_service.experiments": "a4b37f28af5f5beaa006e50042e9b62b0bbebd389469353bb3f5b4733b4ca52f",
+        "measure_service.gaussian_producer": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970",
+        "measure_service.method_registry": "1df612779079dbe7eafadbb3c15536de855d04f280fcb50aa56b8e503d05295d",
+        "measure_service.methods": "925650c3d1aed5ca8c5b536a258a56f13c040aa34e5a8d4e057ff8cbe24e4859",
+        "measure_service.observations": "1fb023f0ed57defc7d3bb35adff53eefeb3dc8acc42e2580c18152ddbf52a45d",
+        "measure_service.optimizer_backend": "0a4a97efeccfced7983d7e8dc93ef0112d42ac40e42e1aaf8270778438718f62",
+        "measure_service.retention": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0",
+        "measure_service.storage": "0bab7801582fa76bfce411addb9995c57f3b00579d72aff11523bc70ca402cab"
+      },
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "python_implementation": "CPython",
+      "python_version": "3.13.11"
+    },
+    "initial_design_sha256": "5c705d93fce23acd29279c8edde1217396c280176a444a96ccb1ab029455b664",
+    "profile": "measure-service-suggestion-sequence-precall-manifest/1"
+  },
+  "profile": "measure-service-suggestion-sequence-qualification/1",
+  "qualified": true,
+  "registration_failure": null,
+  "run_reservation_sha256": "f33b14b3d8273549753194edf6843b79d82b481a26f09af3dc7b4023955ce0d7",
+  "status": "qualified"
+}

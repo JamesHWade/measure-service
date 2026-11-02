@@ -1,0 +1,47 @@
+{
+  "copied_files": {
+    "independent-review-supplement.json": {
+      "sha256": "77b1cf620f73d981cd6cb4a5300974d375f63bd7a1bb8a940573eed85b468c0b",
+      "size_bytes": 11923
+    },
+    "independent-review.json": {
+      "sha256": "0067e54d67de1536baad1cea63e10b861bcabda4ed9dd07750fd2dde07aacf80",
+      "size_bytes": 82855
+    },
+    "report.json": {
+      "sha256": "59a164e66d1677baed80c86a1d5520b4620e659f89f0d483495abfeab5af67ef",
+      "size_bytes": 40184
+    },
+    "slots.csv": {
+      "sha256": "4f6d0fc540c54424d5f218fe59f207e9fcb8a5e80f0f96c527a356169d995d98",
+      "size_bytes": 74402
+    }
+  },
+  "created_at": "2026-11-02T00:54:00.487723+00:00",
+  "declaration_sha256": "d85f83d19076e266e4e159253d35e7baa9baea2cde32db225b1be9d7bfc4f4ef",
+  "executed_source_commit": "f6e86f3df206c5ace379fdee50692f57753c2799",
+  "executed_source_tree": "599d4a27b65792a1abc64c3a4cb6d11658d83b4e",
+  "external_execution_freeze_sha256": "293d5cda39072821d8e7c78450283dc7e7dc29d24b17c3dd09ffeb26281f88d4",
+  "full_evidence_complete_sha256": "8d30f3014076352f138e9b884b99a224b07ee65542ddaab57ba22cf808b765a0",
+  "full_evidence_contents": [
+    "SQLite backup",
+    "84 component request/result rows",
+    "16 campaign evidence graphs",
+    "all fsynced journals",
+    "frozen declaration and independent oracle",
+    "pre-call software/settings manifests",
+    "worker process and restart receipts"
+  ],
+  "independent_audit_artifact_accepted": true,
+  "independent_audit_qualified": true,
+  "precall_manifest_sha256": "e76f841fe63e0df26f7d9ece4d32d251daf9d5b04b6a921e36ce189233daf08f",
+  "profile": "measure-service-suggestion-qualification-publication/1",
+  "reference_grains": {
+    "independent-review-supplement.json": "Independent external-freeze binding, finite numerical error maxima, process/replay closure and audit source hashes",
+    "independent-review.json": "independent read-only SQLite, source, arithmetic, policy and accounting audit",
+    "report.json": "recorded runner criteria and counts; exact sealed bytes",
+    "slots.csv": "all 160 planned durable evaluation slots; exact sealed bytes"
+  },
+  "source_identity_note": "The executed source commit precedes these publication-only documentation, figure and reference additions. Hashes record observed builds; they do not restrict compatible dependency revisions.",
+  "wheel_sha256": "d0eeef91c95b055633d6636d3cbd11a430d87b273137ebd75ee3b67f645236fc"
+}

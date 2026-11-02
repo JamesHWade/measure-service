@@ -25,6 +25,15 @@ def test_service_distribution_contains_both_import_packages_and_worker():
     assert "measure_methods/__init__.py" in files
     assert "measure_methods/volume.py" in files
     assert "measure_service/worker.R" in files
+    assert {
+        "measure_service/benchmarks/reference_data/suggestion_sequences_v1/" + name
+        for name in (
+            "candidate-declaration.json",
+            "fixture-oracle.json",
+            "initial-design.json",
+            "independent_oracle.py.txt",
+        )
+    } <= files
 
 
 def test_method_backend_imports_without_service_or_mcp(tmp_path):

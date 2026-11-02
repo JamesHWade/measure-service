@@ -5,3 +5,4 @@ recursive-include scripts *.py *.R
 recursive-include tests *.py *.json
 recursive-include src/measure_service *.R
 recursive-include src/measure_service/benchmarks/reference_data *.json *.md
+recursive-include src/measure_service/benchmarks/reference_data/suggestion_sequences_v1 *.txt

@@ -1,0 +1,91 @@
+{
+  "installed_protocol_file": "/tmp/measure-replication-profile-installed-green-20261101/measure_service/campaign_protocol.py",
+  "installed_protocol_sha256": "4420bc4e469cbe73178b4b44147a863976487df3a2e8256fde76d4abf9d7479e",
+  "distribution_version": "0.1.0.dev0",
+  "normalized_protocol_template": {
+    "profile": "synthetic-isocratic-ablation/2",
+    "domain": {
+      "strong_solvent_fraction": {
+        "lower": 0.1,
+        "upper": 0.9
+      },
+      "acquisition_duration_min": {
+        "lower": 2.0,
+        "upper": 10.0
+      }
+    },
+    "flow_ml_min": 0.5,
+    "constraints": {
+      "min_segment_duration_min": null,
+      "max_acquisition_duration_min": null,
+      "max_occupancy_duration_min": null,
+      "max_flow_ml_min": null,
+      "max_abs_fraction_slope_per_min": null,
+      "solvent_bounds": [],
+      "equipment_constraints": []
+    },
+    "tasks": [
+      {
+        "task_id": "qualify-all-confirmed",
+        "producer_id": "pending-producer-0",
+        "observation_contract_id": "pending-contract-0"
+      },
+      {
+        "task_id": "qualify-all-not-accepted",
+        "producer_id": "pending-producer-1",
+        "observation_contract_id": "pending-contract-1"
+      },
+      {
+        "task_id": "qualify-all-censored",
+        "producer_id": "pending-producer-2",
+        "observation_contract_id": "pending-contract-2"
+      },
+      {
+        "task_id": "qualify-mixed-initial",
+        "producer_id": "pending-producer-3",
+        "observation_contract_id": "pending-contract-3"
+      }
+    ],
+    "seeds": [
+      17
+    ],
+    "evaluation_budget": 10,
+    "initial_design_size": 3,
+    "policies": [
+      "random",
+      "bo_mcp_gp_logei"
+    ],
+    "initial_design_policy": "common_coordinates_counted_per_policy_seed",
+    "stopping_policy": "full_budget",
+    "fidelity": 1.0,
+    "fidelity_role": "high",
+    "observation_origin": "simulator_latent",
+    "evaluation_cost": 1.0,
+    "evaluation_cost_unit": "synthetic_evaluation",
+    "initial_evaluations_always_count": true,
+    "utility_profile": "moses-botier-1.0.0-binary64/1",
+    "utility_input_definition": "finite-resolution-reference/1",
+    "analytical_success_policy": "separate-strict-observation-contract",
+    "optimizer_target": "confirmed_acceptance_reward",
+    "surrogate_noise_prior": "default",
+    "duplicate_policy": "replicate"
+  },
+  "campaign_design_sha256": "93bd69abbfa5d985831474639e7132c5a3dff0224d79bf1a987c9f9e70a5f69d",
+  "initial_coordinates": [
+    {
+      "strong_solvent_fraction": 0.48349881655330484,
+      "acquisition_duration_min": 7.54897224762647
+    },
+    {
+      "strong_solvent_fraction": 0.7832216549547181,
+      "acquisition_duration_min": 2.440073295364153
+    },
+    {
+      "strong_solvent_fraction": 0.13611031914245575,
+      "acquisition_duration_min": 6.97704856585468
+    }
+  ],
+  "all_eight_factor_streams_equal": true,
+  "backend_calls": 0,
+  "registry_calls": 0
+}

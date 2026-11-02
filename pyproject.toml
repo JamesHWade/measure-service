@@ -35,7 +35,13 @@ Issues = "https://github.com/JamesHWade/measure-service/issues"
 where = ["src"]
 
 [tool.setuptools.package-data]
-measure_service = ["worker.R", "benchmarks/reference_data/*.json", "benchmarks/reference_data/*.md"]
+measure_service = [
+  "worker.R",
+  "benchmarks/reference_data/*.json",
+  "benchmarks/reference_data/*.md",
+  "benchmarks/reference_data/suggestion_sequences_v1/*.json",
+  "benchmarks/reference_data/suggestion_sequences_v1/*.txt",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

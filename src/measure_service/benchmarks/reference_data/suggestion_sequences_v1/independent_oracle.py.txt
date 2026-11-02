@@ -1,0 +1,44 @@
+"""Qualification-only 70-digit Decimal oracle; no production imports or BO calls.
+
+Inputs are the exact parsed binary64 declaration/candidate values. Required
+cohort size is derived from the fixture, never copied from an earlier study.
+"""
+from decimal import Decimal, localcontext
+
+def d(value):
+    if isinstance(value, bool):
+        raise TypeError('Boolean is not a numeric input')
+    return Decimal.from_float(value) if isinstance(value, float) else Decimal(value)
+
+def evaluate(fixture, candidate, declaration):
+    with localcontext() as ctx:
+        ctx.prec = 70
+        phi = d(candidate['strong_solvent_fraction'])
+        duration = d(candidate['acquisition_duration_min'])
+        geometry = declaration['geometry']
+        flow = d(declaration['flow_ml_min'])
+        dead = d(geometry['column_length_m']) * d(geometry['effective_area_m2']) * d(1000000) / flow
+        post = d(geometry['post_column_volume_ml']) / flow
+        times = [dead * (1 + (d(a['ln_k0']) - d(a['S1']) * phi).exp()) + post for a in fixture['analytes']]
+        finite = sorted((t, a['analyte_id'], i) for i,(t,a) in enumerate(zip(times, fixture['analytes'])) if t <= duration)
+        rs = [None] * len(times)
+        pairs = []
+        width = d(fixture['fwhm_min'])
+        for (left, lid, i),(right, rid, j) in zip(finite, finite[1:]):
+            value = (right-left) * d(2.3548) / (4*width)
+            for k in (i,j):
+                rs[k] = value if rs[k] is None else min(rs[k], value)
+            pairs.append({'analytes':[lid,rid], 'resolution':value})
+        threshold = d(declaration['contract']['resolution_threshold'])
+        any_failure = any(v is not None and v < threshold for v in rs)
+        accepted = not any_failure and len(finite)==len(times) and all(v is not None for v in rs)
+        state = 'not_accepted' if any_failure else 'accepted' if accepted else 'unknown'
+        # Previously reviewed historical profile, independently expressed.
+        observed = [v for v in rs if v is not None]
+        missing = len(fixture['analytes']) - len(observed)
+        contract = declaration['contract']
+        x=[(d(10)-missing)/(d(10)-d(contract['count_threshold'])), min(max(min(observed) if observed else d(0),d(0)),d(5))/threshold, (d(contract['max_acquisition_duration_min'])-duration)/(d(contract['max_acquisition_duration_min'])-d(contract['runtime_preference_min']))]
+        gates=[1/(1+(-100*(v-1)).exp()) for v in x]
+        soft=[(v*(-100*v).exp()+d(-100).exp())/((-100*v).exp()+d(-100).exp()) for v in x]
+        utility=soft[0]+gates[0]*soft[1]+gates[0]*gates[1]*soft[2]+gates[0]*gates[1]*gates[2]*x[0]
+        return {'dead_time_min':dead,'latent_retention_times_min':times,'observed_retention_times_min':[t if t<=duration else None for t in times],'retention_statuses':['eluted' if t<=duration else 'not_eluted' for t in times],'detection':[True if t<=duration else None for t in times],'resolutions':rs,'resolution_statuses':['observed' if v is not None else 'censored' if t>duration else 'unsupported' for t,v in zip(times,rs)],'pairs':pairs,'analytical_acceptance':state,'confirmed_acceptance_reward':1.0 if accepted else 0.0,'historical_utility':utility,'completed_attempt_cost':d(declaration['evaluation_cost']),'declared_acquisition_duration_min':duration,'declared_solvent_volume_ml':flow*duration,'declared_solvent_A_ml':flow*duration*(1-phi),'declared_solvent_B_ml':flow*duration*phi,'near_censor_boundary':[i for i,t in enumerate(times) if abs(t-duration)<=d(1e-7)],'near_resolution_boundary':[i for i,v in enumerate(rs) if v is not None and abs(v-threshold)<=d(1e-6)]}

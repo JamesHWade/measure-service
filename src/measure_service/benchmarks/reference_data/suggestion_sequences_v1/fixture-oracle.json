@@ -1,0 +1,1370 @@
+{
+  "qualify-all-confirmed": {
+    "initial": [
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.48349881655330484,
+          "acquisition_duration_min": 7.54897224762647
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "observed_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "17.66099999999999875334156480165625204656361732517220262913515664129523",
+          "17.66099999999999875334156480165625204656361732517220262913515664129523"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "17.66099999999999875334156480165625204656361732517220262913515664129523"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "2.482798822483128128463587434288015675527770033463352562682292900564512",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "7.548972247626469567194362753070890903472900390625",
+        "declared_solvent_volume_ml": "3.7744861238132347835971813765354454517364501953125",
+        "declared_solvent_A_ml": "1.949526549852664903502426064782153362356085491735332478266938018018894",
+        "declared_solvent_B_ml": "1.824959573960569880094755311753292089380364703577167521733061981981106",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.7832216549547181,
+          "acquisition_duration_min": 2.440073295364153
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "observed_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "17.66099999999999875334156480165625204656361732517220262913515664129523",
+          "17.66099999999999875334156480165625204656361732517220262913515664129523"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "17.66099999999999875334156480165625204656361732517220262913515664129523"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "4.037174855039710133609189202714431574132241942498968274502057821981680",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2.440073295364153072029012037091888487339019775390625",
+        "declared_solvent_volume_ml": "1.2200366476820765360145060185459442436695098876953125",
+        "declared_solvent_A_ml": "0.2644775253791142496096977500087184996714462192330453847833546818582584",
+        "declared_solvent_B_ml": "0.9555591223029622864048082685372257439980636684622671152166453181417416",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.13611031914245575,
+          "acquisition_duration_min": 6.97704856585468
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "observed_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "17.66099999999999875334156480165625204656361732517220262913515664129523",
+          "17.66099999999999875334156480165625204656361732517220262913515664129523"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "17.66099999999999875334156480165625204656361732517220262913515664129523"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "2.596594221074459448218997444743713167552222970488158212215757901252044",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "6.97704856585468036200836650095880031585693359375",
+        "declared_solvent_volume_ml": "3.488524282927340181004183250479400157928466796875",
+        "declared_solvent_A_ml": "3.013700129441893315409730201938356426240605343327623996186378357853286",
+        "declared_solvent_B_ml": "0.4748241534854468655944530485410437316878614535473760038136216421467140",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      }
+    ],
+    "corners": [
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.1,
+          "acquisition_duration_min": 2.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "observed_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "17.66099999999999875334156480165625204656361732517220262913515664129523",
+          "17.66099999999999875334156480165625204656361732517220262913515664129523"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "17.66099999999999875334156480165625204656361732517220262913515664129523"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "4.037174855039710133609220490458072115219909659784394831084542352460074",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2",
+        "declared_solvent_volume_ml": "1.0",
+        "declared_solvent_A_ml": "0.89999999999999999444888487687421729788184165954589843750",
+        "declared_solvent_B_ml": "0.10000000000000000555111512312578270211815834045410156250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.1,
+          "acquisition_duration_min": 10.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "observed_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "17.66099999999999875334156480165625204656361732517220262913515664129523",
+          "17.66099999999999875334156480165625204656361732517220262913515664129523"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "17.66099999999999875334156480165625204656361732517220262913515664129523"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "1.995118929292318435544185973301186173459975172963098191675244476369358",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "10",
+        "declared_solvent_volume_ml": "5.0",
+        "declared_solvent_A_ml": "4.49999999999999997224442438437108648940920829772949218750",
+        "declared_solvent_B_ml": "0.50000000000000002775557561562891351059079170227050781250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.9,
+          "acquisition_duration_min": 2.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "observed_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "17.66099999999999875334156480165625204656361732517220262913515664129523",
+          "17.66099999999999875334156480165625204656361732517220262913515664129523"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "17.66099999999999875334156480165625204656361732517220262913515664129523"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "4.037174855039710133609220490458072115219909659784394831084542352460074",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2",
+        "declared_solvent_volume_ml": "1.0",
+        "declared_solvent_A_ml": "0.099999999999999977795539507496869191527366638183593750",
+        "declared_solvent_B_ml": "0.900000000000000022204460492503130808472633361816406250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.9,
+          "acquisition_duration_min": 10.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "observed_retention_times_min": [
+          "0.4000000000000000041037052228576332779244456780145241661980897982699504",
+          "0.9999999999999999731545140356032898267025458614399247341047788888488189"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "17.66099999999999875334156480165625204656361732517220262913515664129523",
+          "17.66099999999999875334156480165625204656361732517220262913515664129523"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "17.66099999999999875334156480165625204656361732517220262913515664129523"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "1.995118929292318435544185973301186173459975172963098191675244476369358",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "10",
+        "declared_solvent_volume_ml": "5.0",
+        "declared_solvent_A_ml": "0.499999999999999888977697537484345957636833190917968750",
+        "declared_solvent_B_ml": "4.500000000000000111022302462515654042363166809082031250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      }
+    ]
+  },
+  "qualify-all-not-accepted": {
+    "initial": [
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.48349881655330484,
+          "acquisition_duration_min": 7.54897224762647
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951",
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+          }
+        ],
+        "analytical_acceptance": "not_accepted",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "1.004175616431839033507608390587203871389635538015828551191460789418087",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "7.548972247626469567194362753070890903472900390625",
+        "declared_solvent_volume_ml": "3.7744861238132347835971813765354454517364501953125",
+        "declared_solvent_A_ml": "1.949526549852664903502426064782153362356085491735332478266938018018894",
+        "declared_solvent_B_ml": "1.824959573960569880094755311753292089380364703577167521733061981981106",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.7832216549547181,
+          "acquisition_duration_min": 2.440073295364153
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951",
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+          }
+        ],
+        "analytical_acceptance": "not_accepted",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "1.004175616431839033507608390587203871389635623631646163244247954684284",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2.440073295364153072029012037091888487339019775390625",
+        "declared_solvent_volume_ml": "1.2200366476820765360145060185459442436695098876953125",
+        "declared_solvent_A_ml": "0.2644775253791142496096977500087184996714462192330453847833546818582584",
+        "declared_solvent_B_ml": "0.9555591223029622864048082685372257439980636684622671152166453181417416",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.13611031914245575,
+          "acquisition_duration_min": 6.97704856585468
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951",
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+          }
+        ],
+        "analytical_acceptance": "not_accepted",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "1.004175616431839033507608390587203871389635544283736629304226032294716",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "6.97704856585468036200836650095880031585693359375",
+        "declared_solvent_volume_ml": "3.488524282927340181004183250479400157928466796875",
+        "declared_solvent_A_ml": "3.013700129441893315409730201938356426240605343327623996186378357853286",
+        "declared_solvent_B_ml": "0.4748241534854468655944530485410437316878614535473760038136216421467140",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      }
+    ],
+    "corners": [
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.1,
+          "acquisition_duration_min": 2.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951",
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+          }
+        ],
+        "analytical_acceptance": "not_accepted",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "1.004175616431839033507608390587203871389635623631646163244247954686007",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2",
+        "declared_solvent_volume_ml": "1.0",
+        "declared_solvent_A_ml": "0.89999999999999999444888487687421729788184165954589843750",
+        "declared_solvent_B_ml": "0.10000000000000000555111512312578270211815834045410156250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.1,
+          "acquisition_duration_min": 10.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951",
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+          }
+        ],
+        "analytical_acceptance": "not_accepted",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "1.004175616431839033507608390587203871389635511154173511506036201508271",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "10",
+        "declared_solvent_volume_ml": "5.0",
+        "declared_solvent_A_ml": "4.49999999999999997224442438437108648940920829772949218750",
+        "declared_solvent_B_ml": "0.50000000000000002775557561562891351059079170227050781250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.9,
+          "acquisition_duration_min": 2.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951",
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+          }
+        ],
+        "analytical_acceptance": "not_accepted",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "1.004175616431839033507608390587203871389635623631646163244247954686007",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2",
+        "declared_solvent_volume_ml": "1.0",
+        "declared_solvent_A_ml": "0.099999999999999977795539507496869191527366638183593750",
+        "declared_solvent_B_ml": "0.900000000000000022204460492503130808472633361816406250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.9,
+          "acquisition_duration_min": 10.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6019999999999999564641300361553395226065570494242749160625591821759332"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951",
+          "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "0.005886999999999880721603456165401271814770012131818762810522445782235951"
+          }
+        ],
+        "analytical_acceptance": "not_accepted",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "1.004175616431839033507608390587203871389635511154173511506036201508271",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "10",
+        "declared_solvent_volume_ml": "5.0",
+        "declared_solvent_A_ml": "0.499999999999999888977697537484345957636833190917968750",
+        "declared_solvent_B_ml": "4.500000000000000111022302462515654042363166809082031250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      }
+    ]
+  },
+  "qualify-all-censored": {
+    "initial": [
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.48349881655330484,
+          "acquisition_duration_min": 7.54897224762647
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "4405.493158961343348588693343289944245911941449651650307639079184537076",
+          "7263.300534849327622298516230377890311977110974226861634607024483399042"
+        ],
+        "observed_retention_times_min": [
+          null,
+          null
+        ],
+        "retention_statuses": [
+          "not_eluted",
+          "not_eluted"
+        ],
+        "detection": [
+          null,
+          null
+        ],
+        "resolutions": [
+          null,
+          null
+        ],
+        "resolution_statuses": [
+          "censored",
+          "censored"
+        ],
+        "pairs": [],
+        "analytical_acceptance": "unknown",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "0.8421052850903019255391608672775680672121071421069847062178571642678090",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "7.548972247626469567194362753070890903472900390625",
+        "declared_solvent_volume_ml": "3.7744861238132347835971813765354454517364501953125",
+        "declared_solvent_A_ml": "1.949526549852664903502426064782153362356085491735332478266938018018894",
+        "declared_solvent_B_ml": "1.824959573960569880094755311753292089380364703577167521733061981981106",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.7832216549547181,
+          "acquisition_duration_min": 2.440073295364153
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "4405.493158961343348588693343289944245911941449651650307639079184537076",
+          "7263.300534849327622298516230377890311977110974226861634607024483399042"
+        ],
+        "observed_retention_times_min": [
+          null,
+          null
+        ],
+        "retention_statuses": [
+          "not_eluted",
+          "not_eluted"
+        ],
+        "detection": [
+          null,
+          null
+        ],
+        "resolutions": [
+          null,
+          null
+        ],
+        "resolution_statuses": [
+          "censored",
+          "censored"
+        ],
+        "pairs": [],
+        "analytical_acceptance": "unknown",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "0.8421052850903019255391608672775680672121071421069916919982980114383832",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2.440073295364153072029012037091888487339019775390625",
+        "declared_solvent_volume_ml": "1.2200366476820765360145060185459442436695098876953125",
+        "declared_solvent_A_ml": "0.2644775253791142496096977500087184996714462192330453847833546818582584",
+        "declared_solvent_B_ml": "0.9555591223029622864048082685372257439980636684622671152166453181417416",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.13611031914245575,
+          "acquisition_duration_min": 6.97704856585468
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "4405.493158961343348588693343289944245911941449651650307639079184537076",
+          "7263.300534849327622298516230377890311977110974226861634607024483399042"
+        ],
+        "observed_retention_times_min": [
+          null,
+          null
+        ],
+        "retention_statuses": [
+          "not_eluted",
+          "not_eluted"
+        ],
+        "detection": [
+          null,
+          null
+        ],
+        "resolutions": [
+          null,
+          null
+        ],
+        "resolution_statuses": [
+          "censored",
+          "censored"
+        ],
+        "pairs": [],
+        "analytical_acceptance": "unknown",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "0.8421052850903019255391608672775680672121071421069852972873325544078422",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "6.97704856585468036200836650095880031585693359375",
+        "declared_solvent_volume_ml": "3.488524282927340181004183250479400157928466796875",
+        "declared_solvent_A_ml": "3.013700129441893315409730201938356426240605343327623996186378357853286",
+        "declared_solvent_B_ml": "0.4748241534854468655944530485410437316878614535473760038136216421467140",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      }
+    ],
+    "corners": [
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.1,
+          "acquisition_duration_min": 2.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "4405.493158961343348588693343289944245911941449651650307639079184537076",
+          "7263.300534849327622298516230377890311977110974226861634607024483399042"
+        ],
+        "observed_retention_times_min": [
+          null,
+          null
+        ],
+        "retention_statuses": [
+          "not_eluted",
+          "not_eluted"
+        ],
+        "detection": [
+          null,
+          null
+        ],
+        "resolutions": [
+          null,
+          null
+        ],
+        "resolution_statuses": [
+          "censored",
+          "censored"
+        ],
+        "pairs": [],
+        "analytical_acceptance": "unknown",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "0.8421052850903019255391608672775680672121071421069916919982980114383832",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2",
+        "declared_solvent_volume_ml": "1.0",
+        "declared_solvent_A_ml": "0.89999999999999999444888487687421729788184165954589843750",
+        "declared_solvent_B_ml": "0.10000000000000000555111512312578270211815834045410156250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.1,
+          "acquisition_duration_min": 10.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "4405.493158961343348588693343289944245911941449651650307639079184537076",
+          "7263.300534849327622298516230377890311977110974226861634607024483399042"
+        ],
+        "observed_retention_times_min": [
+          null,
+          null
+        ],
+        "retention_statuses": [
+          "not_eluted",
+          "not_eluted"
+        ],
+        "detection": [
+          null,
+          null
+        ],
+        "resolutions": [
+          null,
+          null
+        ],
+        "resolution_statuses": [
+          "censored",
+          "censored"
+        ],
+        "pairs": [],
+        "analytical_acceptance": "unknown",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "0.8421052850903019255391608672775680672121071421069821731391721306019360",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "10",
+        "declared_solvent_volume_ml": "5.0",
+        "declared_solvent_A_ml": "4.49999999999999997224442438437108648940920829772949218750",
+        "declared_solvent_B_ml": "0.50000000000000002775557561562891351059079170227050781250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.9,
+          "acquisition_duration_min": 2.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "4405.493158961343348588693343289944245911941449651650307639079184537076",
+          "7263.300534849327622298516230377890311977110974226861634607024483399042"
+        ],
+        "observed_retention_times_min": [
+          null,
+          null
+        ],
+        "retention_statuses": [
+          "not_eluted",
+          "not_eluted"
+        ],
+        "detection": [
+          null,
+          null
+        ],
+        "resolutions": [
+          null,
+          null
+        ],
+        "resolution_statuses": [
+          "censored",
+          "censored"
+        ],
+        "pairs": [],
+        "analytical_acceptance": "unknown",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "0.8421052850903019255391608672775680672121071421069916919982980114383832",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2",
+        "declared_solvent_volume_ml": "1.0",
+        "declared_solvent_A_ml": "0.099999999999999977795539507496869191527366638183593750",
+        "declared_solvent_B_ml": "0.900000000000000022204460492503130808472633361816406250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.9,
+          "acquisition_duration_min": 10.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "4405.493158961343348588693343289944245911941449651650307639079184537076",
+          "7263.300534849327622298516230377890311977110974226861634607024483399042"
+        ],
+        "observed_retention_times_min": [
+          null,
+          null
+        ],
+        "retention_statuses": [
+          "not_eluted",
+          "not_eluted"
+        ],
+        "detection": [
+          null,
+          null
+        ],
+        "resolutions": [
+          null,
+          null
+        ],
+        "resolution_statuses": [
+          "censored",
+          "censored"
+        ],
+        "pairs": [],
+        "analytical_acceptance": "unknown",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "0.8421052850903019255391608672775680672121071421069821731391721306019360",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "10",
+        "declared_solvent_volume_ml": "5.0",
+        "declared_solvent_A_ml": "0.499999999999999888977697537484345957636833190917968750",
+        "declared_solvent_B_ml": "4.500000000000000111022302462515654042363166809082031250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      }
+    ]
+  },
+  "qualify-mixed-initial": {
+    "initial": [
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.48349881655330484,
+          "acquisition_duration_min": 7.54897224762647
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6066552319689278293316907862997308757280205974631446262135404990189961"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.6066552319689278293316907862997308757280205974631446262135404990189961"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "0.09794837650269537225539347693763416402223668323641645572214661863059724",
+          "0.09794837650269537225539347693763416402223668323641645572214661863059724"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "0.09794837650269537225539347693763416402223668323641645572214661863059724"
+          }
+        ],
+        "analytical_acceptance": "not_accepted",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "1.065233652482711329129667001542180511913283308988400935639371263346734",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "7.548972247626469567194362753070890903472900390625",
+        "declared_solvent_volume_ml": "3.7744861238132347835971813765354454517364501953125",
+        "declared_solvent_A_ml": "1.949526549852664903502426064782153362356085491735332478266938018018894",
+        "declared_solvent_B_ml": "1.824959573960569880094755311753292089380364703577167521733061981981106",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.7832216549547181,
+          "acquisition_duration_min": 2.440073295364153
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.5013411139897809395137668987790036022052238367399283626168546738330907"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.5013411139897809395137668987790036022052238367399283626168546738330907"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "1.452012154855398949180998097001138885640960546411415977610953579547919",
+          "1.452012154855398949180998097001138885640960546411415977610953579547919"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "B",
+              "A"
+            ],
+            "resolution": "1.452012154855398949180998097001138885640960546411415977610953579547919"
+          }
+        ],
+        "analytical_acceptance": "not_accepted",
+        "confirmed_acceptance_reward": 0.0,
+        "historical_utility": "2.044580253330473497437385276778904343202370749768208748134467579063986",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2.440073295364153072029012037091888487339019775390625",
+        "declared_solvent_volume_ml": "1.2200366476820765360145060185459442436695098876953125",
+        "declared_solvent_A_ml": "0.2644775253791142496096977500087184996714462192330453847833546818582584",
+        "declared_solvent_B_ml": "0.9555591223029622864048082685372257439980636684622671152166453181417416",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.13611031914245575,
+          "acquisition_duration_min": 6.97704856585468
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.7755661861925921041269662150616979630998912797064032257908096538527755"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.7755661861925921041269662150616979630998912797064032257908096538527755"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "2.583895345289474289306384730060615133929973218935626232694765348697580",
+          "2.583895345289474289306384730060615133929973218935626232694765348697580"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "2.583895345289474289306384730060615133929973218935626232694765348697580"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "2.596594221074459448218997444743718039228994468372274584793063953332280",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "6.97704856585468036200836650095880031585693359375",
+        "declared_solvent_volume_ml": "3.488524282927340181004183250479400157928466796875",
+        "declared_solvent_A_ml": "3.013700129441893315409730201938356426240605343327623996186378357853286",
+        "declared_solvent_B_ml": "0.4748241534854468655944530485410437316878614535473760038136216421467140",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      }
+    ],
+    "corners": [
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.1,
+          "acquisition_duration_min": 2.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.7967298790565081844031662133137989245254987767166702176873527322920951"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.7967298790565081844031662133137989245254987767166702176873527322920951"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "2.895371995014159194851361984870475559206958657892004242553669344474679",
+          "2.895371995014159194851361984870475559206958657892004242553669344474679"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "2.895371995014159194851361984870475559206958657892004242553669344474679"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "4.037174855039710133609220490458072115219865223191218597744103511157799",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2",
+        "declared_solvent_volume_ml": "1.0",
+        "declared_solvent_A_ml": "0.89999999999999999444888487687421729788184165954589843750",
+        "declared_solvent_B_ml": "0.10000000000000000555111512312578270211815834045410156250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.1,
+          "acquisition_duration_min": 10.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.7967298790565081844031662133137989245254987767166702176873527322920951"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.7967298790565081844031662133137989245254987767166702176873527322920951"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "2.895371995014159194851361984870475559206958657892004242553669344474679",
+          "2.895371995014159194851361984870475559206958657892004242553669344474679"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "A",
+              "B"
+            ],
+            "resolution": "2.895371995014159194851361984870475559206958657892004242553669344474679"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "1.995118929292318435544185973301186173460012002664132888103764469941819",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "10",
+        "declared_solvent_volume_ml": "5.0",
+        "declared_solvent_A_ml": "4.49999999999999997224442438437108648940920829772949218750",
+        "declared_solvent_B_ml": "0.50000000000000002775557561562891351059079170227050781250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.9,
+          "acquisition_duration_min": 2.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.4681280184142557426969593545755255829389932859018952104397422211692153"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.4681280184142557426969593545755255829389932859018952104397422211692153"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "1.940825888988191024041857851303923519165616549918185156355938437464859",
+          "1.940825888988191024041857851303923519165616549918185156355938437464859"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "B",
+              "A"
+            ],
+            "resolution": "1.940825888988191024041857851303923519165616549918185156355938437464859"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "4.037174855039408316803185804244463072154419097375570770126182410889037",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "2",
+        "declared_solvent_volume_ml": "1.0",
+        "declared_solvent_A_ml": "0.099999999999999977795539507496869191527366638183593750",
+        "declared_solvent_B_ml": "0.900000000000000022204460492503130808472633361816406250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      },
+      {
+        "candidate": {
+          "strong_solvent_fraction": 0.9,
+          "acquisition_duration_min": 10.0
+        },
+        "dead_time_min": "0.2000000000000000020518526114288166389622228390072620830990448991349752",
+        "latent_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.4681280184142557426969593545755255829389932859018952104397422211692153"
+        ],
+        "observed_retention_times_min": [
+          "0.5999999999999999968793705789012514672999639374092147792410243515958717",
+          "0.4681280184142557426969593545755255829389932859018952104397422211692153"
+        ],
+        "retention_statuses": [
+          "eluted",
+          "eluted"
+        ],
+        "detection": [
+          true,
+          true
+        ],
+        "resolutions": [
+          "1.940825888988191024041857851303923519165616549918185156355938437464859",
+          "1.940825888988191024041857851303923519165616549918185156355938437464859"
+        ],
+        "resolution_statuses": [
+          "observed",
+          "observed"
+        ],
+        "pairs": [
+          {
+            "analytes": [
+              "B",
+              "A"
+            ],
+            "resolution": "1.940825888988191024041857851303923519165616549918185156355938437464859"
+          }
+        ],
+        "analytical_acceptance": "accepted",
+        "confirmed_acceptance_reward": 1.0,
+        "historical_utility": "1.995118929292368868650799554840485023587112833723578180139217844426585",
+        "completed_attempt_cost": "1",
+        "declared_acquisition_duration_min": "10",
+        "declared_solvent_volume_ml": "5.0",
+        "declared_solvent_A_ml": "0.499999999999999888977697537484345957636833190917968750",
+        "declared_solvent_B_ml": "4.500000000000000111022302462515654042363166809082031250",
+        "near_censor_boundary": [],
+        "near_resolution_boundary": []
+      }
+    ]
+  }
+}
