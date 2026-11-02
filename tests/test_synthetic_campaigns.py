@@ -19,7 +19,7 @@ from measure_service import (
     retention,
 )
 from measure_service.benchmarks import synthetic_campaigns as benchmark
-from measure_service.storage import registry_connection, sha256
+from measure_service.storage import registry_connection
 
 
 def _mini_protocol(owner: str, key_prefix: str = "fixture") -> dict:
@@ -393,10 +393,14 @@ def test_unconsumed_completed_attempt_keeps_declared_expenditure_and_walltime(
     original_predict = retention.predict_retention
     prediction_calls = 0
 
-    def fake_bo_candidate(spec, training, seed):
+    def fake_bo_candidate(spec, training, seed, *, elapsed_evidence=None):
+        from test_campaign_suggestion_runtime import _valid_backend
+
+        backend = _valid_backend(spec, training, seed)
+        backend["runtime"]["elapsed_seconds"] = 1.25
         return (
             {"strong_solvent_fraction": 0.31, "acquisition_duration_min": 6.5},
-            {"training_sha256": sha256(training), "runtime": {"elapsed_seconds": 1.25}},
+            backend,
         )
 
     def fail_on_bo_prediction(owner, model_id, method_id, key):

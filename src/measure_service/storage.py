@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterator
 
+from .campaign_schema import ensure_proposal_repetition_schema
+
 
 def canonical(value: object) -> str:
     return json.dumps(
@@ -203,7 +205,7 @@ def connect() -> sqlite3.Connection:
       executable_method_id TEXT NOT NULL, method_input_digest TEXT NOT NULL,
       canonical_program_digest TEXT NOT NULL, payload TEXT NOT NULL,
       input_digest TEXT NOT NULL, created_at TEXT NOT NULL,
-      UNIQUE(campaign_id, ordinal), UNIQUE(campaign_id, candidate_digest),
+      UNIQUE(campaign_id, ordinal),
       FOREIGN KEY(campaign_id) REFERENCES campaign_runs(id),
       FOREIGN KEY(executable_method_id) REFERENCES executable_methods(id)
     );
@@ -226,6 +228,11 @@ def connect() -> sqlite3.Connection:
       FOREIGN KEY(attempt_id, attempt_revision) REFERENCES attempt_revisions(attempt_id, revision)
     );
     """)
+    try:
+        ensure_proposal_repetition_schema(con)
+    except BaseException:
+        con.close()
+        raise
     return con
 
 
@@ -266,6 +273,20 @@ def registry_mutation(
                     "Idempotency key was already used for a different registry request"
                 )
             return json.loads(receipt["response"])
+        # A durable suggestion claim reserves the same namespace as ordinary
+        # receipts, including while its external computation is unresolved.
+        claims_exist = con.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='campaign_suggestion_attempts'"
+        ).fetchone()
+        if (
+            claims_exist is not None
+            and con.execute(
+                "SELECT 1 FROM campaign_suggestion_attempts WHERE owner=? AND request_key=?",
+                (owner, key),
+            ).fetchone()
+            is not None
+        ):
+            raise ValueError("Idempotency key is reserved by a campaign suggestion attempt")
         response = action(con)
         con.execute(
             "INSERT INTO registry_receipts VALUES (?, ?, ?, ?, ?)",

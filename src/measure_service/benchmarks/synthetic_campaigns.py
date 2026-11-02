@@ -29,6 +29,7 @@ from measure_methods.trajectories import (
 from .. import (
     campaign_protocol,
     campaign_protocol_registry,
+    campaign_suggestion_attempts,
     campaigns,
     experiments,
     gaussian_producer,
@@ -84,6 +85,9 @@ _SERVICE_TABLES = {
     "campaign_proposals",
     "campaign_protocols",
     "campaign_runs",
+    "campaign_suggestion_attempts",
+    "campaign_suggestion_attempt_outcomes",
+    "campaign_suggestion_attempt_late_results",
     "dataset_sources",
     "datasets",
     "executable_methods",
@@ -105,7 +109,10 @@ _SERVICE_INDEXES = {
     "attempts_owner_experiment",
     "campaign_one_pending",
     "campaign_protocols_owner_order",
+    "campaign_proposals_candidate",
     "campaign_runs_owner_order",
+    "campaign_suggestion_one_active",
+    "campaign_suggestion_owner_campaign_order",
     "experiments_owner_order",
     "gaussian_observations_owner_attempt",
     "gaussian_observations_owner_order",
@@ -366,6 +373,58 @@ def _store_identity_references(value: Any, ids: set[str], attempt_revisions: set
             _store_identity_references(item, ids, attempt_revisions)
 
 
+def _check_suggestion_claim_closure(
+    con: sqlite3.Connection,
+    owner: str,
+    allowed_prefixes: tuple[str, ...],
+    table_names: set[str],
+    receipt_ids: set[str],
+) -> None:
+    """Validate durable claims as typed roots, including unresolved executions."""
+    names = {
+        "campaign_suggestion_attempts",
+        "campaign_suggestion_attempt_outcomes",
+        "campaign_suggestion_attempt_late_results",
+    }
+    if not names.intersection(table_names):
+        return
+    if not names.issubset(table_names):
+        raise ValueError("isolated data_dir contains incomplete suggestion-attempt storage")
+    factory = con.row_factory
+    con.row_factory = sqlite3.Row
+    try:
+        claims = con.execute(
+            "SELECT id, request_key, campaign_id FROM campaign_suggestion_attempts "
+            "WHERE owner=? ORDER BY created_at, id",
+            (owner,),
+        ).fetchall()
+        claim_ids = {row["id"] for row in claims}
+        for row in claims:
+            if (
+                not any(row["request_key"].startswith(prefix) for prefix in allowed_prefixes)
+                or row["campaign_id"] not in receipt_ids
+            ):
+                raise ValueError("isolated data_dir contains an off-plan suggestion claim")
+            record = campaign_suggestion_attempts.get(con, owner, row["id"])
+            campaigns._verify_suggestion_context(con, owner, record)
+            outcome = record.get("outcome")
+            if (
+                isinstance(outcome, dict)
+                and outcome.get("status") == "accepted"
+                and outcome.get("proposal_id") not in receipt_ids
+            ):
+                raise ValueError("isolated data_dir suggestion has an unreceipted proposal")
+            receipt_ids.add(row["id"])
+        for table in names - {"campaign_suggestion_attempts"}:
+            for row in con.execute(
+                f"SELECT suggestion_attempt_id FROM {table} WHERE owner=?", (owner,)
+            ):
+                if row["suggestion_attempt_id"] not in claim_ids:
+                    raise ValueError("isolated data_dir contains orphaned suggestion evidence")
+    finally:
+        con.row_factory = factory
+
+
 def _check_owned_store(
     con: sqlite3.Connection,
     input_sha256: str,
@@ -444,6 +503,8 @@ def _check_owned_store(
             if not isinstance(decoded, dict):
                 raise ValueError("isolated data_dir registry receipt is not an object")
             _store_identity_references(decoded, receipt_ids, attempt_revisions)
+
+    _check_suggestion_claim_closure(con, owner, allowed_receipt_prefixes, table_names, receipt_ids)
 
     for table in sorted(_SERVICE_OWNER_TABLES - {"observation_snapshot_members"}):
         if table not in table_names:

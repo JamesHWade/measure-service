@@ -8,6 +8,7 @@ import math
 import os
 import subprocess
 import sys
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from types import SimpleNamespace
 
@@ -530,7 +531,7 @@ def test_campaign_rejects_snapshot_that_omits_or_reclassifies_producer_evidence(
         )
 
 
-def test_simultaneous_suggestions_use_revision_cas_and_leave_one_pending():
+def test_simultaneous_suggestions_use_revision_cas_and_leave_one_pending(monkeypatch):
     prepared = _prepared(key="concurrent")
     owner = prepared["owner"]
     campaign = campaigns.create_campaign(
@@ -542,21 +543,41 @@ def test_simultaneous_suggestions_use_revision_cas_and_leave_one_pending():
         "concurrent-campaign",
     )
 
-    def suggest(key):
-        try:
-            return campaigns.suggest_campaign(owner, campaign["campaign_id"], 1, key)
-        except ValueError as error:
-            return error
+    generating = threading.Event()
+    release = threading.Event()
+    original_initial_candidate = campaign_protocol.initial_candidate
 
+    def blocked_initial_candidate(spec, seed, ordinal):
+        generating.set()
+        assert release.wait(10), "initial candidate generation was not released"
+        return original_initial_candidate(spec, seed, ordinal)
+
+    monkeypatch.setattr(campaign_protocol, "initial_candidate", blocked_initial_candidate)
     with ThreadPoolExecutor(max_workers=2) as pool:
-        outcomes = list(pool.map(suggest, ("concurrent-a", "concurrent-b")))
-    successes = [item for item in outcomes if isinstance(item, dict)]
-    failures = [item for item in outcomes if isinstance(item, ValueError)]
-    assert len(successes) == len(failures) == 1
-    assert "revision conflict" in str(failures[0]).lower()
+        first = pool.submit(
+            campaigns.suggest_campaign, owner, campaign["campaign_id"], 1, "concurrent-a"
+        )
+        try:
+            assert generating.wait(10), "suggestion did not reach candidate generation"
+            with pytest.raises(campaigns.SuggestionInProgressError) as active:
+                campaigns.suggest_campaign(owner, campaign["campaign_id"], 1, "concurrent-b")
+            claim = campaigns.get_campaign_suggestion_attempt(
+                owner, active.value.suggestion_attempt_id
+            )
+            assert claim["state"] == "claimed"
+        finally:
+            release.set()
+        success = first.result(timeout=10)
+
+    with pytest.raises(ValueError, match="revision conflict"):
+        campaigns.suggest_campaign(owner, campaign["campaign_id"], 1, "concurrent-b")
     retained = campaigns.get_campaign(owner, campaign["campaign_id"])
     assert retained["revision"] == 2
-    assert retained["pending_proposal"]["proposal_id"] == successes[0]["proposal"]["proposal_id"]
+    assert retained["pending_proposal"]["proposal_id"] == success["proposal"]["proposal_id"]
+    assert (
+        len(campaigns.list_campaign_suggestion_attempts(owner, campaign["campaign_id"])["records"])
+        == 1
+    )
     with registry_connection() as con:
         assert (
             con.execute(
@@ -676,7 +697,13 @@ def test_failed_state_transitions_roll_back_records_methods_revision_and_receipt
             == 0
         )
 
-    suggestion = campaigns.suggest_campaign(owner, campaign["campaign_id"], 1, "rollback-suggest")
+    # The failed computation now has an immutable terminal receipt. Retrying
+    # transport replays that failure; a new key deliberately starts fresh work.
+    with pytest.raises(RuntimeError, match="injected response serialization failure"):
+        campaigns.suggest_campaign(owner, campaign["campaign_id"], 1, "rollback-suggest")
+    suggestion = campaigns.suggest_campaign(
+        owner, campaign["campaign_id"], 1, "rollback-suggest-new-computation"
+    )
     evidence = _record_snapshot(prepared, suggestion["proposal"], key="rollback-evaluation")
     monkeypatch.setattr(campaigns, "_campaign_response", fail_response)
     with pytest.raises(RuntimeError, match="injected response serialization failure"):

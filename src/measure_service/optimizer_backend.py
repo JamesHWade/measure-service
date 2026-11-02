@@ -47,6 +47,38 @@ MAX_RESPONSE_BYTES = 1_048_576
 SIDECAR_TIMEOUT_SECONDS = 60
 _CANDIDATE_KEYS = frozenset({"strong_solvent_fraction", "acquisition_duration_min"})
 _NOISE_PRIOR_LOWER_BOUND = 1e-4
+_FAILURE_DIAGNOSTICS_PROFILE = "measure-service-bo-suggestion-failure/1"
+_FAILURE_PHASES = frozenset(
+    {
+        "runtime_resolution",
+        "sidecar_setup",
+        "process_launch",
+        "process_timeout",
+        "process_exit",
+        "response_size",
+        "response_decode",
+        "response_parse",
+        "response_validation",
+        "process_timing",
+        "result_serialization",
+    }
+)
+_FAILURE_CATEGORIES = frozenset(
+    {
+        "runtime_missing",
+        "runtime_invalid",
+        "launch_error",
+        "timeout",
+        "nonzero_exit",
+        "oversized_response",
+        "invalid_utf8",
+        "invalid_json",
+        "invalid_response",
+        "invalid_elapsed_time",
+        "invalid_result",
+    }
+)
+_MAX_FAILURE_DIAGNOSTICS_BYTES = 4096
 _PREFLIGHT_PROFILE = "measure-service-bo-ablation-preflight/1"
 _PREFLIGHT_FIXTURE_SHA256 = "0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094"
 _PREFLIGHT_MAX_BYTES = 20 * 1024 * 1024
@@ -63,6 +95,65 @@ _DESIGN_KERNEL_SOURCE_PATH = (
 
 class OptimizerBackendError(RuntimeError):
     """The configured BO sidecar could not produce a verified BO suggestion."""
+
+    def __init__(self, *args: object, diagnostics: dict[str, Any] | None = None) -> None:
+        super().__init__(*args)
+        self.diagnostics = _bounded_failure_diagnostics(diagnostics)
+
+
+def _bounded_failure_diagnostics(value: object) -> dict[str, Any] | None:
+    """Keep failure evidence to fixed-size metadata and hashes only."""
+    if not isinstance(value, dict) or value.get("profile") != _FAILURE_DIAGNOSTICS_PROFILE:
+        return None
+    phase = value.get("phase")
+    category = value.get("category")
+    if (
+        not isinstance(phase, str)
+        or phase not in _FAILURE_PHASES
+        or not isinstance(category, str)
+        or category not in _FAILURE_CATEGORIES
+    ):
+        return None
+    source = value.get("source_sha256")
+    source_names = ("optimizer_adapter", "campaign_protocol", "design_kernel")
+    if not isinstance(source, dict) or any(
+        not _is_sha256(source.get(name)) for name in source_names
+    ):
+        return None
+    output: dict[str, Any] = {
+        "profile": _FAILURE_DIAGNOSTICS_PROFILE,
+        "phase": phase,
+        "category": category,
+        "request_sha256": value.get("request_sha256"),
+        "protocol_sha256": value.get("protocol_sha256"),
+        "training_sha256": value.get("training_sha256"),
+        "source_sha256": {name: source[name] for name in source_names},
+        "subprocess_elapsed_seconds": value.get("subprocess_elapsed_seconds"),
+        "returncode": value.get("returncode"),
+        "response_bytes": value.get("response_bytes"),
+        "stderr_bytes": value.get("stderr_bytes"),
+        "response_sha256": value.get("response_sha256"),
+    }
+    for name in ("request_sha256", "protocol_sha256", "training_sha256"):
+        if not _is_sha256(output[name]):
+            return None
+    elapsed = output["subprocess_elapsed_seconds"]
+    if elapsed is not None and (
+        isinstance(elapsed, bool)
+        or not isinstance(elapsed, (int, float))
+        or not math.isfinite(elapsed)
+        or elapsed < 0
+    ):
+        return None
+    for name in ("returncode", "response_bytes", "stderr_bytes"):
+        count = output[name]
+        if count is not None and (type(count) is not int or (name != "returncode" and count < 0)):
+            return None
+    if output["response_sha256"] is not None and not _is_sha256(output["response_sha256"]):
+        return None
+    if len(canonical(output).encode("utf-8")) > _MAX_FAILURE_DIAGNOSTICS_BYTES:
+        return None
+    return output
 
 
 class _ScientificWarningCapture(logging.Handler):
@@ -221,6 +312,70 @@ def _normalize_inputs(
     if len(encoded) > MAX_REQUEST_BYTES:
         raise ValueError("optimizer request exceeds the configured size limit")
     return protocol, normalized, request_payload
+
+
+def suggestion_request_evidence(
+    spec: CampaignProtocolSpec | AblationProtocolSpec | dict[str, Any],
+    training_data: list[dict[str, Any]],
+    seed: int,
+) -> dict[str, Any]:
+    """Return the exact normalized, hashed request that a BO sidecar would receive.
+
+    This helper does not resolve an interpreter or launch a process. Its payload
+    records caller-declared protocol and target inputs, ordered training data,
+    and source hashes; it does not assert that a backend fitted a model.
+    """
+    _, _, request_payload = _normalize_inputs(spec, training_data, seed)
+    return request_payload
+
+
+def _failure_diagnostics(
+    request_payload: dict[str, Any],
+    *,
+    phase: str,
+    category: str,
+    elapsed_seconds: float | None = None,
+    returncode: int | None = None,
+    response: bytes | None = None,
+    stderr: bytes | None = None,
+) -> dict[str, Any]:
+    """Build bounded request and process evidence without retaining output text."""
+    return {
+        "profile": _FAILURE_DIAGNOSTICS_PROFILE,
+        "phase": phase,
+        "category": category,
+        "request_sha256": sha256(request_payload),
+        "protocol_sha256": request_payload["protocol_sha256"],
+        "training_sha256": request_payload["training_sha256"],
+        "source_sha256": {
+            "optimizer_adapter": request_payload["adapter_source_sha256"],
+            "campaign_protocol": request_payload["campaign_protocol_source_sha256"],
+            "design_kernel": request_payload["design_kernel_source_sha256"],
+        },
+        "subprocess_elapsed_seconds": elapsed_seconds,
+        "returncode": returncode,
+        "response_bytes": None if response is None else len(response),
+        "stderr_bytes": None if stderr is None else len(stderr),
+        "response_sha256": None if response is None else hashlib.sha256(response).hexdigest(),
+    }
+
+
+def _captured_bytes(value: object) -> bytes | None:
+    if isinstance(value, bytes):
+        return value
+    if isinstance(value, str):
+        return value.encode("utf-8")
+    return None
+
+
+def _subprocess_elapsed(started: float) -> float | None:
+    try:
+        elapsed = time.perf_counter() - started
+    except Exception:
+        return None
+    if isinstance(elapsed, bool) or not math.isfinite(elapsed) or elapsed < 0:
+        return None
+    return float(elapsed)
 
 
 def _runtime_path() -> Path:
@@ -476,75 +631,197 @@ def suggest_candidate(
     choose an executable or submit arbitrary backend options.
     """
     protocol, normalized_training, request_payload = _normalize_inputs(spec, training_data, seed)
-    interpreter = _runtime_path()
-    with tempfile.TemporaryDirectory(prefix="measure-bo-sidecar-") as runtime_directory:
-        environment = os.environ.copy()
-        environment.update(
-            {
-                "XDG_CACHE_HOME": runtime_directory,
-                "TORCH_HOME": runtime_directory,
-                "PYTHONPYCACHEPREFIX": runtime_directory,
-                "PYTHONHASHSEED": "0",
-                "PYTHONNOUSERSITE": "1",
-                "BO_ENGINE_DEVICE": "cpu",
-                "BO_ENGINE_DISABLE_GPU": "1",
-                "OMP_NUM_THREADS": "1",
-                "MKL_NUM_THREADS": "1",
-                "OPENBLAS_NUM_THREADS": "1",
-                "VECLIB_MAXIMUM_THREADS": "1",
-            }
+    try:
+        interpreter = _runtime_path()
+    except OptimizerBackendError as error:
+        category = (
+            "runtime_missing" if not os.environ.get("MEASURE_BO_PYTHON") else "runtime_invalid"
         )
-        environment.pop("PYTHONHOME", None)
-        environment.pop("PYTHONPATH", None)
-        started = time.perf_counter()
-        try:
-            completed = subprocess.run(
-                [str(interpreter), "-m", "measure_service.optimizer_backend"],
-                input=canonical(request_payload),
-                text=True,
-                encoding="utf-8",
-                capture_output=True,
-                cwd=runtime_directory,
-                env=environment,
-                timeout=SIDECAR_TIMEOUT_SECONDS,
-                check=False,
+        raise OptimizerBackendError(
+            str(error),
+            diagnostics=_failure_diagnostics(
+                request_payload,
+                phase="runtime_resolution",
+                category=category,
+            ),
+        ) from error
+
+    try:
+        with tempfile.TemporaryDirectory(prefix="measure-bo-sidecar-") as runtime_directory:
+            environment = os.environ.copy()
+            environment.update(
+                {
+                    "XDG_CACHE_HOME": runtime_directory,
+                    "TORCH_HOME": runtime_directory,
+                    "PYTHONPYCACHEPREFIX": runtime_directory,
+                    "PYTHONHASHSEED": "0",
+                    "PYTHONNOUSERSITE": "1",
+                    "BO_ENGINE_DEVICE": "cpu",
+                    "BO_ENGINE_DISABLE_GPU": "1",
+                    "OMP_NUM_THREADS": "1",
+                    "MKL_NUM_THREADS": "1",
+                    "OPENBLAS_NUM_THREADS": "1",
+                    "VECLIB_MAXIMUM_THREADS": "1",
+                }
             )
-        except subprocess.TimeoutExpired as error:
-            raise OptimizerBackendError(
-                "BO sidecar exceeded the 60-second runtime limit"
-            ) from error
-        except OSError as error:
-            raise OptimizerBackendError("BO sidecar could not be started") from error
-        finally:
-            elapsed_seconds = time.perf_counter() - started
+            environment.pop("PYTHONHOME", None)
+            environment.pop("PYTHONPATH", None)
+            started = time.perf_counter()
+            try:
+                completed = subprocess.run(
+                    [str(interpreter), "-m", "measure_service.optimizer_backend"],
+                    input=canonical(request_payload).encode("utf-8"),
+                    text=False,
+                    capture_output=True,
+                    cwd=runtime_directory,
+                    env=environment,
+                    timeout=SIDECAR_TIMEOUT_SECONDS,
+                    check=False,
+                )
+            except subprocess.TimeoutExpired as error:
+                partial_stdout = error.stdout if error.stdout is not None else error.output
+                raise OptimizerBackendError(
+                    "BO sidecar exceeded the 60-second runtime limit",
+                    diagnostics=_failure_diagnostics(
+                        request_payload,
+                        phase="process_timeout",
+                        category="timeout",
+                        elapsed_seconds=_subprocess_elapsed(started),
+                        response=_captured_bytes(partial_stdout),
+                        stderr=_captured_bytes(error.stderr),
+                    ),
+                ) from error
+            except OSError as error:
+                raise OptimizerBackendError(
+                    "BO sidecar could not be started",
+                    diagnostics=_failure_diagnostics(
+                        request_payload,
+                        phase="process_launch",
+                        category="launch_error",
+                    ),
+                ) from error
+            elapsed_seconds = _subprocess_elapsed(started)
+    except OptimizerBackendError:
+        raise
+    except OSError as error:
+        raise OptimizerBackendError(
+            "BO sidecar could not be started",
+            diagnostics=_failure_diagnostics(
+                request_payload,
+                phase="sidecar_setup",
+                category="launch_error",
+            ),
+        ) from error
+
+    response_bytes = _captured_bytes(completed.stdout)
+    stderr_bytes = _captured_bytes(completed.stderr)
     if completed.returncode != 0:
         raise OptimizerBackendError(
-            f"BO sidecar failed with exit status {completed.returncode}; details are available in its stderr"
+            f"BO sidecar failed with exit status {completed.returncode}; details are available in its stderr",
+            diagnostics=_failure_diagnostics(
+                request_payload,
+                phase="process_exit",
+                category="nonzero_exit",
+                elapsed_seconds=elapsed_seconds,
+                returncode=completed.returncode,
+                response=response_bytes,
+                stderr=stderr_bytes,
+            ),
         )
-    if len(completed.stdout.encode("utf-8")) > MAX_RESPONSE_BYTES:
-        raise OptimizerBackendError("BO sidecar response exceeds the configured size limit")
+    if response_bytes is not None and len(response_bytes) > MAX_RESPONSE_BYTES:
+        raise OptimizerBackendError(
+            "BO sidecar response exceeds the configured size limit",
+            diagnostics=_failure_diagnostics(
+                request_payload,
+                phase="response_size",
+                category="oversized_response",
+                elapsed_seconds=elapsed_seconds,
+                returncode=completed.returncode,
+                response=response_bytes,
+                stderr=stderr_bytes,
+            ),
+        )
     try:
-        response = _loads_strict(completed.stdout, max_bytes=MAX_RESPONSE_BYTES)
-    except (UnicodeError, ValueError, json.JSONDecodeError) as error:
-        raise OptimizerBackendError("BO sidecar returned malformed JSON") from error
-    result = _validate_backend_response(
-        response,
-        protocol=protocol,
-        training_data=normalized_training,
-        seed=seed,
-        protocol_digest=request_payload["protocol_sha256"],
-        training_digest=request_payload["training_sha256"],
-        adapter_source_digest=request_payload["adapter_source_sha256"],
-        campaign_protocol_source_digest=request_payload["campaign_protocol_source_sha256"],
-        design_kernel_source_digest=request_payload["design_kernel_source_sha256"],
-    )
-    if not math.isfinite(elapsed_seconds) or elapsed_seconds < 0:
-        raise OptimizerBackendError("BO sidecar elapsed time was not a finite nonnegative value")
+        response = _loads_strict(response_bytes or b"", max_bytes=MAX_RESPONSE_BYTES)
+    except UnicodeError as error:
+        raise OptimizerBackendError(
+            "BO sidecar returned malformed JSON",
+            diagnostics=_failure_diagnostics(
+                request_payload,
+                phase="response_decode",
+                category="invalid_utf8",
+                elapsed_seconds=elapsed_seconds,
+                returncode=completed.returncode,
+                response=response_bytes,
+                stderr=stderr_bytes,
+            ),
+        ) from error
+    except (ValueError, json.JSONDecodeError) as error:
+        raise OptimizerBackendError(
+            "BO sidecar returned malformed JSON",
+            diagnostics=_failure_diagnostics(
+                request_payload,
+                phase="response_parse",
+                category="invalid_json",
+                elapsed_seconds=elapsed_seconds,
+                returncode=completed.returncode,
+                response=response_bytes,
+                stderr=stderr_bytes,
+            ),
+        ) from error
+    try:
+        result = _validate_backend_response(
+            response,
+            protocol=protocol,
+            training_data=normalized_training,
+            seed=seed,
+            protocol_digest=request_payload["protocol_sha256"],
+            training_digest=request_payload["training_sha256"],
+            adapter_source_digest=request_payload["adapter_source_sha256"],
+            campaign_protocol_source_digest=request_payload["campaign_protocol_source_sha256"],
+            design_kernel_source_digest=request_payload["design_kernel_source_sha256"],
+        )
+    except OptimizerBackendError as error:
+        raise OptimizerBackendError(
+            str(error),
+            diagnostics=_failure_diagnostics(
+                request_payload,
+                phase="response_validation",
+                category="invalid_response",
+                elapsed_seconds=elapsed_seconds,
+                returncode=completed.returncode,
+                response=response_bytes,
+                stderr=stderr_bytes,
+            ),
+        ) from error
+    if elapsed_seconds is None:
+        raise OptimizerBackendError(
+            "BO sidecar elapsed time was not a finite nonnegative value",
+            diagnostics=_failure_diagnostics(
+                request_payload,
+                phase="process_timing",
+                category="invalid_elapsed_time",
+                returncode=completed.returncode,
+                response=response_bytes,
+                stderr=stderr_bytes,
+            ),
+        )
     result["backend"]["runtime"]["elapsed_seconds"] = elapsed_seconds
     try:
         canonical(result)
     except (TypeError, ValueError) as error:
-        raise OptimizerBackendError("BO sidecar result contains invalid runtime timing") from error
+        raise OptimizerBackendError(
+            "BO sidecar result contains invalid runtime timing",
+            diagnostics=_failure_diagnostics(
+                request_payload,
+                phase="result_serialization",
+                category="invalid_result",
+                elapsed_seconds=elapsed_seconds,
+                returncode=completed.returncode,
+                response=response_bytes,
+                stderr=stderr_bytes,
+            ),
+        ) from error
     return result
 
 

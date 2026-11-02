@@ -14,6 +14,7 @@ from measure_service import (
     experiments,
     gaussian_producer,
     observations,
+    optimizer_backend,
     retention,
 )
 from measure_service.benchmarks import synthetic_ablations as ablations
@@ -61,6 +62,15 @@ def _backend_report(
             "campaign_protocol_source_sha256": "b" * 64,
             "design_kernel_source_sha256": "c" * 64,
         }
+        # This fake echoes the actual request identity; it is not a backend
+        # qualification. Durable receipts now cross-check these source fields.
+        actual_request = optimizer_backend.suggestion_request_evidence(route_spec, rows, 17)
+        for name in (
+            "adapter_source_sha256",
+            "campaign_protocol_source_sha256",
+            "design_kernel_source_sha256",
+        ):
+            request[name] = actual_request[name]
         backend = {
             "backend_id": "bo-engine/BoTorchBackend",
             "adapter_profile": config["adapter_profile"],

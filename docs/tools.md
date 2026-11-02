@@ -10,10 +10,11 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 51 tools.
+The current catalog contains 54 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
+| `measurement_abandon_campaign_suggestion_attempt` | `suggestion_attempt_id`, `expected_start_sha256`, `reason`, `idempotency_key` | write | idempotent |
 | `measurement_analyze_chromatogram` | `dataset_id`, `trace_id`, `method` | write | creates new record |
 | `measurement_analyze_sec` | `dataset_id`, `trace_id`, `method` | write | creates new record |
 | `measurement_capabilities` | — | read | idempotent |
@@ -29,6 +30,7 @@ The current catalog contains 51 tools.
 | `measurement_get_campaign_consumption` | `consumption_id` | read | idempotent |
 | `measurement_get_campaign_proposal` | `proposal_id` | read | idempotent |
 | `measurement_get_campaign_protocol` | `protocol_id` | read | idempotent |
+| `measurement_get_campaign_suggestion_attempt` | `suggestion_attempt_id` | read | idempotent |
 | `measurement_get_experiment` | `experiment_id` | read | idempotent |
 | `measurement_get_gaussian_observation` | `run_id` | read | idempotent |
 | `measurement_get_gaussian_producer` | `producer_id` | read | idempotent |
@@ -41,6 +43,7 @@ The current catalog contains 51 tools.
 | `measurement_get_retention_prediction` | `prediction_id` | read | idempotent |
 | `measurement_inspect_dataset` | `dataset_id` | read | idempotent |
 | `measurement_list_attempts` | `experiment_id` | read | idempotent |
+| `measurement_list_campaign_suggestion_attempts` | `campaign_id` | read | idempotent |
 | `measurement_list_experiments` | — | read | idempotent |
 | `measurement_list_methods` | — | read | idempotent |
 | `measurement_list_results` | `attempt_id` | read | idempotent |
@@ -67,6 +70,10 @@ The current catalog contains 51 tools.
 | `measurement_validate_method` | `declaration` | read | idempotent |
 
 ## Tool descriptions
+
+### `measurement_abandon_campaign_suggestion_attempt`
+
+Explicitly reconcile an unresolved owned suggestion as abandoned_unknown; this does not assert failure, kill a process or invent timing, and any late computation cannot create a proposal.
 
 ### `measurement_analyze_chromatogram`
 
@@ -128,6 +135,10 @@ Read an owned immutable proposal with its executable method, exact consumed trai
 
 Read an owned immutable matched protocol, complete task bindings, budgets, seeds and provenance.
 
+### `measurement_get_campaign_suggestion_attempt`
+
+Read an owned suggestion claim, immutable terminal or late evidence, exact requested training and available timing; a claim does not prove the optimizer started.
+
 ### `measurement_get_experiment`
 
 Retrieve an experiment's intended conditions and caller-declared origin.
@@ -175,6 +186,10 @@ Inspect available traces, sample/injection identities, axes and units without re
 ### `measurement_list_attempts`
 
 List a bounded page of attempts and latest reported statuses for an owned experiment.
+
+### `measurement_list_campaign_suggestion_attempts`
+
+List bounded owned suggestion-attempt summaries in stable order; after is a suggestion-attempt ID from the same campaign, and historical missing telemetry stays absent.
 
 ### `measurement_list_experiments`
 
@@ -266,7 +281,7 @@ Append a corrected or updated reported attempt snapshot with an explanation and 
 
 ### `measurement_suggest_campaign`
 
-Atomically retain one feasible synthetic proposal and its exact training-snapshot identities; uses common initialization, deterministic random sampling or the optional BO-MCP runtime without fallback.
+Durably claim and finalize one synthetic suggestion with exact training evidence and failure timing; same-key retries never rerun a claimed computation, and no fallback replaces a failed candidate.
 
 ### `measurement_validate_method`
 

@@ -1,5 +1,9 @@
 # Change the optimizer target and inferred-noise prior independently
 
+For a new study that declares how repeated candidates are handled, use the
+separate [explicit replication profile](campaign-replication.md). The original
+profile below remains the historical study's declaration.
+
 Register `synthetic-isocratic-ablation/1` to declare two controlled factors on
 the existing isocratic synthetic campaign. It uses the same owned task,
 producer, observation contract and immutable outcome consumption as the
