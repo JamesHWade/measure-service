@@ -79,6 +79,7 @@ jobs:
           assert "docs/suggestion-sequence-qualification.md" in members
           assert "src/measure_service/benchmarks/suggestion_sequences.py" in members
           assert "tests/test_suggestion_sequences.py" in members
+          assert "tests/test_suggestion_sequences_real.py" in members
           for name in ("candidate-declaration.json", "fixture-oracle.json", "initial-design.json", "independent_oracle.py.txt"):
               assert "src/measure_service/benchmarks/reference_data/suggestion_sequences_v1/" + name in members
           assert "src/measure_service/benchmarks/synthetic_ablations.py" in members
