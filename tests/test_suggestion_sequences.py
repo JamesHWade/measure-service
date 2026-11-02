@@ -998,3 +998,170 @@ def test_incomplete_accounting_keeps_unknown_costs_unknown():
     assert summary["known_consumed_evaluation_cost_total"] is None
     assert summary["known_consumed_evaluation_cost_count"] == 0
     assert summary["unknown_consumed_evaluation_cost_count"] == 1
+
+
+def _checkpoint_before(consumed_before):
+    return {
+        "consumed_before": consumed_before,
+        "process_status": "returned",
+        "fresh_process_verified": True,
+        "restart_receipt_replay": (
+            None
+            if consumed_before == 0
+            else {"passed": True, "preceding_ordinal": consumed_before - 1}
+        ),
+    }
+
+
+def _fully_consumed_replicate_case(case_id, *, status="budget_complete", checkpoints=None):
+    slots = [
+        {
+            "ordinal": ordinal,
+            "status": "consumed",
+            "suggestion_events": [],
+            "consumption": {
+                "consumption_id": f"{case_id}-consumption-{ordinal}",
+                "result": {"evaluation_cost": 1.0},
+            },
+        }
+        for ordinal in range(sequences.EVALUATION_BUDGET)
+    ]
+    return {
+        "case_id": case_id,
+        "duplicate_policy": "replicate",
+        "surrogate_noise_prior": "default",
+        "evaluation_budget": sequences.EVALUATION_BUDGET,
+        "status": status,
+        "failure": None if status == "budget_complete" else {"type": "WorkerResponseLost"},
+        "slots": slots,
+        "worker_processes": [
+            {"status": "returned"} for _ in (checkpoints or [_checkpoint_before(0)])
+        ],
+        "restart_checkpoints": checkpoints or [_checkpoint_before(0)],
+        "worker_journal_error": None,
+        "worker_journal_tail_error": None,
+        "store_reconciliation": {
+            "status": "reconciled",
+            "consumed_ordinals": list(range(sequences.EVALUATION_BUDGET)),
+            "attempted_suggestion_ordinals": list(range(sequences.EVALUATION_BUDGET)),
+            "per_ordinal": [{} for _ in range(sequences.EVALUATION_BUDGET)],
+        },
+    }
+
+
+def test_lost_final_worker_delivery_fails_policy_but_preserves_full_spend():
+    complete_boundaries = [
+        _checkpoint_before(0),
+        _checkpoint_before(3),
+        _checkpoint_before(7),
+    ]
+    cases = [
+        _fully_consumed_replicate_case(
+            f"replicate-{index}",
+            status=("partial_failure" if index == 7 else "budget_complete"),
+            checkpoints=(
+                [
+                    _checkpoint_before(0),
+                    _checkpoint_before(3),
+                ]
+                if index == 7
+                else complete_boundaries
+            ),
+        )
+        for index in range(8)
+    ]
+    cases[7]["worker_processes"].append(
+        {
+            "status": "response_lost",
+            "parse_failure": "final worker result was not delivered",
+        }
+    )
+
+    summary = sequences._durable_summary(cases)
+
+    failed_case = summary["operational_completion_by_case"]["replicate-7"]
+    restart_case = summary["restart_evidence_by_case"]["replicate-7"]
+    assert summary["consumed_evaluations"] == 80
+    assert summary["known_consumed_evaluation_cost_total"] == 80.0
+    assert summary["replicate_budget_complete_campaigns"] == 8
+    assert summary["replicate_budget_completion"] is True
+    assert restart_case["reached_ordinals"] == list(range(10))
+    assert restart_case["required_boundaries_before"] == [0, 3, 7]
+    assert restart_case["boundaries_before"] == [0, 3]
+    assert restart_case["required_reached_boundaries"] is False
+    assert failed_case["case_failure_absent"] is False
+    assert failed_case["worker_deliveries_complete"] is False
+    assert summary["operational_completion"] is False
+    assert summary["fresh_process_restart_evidence"] is False
+    assert summary["durable_policy_compliance"] is False
+
+
+def test_valid_expected_duplicate_stop_requires_only_reached_restart_chunks():
+    slots = [
+        {
+            "ordinal": ordinal,
+            "status": "consumed",
+            "suggestion_events": [],
+            "consumption": {
+                "consumption_id": f"duplicate-stop-consumption-{ordinal}",
+                "result": {"evaluation_cost": 1.0},
+            },
+        }
+        for ordinal in range(3)
+    ]
+    slots.extend(
+        [
+            {
+                "ordinal": 3,
+                "status": "duplicate_rejected",
+                "duplicate_of_prior_proposals": ["proposal-0"],
+                "suggestion_events": [
+                    {
+                        "kind": "terminal_failure_retry",
+                        "same_failure": True,
+                        "resource_counts_unchanged": True,
+                        "original_rejection_created_no_proposal_or_analysis": True,
+                    }
+                ],
+            },
+            *[
+                {
+                    "ordinal": ordinal,
+                    "status": "not_attempted_unknown",
+                    "suggestion_events": [],
+                }
+                for ordinal in range(4, sequences.EVALUATION_BUDGET)
+            ],
+        ]
+    )
+    checkpoints = [_checkpoint_before(0), _checkpoint_before(3)]
+    case = {
+        "case_id": "task-0:default:reject",
+        "duplicate_policy": "reject",
+        "surrogate_noise_prior": "default",
+        "evaluation_budget": sequences.EVALUATION_BUDGET,
+        "status": "stopped_expected_duplicate_rejection",
+        "failure": None,
+        "slots": slots,
+        "worker_processes": [{"status": "returned"}, {"status": "returned"}],
+        "restart_checkpoints": checkpoints,
+        "worker_journal_error": None,
+        "worker_journal_tail_error": None,
+        "store_reconciliation": {
+            "status": "reconciled",
+            "consumed_ordinals": [0, 1, 2],
+            "attempted_suggestion_ordinals": [0, 1, 2, 3],
+            "per_ordinal": [{} for _ in range(sequences.EVALUATION_BUDGET)],
+        },
+    }
+
+    summary = sequences._durable_summary([case])
+
+    restart_case = summary["restart_evidence_by_case"][case["case_id"]]
+    completion_case = summary["operational_completion_by_case"][case["case_id"]]
+    assert restart_case["reached_ordinals"] == [0, 1, 2, 3]
+    assert restart_case["required_boundaries_before"] == [0, 3]
+    assert restart_case["boundaries_before"] == [0, 3]
+    assert restart_case["required_reached_boundaries"] is True
+    assert completion_case["passed"] is True
+    assert summary["fresh_process_restart_evidence"] is True

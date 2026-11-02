@@ -3624,6 +3624,7 @@ def _durable_summary(cases: list[dict[str, Any]]) -> dict[str, Any]:
     slots = [slot for case in cases for slot in case["slots"]]
     consumed_ordinals_by_case = {}
     attempted_ordinals_by_case = {}
+    reached_ordinals_by_case = {}
     completed_attempts_by_case = {}
     completed_attempt_ordinals_by_case = {}
     observation_ids = set()
@@ -3634,6 +3635,7 @@ def _durable_summary(cases: list[dict[str, Any]]) -> dict[str, Any]:
         known_attempted = set()
         known_completed = set()
         known_completed_ordinals = []
+        reached_ordinals = set()
         if reconciliation.get("status") in {"reconciled", "partial"}:
             known_consumed.update(reconciliation.get("consumed_ordinals", []))
             known_attempted.update(reconciliation.get("attempted_suggestion_ordinals", []))
@@ -3652,6 +3654,9 @@ def _durable_summary(cases: list[dict[str, Any]]) -> dict[str, Any]:
                 if isinstance(item, dict) and isinstance(item.get("observation_id"), str)
             )
         for slot in case["slots"]:
+            ordinal = slot.get("ordinal")
+            if type(ordinal) is int and slot.get("status") != "not_attempted_unknown":
+                reached_ordinals.add(ordinal)
             if _slot_has_consumption(slot):
                 known_consumed.add(slot["ordinal"])
             if slot.get("suggestion_events"):
@@ -3670,8 +3675,11 @@ def _durable_summary(cases: list[dict[str, Any]]) -> dict[str, Any]:
                     known_attempted.add(slot["ordinal"])
                 if isinstance(reconciliation_slot.get("observation_id"), str):
                     observation_ids.add(reconciliation_slot["observation_id"])
+        reached_ordinals.update(known_consumed)
+        reached_ordinals.update(known_attempted)
         consumed_ordinals_by_case[case_id] = known_consumed
         attempted_ordinals_by_case[case_id] = known_attempted
+        reached_ordinals_by_case[case_id] = reached_ordinals
         completed_attempts_by_case[case_id] = known_completed
         completed_attempt_ordinals_by_case[case_id] = known_completed_ordinals
     consumed = sum(len(items) for items in consumed_ordinals_by_case.values())
@@ -3825,14 +3833,26 @@ def _durable_summary(cases: list[dict[str, Any]]) -> dict[str, Any]:
         for case in cases
         for slot in case["slots"]
     )
-    restart_evidence_by_case = {
-        case["case_id"]: {
-            "boundaries_before": [
-                item.get("consumed_before") for item in case.get("restart_checkpoints", [])
-            ],
+    restart_evidence_by_case = {}
+    operational_completion_by_case = {}
+    for case in cases:
+        case_id = case["case_id"]
+        checkpoints = case.get("restart_checkpoints", [])
+        boundaries = [item.get("consumed_before") for item in checkpoints]
+        reached_ordinals = reached_ordinals_by_case.get(case_id, set())
+        required_boundaries = []
+        if reached_ordinals:
+            required_boundaries.append(0)
+            if any(ordinal >= 3 for ordinal in reached_ordinals):
+                required_boundaries.append(3)
+            if any(ordinal >= 7 for ordinal in reached_ordinals):
+                required_boundaries.append(7)
+        restart_evidence_by_case[case_id] = {
+            "reached_ordinals": sorted(reached_ordinals),
+            "boundaries_before": boundaries,
+            "required_boundaries_before": required_boundaries,
             "fresh_processes": all(
-                item.get("fresh_process_verified") is True
-                for item in case.get("restart_checkpoints", [])
+                item.get("fresh_process_verified") is True for item in checkpoints
             ),
             "receipt_replays_passed": all(
                 (
@@ -3843,22 +3863,74 @@ def _durable_summary(cases: list[dict[str, Any]]) -> dict[str, Any]:
                     and item["restart_receipt_replay"].get("preceding_ordinal")
                     == item.get("consumed_before") - 1
                 )
-                for item in case.get("restart_checkpoints", [])
+                for item in checkpoints
             ),
-            "required_completed_budget_boundaries": (
-                case.get("status") != "budget_complete"
-                or [item.get("consumed_before") for item in case.get("restart_checkpoints", [])]
-                == [0, 3, 7]
-            ),
+            "required_reached_boundaries": boundaries == required_boundaries,
         }
-        for case in cases
-    }
+
+        status = case.get("status")
+        duplicate_rejected_in_case = any(
+            slot.get("status") == "duplicate_rejected" for slot in case["slots"]
+        )
+        consumed_count = len(consumed_ordinals_by_case.get(case_id, set()))
+        evaluation_budget = case.get("evaluation_budget")
+        if status == "budget_complete":
+            status_and_spend_match = consumed_count == evaluation_budget
+        elif status == "stopped_expected_duplicate_rejection":
+            status_and_spend_match = (
+                case.get("duplicate_policy") == "reject"
+                and duplicate_rejected_in_case
+                and type(evaluation_budget) is int
+                and consumed_count < evaluation_budget
+            )
+        else:
+            status_and_spend_match = False
+        worker_processes = case.get("worker_processes", [])
+        worker_deliveries_complete = (
+            bool(checkpoints)
+            and len(worker_processes) == len(checkpoints)
+            and all(
+                item.get("status") == "returned"
+                and not item.get("worker_failure")
+                and not item.get("journal_error")
+                and not item.get("journal_tail_error")
+                and item.get("output_limit_exceeded") is not True
+                and item.get("parse_failure") is None
+                for item in worker_processes
+            )
+            and all(item.get("process_status") == "returned" for item in checkpoints)
+        )
+        if case.get("duplicate_policy") == "replicate":
+            status_valid = status == "budget_complete"
+        elif case.get("duplicate_policy") == "reject":
+            status_valid = status in {
+                "budget_complete",
+                "stopped_expected_duplicate_rejection",
+            }
+        else:
+            status_valid = False
+        operational_completion_by_case[case_id] = {
+            "terminal_status": status,
+            "terminal_status_valid": status_valid,
+            "case_failure_absent": not bool(case.get("failure")),
+            "worker_journal_valid": not bool(
+                case.get("worker_journal_error") or case.get("worker_journal_tail_error")
+            ),
+            "worker_deliveries_complete": worker_deliveries_complete,
+            "terminal_status_matches_persisted_spend": status_and_spend_match,
+        }
+        operational_completion_by_case[case_id]["passed"] = all(
+            value is True
+            for key, value in operational_completion_by_case[case_id].items()
+            if key != "terminal_status"
+        )
     restart_evidence = all(
         item["fresh_processes"]
         and item["receipt_replays_passed"]
-        and item["required_completed_budget_boundaries"]
+        and item["required_reached_boundaries"]
         for item in restart_evidence_by_case.values()
     )
+    operational_completion = all(item["passed"] for item in operational_completion_by_case.values())
     nonnumeric_failures = sum(
         slot.get("status")
         in {"failed", "partial_failure", "policy_violation", "interrupted_unknown"}
@@ -3869,6 +3941,7 @@ def _durable_summary(cases: list[dict[str, Any]]) -> dict[str, Any]:
         and valid_duplicate_failures
         and unknown_allowed
         and restart_evidence
+        and operational_completion
     )
     numerical_validation = (
         bool(numerical_rows)
@@ -3925,6 +3998,8 @@ def _durable_summary(cases: list[dict[str, Any]]) -> dict[str, Any]:
         "near_boundary_comparisons": near_boundary,
         "numerical_validation": numerical_validation,
         "durable_policy_compliance": policy_compliance,
+        "operational_completion": operational_completion,
+        "operational_completion_by_case": operational_completion_by_case,
         "fresh_process_restart_evidence": restart_evidence,
         "restart_evidence_by_case": restart_evidence_by_case,
         "declared_restart_schedule": {
