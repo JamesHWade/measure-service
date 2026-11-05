@@ -284,6 +284,12 @@ def test_validation_detects_content_and_method_tampering():
     with pytest.raises(ValueError, match="result peak_count"):
         validate_evidence(wrong_result_count)
 
+    changed_processed_signal = copy.deepcopy(bundle)
+    changed_processed_signal["points"][0]["processed_signal"] += 1
+    _reseal(changed_processed_signal)
+    with pytest.raises(ValueError, match="stored result digest"):
+        validate_evidence(changed_processed_signal)
+
     reordered = copy.deepcopy(bundle)
     reordered["points"][0], reordered["points"][1] = reordered["points"][1], reordered["points"][0]
     _reseal(reordered)
@@ -328,6 +334,42 @@ def test_assembly_rejects_missing_duplicate_reordered_or_foreign_pages():
     rows[1], rows[2] = rows[2], rows[1]
     with pytest.raises(ValueError, match="sample_index"):
         assemble_evidence(manifest, rows, bundle["peaks"])
+
+
+def test_assembly_rejects_oversized_pages_and_non_strict_continuation_fields():
+    bundle = _bundle()
+    manifest = manifest_for(bundle)
+    peak_pages = [page_for(bundle, "peaks", 0, 10)]
+
+    oversized = copy.deepcopy(page_for(bundle, "trace", 0, 1))
+    oversized["data"][0]["extra"] = "x" * (256 * 1024)
+    with pytest.raises(ValueError, match="page-size limit"):
+        assemble_evidence(manifest, [oversized], peak_pages)
+
+    invalid_count = page_for(bundle, "trace", 0, 2)
+    invalid_count["count"] = 5.0
+    with pytest.raises(ValueError, match="page count must be an integer"):
+        assemble_evidence(manifest, [invalid_count], peak_pages)
+
+    invalid_next = page_for(bundle, "trace", 0, 2)
+    invalid_next["next_offset"] = 2.0
+    with pytest.raises(ValueError, match="page next_offset must be an integer"):
+        assemble_evidence(manifest, [invalid_next], peak_pages)
+
+    incorrect_next = page_for(bundle, "trace", 0, 2)
+    incorrect_next["next_offset"] = 3
+    with pytest.raises(ValueError, match="next_offset is inconsistent"):
+        assemble_evidence(manifest, [incorrect_next], peak_pages)
+
+    terminal = page_for(bundle, "trace", 0, 10)
+    with pytest.raises(ValueError, match="after the terminal page"):
+        assemble_evidence(manifest, [terminal, terminal], peak_pages)
+
+    empty_bundle = _bundle(peaks=[])
+    empty_manifest = manifest_for(empty_bundle)
+    empty_page = page_for(empty_bundle, "peaks", 0, 100)
+    with pytest.raises(ValueError, match="after the terminal page"):
+        assemble_evidence(empty_manifest, empty_bundle["points"], [empty_page, empty_page])
 
 
 def test_full_bundle_and_page_byte_limits_are_enforced():

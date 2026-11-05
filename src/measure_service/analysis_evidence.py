@@ -272,6 +272,17 @@ def validate_evidence(bundle: dict) -> None:
     axis_min, axis_max = points[0]["processed_axis"], points[-1]["processed_axis"]
     for peak in normalized_peaks:
         _validate_peak_bounds(peak, axis_min, axis_max)
+    stored_result = dict(bundle["result"])
+    stored_result["peaks"] = peaks
+    stored_result["processed_trace"] = {
+        "axis": [point["processed_axis"] for point in points],
+        "signal": [point["processed_signal"] for point in points],
+    }
+    if (
+        _sha256_or_error(stored_result, "reconstructed stored result")
+        != bundle["analysis"]["stored_result_sha256"]
+    ):
+        raise ValueError("stored result digest does not match its portable rows")
     expected_digest = _evidence_digest(bundle)
     if not _is_sha256(bundle["evidence_sha256"]) or bundle["evidence_sha256"] != expected_digest:
         raise ValueError("evidence digest does not match the complete document")
@@ -475,7 +486,9 @@ def _assemble_rows(manifest: dict, kind: Literal["trace", "peaks"], source: Sequ
         pages = list(source)
         rows: list = []
         next_offset = 0
-        for page in pages:
+        for page_index, page in enumerate(pages):
+            if page_index and next_offset >= expected:
+                raise ValueError(f"{kind} pages continue after the terminal page")
             if set(page) != {
                 "profile",
                 "analysis_id",
@@ -487,23 +500,31 @@ def _assemble_rows(manifest: dict, kind: Literal["trace", "peaks"], source: Sequ
                 "data",
             }:
                 raise ValueError(f"{kind} page has an unexpected shape")
+            page_offset = _strict_integer(page["offset"], "page offset", minimum=0)
+            page_count = _strict_integer(page["count"], "page count", minimum=0)
+            page_next = page["next_offset"]
+            if page_next is not None:
+                page_next = _strict_integer(page_next, "page next_offset", minimum=0)
             if (
                 page["profile"] != PROFILE
                 or page["analysis_id"] != manifest["analysis"]["analysis_id"]
                 or page["evidence_sha256"] != manifest["evidence_sha256"]
                 or page["kind"] != kind
-                or page["count"] != expected
-                or page["offset"] != next_offset
+                or page_count != expected
+                or page_offset != next_offset
             ):
                 raise ValueError(f"{kind} page does not match manifest identity or ordering")
+            if len(_canonical_bytes(page)) > MAX_PAGE_BYTES:
+                raise ValueError(f"{kind} page exceeds the portable page-size limit")
             page_data = page["data"]
             if not isinstance(page_data, list) or len(page_data) > MAX_PAGE:
                 raise ValueError(f"{kind} page data is invalid")
-            _strict_integer(page["offset"], "page offset", minimum=0)
-            if page["offset"] + len(page_data) > expected:
+            if page_offset < expected and not page_data:
+                raise ValueError(f"{kind} page is empty before the declared end")
+            if page_offset + len(page_data) > expected:
                 raise ValueError(f"{kind} page extends beyond its declared count")
-            expected_next = page["offset"] + len(page_data)
-            if page["next_offset"] != (expected_next if expected_next < expected else None):
+            expected_next = page_offset + len(page_data)
+            if page_next != (expected_next if expected_next < expected else None):
                 raise ValueError(f"{kind} page next_offset is inconsistent")
             rows.extend(page_data)
             next_offset = expected_next
