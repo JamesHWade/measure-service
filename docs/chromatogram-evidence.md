@@ -6,6 +6,16 @@ uses stored results and does not repeat baseline correction, smoothing, peak
 detection or integration. Reading and rendering an existing analysis need no
 R worker. Creating a new analysis still uses the configured R backends.
 
+Open the [representative report](reference-data/chromatogram-example/report.html)
+or [standalone SVG](reference-data/chromatogram-example/chromatogram.svg).
+The constructed two-peak example retains 501 raw and processed samples,
+including 48 negative processed values, plus both recorded peak areas and
+their `observed_signal` basis. The [publication receipt](reference-data/chromatogram-example/publication.json)
+binds the files to the executed source and wheel. This is a processing and
+export illustration, not a physical method qualification.
+
+![Constructed LC trace: two processed peaks overlaid with raw signal, recorded boundary bands, and the stored peak table.](figures/chromatogram-evidence-example.png)
+
 ## Read the complete evidence through MCP
 
 `measurement_get_chromatogram_evidence(analysis_id)` returns the
