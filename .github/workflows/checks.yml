@@ -101,6 +101,11 @@ jobs:
           assert "docs/figures/ablation-success.svg" in members
           assert "docs/figures/ablation-endpoints.png" in members
           assert "docs/figures/ablation-endpoints.svg" in members
+          assert "docs/chromatogram-evidence.md" in members
+          assert "examples/chromatogram_report.py" in members
+          assert "docs/figures/chromatogram-evidence-example.png" in members
+          for name in ("report.html", "chromatogram.svg", "evidence.json", "trace.csv", "peaks.csv", "publication.json"):
+              assert "docs/reference-data/chromatogram-example/" + name in members
           PY
       - name: Check upgrade from the standalone method distribution
         run: python scripts/check_distribution_upgrade.py dist/*.whl

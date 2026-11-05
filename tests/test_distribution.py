@@ -1,5 +1,6 @@
 """Check installed entrypoints, worker data and documented client workflows."""
 
+import hashlib
 import json
 import os
 import subprocess
@@ -25,6 +26,11 @@ def test_service_distribution_contains_both_import_packages_and_worker():
     assert "measure_methods/__init__.py" in files
     assert "measure_methods/volume.py" in files
     assert "measure_service/worker.R" in files
+    assert {
+        "measure_service/analysis_evidence.py",
+        "measure_service/evidence_client.py",
+        "measure_service/evidence_report.py",
+    } <= files
     assert {
         "measure_service/benchmarks/reference_data/suggestion_sequences_v1/" + name
         for name in (
@@ -148,8 +154,6 @@ def test_retention_example_outside_checkout_keeps_censoring_and_qualification_li
 
 
 def test_installed_numerical_references_match_the_reviewed_data_digests():
-    import hashlib
-
     from measure_service.benchmarks import gaussian_qualification as gaussian
     from measure_service.benchmarks import retention_qualification as qualification
 
@@ -185,3 +189,41 @@ def test_generated_observation_example_outside_checkout(tmp_path):
     assert evidence["original_run_and_snapshot_unchanged"] is True
     assert evidence["observation_origin"] == "simulator_latent"
     assert evidence["fresh_optimizer_run"] is False
+
+
+@pytest.mark.r_backend
+def test_chromatogram_report_example_outside_checkout(tmp_path):
+    environment = dict(os.environ, MEASURE_MCP_R=os.environ.get("MEASURE_MCP_TEST_R", "R"))
+    environment.pop("PYTHONPATH", None)
+    output = tmp_path / "report"
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "examples" / "chromatogram_report.py"),
+            "--output-dir",
+            str(output),
+        ],
+        capture_output=True,
+        text=True,
+        timeout=45,
+        cwd=tmp_path,
+        env=environment,
+        check=True,
+    )
+    report = json.loads(completed.stdout)
+    assert report["profile"] == "measure-chromatogram-report-example/1"
+    assert report["point_count"] == 501
+    assert report["peak_count"] == 2
+    assert report["availability"]["calibration"] == "not_linked"
+    assert set(report["publication"]) == {
+        "report.html",
+        "chromatogram.svg",
+        "evidence.json",
+        "trace.csv",
+        "peaks.csv",
+    }
+    import hashlib
+
+    for name, entry in report["publication"].items():
+        assert Path(entry["path"]).resolve() == (output / name).resolve()
+        assert hashlib.sha256((output / name).read_bytes()).hexdigest() == entry["sha256"]

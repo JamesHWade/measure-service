@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 54 tools.
+The current catalog contains 56 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -31,6 +31,7 @@ The current catalog contains 54 tools.
 | `measurement_get_campaign_proposal` | `proposal_id` | read | idempotent |
 | `measurement_get_campaign_protocol` | `protocol_id` | read | idempotent |
 | `measurement_get_campaign_suggestion_attempt` | `suggestion_attempt_id` | read | idempotent |
+| `measurement_get_chromatogram_evidence` | `analysis_id` | read | idempotent |
 | `measurement_get_experiment` | `experiment_id` | read | idempotent |
 | `measurement_get_gaussian_observation` | `run_id` | read | idempotent |
 | `measurement_get_gaussian_producer` | `producer_id` | read | idempotent |
@@ -51,6 +52,7 @@ The current catalog contains 54 tools.
 | `measurement_predict_retention` | `model_id`, `method_id`, `idempotency_key` | write | idempotent |
 | `measurement_quantify_peak` | `analysis_id`, `peak_id`, `method` | write | creates new record |
 | `measurement_read_analysis_data` | `analysis_id`, `kind` | read | idempotent |
+| `measurement_read_chromatogram_evidence` | `analysis_id`, `kind`, `evidence_sha256` | read | idempotent |
 | `measurement_read_source` | `dataset_id` | read | idempotent |
 | `measurement_record_attempt` | `experiment_id`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_record_gaussian_observation` | `producer_id`, `prediction_id`, `attempt_id`, `expected_attempt_revision`, `idempotency_key` | write | idempotent |
@@ -139,6 +141,10 @@ Read an owned immutable matched protocol, complete task bindings, budgets, seeds
 
 Read an owned suggestion claim, immutable terminal or late evidence, exact requested training and available timing; a claim does not prove the optimizer started.
 
+### `measurement_get_chromatogram_evidence`
+
+Capture owned stored chromatogram evidence and return its manifest/digest for bounded immutable paging; does not reanalyze or return large arrays.
+
 ### `measurement_get_experiment`
 
 Retrieve an experiment's intended conditions and caller-declared origin.
@@ -218,6 +224,10 @@ Quantify an explicitly assigned chromatogram peak with supplied linear response 
 ### `measurement_read_analysis_data`
 
 Read a bounded page of peaks, processed trace points, or SEC distribution points.
+
+### `measurement_read_chromatogram_evidence`
+
+Read a bounded page from an owned immutable capture selected by its manifest digest; request a new manifest after cache eviction or server restart.
 
 ### `measurement_read_source`
 

@@ -1,0 +1,55 @@
+{
+  "analysis_id": "644bad9b-9a86-478d-8c2c-ce22ddeb90bf",
+  "evidence_sha256": "9b66078013b04e520142d684c0a17af7b93a3d6b6515b0be75cfbe72eb6d33d0",
+  "files": {
+    "chromatogram.svg": {
+      "sha256": "002d5b5bb620b2ba2087ecd3e60bd800082d9e36069754c18a2d7b6560505d42",
+      "size_bytes": 43806
+    },
+    "evidence.json": {
+      "sha256": "bc57228b09d33182b9be05400e130a48c7e421ef3c2063e7a76816c73614903e",
+      "size_bytes": 91287
+    },
+    "peaks.csv": {
+      "sha256": "0f73b97a38e955e52327bd878896e198112bd24fb10aad7c6379d03a5db246ed",
+      "size_bytes": 504
+    },
+    "report.html": {
+      "sha256": "e05d9d7a41d363bceb22005a9f593f3fdc78d7d188872acc69d96f1dc49f8f98",
+      "size_bytes": 51068
+    },
+    "trace.csv": {
+      "sha256": "29a4c2afa3c5aca6a92d4bea29384d727e10c929eb5248bde252fc933a32871f",
+      "size_bytes": 82308
+    }
+  },
+  "final_export": {
+    "R_worker_available": false,
+    "example_source_sha256": "fb10f37896f0428d3c7fdc8128eaddb220a69bb35f2bce55964da6f9818ca29b",
+    "source_commit": "24a9d766647f08bc1d379f7f334e2b24ea10ec7e",
+    "source_tree": "d999e95ad6486692280dcd81d1a30ee2f2bfb4b9",
+    "wheel_sha256": "2a8505166d6c4b930962c9db488e25efff1da9bd2e94db8eebe3f4d0b7300031"
+  },
+  "initial_processing": {
+    "example_source_sha256": "fb10f37896f0428d3c7fdc8128eaddb220a69bb35f2bce55964da6f9818ca29b",
+    "source_commit": "0587e6bdcc8748a0758d03fa28e369ad17b8baf6",
+    "source_tree": "3c16806848e02f597056fba2ec5e15286165170e",
+    "wheel_sha256": "e2167aec30aa2f4b6990c5ac19a73c7168033eb5382a76fa2267580a05262aa3"
+  },
+  "input_origin": "constructed_example_not_physical_measurement",
+  "installed_r_code_md5": {
+    "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+    "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+  },
+  "numerical_recomputation_by_reporter": false,
+  "optimizer_calls": 0,
+  "packages": {
+    "measure": "0.0.1.9003",
+    "measure.sec": "0.0.0.9000",
+    "recipes": "1.3.1"
+  },
+  "peak_count": 2,
+  "point_count": 501,
+  "profile": "measure-chromatogram-example-publication/1",
+  "scope": "A public MCP/R processing and evidence/export illustration, not physical method qualification, calibration, deconvolution or manuscript parity."
+}
