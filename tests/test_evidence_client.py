@@ -377,7 +377,12 @@ def test_real_installed_stdio_evidence_report_survives_restart(tmp_path):
                 assert bundle["peaks"] == stored_peaks["data"]
                 assert all("prominence" not in p for p in bundle["peaks"])
                 assert bundle["availability"]["calibration"] == "not_linked"
-        async with stdio_client(parameters) as (read, write):
+        readonly_parameters = StdioServerParameters(
+            command=sys.executable,
+            args=["-m", "measure_service"],
+            env=dict(environment, MEASURE_MCP_R=str(tmp_path / "unavailable-R")),
+        )
+        async with stdio_client(readonly_parameters) as (read, write):
             async with ClientSession(read, write) as client:
                 await client.initialize()
                 restored = await collect_chromatogram_evidence(

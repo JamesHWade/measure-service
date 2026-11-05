@@ -9,6 +9,7 @@ import json
 import math
 import re
 import xml.etree.ElementTree as ET
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -237,7 +238,7 @@ def test_report_escapes_metadata_and_keeps_complete_provenance_visible() -> None
     assert trace_rows[1]["raw_signal"] == "-1.0"
 
 
-def test_forbidden_xml_codepoints_are_escaped_in_markup_not_evidence_exports() -> None:
+def test_forbidden_xml_codepoints_are_escaped_in_markup_and_csv_only() -> None:
     forbidden = "\x00\x01\x08\x0b\x0c\x1f\ufffe\uffff"
     axis_unit = f"mAU{forbidden}"
     method_name = f"method{forbidden}"
@@ -268,8 +269,32 @@ def test_forbidden_xml_codepoints_are_escaped_in_markup_not_evidence_exports() -
     assert document["analysis"]["method"]["name"] == method_name
     assert document["result"]["notes"] == notes
     assert document["peaks"][0]["area_basis"] == area_basis
+    assert (
+        trace_rows[0]["axis_unit"] == "mAU\\u0000\\u0001\\u0008\\u000b\\u000c\\u001f\\ufffe\\uffff"
+    )
+    assert (
+        peak_rows[0]["area_basis"]
+        == "observed\\u0000\\u0001\\u0008\\u000b\\u000c\\u001f\\ufffe\\uffff"
+    )
+
+
+def test_csv_preserves_tabs_newlines_carriage_returns_unicode_and_backslashes() -> None:
+    axis_unit = "µm\\column,\tmode\nnext\rfinal"
+    area_basis = "observed\\integral"
+    bundle = _bundle(axis_unit=axis_unit, signal_unit="mAU·s", area_basis=area_basis)
+    artifacts = evidence_report.render_report(bundle)
+    trace_csv = artifacts["trace.csv"].decode("utf-8")
+    _, trace_rows = _csv_rows(artifacts["trace.csv"])
+    _, peak_rows = _csv_rows(artifacts["peaks.csv"])
+    document = json.loads(artifacts["evidence.json"])
+
+    assert artifacts["trace.csv"].endswith(b"\r\n")
+    assert '"µm\\column,\tmode\nnext\rfinal"' in trace_csv
     assert trace_rows[0]["axis_unit"] == axis_unit
+    assert trace_rows[0]["signal_unit"] == "mAU·s"
     assert peak_rows[0]["area_basis"] == area_basis
+    assert document["trace"]["axis_unit"] == axis_unit
+    assert document["peaks"][0]["area_basis"] == area_basis
 
 
 def test_optional_prominence_and_null_values_are_presented_truthfully() -> None:
@@ -339,6 +364,28 @@ def test_report_handles_negative_flat_and_extreme_finite_values() -> None:
     assert min(extreme_ticks) < 0 < max(extreme_ticks)
     assert all(math.isfinite(value) for value in extreme_ticks)
     assert "-1.7e+308" in evidence_report.render_report(extreme)["trace.csv"].decode("utf-8")
+
+
+def test_signal_coordinates_use_exact_differences_near_large_offsets() -> None:
+    values = [
+        1e10,
+        1e10 + 0.000002,
+        1e10 + 0.000004,
+        1e10 + 0.000006,
+    ]
+    bundle = _bundle(raw=values, processed=values)
+    svg = evidence_report.render_report(bundle)["chromatogram.svg"]
+    actual_y = [float(y) for _, y in _path_points(svg, "raw")]
+
+    exact_values = [Fraction.from_float(value) for value in values]
+    low = min(exact_values)
+    span = max(exact_values) - low
+    expected_fraction = [float((value - low) / span) for value in exact_values]
+    actual_fraction = [(448.0 - value) / 410.0 for value in actual_y]
+
+    assert actual_fraction == pytest.approx(expected_fraction, abs=1e-12)
+    assert actual_fraction[1] == pytest.approx(1 / 3, abs=1e-12)
+    assert actual_fraction[2] == pytest.approx(2 / 3, abs=1e-12)
 
 
 def test_conventional_ticks_cover_fractional_and_symmetric_domains() -> None:

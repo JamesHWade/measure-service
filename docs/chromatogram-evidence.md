@@ -44,6 +44,8 @@ Cache eviction, database replacement or server restart requires an explicit
 new manifest request. A failed partial collection writes no report; start a
 new collection rather than appending pages to the old one. Captures are
 temporary paging state, not a durable backup or general dataset snapshot.
+HTTP paging requests must reach the same process; replicated routing is not
+implemented for captures.
 
 For an initialized MCP `ClientSession`, the provided collector reads all pages
 and verifies complete coverage and the canonical whole-document digest:
@@ -106,11 +108,11 @@ unrecorded baseline curve or recalculate areas from the drawn overlay.
 
 JSON retains numerical zeros and `null`. CSV numeric blanks mean unavailable,
 not zero. Text cells that could be interpreted as spreadsheet formulas receive
-an apostrophe prefix; their original text remains in JSON. Negative numerical
-values stay numerical. HTML/SVG escape source labels and contain no scripts or
-external resources.
-XML-forbidden label characters are displayed as visible Unicode escapes;
-their original text remains in JSON and CSV.
+an apostrophe prefix. XML-forbidden controls use visible Unicode escapes in
+CSV and rendered labels; JSON retains their exact original text. Negative
+numerical values stay numerical. CSV uses CRLF records and quoted multiline
+text for compatibility across supported Python versions. HTML/SVG escape
+source labels and contain no scripts or external resources.
 
 ## Interpret the evidence at its supported scope
 

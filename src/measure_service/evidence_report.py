@@ -57,9 +57,11 @@ def _display(value: Any) -> str:
 
 
 def _e(value: Any) -> str:
-    text = _display(value)
-    safe_text = "".join(_xml10_char(char) for char in text)
-    return html.escape(safe_text, quote=True)
+    return html.escape(_xml_safe_text(_display(value)), quote=True)
+
+
+def _xml_safe_text(value: str) -> str:
+    return "".join(_xml10_char(char) for char in value)
 
 
 def _xml10_char(char: str) -> str:
@@ -88,6 +90,7 @@ def _csv_text(value: Any) -> str:
     if value is None:
         return ""
     if isinstance(value, str):
+        value = _xml_safe_text(value)
         first = value.lstrip(" \t\r\n\v\f\x00\ufeff")[:1]
         return "'" + value if first in {"=", "+", "-", "@"} else value
     if isinstance(value, (int, float)) and not isinstance(value, bool):
@@ -111,7 +114,7 @@ def _csv_value(name: str, value: Any) -> str:
 
 def _csv_bytes(fields: tuple[str, ...], rows: list[dict[str, Any]]) -> bytes:
     stream = io.StringIO(newline="")
-    writer = csv.writer(stream, lineterminator="\n")
+    writer = csv.writer(stream, lineterminator="\r\n")
     writer.writerow(fields)
     for row in rows:
         writer.writerow(_csv_value(name, row.get(name)) for name in fields)
@@ -119,18 +122,18 @@ def _csv_bytes(fields: tuple[str, ...], rows: list[dict[str, Any]]) -> bytes:
 
 
 def _mapped_positions(values: list[float], domain: list[float]) -> list[float]:
-    """Map finite values to a data domain without overflowing extreme ranges."""
+    """Normalize finite values by exact differences, including extreme ranges."""
     if not domain:
         return []
-    scale = max(abs(value) for value in [*values, *domain]) or 1.0
-    scaled_values = [value / scale for value in values]
-    scaled_domain = [value / scale for value in domain]
-    low = min(scaled_domain)
-    high = max(scaled_domain)
-    span = high - low
-    if span == 0.0:
+    low = min(domain)
+    high = max(domain)
+    if low == high:
         return [0.5] * len(values)
-    return [(value - low) / span for value in scaled_values]
+    with localcontext() as context:
+        context.prec = 1200
+        low_decimal = Decimal.from_float(low)
+        span_decimal = Decimal.from_float(high) - low_decimal
+        return [float((Decimal.from_float(value) - low_decimal) / span_decimal) for value in values]
 
 
 def _scaled_positions(values: list[float]) -> list[float]:
