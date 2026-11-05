@@ -59,6 +59,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Local setup and examples](docs/quickstart.md)
 - [Input formats and limits](docs/inputs.md)
 - [Scientific methods and interpretation](docs/analysis.md)
+- [Inspect linked chromatogram evidence and export a local report](docs/chromatogram-evidence.md)
 - [Chromatography method declarations](docs/methods.md)
 - [Experiment and result contracts](docs/experiments.md)
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)

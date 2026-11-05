@@ -13,6 +13,13 @@ selection uses height, prominence and minimum distance. Peak areas use
 trapezoidal integration with the selected local, global or no-baseline rule.
 The stored result contains peaks and the processed trace.
 
+The [chromatogram evidence workflow](chromatogram-evidence.md) links that result
+to its raw trace, recorded processed grid, peak boundaries, settings and
+provenance. Two read-only tools expose a manifest and bounded exact pages.
+The local client verifies the complete document and can export HTML/SVG plus
+JSON/CSV without repeating an analysis. Unavailable assignment, calibration and
+deconvolution evidence stays explicit.
+
 ALS and Gaussian smoothing use sample indices. `smoothing_sigma` is in sample
 points; `min_distance` is in the declared axis unit. On irregular grids, the
 physical width of index-based preprocessing varies and the service returns a

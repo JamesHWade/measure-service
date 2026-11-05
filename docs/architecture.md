@@ -7,6 +7,12 @@ a fixed R subprocess. Protocol resource accounting calls the R-free Python
 returns JSON; the MCP process stores the result and returns a compact record.
 Arrays and original text are read in pages.
 
+Chromatogram evidence pages bind the raw and processed recorded grids and peak
+rows to a versioned content digest. The service checks ownership and source
+consistency; the client assembles and verifies every page. Local report
+rendering uses those stored values without R, scientific recomputation or
+server file writes. See the [evidence contract](chromatogram-evidence.md).
+
 No tool accepts executable code, a server file path or an arbitrary URL. The R
 worker path comes from the installed Python package. An R-backed call is
 synchronous and has a 90-second subprocess timeout. There is no job queue or

@@ -14,7 +14,9 @@ import json
 import math
 import os
 import subprocess
+import threading
 import uuid
+from collections import OrderedDict
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
@@ -23,6 +25,7 @@ from mcp.types import ToolAnnotations
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
 from . import (
+    analysis_evidence,
     campaign_protocol_registry,
     campaign_suggestion_attempts,
     campaigns,
@@ -53,7 +56,7 @@ from .methods import (
 )
 from .observations import ObservationContractSpec, ObservationEvidenceSpec
 from .retention import RetentionModelSpec
-from .storage import canonical, connect, now, sha256
+from .storage import canonical, connect, db_path, now, sha256
 
 ROOT = Path(__file__).resolve().parent
 MAX_TRACES = 32
@@ -61,6 +64,11 @@ MAX_POINTS = 50_000
 MAX_DATASET_POINTS = 150_000
 MAX_PAYLOAD_BYTES = 4_000_000
 MAX_PAGE = 1000
+MAX_EVIDENCE_SNAPSHOTS = 4
+MAX_EVIDENCE_CACHE_BYTES = 64 * 1024 * 1024
+_EVIDENCE_SNAPSHOTS: OrderedDict[tuple, Any] = OrderedDict()
+_EVIDENCE_SNAPSHOT_BYTES = 0
+_EVIDENCE_SNAPSHOT_LOCK = threading.Lock()
 
 
 class StrictModel(BaseModel):
@@ -603,6 +611,20 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "observation_snapshots": "immutable_explicit_membership_without_duplicate_attempts",
         "retention_models": "explicit_ideal_reference_inputs_with_immutable_predictions",
         "gaussian_observation_producer": "predeclared_synthetic_widths_and_exact_prediction_bound_results",
+        "chromatogram_evidence": {
+            "profile": analysis_evidence.PROFILE,
+            "retrieval": "owned_stored_results_without_reanalysis",
+            "data": "complete_raw_and_processed_recorded_grids_with_peak_rows",
+            "point_limit": analysis_evidence.MAX_POINTS,
+            "peak_limit": analysis_evidence.MAX_PEAKS,
+            "page_rows": analysis_evidence.MAX_PAGE,
+            "page_bytes": analysis_evidence.MAX_PAGE_BYTES,
+            "document_bytes": analysis_evidence.MAX_BUNDLE_BYTES,
+            "paging": "process_local_immutable_capture_by_owner_store_analysis_and_digest",
+            "capture_limit": MAX_EVIDENCE_SNAPSHOTS,
+            "capture_serialized_bytes": MAX_EVIDENCE_CACHE_BYTES,
+            "managed_artifact_upload": False,
+        },
         "synthetic_campaigns": {
             "profile": "synthetic-isocratic-paired/1",
             "supported_profiles": [
@@ -1273,6 +1295,89 @@ def measurement_quantify_peak(
     )
     return save_analysis(
         owner, source["dataset_id"], source["trace_id"], "peak_quantitation", spec, result, digest
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_chromatogram_evidence(analysis_id: str, ctx: Context) -> dict[str, Any]:
+    """Capture owned stored chromatogram evidence and return its manifest/digest for bounded immutable paging; does not reanalyze or return large arrays."""
+    owner = identity(ctx)
+    store_identity = _evidence_store_identity()
+    snapshot = analysis_evidence.capture_evidence(_owned_chromatogram_evidence(owner, analysis_id))
+    manifest = analysis_evidence.manifest_for(snapshot)
+    _cache_evidence_snapshot(
+        owner, analysis_id, manifest["evidence_sha256"], snapshot, store_identity
+    )
+    return manifest
+
+
+def _owned_chromatogram_evidence(owner: str, analysis_id: str) -> dict[str, Any]:
+    record = analysis_for(owner, analysis_id)
+    dataset, digest = dataset_for(owner, record["dataset_id"])
+    return analysis_evidence.build_evidence(record, dataset, digest)
+
+
+def _evidence_store_identity() -> tuple:
+    path = db_path().resolve()
+    try:
+        stat = path.stat()
+    except OSError as error:
+        raise ValueError(
+            "Evidence snapshot was not found or is not accessible; request a manifest"
+        ) from error
+    return str(path), stat.st_dev, stat.st_ino
+
+
+def _cache_evidence_snapshot(
+    owner: str, analysis_id: str, digest: str, snapshot: Any, store_identity: tuple
+) -> None:
+    global _EVIDENCE_SNAPSHOT_BYTES
+    size = snapshot.serialized_size_bytes
+    if size > MAX_EVIDENCE_CACHE_BYTES:
+        raise ValueError("Evidence capture exceeds the process-local cache limit")
+    if _evidence_store_identity() != store_identity:
+        raise ValueError(
+            "Database identity changed during evidence capture; request a new manifest"
+        )
+    key = (*store_identity, owner, analysis_id, digest)
+    with _EVIDENCE_SNAPSHOT_LOCK:
+        previous = _EVIDENCE_SNAPSHOTS.pop(key, None)
+        if previous is not None:
+            _EVIDENCE_SNAPSHOT_BYTES -= previous.serialized_size_bytes
+        while _EVIDENCE_SNAPSHOTS and (
+            len(_EVIDENCE_SNAPSHOTS) >= MAX_EVIDENCE_SNAPSHOTS
+            or _EVIDENCE_SNAPSHOT_BYTES + size > MAX_EVIDENCE_CACHE_BYTES
+        ):
+            _, evicted = _EVIDENCE_SNAPSHOTS.popitem(last=False)
+            _EVIDENCE_SNAPSHOT_BYTES -= evicted.serialized_size_bytes
+        _EVIDENCE_SNAPSHOTS[key] = snapshot
+        _EVIDENCE_SNAPSHOT_BYTES += size
+
+
+def _cached_evidence_snapshot(owner: str, analysis_id: str, digest: str) -> Any:
+    key = (*_evidence_store_identity(), owner, analysis_id, digest)
+    with _EVIDENCE_SNAPSHOT_LOCK:
+        snapshot = _EVIDENCE_SNAPSHOTS.get(key)
+        if snapshot is None:
+            raise ValueError(
+                "Evidence snapshot was not found or is not accessible; request a manifest"
+            )
+        _EVIDENCE_SNAPSHOTS.move_to_end(key)
+    return snapshot
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_chromatogram_evidence(
+    analysis_id: str,
+    kind: Literal["trace", "peaks"],
+    ctx: Context,
+    evidence_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")],
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=1000)] = 1000,
+) -> dict[str, Any]:
+    """Read a bounded page from an owned immutable capture selected by its manifest digest; request a new manifest after cache eviction or server restart."""
+    return analysis_evidence.page_for(
+        _cached_evidence_snapshot(identity(ctx), analysis_id, evidence_sha256), kind, offset, limit
     )
 
 
