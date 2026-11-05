@@ -7,9 +7,11 @@ it does not repeat or reinterpret scientific calculations.
 
 from __future__ import annotations
 
+import json
 import math
 import re
 from collections.abc import Sequence
+from dataclasses import dataclass, field
 from numbers import Real
 from typing import Any, Literal
 
@@ -79,6 +81,44 @@ _BUNDLE_FIELDS = frozenset(
     }
 )
 _MANIFEST_FIELDS = _BUNDLE_FIELDS - {"points", "peaks"}
+_SNAPSHOT_VALIDATION_TOKEN = object()
+
+
+@dataclass(frozen=True, slots=True)
+class EvidenceSnapshot:
+    """Immutable, validated byte snapshot used for repeated manifest/page reads."""
+
+    _manifest_bytes: bytes = field(repr=False)
+    _point_rows: tuple[bytes, ...] = field(repr=False)
+    _peak_rows: tuple[bytes, ...] = field(repr=False)
+    _analysis_id: str = field(repr=False)
+    _evidence_sha256: str = field(repr=False)
+    serialized_size_bytes: int
+    _validation_token: object | None = field(default=None, init=False, repr=False, compare=False)
+
+
+def capture_evidence(bundle: dict) -> EvidenceSnapshot:
+    """Freeze one owned JSON copy, validate it, and index its rows as immutable bytes."""
+    _require_mapping(bundle, "evidence bundle")
+    frozen_bytes = _canonical_bytes(bundle)
+    if len(frozen_bytes) > MAX_BUNDLE_BYTES:
+        raise ValueError("evidence bundle exceeds the portable size limit")
+    try:
+        owned = json.loads(frozen_bytes)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("evidence bundle must be valid JSON data") from exc
+    validate_evidence(owned)
+    manifest = {key: value for key, value in owned.items() if key not in {"points", "peaks"}}
+    snapshot = EvidenceSnapshot(
+        _manifest_bytes=_canonical_bytes(manifest),
+        _point_rows=tuple(_canonical_bytes(row) for row in owned["points"]),
+        _peak_rows=tuple(_canonical_bytes(row) for row in owned["peaks"]),
+        _analysis_id=owned["analysis"]["analysis_id"],
+        _evidence_sha256=owned["evidence_sha256"],
+        serialized_size_bytes=len(frozen_bytes),
+    )
+    object.__setattr__(snapshot, "_validation_token", _SNAPSHOT_VALIDATION_TOKEN)
+    return snapshot
 
 
 def build_evidence(record: dict, dataset: dict, digest: str) -> dict[str, Any]:
@@ -167,39 +207,45 @@ def build_evidence(record: dict, dataset: dict, digest: str) -> dict[str, Any]:
     return evidence
 
 
-def manifest_for(bundle: dict) -> dict[str, Any]:
-    """Return bundle metadata and integrity identity without point or peak rows."""
-    validate_evidence(bundle)
-    return {key: value for key, value in bundle.items() if key not in {"points", "peaks"}}
+def manifest_for(snapshot: EvidenceSnapshot) -> dict[str, Any]:
+    """Return fresh decoded metadata from a previously captured snapshot."""
+    _require_snapshot(snapshot)
+    return _decode_json(snapshot._manifest_bytes, "snapshot manifest")
 
 
 def page_for(
-    bundle: dict,
+    snapshot: EvidenceSnapshot,
     kind: Literal["trace", "peaks"],
     offset: int,
     limit: int,
 ) -> dict[str, Any]:
-    """Return one bounded trace-point or peak page for a validated bundle."""
-    validate_evidence(bundle)
+    """Decode one bounded row page without revalidating or rehashing the bundle."""
+    _require_snapshot(snapshot)
     if not isinstance(kind, str) or kind not in {"trace", "peaks"}:
         raise ValueError("kind must be 'trace' or 'peaks'")
     _strict_integer(offset, "offset", minimum=0)
     _strict_integer(limit, "limit", minimum=1, maximum=MAX_PAGE)
-    source_key = "points" if kind == "trace" else "peaks"
-    rows = bundle[source_key]
-    page_rows = rows[offset : offset + limit]
+    encoded_rows = snapshot._point_rows if kind == "trace" else snapshot._peak_rows
+    count = len(encoded_rows)
+    page_bytes = encoded_rows[offset : offset + limit]
     response = {
         "profile": PROFILE,
-        "analysis_id": bundle["analysis"]["analysis_id"],
-        "evidence_sha256": bundle["evidence_sha256"],
+        "analysis_id": snapshot._analysis_id,
+        "evidence_sha256": snapshot._evidence_sha256,
         "kind": kind,
         "offset": offset,
-        "count": len(rows),
-        "next_offset": offset + limit if offset + limit < len(rows) else None,
-        "data": page_rows,
+        "count": count,
+        "next_offset": offset + limit if offset + limit < count else None,
+        "data": [],
     }
-    if len(_canonical_bytes(response)) > MAX_PAGE_BYTES:
+    base_bytes = len(_canonical_bytes(response))
+    if page_bytes:
+        page_size = base_bytes - 2 + sum(len(row) for row in page_bytes) + len(page_bytes) - 1
+    else:
+        page_size = base_bytes
+    if page_size > MAX_PAGE_BYTES:
         raise ValueError("page exceeds the portable page-size limit")
+    response["data"] = [_decode_json(row, "snapshot row") for row in page_bytes]
     return response
 
 
@@ -561,6 +607,21 @@ def _canonical_bytes(value: Any) -> bytes:
         return canonical(value).encode("utf-8")
     except (TypeError, ValueError, OverflowError) as exc:
         raise ValueError("evidence must contain JSON-safe finite data") from exc
+
+
+def _decode_json(encoded: bytes, label: str) -> Any:
+    try:
+        return json.loads(encoded)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"{label} is not valid canonical JSON") from exc
+
+
+def _require_snapshot(value: Any) -> None:
+    if (
+        not isinstance(value, EvidenceSnapshot)
+        or value._validation_token is not _SNAPSHOT_VALIDATION_TOKEN
+    ):
+        raise ValueError("a validated EvidenceSnapshot is required; call capture_evidence(bundle)")
 
 
 def _require_mapping(value: Any, label: str) -> None:

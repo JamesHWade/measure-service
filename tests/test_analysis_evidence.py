@@ -1,19 +1,23 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import FrozenInstanceError
 
 import pytest
 
+import measure_service.analysis_evidence as evidence_module
 from measure_service.analysis_evidence import (
     MAX_PAGE,
     PROFILE,
+    EvidenceSnapshot,
     assemble_evidence,
     build_evidence,
+    capture_evidence,
     manifest_for,
     page_for,
     validate_evidence,
 )
-from measure_service.storage import sha256
+from measure_service.storage import canonical, sha256
 
 
 def _peak(peak_id: int, location: float) -> dict:
@@ -87,6 +91,10 @@ def _bundle(**kwargs) -> dict:
     return build_evidence(record, dataset, digest)
 
 
+def _snapshot(bundle: dict | None = None, **kwargs) -> EvidenceSnapshot:
+    return capture_evidence(_bundle(**kwargs) if bundle is None else bundle)
+
+
 def _reseal(bundle: dict) -> None:
     bundle["evidence_sha256"] = sha256(
         {key: value for key, value in bundle.items() if key != "evidence_sha256"}
@@ -126,9 +134,10 @@ def test_builds_portable_document_without_recomputing_worker_outputs():
 
 def test_manifest_pages_and_page_order_reconstruct_exact_document():
     bundle = _bundle()
-    manifest = manifest_for(bundle)
-    trace_pages = [page_for(bundle, "trace", offset, 2) for offset in (0, 2, 4)]
-    peak_pages = [page_for(bundle, "peaks", offset, 1) for offset in (0, 1)]
+    snapshot = _snapshot(bundle)
+    manifest = manifest_for(snapshot)
+    trace_pages = [page_for(snapshot, "trace", offset, 2) for offset in (0, 2, 4)]
+    peak_pages = [page_for(snapshot, "peaks", offset, 1) for offset in (0, 1)]
 
     assert set(manifest) == set(bundle) - {"points", "peaks"}
     assert [page["next_offset"] for page in trace_pages] == [2, 4, None]
@@ -137,12 +146,86 @@ def test_manifest_pages_and_page_order_reconstruct_exact_document():
     assert assembled == bundle
 
 
+def test_snapshot_is_detached_from_mutable_inputs_and_outputs():
+    bundle = _bundle()
+    snapshot = capture_evidence(bundle)
+    size = len(canonical(bundle).encode("utf-8"))
+    assert snapshot.serialized_size_bytes == size
+
+    bundle["analysis"]["method"]["baseline"] = "mutated input"
+    bundle["points"][0]["raw_signal"] = -999
+    manifest = manifest_for(snapshot)
+    manifest["analysis"]["method"]["baseline"] = "mutated output"
+    first_page = page_for(snapshot, "trace", 0, 1)
+    first_page["data"][0]["raw_signal"] = -777
+
+    assert manifest_for(snapshot)["analysis"]["method"]["baseline"] == "none"
+    assert page_for(snapshot, "trace", 0, 1)["data"][0]["raw_signal"] == 1.0
+    assert snapshot.serialized_size_bytes == size
+    with pytest.raises(FrozenInstanceError):
+        snapshot.serialized_size_bytes = 0
+
+
+def test_manifest_and_page_require_a_captured_snapshot():
+    bundle = _bundle()
+    with pytest.raises(ValueError, match="validated EvidenceSnapshot"):
+        manifest_for(bundle)
+    with pytest.raises(ValueError, match="validated EvidenceSnapshot"):
+        page_for(bundle, "trace", 0, 1)
+
+    forged = EvidenceSnapshot(b"{}", (), (), "analysis-1", "0" * 64, 0)
+    with pytest.raises(ValueError, match="validated EvidenceSnapshot"):
+        manifest_for(forged)
+
+
+def test_fifty_thousand_points_can_be_paged_without_revalidating_or_rehashing(
+    monkeypatch,
+):
+    record, dataset, digest = _inputs(peaks=[])
+    point_count = 50_000
+    axis = [float(index) for index in range(point_count)]
+    signal = [1.0] * point_count
+    dataset["traces"][0]["axis"] = axis
+    dataset["traces"][0]["signal"] = signal
+    digest = sha256(dataset)
+    record["provenance"]["input_sha256"] = digest
+    record["result"]["processed_trace"] = {"axis": list(axis), "signal": list(signal)}
+    bundle = build_evidence(record, dataset, digest)
+
+    real_validate = evidence_module.validate_evidence
+    real_digest = evidence_module._evidence_digest
+    calls = {"validate": 0, "digest": 0}
+
+    def count_validate(value):
+        calls["validate"] += 1
+        return real_validate(value)
+
+    def count_digest(value):
+        calls["digest"] += 1
+        return real_digest(value)
+
+    monkeypatch.setattr(evidence_module, "validate_evidence", count_validate)
+    monkeypatch.setattr(evidence_module, "_evidence_digest", count_digest)
+    snapshot = capture_evidence(bundle)
+    manifest = manifest_for(snapshot)
+    assert manifest["point_count"] == point_count
+    assert calls == {"validate": 1, "digest": 1}
+
+    total_rows = 0
+    for offset in range(0, point_count, 1_000):
+        page = page_for(snapshot, "trace", offset, 1_000)
+        total_rows += len(page["data"])
+    assert total_rows == point_count
+    assert calls == {"validate": 1, "digest": 1}
+
+
 def test_empty_peak_set_and_null_peak_measurements_are_preserved():
     bundle = _bundle(peaks=[])
+    snapshot = _snapshot(bundle)
     assert bundle["peak_count"] == 0
-    empty_page = page_for(bundle, "peaks", 0, 100)
+    empty_page = page_for(snapshot, "peaks", 0, 100)
     assert empty_page["data"] == []
-    assert assemble_evidence(manifest_for(bundle), bundle["points"], [empty_page]) == bundle
+    assert assemble_evidence(manifest_for(snapshot), bundle["points"], [empty_page]) == bundle
 
 
 def test_six_field_worker_peak_rows_do_not_invent_prominence():
@@ -278,7 +361,7 @@ def test_builder_rejects_inconsistent_or_out_of_trace_peak_boundaries(
 )
 def test_page_arguments_are_strict_and_bounded(kind, offset, limit):
     with pytest.raises(ValueError):
-        page_for(_bundle(), kind, offset, limit)
+        page_for(_snapshot(), kind, offset, limit)
 
 
 def test_validation_detects_content_and_method_tampering():
@@ -326,11 +409,12 @@ def test_builder_requires_worker_diagnostic_fields_to_keep_their_stored_shapes()
 
 def test_assembly_rejects_missing_duplicate_reordered_or_foreign_pages():
     bundle = _bundle()
-    manifest = manifest_for(bundle)
-    first = page_for(bundle, "trace", 0, 2)
-    second = page_for(bundle, "trace", 2, 2)
-    last = page_for(bundle, "trace", 4, 2)
-    peak_page = page_for(bundle, "peaks", 0, 10)
+    snapshot = _snapshot(bundle)
+    manifest = manifest_for(snapshot)
+    first = page_for(snapshot, "trace", 0, 2)
+    second = page_for(snapshot, "trace", 2, 2)
+    last = page_for(snapshot, "trace", 4, 2)
+    peak_page = page_for(snapshot, "peaks", 0, 10)
 
     with pytest.raises(ValueError, match="ordering"):
         assemble_evidence(manifest, [first, last], [peak_page])
@@ -353,36 +437,38 @@ def test_assembly_rejects_missing_duplicate_reordered_or_foreign_pages():
 
 def test_assembly_rejects_oversized_pages_and_non_strict_continuation_fields():
     bundle = _bundle()
-    manifest = manifest_for(bundle)
-    peak_pages = [page_for(bundle, "peaks", 0, 10)]
+    snapshot = _snapshot(bundle)
+    manifest = manifest_for(snapshot)
+    peak_pages = [page_for(snapshot, "peaks", 0, 10)]
 
-    oversized = copy.deepcopy(page_for(bundle, "trace", 0, 1))
+    oversized = copy.deepcopy(page_for(snapshot, "trace", 0, 1))
     oversized["data"][0]["extra"] = "x" * (256 * 1024)
     with pytest.raises(ValueError, match="page-size limit"):
         assemble_evidence(manifest, [oversized], peak_pages)
 
-    invalid_count = page_for(bundle, "trace", 0, 2)
+    invalid_count = page_for(snapshot, "trace", 0, 2)
     invalid_count["count"] = 5.0
     with pytest.raises(ValueError, match="page count must be an integer"):
         assemble_evidence(manifest, [invalid_count], peak_pages)
 
-    invalid_next = page_for(bundle, "trace", 0, 2)
+    invalid_next = page_for(snapshot, "trace", 0, 2)
     invalid_next["next_offset"] = 2.0
     with pytest.raises(ValueError, match="page next_offset must be an integer"):
         assemble_evidence(manifest, [invalid_next], peak_pages)
 
-    incorrect_next = page_for(bundle, "trace", 0, 2)
+    incorrect_next = page_for(snapshot, "trace", 0, 2)
     incorrect_next["next_offset"] = 3
     with pytest.raises(ValueError, match="next_offset is inconsistent"):
         assemble_evidence(manifest, [incorrect_next], peak_pages)
 
-    terminal = page_for(bundle, "trace", 0, 10)
+    terminal = page_for(snapshot, "trace", 0, 10)
     with pytest.raises(ValueError, match="after the terminal page"):
         assemble_evidence(manifest, [terminal, terminal], peak_pages)
 
     empty_bundle = _bundle(peaks=[])
-    empty_manifest = manifest_for(empty_bundle)
-    empty_page = page_for(empty_bundle, "peaks", 0, 100)
+    empty_snapshot = _snapshot(empty_bundle)
+    empty_manifest = manifest_for(empty_snapshot)
+    empty_page = page_for(empty_snapshot, "peaks", 0, 100)
     with pytest.raises(ValueError, match="after the terminal page"):
         assemble_evidence(empty_manifest, empty_bundle["points"], [empty_page, empty_page])
 
@@ -408,5 +494,6 @@ def test_full_bundle_and_page_byte_limits_are_enforced():
     ]
     record["result"]["peak_count"] = 1_000
     bundle = build_evidence(record, dataset, digest)
+    snapshot = _snapshot(bundle)
     with pytest.raises(ValueError, match="page-size limit"):
-        page_for(bundle, "peaks", 0, 1_000)
+        page_for(snapshot, "peaks", 0, 1_000)
