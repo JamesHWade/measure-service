@@ -240,7 +240,7 @@ def page_for(
     }
     base_bytes = len(_canonical_bytes(response))
     if page_bytes:
-        page_size = base_bytes - 2 + sum(len(row) for row in page_bytes) + len(page_bytes) - 1
+        page_size = base_bytes + sum(len(row) for row in page_bytes) + len(page_bytes) - 1
     else:
         page_size = base_bytes
     if page_size > MAX_PAGE_BYTES:

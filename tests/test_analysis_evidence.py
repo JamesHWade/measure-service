@@ -178,6 +178,29 @@ def test_manifest_and_page_require_a_captured_snapshot():
         manifest_for(forged)
 
 
+def test_page_byte_limit_counts_exact_serialized_response_including_empty_arrays(monkeypatch):
+    original_cap = evidence_module.MAX_PAGE_BYTES
+    snapshot = _snapshot()
+    expected_page = page_for(snapshot, "trace", 0, 2)
+    exact_size = len(canonical(expected_page).encode("utf-8"))
+
+    monkeypatch.setattr(evidence_module, "MAX_PAGE_BYTES", exact_size)
+    assert page_for(snapshot, "trace", 0, 2) == expected_page
+    monkeypatch.setattr(evidence_module, "MAX_PAGE_BYTES", exact_size - 1)
+    with pytest.raises(ValueError, match="page-size limit"):
+        page_for(snapshot, "trace", 0, 2)
+
+    monkeypatch.setattr(evidence_module, "MAX_PAGE_BYTES", original_cap)
+    empty_snapshot = _snapshot(peaks=[])
+    expected_empty = page_for(empty_snapshot, "peaks", 0, 100)
+    empty_size = len(canonical(expected_empty).encode("utf-8"))
+    monkeypatch.setattr(evidence_module, "MAX_PAGE_BYTES", empty_size)
+    assert page_for(empty_snapshot, "peaks", 0, 100) == expected_empty
+    monkeypatch.setattr(evidence_module, "MAX_PAGE_BYTES", empty_size - 1)
+    with pytest.raises(ValueError, match="page-size limit"):
+        page_for(empty_snapshot, "peaks", 0, 100)
+
+
 def test_fifty_thousand_points_can_be_paged_without_revalidating_or_rehashing(
     monkeypatch,
 ):
