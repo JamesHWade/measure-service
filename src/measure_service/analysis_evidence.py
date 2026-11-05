@@ -53,6 +53,7 @@ _PROVENANCE_HASH_FIELDS = (
 _PEAK_REQUIRED_FIELDS = frozenset(
     {"peak_id", "location", "height", "left_base", "right_base", "area"}
 )
+_PEAK_OPTIONAL_FIELDS = frozenset({"prominence", "area_basis"})
 _POINT_FIELDS = frozenset(
     {"sample_index", "axis", "processed_axis", "raw_signal", "processed_signal"}
 )
@@ -442,10 +443,10 @@ def _validate_peaks(peaks: Any) -> list[dict]:
     normalized = []
     for peak in peaks:
         _require_mapping(peak, "peak row")
-        if set(peak) not in {
-            _PEAK_REQUIRED_FIELDS,
-            _PEAK_REQUIRED_FIELDS | {"prominence"},
-        }:
+        peak_fields = set(peak)
+        if not _PEAK_REQUIRED_FIELDS.issubset(peak_fields) or peak_fields - (
+            _PEAK_REQUIRED_FIELDS | _PEAK_OPTIONAL_FIELDS
+        ):
             raise ValueError("peak row has an unexpected shape")
         peak_id = _strict_integer(peak["peak_id"], "peak_id", minimum=1)
         if peak_id in seen:
@@ -457,6 +458,11 @@ def _validate_peaks(peaks: Any) -> list[dict]:
                 continue
             value = peak[key]
             normalized_peak[key] = None if value is None else _finite_number(value, f"peak {key}")
+        if "area_basis" in peak:
+            area_basis = peak["area_basis"]
+            if not isinstance(area_basis, str) or not area_basis.strip():
+                raise ValueError("peak area_basis must be a nonempty string")
+            normalized_peak["area_basis"] = area_basis
         normalized.append(normalized_peak)
     return normalized
 

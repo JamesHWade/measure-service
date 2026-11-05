@@ -161,6 +161,21 @@ def test_six_field_worker_peak_rows_do_not_invent_prominence():
     }
 
 
+def test_current_worker_area_basis_is_preserved_without_inventing_prominence():
+    record, dataset, digest = _inputs()
+    for peak in record["result"]["peaks"]:
+        peak.pop("prominence")
+        peak["area_basis"] = "observed_signal"
+
+    bundle = build_evidence(record, dataset, digest)
+    assert bundle["peaks"][0]["area_basis"] == "observed_signal"
+    assert "prominence" not in bundle["peaks"][0]
+
+    record["result"]["peaks"][0]["area_basis"] = ""
+    with pytest.raises(ValueError, match="area_basis must be a nonempty string"):
+        build_evidence(record, dataset, digest)
+
+
 def test_builder_rejects_digest_method_and_trace_identity_mismatches():
     record, dataset, digest = _inputs()
     with pytest.raises(ValueError, match="dataset digest"):
