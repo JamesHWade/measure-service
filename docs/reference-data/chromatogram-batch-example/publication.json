@@ -1,0 +1,202 @@
+{
+  "counts": {
+    "control_events": 2,
+    "control_item_transitions": 3,
+    "delivery_files": 27,
+    "example_source_files": 1,
+    "failed_attempts": 1,
+    "numerical_attempts": 5,
+    "package_source_files": 62,
+    "peak_rows": 6,
+    "processed_trace_points": 2004,
+    "raw_trace_points": 2004,
+    "receipt_listed_artifacts": 25,
+    "registry_receipts": 6,
+    "retained_analyses": 4,
+    "runs": 3,
+    "selected_traces": 4,
+    "source_import_records": 0,
+    "successful_attempts": 4
+  },
+  "execution_head": "d67f0aeadabacfd11e15539fb0c1ea999fa5e61a",
+  "execution_source_sha256": {
+    "examples/chromatogram_batch.py": "58cd5b28ce08146fc0210b3d66f122ecee8323543ef7a380427f6725036fdfe8",
+    "measure_methods/__init__.py": "b32a7d28870bdc473b685126e43861f55451d3058e17468db2f49a98f491a166",
+    "measure_methods/chromatography.py": "1824a0a6ddaef062a440cfd5913d3ef89fb45d00bb6f7dc64b741c6d00fbe699",
+    "measure_methods/design.py": "ebd5e83393aed0542307568e98991ec1aa9cee684e826a0adb5203c22bd5d3fa",
+    "measure_methods/gaussian_observations.py": "a7a9e29f44a2f969ebb7eb938550f154c4e83b5e1f8b73e28a262dbb22d3eba9",
+    "measure_methods/metric_candidates.py": "30c5218b2337633ce3f3894d683d19a96021a0355c51a4f81470e06091852606",
+    "measure_methods/moses_objective.py": "2d5fe86082e02dbb6ac1bdf1a1fb4635c115870c0c394746fab8c1cd972b00f8",
+    "measure_methods/objectives.py": "ac649d339bbeb60e54ebeb738c4d31e28111ec511d3d92219f837cad496fdce1",
+    "measure_methods/observations.py": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f",
+    "measure_methods/retention.py": "15a8d49fd22ebafbcfeae904972fa71c33a8bd2bbf2536b7fb4a3db73a6d9538",
+    "measure_methods/trajectories.py": "17ee10247239ac4c8faf4266ab92d21763e348c5118496db1416c418cdc09815",
+    "measure_methods/volume.py": "280262b13b7d26c0dcb8cd18c987713af2f79d27437ee4ea7da6ac4554343221",
+    "measure_service/__init__.py": "e5700ed5be1d33881c6e64fe73027651986ed523151763b69656d80f281c91d1",
+    "measure_service/__main__.py": "3c7b28e5b7170a6b6c83ccd6fcde24623958031d899ca385f9c6762dbe8ee6e9",
+    "measure_service/analysis_evidence.py": "55f0f0e4f6d39176782b3e1739d2b18b792ad31501a9d13e40805a63cd10a5dc",
+    "measure_service/analysis_models.py": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+    "measure_service/analysis_runtime.py": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+    "measure_service/batch_execution.py": "414f06a39d58fd09dc10a9c89d641b620c1f25ec2b763238cdd1ede66851b9aa",
+    "measure_service/batch_models.py": "497f981a6d0c345ca7187e8a41bc80a5c5592930c0d242b470cc399f18c2c3d4",
+    "measure_service/batch_schema.py": "14748218b88d998c3c22745a364176faea343db4120c63cb9ae9ee60b9ca6518",
+    "measure_service/batches.py": "21122db706a3da2efef0c2647bb2ecca6e2ea5d162619d7304303ba713c9ca5f",
+    "measure_service/benchmarks/__init__.py": "f405de642c5e1c53d7955f388db39bcb16dbf72fe1369f231515a13b2ec5389b",
+    "measure_service/benchmarks/__main__.py": "abfca88f15e104f0f6c2b9886c2cfb611108c58477fa1a57a39cc24387ee9d45",
+    "measure_service/benchmarks/evidence.py": "ce71b554b234946825178fd2872fc89b4c4b019d447dc9282b73e4dc15332435",
+    "measure_service/benchmarks/gaussian_qualification.py": "f2f8bf2182fb5fc36a1bdab26e45fddada95b4f78cfab61fdb18cddcc6834a38",
+    "measure_service/benchmarks/moses_archive.py": "2ea50c33404fc336fe7adfc8cb68c8b283f35e22522a36fff6420cd452d411a1",
+    "measure_service/benchmarks/moses_replay.py": "3ad35b5a346097086738db538e567790b8774cbca86992a6efee7fd1d97b9558",
+    "measure_service/benchmarks/moses_sensitivity.py": "ea61ffc71385ca79eebe5b59fe9a1acf0c39fb2ff3461331896212c583c58546",
+    "measure_service/benchmarks/pickle_records.py": "e62119def51fe109e4b6a4d0fbd007fb7953f772c4e8f8fc06e493817363ab39",
+    "measure_service/benchmarks/reference_data/README.md": "f06d03a3fab7cdcc9266879e43fee8555b50e8ed60990472f6f52dbd2de23bf8",
+    "measure_service/benchmarks/reference_data/gaussian-centroid-binary64-v1.json": "c508f761b8547cc40a64c8b3dc603d5e2ec69103f93c3396008c9c32fed43dd7",
+    "measure_service/benchmarks/reference_data/retention-ideal-binary64-v3.json": "7ecd483f1a0ca5e2ee75e7a4f19940e7288a8199b164d90d58202d2b2770d02d",
+    "measure_service/benchmarks/reference_data/retention-law-upstream-v1.json": "92a43a7fbfa148d8d25d99506c9202ca4c3ad435c1c233cc70cb51a18167eb30",
+    "measure_service/benchmarks/reference_data/suggestion_sequences_v1/candidate-declaration.json": "d85f83d19076e266e4e159253d35e7baa9baea2cde32db225b1be9d7bfc4f4ef",
+    "measure_service/benchmarks/reference_data/suggestion_sequences_v1/fixture-oracle.json": "067b276933e5f434e52a47936a8cfa8041042a71f8c52fec1903f907a9a02b79",
+    "measure_service/benchmarks/reference_data/suggestion_sequences_v1/independent_oracle.py.txt": "093a7a269a70f9ffd11a8cb31572112e627234aebbad7329b56907bfde228789",
+    "measure_service/benchmarks/reference_data/suggestion_sequences_v1/initial-design.json": "5c705d93fce23acd29279c8edde1217396c280176a444a96ccb1ab029455b664",
+    "measure_service/benchmarks/reference_data/synthetic-isocratic-ablation-v1.json": "0c607fa590c3c5682018765f25b37c4c9820a2ef36fc3d57bb205d0f1aa31094",
+    "measure_service/benchmarks/reference_data/synthetic-isocratic-paired-v1.json": "0728c6b2e03132d2889fef030c57a5331cae24067ca3fc5e6c40256f1238b38e",
+    "measure_service/benchmarks/retention_qualification.py": "09bb7da54ffa2f8f6e5a836d503aa33cf3dd275f7f3efd17eb1fe1f2e9be7bbd",
+    "measure_service/benchmarks/sensitivity_summary.py": "b05cc5ff144fcacc38fff68eb0838a082bb8c06bc2ab0fa655aed8d6dddabda6",
+    "measure_service/benchmarks/suggestion_sequences.py": "cb006ea51066c85a5acca990fc61d5a5b4bdc48b347fe4613ebffe911a0cf9ba",
+    "measure_service/benchmarks/synthetic_ablations.py": "8dffb59acf673fcd8ea4b6b90e153a2205b9a0b0c8baa35e0446d38c1eb834a5",
+    "measure_service/benchmarks/synthetic_campaigns.py": "ec09d294e82c8ae16e1fbd8bcfa03ae092fef6016351c4cdc7f38e6088e749c9",
+    "measure_service/campaign_protocol.py": "4420bc4e469cbe73178b4b44147a863976487df3a2e8256fde76d4abf9d7479e",
+    "measure_service/campaign_protocol_registry.py": "6e92897a42b11822be13fe2f2917a4ba5c2d6cff1a9d4a267f98c00b1291abf5",
+    "measure_service/campaign_schema.py": "033738aabe10932371a4b2d1492d021a4743b9edb03fffcd77d58df0db86be0a",
+    "measure_service/campaign_suggestion_attempts.py": "005e5ecae312638aea1594c700bf25bc808d018c1ebf592ce9c7320c5633fcc8",
+    "measure_service/campaigns.py": "110615d7658a452f97aec2312478f17707dbd4bff27c79e617534502e365385b",
+    "measure_service/evidence_client.py": "66326f7ef39b55dd6ebf28784f00a70994d1fa6a91dea5dc2f3c57366e8fc779",
+    "measure_service/evidence_report.py": "0a58777e29e3938c9a90beefcd7c8dbd5ab62143bac7c6efced6dbd068058dbd",
+    "measure_service/experiments.py": "a4b37f28af5f5beaa006e50042e9b62b0bbebd389469353bb3f5b4733b4ca52f",
+    "measure_service/gaussian_producer.py": "45714f8b48d26fea11763626835c9ee08d7eeaced6b5b2cb7908ab96727d9970",
+    "measure_service/method_backend.py": "2e8a3a3dfde1f781e2e15a0874263bb66678dd081dcb5c119330e10702422aec",
+    "measure_service/method_registry.py": "1df612779079dbe7eafadbb3c15536de855d04f280fcb50aa56b8e503d05295d",
+    "measure_service/methods.py": "925650c3d1aed5ca8c5b536a258a56f13c040aa34e5a8d4e057ff8cbe24e4859",
+    "measure_service/moses_score_qualification.py": "1f81445de376bfe2973288c14959831eac108b96ef5ed8c98afdead3780b9ef9",
+    "measure_service/observations.py": "1fb023f0ed57defc7d3bb35adff53eefeb3dc8acc42e2580c18152ddbf52a45d",
+    "measure_service/optimizer_backend.py": "0a4a97efeccfced7983d7e8dc93ef0112d42ac40e42e1aaf8270778438718f62",
+    "measure_service/retention.py": "0ecc6bd1d1a35dde60425fa4e887ad31ad5866466643eef572ab7004228248d0",
+    "measure_service/server.py": "7cb588c2bf36618f4e3e085936c6588832b7de81b231f163c9923dfca1eacbf3",
+    "measure_service/storage.py": "b3f101098a67a11f7b89a18d6eea83debc32d663710a78a13edf716fa16b211d",
+    "measure_service/worker.R": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+  },
+  "execution_wheel_sha256": "944b9f0d2bc9014a5857ee11b994605184ce8b1ee9184eb522d39fecc48fbdec",
+  "files": {
+    "attempts.csv": {
+      "sha256": "09ccdc25c3ea72eb761383e69742a303bd82f2968b9862ee23d9beb382bc5ee1",
+      "size_bytes": 1298
+    },
+    "control-events.csv": {
+      "sha256": "64646bdd1390a4863e9ffbe42d31669897637ecc36455cacda7098b614bf59ef",
+      "size_bytes": 502
+    },
+    "control-items.csv": {
+      "sha256": "09bf963332acbf29276835d2b346bf5240e94989ef1d91bc45763acf25e9ca33",
+      "size_bytes": 344
+    },
+    "independent-review.json": {
+      "sha256": "2d56862e6ae50301e374450ab85143b4d62f55a5a1c20d5aa09b3cf4d7c90413",
+      "size_bytes": 12159
+    },
+    "items.csv": {
+      "sha256": "3536f3611248142ea0bc8d0257eb7efd44edb1ed95ec35e17c2bc098ceb5080c",
+      "size_bytes": 1545
+    },
+    "items/000/chromatogram.svg": {
+      "sha256": "e130bd2895b53c180a5926efeec00fe2bb04773721b3115494ae166116dacffd",
+      "size_bytes": 43790
+    },
+    "items/000/evidence.json": {
+      "sha256": "f2ad7342132aeec051530b2ee176ab91bb9821ed32b8950d6939c8dcf7f7c336",
+      "size_bytes": 91484
+    },
+    "items/000/peaks.csv": {
+      "sha256": "442381a46e4b2738ca305ed87e5c3a47e86698dc662f9aae8fc9d15a613a1b3d",
+      "size_bytes": 504
+    },
+    "items/000/report.html": {
+      "sha256": "a8ae4d43e2ea89b121fa725923567945d36811807d172c9890c82ff6dc849465",
+      "size_bytes": 51062
+    },
+    "items/000/trace.csv": {
+      "sha256": "1d1fef30770f28f1f5633eb9d595d4bce02d016062e9dd70dd5a1c70a2b7689a",
+      "size_bytes": 82495
+    },
+    "items/001/chromatogram.svg": {
+      "sha256": "bab1a6c5a8b91109c4ed2bffff7d5210302326ce9316ad23a54774b4c9b4d679",
+      "size_bytes": 26923
+    },
+    "items/001/evidence.json": {
+      "sha256": "778ce5d7338248e9a594b7b652d2c5c4c73b6488edcea49629248134e3f97dd6",
+      "size_bytes": 74064
+    },
+    "items/001/peaks.csv": {
+      "sha256": "25414810281593e767f6c605a7784930c9667cf95ba5150d96ee4b1a462d26f1",
+      "size_bytes": 122
+    },
+    "items/001/report.html": {
+      "sha256": "f8198c2da2a318101d76087dc83b0d4d7dd343fa45c67bcd02dfc63db0f2859a",
+      "size_bytes": 33969
+    },
+    "items/001/trace.csv": {
+      "sha256": "0669cc6677618cd18e1aafe8e07661155999522a3018751ba6109c2ab9c89b24",
+      "size_bytes": 65519
+    },
+    "items/002/chromatogram.svg": {
+      "sha256": "8ff2d058fa8d4a1d93e0ff3fe0fa663d4629a2a1c3dc609e6061a9308c726feb",
+      "size_bytes": 44056
+    },
+    "items/002/evidence.json": {
+      "sha256": "5907cccacd6bfcff56811ae2241f482ffe811aac1764e845d9222da79788348b",
+      "size_bytes": 91622
+    },
+    "items/002/peaks.csv": {
+      "sha256": "dfc7f678cf63e22c894373e44b225de3e5544fbd2b6a56f5cf063043cf45532a",
+      "size_bytes": 505
+    },
+    "items/002/report.html": {
+      "sha256": "0668d47888048473f3840b07768325afd8833f127cee00cc1c43ce4e8196d85c",
+      "size_bytes": 51308
+    },
+    "items/002/trace.csv": {
+      "sha256": "a4bf08d71f61a73427c0d05e20fd5efdb0b4e18c37725bc4ec6995884c585713",
+      "size_bytes": 82653
+    },
+    "items/003/chromatogram.svg": {
+      "sha256": "94a462bda39e86fb43d5116d16dde60b9a26b703682936fad62ad82855deffbd",
+      "size_bytes": 43533
+    },
+    "items/003/evidence.json": {
+      "sha256": "ef37d350795cbd8356a59862bda01cdbda2c8d8ca0cefedd25ed49dbac5824f9",
+      "size_bytes": 91612
+    },
+    "items/003/peaks.csv": {
+      "sha256": "daccfb946c83a3effcfb4025a80ef22280f0fa2c03919615afb8ca47cf57ccf7",
+      "size_bytes": 503
+    },
+    "items/003/report.html": {
+      "sha256": "2141cc85c12f6c1222462ed73440d924e0628d61e60083b411d1b9343bc5129a",
+      "size_bytes": 50798
+    },
+    "items/003/trace.csv": {
+      "sha256": "64a57040f2709157bd56d428c7711c79aa44a513209bf64c9851f07aa4681f8d",
+      "size_bytes": 82630
+    },
+    "summary.html": {
+      "sha256": "544e682ea90012cefcc1ac616fdac4fe281c03e0a0ca2dd366131d18a466b88b",
+      "size_bytes": 6734
+    },
+    "workflow_receipt.json": {
+      "sha256": "886736829d995cec33e8cc4d7b6e5e634c20e1e58a0205cd69d9b79f47adf3df",
+      "size_bytes": 103086
+    }
+  },
+  "profile": "measure-service-chromatogram-batch-publication/1",
+  "scope": "One independently audited synthetic local-MCP execution; not physical qualification, portable restore or a new optimizer study.",
+  "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca",
+  "workflow_receipt_sha256": "886736829d995cec33e8cc4d7b6e5e634c20e1e58a0205cd69d9b79f47adf3df"
+}

@@ -9,6 +9,9 @@ analyses: read their evidence and export reports with the
 
 ## Try the restart and retry example
 
+[Inspect a retained synthetic run](reference-data/chromatogram-batch-example/summary.html)
+or read its [evidence and scope](chromatogram-batch-results.md).
+
 From an installed service environment with compatible R backends, run:
 
 ```sh

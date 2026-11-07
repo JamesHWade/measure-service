@@ -1,0 +1,222 @@
+{
+  "evidence": {
+    "all_checks_passed": true,
+    "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+    "check_count": 259,
+    "csv_numeric_cells_compared": 10056,
+    "declaration_sha256": "fec0d3891b77f99a2e1324acd2d18561bc2cac4f2c552dcc631497889241625a",
+    "delivery_unchanged": true,
+    "final_revision": 11,
+    "final_status": "completed",
+    "item_evidence": [
+      {
+        "analysis_id": "9af15e67-7c5b-4c52-813c-cec40833615e",
+        "attempts": 1,
+        "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+        "evidence_sha256": "815a338d340d27f47210ede5c2f5e53427a0074d382ec7d8d289bf484b11e882",
+        "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+        "ordinal": 0,
+        "peaks": 2,
+        "points": 501,
+        "provenance": {
+          "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": null,
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+        "role": "reference",
+        "stored_result_sha256": "95adf1656d965a36294c49b52c8f2f39a73a1bd38eb3cbb8f242060ad6d09d59"
+      },
+      {
+        "analysis_id": "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+        "attempts": 1,
+        "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+        "evidence_sha256": "abe49e760d6e8eccd7b86acc9fcb8f4720aa9e750a8f8d2455faecbdd5dd3929",
+        "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+        "ordinal": 1,
+        "peaks": 0,
+        "points": 501,
+        "provenance": {
+          "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": null,
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "result_metadata_sha256": "1308d838ffa1d600bd3f78e40fd3101534d7993bae682cd9befbb8011313cc7c",
+        "role": "blank",
+        "stored_result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363"
+      },
+      {
+        "analysis_id": "fdd3e18a-2371-4e0e-bdab-cc0b528d1c07",
+        "attempts": 2,
+        "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+        "evidence_sha256": "3ebeaf0a1783f826f33983f202c4e9bcc6a8b9f520f6044541886d45a53f4f30",
+        "input_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+        "ordinal": 2,
+        "peaks": 2,
+        "points": 501,
+        "provenance": {
+          "input_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": null,
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+        "role": "qc",
+        "stored_result_sha256": "b6f339e21f9851ff798c9c94f97b73a0ee987e40d87ef68eb9993e3625399fb0"
+      },
+      {
+        "analysis_id": "8e677c52-057a-4329-a05d-2fb60803a0fd",
+        "attempts": 1,
+        "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+        "evidence_sha256": "51ad9a227a6f5ad5bde0c6021ee952db4767f828ac80c10308c05c740fbfa086",
+        "input_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+        "ordinal": 3,
+        "peaks": 2,
+        "points": 501,
+        "provenance": {
+          "input_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": null,
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+        "role": "unknown",
+        "stored_result_sha256": "0cfc2fb5afb175695f034fba292e0fb5e98e0b965abd2ac0bae4d49950e0b872"
+      }
+    ],
+    "manifest_sha256": "ebcd687779e2426e65f573deff0466237fb2b9079f38526d57d1d2d5fde2fda2",
+    "source_store_sha256": "ec56beec41e8725d8f73cc66518ea26ed9b59594f821a48a235651db4003ee96",
+    "svg_verification": [
+      {
+        "curve_points": {
+          "processed": 501,
+          "raw": 501
+        },
+        "max_absolute_coordinate_error": 2.2737367544323206e-13,
+        "ordinal": 0
+      },
+      {
+        "curve_points": {
+          "processed": 501,
+          "raw": 501
+        },
+        "max_absolute_coordinate_error": 2.2737367544323206e-13,
+        "ordinal": 1
+      },
+      {
+        "curve_points": {
+          "processed": 501,
+          "raw": 501
+        },
+        "max_absolute_coordinate_error": 2.2737367544323206e-13,
+        "ordinal": 2
+      },
+      {
+        "curve_points": {
+          "processed": 501,
+          "raw": 501
+        },
+        "max_absolute_coordinate_error": 2.2737367544323206e-13,
+        "ordinal": 3
+      }
+    ],
+    "workflow_receipt_sha256": "886736829d995cec33e8cc4d7b6e5e634c20e1e58a0205cd69d9b79f47adf3df"
+  },
+  "execution_proof_limits": "The stored rows, outputs, source code and receipt are consistent with the declared public-MCP restart/replay workflow. The audit did not rerun numerical work or record those historical process launches itself. Receipt booleans were not used as the sole proof of any stored-state/artifact conclusion.",
+  "findings": [],
+  "reviewed_execution_commit": "d67f0aeadabacfd11e15539fb0c1ea999fa5e61a",
+  "reviewed_wheel_sha256": "944b9f0d2bc9014a5857ee11b994605184ce8b1ee9184eb522d39fecc48fbdec",
+  "scientific_scope": {
+    "data": "Constructed synthetic scalar UV chromatograms; reference, blank, QC and unknown are explicit caller roles matching retained source sample types.",
+    "import_mapping": "All four inputs were registered as JSON datasets. dataset_sources is empty; source_sha256 and source mapping are null. This execution provides no CSV/vendor-import mapping parity claim.",
+    "internal_standard": "The unknown item retains one caller-declared reference label in the immutable manifest/receipt. It is not a verified identity, internal-standard correction or calibration.",
+    "numerical_output": "Stored peak counts2/0/2/2 and six retained signal-area rows are faithfully exported. The audit checks their identity and presentation, not a new independent scientific validation of the R algorithms.",
+    "runtime": "Successful attempts record R4.5.2, measure0.0.1.9003, measure.sec0.0.0.9000, recipes1.3.1 and installed R code MD5 fingerprints. Git revision fields remain null rather than guessed.",
+    "unavailable": "Compound identity not assigned; calibration not linked; deconvolution not performed; physical validation not established. No concentration, purity or instrument qualification claim."
+  },
+  "scope": "The initial actual public-MCP demonstration delivered from frozen d67f0ae. This is artifact acceptance of that execution; it does not stand in for a later hardening commit, final reproduction, full-suite or protected-stack merge gates.",
+  "source_store_in_repository": false,
+  "source_store_scope": "The synthetic execution store is retained in the local sealed delivery; these repository files are reports and evidence, not a portable restoration bundle.",
+  "verdict": "accepted_initial_demonstration_delivery",
+  "verified_behavior": [
+    "All four dataset canonical digests match selected manifest inputs, item fingerprints, analysis provenance, receipt datasets and exported evidence. Reconstructed synthetic raw signals and 501-point axes exactly match each source dataset.",
+    "Four unique completed items correspond one-to-one to four ordinary analyses. Attempt counts are 1/1/2/1; the QC item retains one failed attempt plus one successful retry. No hidden retained attempt/result duplicates exist.",
+    "Original first-two analysis IDs match their initial-success run, final item rows and replay receipt. The original failed run remains bound to its failed attempt while its current QC item is completed.",
+    "The failure retains runtime_status unknown and null analysis/result/evidence/compact fields. R versions and package/code fingerprints are reported only on successful attempts.",
+    "Cancellation of pending ordinal 3 survives as event 1. Event 2 explicitly retries ordinals 2 and 3 from failed/cancelled to pending; no fake numerical cancelled attempt was invented.",
+    "The six global request receipts, three run request digests, five run-item/attempt token bindings and two canonical control-event digests agree with stored identities and exported records.",
+    "Every point and peak in all four evidence bundles matches stored raw/processed results. All 10,056 numeric CSV cells compared agree. Flattened item, attempt, control-event and control-item CSV rows independently reconstruct exactly from database records.",
+    "All 25 receipt-listed artifact file hashes match actual bytes; the receipt itself is separately hashed by this audit. Each of 20 item files exactly matches in-memory rendering from its retained evidence bundle.",
+    "All eight SVG signal paths include 501 points and independently reconstructed coordinates agree within 2.28e-13 screen units. All HTML links remain within the report tree and resolve; referenced images and alt text are present.",
+    "All 62 wheel package files match the exact d67 git commit, frozen source archive and installed environment; the example source also matches. All five attempt execution contexts point to the actual hashed worker/runtime/model bytes."
+  ],
+  "verified_counts": {
+    "control_events": 2,
+    "control_item_transitions": 3,
+    "delivery_files": 27,
+    "example_source_files": 1,
+    "failed_attempts": 1,
+    "numerical_attempts": 5,
+    "package_source_files": 62,
+    "peak_rows": 6,
+    "processed_trace_points": 2004,
+    "raw_trace_points": 2004,
+    "receipt_listed_artifacts": 25,
+    "registry_receipts": 6,
+    "retained_analyses": 4,
+    "runs": 3,
+    "selected_traces": 4,
+    "source_import_records": 0,
+    "successful_attempts": 4
+  }
+}

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Synthetic chromatogram batch</title>
+<style>
+:root{color-scheme:light;--ink:#152f3a;--muted:#45616b;--line:#cfdddd;--teal:#00685c}
+*{box-sizing:border-box}body{margin:0;background:#f6f8f5;color:var(--ink);font:16px/1.55 system-ui,sans-serif}
+main{max-width:1120px;margin:auto;padding:48px 24px}h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.1;margin:12px 0 20px;letter-spacing:-.035em}
+h2{margin:36px 0 14px;font-size:1.45rem}h3{font-size:.9rem;letter-spacing:.1em;margin:0}p{margin:10px 0}
+a{color:#005d72;text-underline-offset:.2em}a:focus-visible{outline:3px solid #9a5000;outline-offset:4px}
+.eyebrow{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);font-weight:750}
+.intro{max-width:750px;color:var(--muted);font-size:1.1rem}.notice{border-left:4px solid #af700a;background:#fff3d9;padding:14px 18px;margin:24px 0}
+.stats{display:flex;gap:32px;flex-wrap:wrap;padding:20px 0;border-block:1px solid var(--line)}.stats strong{font-size:1.8rem;display:block}.stats span{color:var(--muted)}
+.timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:0;list-style:none;counter-reset:stage}
+.timeline li{counter-increment:stage;border-top:3px solid var(--teal);padding-top:12px}.timeline b{display:block}.timeline b:before{content:counter(stage) " / ";color:var(--teal)}.timeline p{font-size:.92rem;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.card{background:white;border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0}
+.cardhead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.badge{background:#e5f4eb;color:#155632;border-radius:20px;font-size:.78rem;padding:3px 9px}
+.card img{display:block;width:100%;height:auto;margin-top:16px}.identifier{color:var(--muted);font-size:.8rem;overflow-wrap:anywhere}.report{display:inline-block;margin-top:8px;font-weight:650}
+.downloads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.downloads a{display:block;background:white;border:1px solid var(--line);border-radius:8px;padding:14px}.downloads span{display:block;font-size:.86rem;color:var(--muted);text-decoration:none}
+footer{margin-top:30px;color:var(--muted);font-size:.9rem}code{font-size:.9em} @media(max-width:650px){main{padding:28px 16px}.grid,.timeline,.downloads{grid-template-columns:1fr}.card{padding:16px}.stats{gap:22px}}
+</style></head><body><main>
+<div class="eyebrow">Measure · retained analytical evidence</div>
+<h1>A batch that remembers<br>how it finished.</h1>
+<p class="intro">Four synthetic UV traces, one declared method and a durable record of success,
+failure, cancellation and selected retry across local MCP process restarts.</p>
+<div class="stats" aria-label="Final workflow counts"><div><strong>4 / 4</strong><span>items completed</span></div>
+<div><strong>5</strong><span>retained attempts</span></div><div><strong>2</strong><span>control events</span></div>
+<div><strong>0</strong><span>replayed computations</span></div></div>
+<aside class="notice">Synthetic signal evidence. Detected peaks do not establish compound identity,
+concentration, purity or physical method qualification. Caller roles and internal-standard labels are declarations.</aside>
+<h2>The retained sequence</h2><ol class="timeline"><li><b>Two succeed</b><p>Reference and blank complete.
+Their analysis IDs remain fixed through every restart.</p></li><li><b>Failure and cancellation</b>
+<p>An unavailable R executable fails the QC attempt; R runtime stays unknown. The pending unknown item is cancelled.</p></li>
+<li><b>Selected retry and replay</b><p>QC and unknown complete after explicit retry. Original run receipts replay with R unavailable;
+the original failure remains failed and cancellation remains in history.</p></li></ol>
+<h2>Inspect the four results</h2><div class="grid"><article class="card"><div class="cardhead"><h3>REFERENCE</h3><span class="badge">Completed</span></div><img src="items/000/chromatogram.svg" alt="Raw and processed synthetic reference UV trace; 2 detected peak rows." loading="lazy"><p>501 samples · 2 peak rows</p><p class="identifier">Analysis <code>9af15e67-7c5b-4c52-813c-cec40833615e</code></p><a class="report" href="items/000/report.html">Inspect evidence report →</a></article><article class="card"><div class="cardhead"><h3>BLANK</h3><span class="badge">Completed</span></div><img src="items/001/chromatogram.svg" alt="Raw and processed synthetic blank UV trace; 0 detected peak rows." loading="lazy"><p>501 samples · 0 peak rows</p><p class="identifier">Analysis <code>a69adc08-1ca1-457e-a5ed-41b45a8d4103</code></p><a class="report" href="items/001/report.html">Inspect evidence report →</a></article><article class="card"><div class="cardhead"><h3>QC</h3><span class="badge">Completed</span></div><img src="items/002/chromatogram.svg" alt="Raw and processed synthetic qc UV trace; 2 detected peak rows." loading="lazy"><p>501 samples · 2 peak rows</p><p class="identifier">Analysis <code>fdd3e18a-2371-4e0e-bdab-cc0b528d1c07</code></p><a class="report" href="items/002/report.html">Inspect evidence report →</a></article><article class="card"><div class="cardhead"><h3>UNKNOWN</h3><span class="badge">Completed</span></div><img src="items/003/chromatogram.svg" alt="Raw and processed synthetic unknown UV trace; 2 detected peak rows." loading="lazy"><p>501 samples · 2 peak rows</p><p class="identifier">Analysis <code>8e677c52-057a-4329-a05d-2fb60803a0fd</code></p><a class="report" href="items/003/report.html">Inspect evidence report →</a></article></div><h2>Use the evidence</h2>
+<p>Full transitions, bounded public reads and artifact hashes: <a href="workflow_receipt.json">workflow_receipt.json</a>.</p>
+<div class="downloads"><a href="items.csv">Items · 4 rows<span>One selected trace, its metadata, final state and result.</span></a>
+<a href="attempts.csv">Attempts · 5 rows<span>One numerical attempt, including the original failure.</span></a>
+<a href="control-events.csv">Control events · 2 rows<span>One cancellation or selected-retry action.</span></a>
+<a href="control-items.csv">Affected items · 3 rows<span>One item changed by a control event.</span></a></div>
+<footer>Blank runtime cells mean unavailable; numerical zero remains zero. CSV text escapes spreadsheet formula
+prefixes and control characters; JSON retains original values. This example covers stored outcomes and local
+process restarts. Expired-claim recovery is tested separately; instrument execution and portable restoration remain outside this example.</footer>
+</main></body></html>

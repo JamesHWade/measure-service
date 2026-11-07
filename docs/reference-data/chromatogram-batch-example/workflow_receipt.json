@@ -1,0 +1,2608 @@
+{
+  "analysis_ids": [
+    "9af15e67-7c5b-4c52-813c-cec40833615e",
+    "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+    "fdd3e18a-2371-4e0e-bdab-cc0b528d1c07",
+    "8e677c52-057a-4329-a05d-2fb60803a0fd"
+  ],
+  "assertions": {
+    "all_calls_used_public_mcp": true,
+    "controlled_failure_runtime_unknown": true,
+    "failed_attempt_and_cancellation_checkpoint_retained": true,
+    "first_two_analysis_ids_unchanged_after_replay": true,
+    "first_two_completed_before_restart": true,
+    "four_unique_completed_analyses": true,
+    "fourth_pending_item_cancelled": true,
+    "no_hidden_retry": true,
+    "original_failed_run_remains_failed": true,
+    "retry_selected_ordinals_2_and_3": true,
+    "roles_and_original_sample_types_preserved": true
+  },
+  "attempt_pages": {
+    "0": {
+      "attempts": [
+        {
+          "analysis_id": "9af15e67-7c5b-4c52-813c-cec40833615e",
+          "attempt_id": "5364ba5f-1151-4003-83d3-2fb47bb5c184",
+          "attempt_no": 1,
+          "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+          "error": null,
+          "evidence_sha256": "815a338d340d27f47210ede5c2f5e53427a0074d382ec7d8d289bf484b11e882",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:05.352875+00:00",
+          "lease_expires_at": "2026-11-07T16:35:33.437775+00:00",
+          "ordinal": 0,
+          "result": null,
+          "result_sha256": "95adf1656d965a36294c49b52c8f2f39a73a1bd38eb3cbb8f242060ad6d09d59",
+          "run_id": "2365031c-f778-4763-b028-c3c28ffbe3b0",
+          "runtime": {
+            "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:03.437591+00:00",
+          "state": "completed"
+        }
+      ],
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "count": 1,
+      "limit": 20,
+      "next_offset": null,
+      "offset": 0,
+      "ordinal": 0,
+      "total": 1
+    },
+    "1": {
+      "attempts": [
+        {
+          "analysis_id": "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+          "attempt_id": "cb181368-3986-49c1-b04b-0a6f224041dc",
+          "attempt_no": 1,
+          "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+          "error": null,
+          "evidence_sha256": "abe49e760d6e8eccd7b86acc9fcb8f4720aa9e750a8f8d2455faecbdd5dd3929",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:05.075076+00:00",
+          "lease_expires_at": "2026-11-07T16:35:33.437968+00:00",
+          "ordinal": 1,
+          "result": null,
+          "result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363",
+          "run_id": "2365031c-f778-4763-b028-c3c28ffbe3b0",
+          "runtime": {
+            "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:03.437591+00:00",
+          "state": "completed"
+        }
+      ],
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "count": 1,
+      "limit": 20,
+      "next_offset": null,
+      "offset": 0,
+      "ordinal": 1,
+      "total": 1
+    },
+    "2": {
+      "attempts": [
+        {
+          "analysis_id": null,
+          "attempt_id": "87a6eaa7-0731-4b13-929c-823799dbfca5",
+          "attempt_no": 1,
+          "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+          "error": {
+            "code": "chromatogram_worker_error",
+            "exception_type": "ValueError",
+            "message": "The R analysis worker could not start or timed out",
+            "r_runtime_evidence": "unknown_until_success"
+          },
+          "evidence_sha256": null,
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:05.781851+00:00",
+          "lease_expires_at": "2026-11-07T16:35:35.769371+00:00",
+          "ordinal": 2,
+          "result": null,
+          "result_sha256": null,
+          "run_id": "7a288e15-f5b5-4aca-b5b4-4daf81130ad9",
+          "runtime": {
+            "runtime_status": "unknown"
+          },
+          "started_at": "2026-11-07T16:33:05.769068+00:00",
+          "state": "failed"
+        },
+        {
+          "analysis_id": "fdd3e18a-2371-4e0e-bdab-cc0b528d1c07",
+          "attempt_id": "98fb26b1-95f2-46ce-9fad-8c3f5f82035c",
+          "attempt_no": 2,
+          "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+          "error": null,
+          "evidence_sha256": "3ebeaf0a1783f826f33983f202c4e9bcc6a8b9f520f6044541886d45a53f4f30",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:08.140553+00:00",
+          "lease_expires_at": "2026-11-07T16:35:36.220878+00:00",
+          "ordinal": 2,
+          "result": null,
+          "result_sha256": "b6f339e21f9851ff798c9c94f97b73a0ee987e40d87ef68eb9993e3625399fb0",
+          "run_id": "c73e994e-203c-4e48-a877-e3774cb65c7d",
+          "runtime": {
+            "input_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:06.220573+00:00",
+          "state": "completed"
+        }
+      ],
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "count": 2,
+      "limit": 20,
+      "next_offset": null,
+      "offset": 0,
+      "ordinal": 2,
+      "total": 2
+    },
+    "3": {
+      "attempts": [
+        {
+          "analysis_id": "8e677c52-057a-4329-a05d-2fb60803a0fd",
+          "attempt_id": "4f8d2f01-31ed-4794-8d4c-6722794f1eb4",
+          "attempt_no": 1,
+          "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+          "error": null,
+          "evidence_sha256": "51ad9a227a6f5ad5bde0c6021ee952db4767f828ac80c10308c05c740fbfa086",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:08.019383+00:00",
+          "lease_expires_at": "2026-11-07T16:35:36.221090+00:00",
+          "ordinal": 3,
+          "result": null,
+          "result_sha256": "0cfc2fb5afb175695f034fba292e0fb5e98e0b965abd2ac0bae4d49950e0b872",
+          "run_id": "c73e994e-203c-4e48-a877-e3774cb65c7d",
+          "runtime": {
+            "input_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:06.220573+00:00",
+          "state": "completed"
+        }
+      ],
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "count": 1,
+      "limit": 20,
+      "next_offset": null,
+      "offset": 0,
+      "ordinal": 3,
+      "total": 1
+    }
+  },
+  "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+  "cancellation_checkpoint": {
+    "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+    "count": 4,
+    "items": [
+      {
+        "analysis_id": "9af15e67-7c5b-4c52-813c-cec40833615e",
+        "attempt_count": 1,
+        "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+        "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+        "dataset_title": "Synthetic reference UV chromatogram",
+        "evidence_sha256": "815a338d340d27f47210ede5c2f5e53427a0074d382ec7d8d289bf484b11e882",
+        "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+        "internal_standard_references": [],
+        "item_id": "10491ec2-f4e5-40a0-bcf4-46f527105da5",
+        "ordinal": 0,
+        "point_count": 501,
+        "result": {
+          "analysis_id": "9af15e67-7c5b-4c52-813c-cec40833615e",
+          "artifact": true,
+          "created_at": "2026-11-07T16:33:05.343733+00:00",
+          "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+          "diagnostics": null,
+          "kind": "chromatogram",
+          "notes": [
+            "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+            "Peak area is detector response, not concentration or compound identity."
+          ],
+          "provenance": {
+            "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "qualification": "experimental",
+          "status": "completed",
+          "summary": {
+            "peak_count": 2
+          },
+          "trace_id": "uv-254",
+          "warnings": []
+        },
+        "result_sha256": "95adf1656d965a36294c49b52c8f2f39a73a1bd38eb3cbb8f242060ad6d09d59",
+        "role": "reference",
+        "source_sha256": null,
+        "state": "completed",
+        "trace": {
+          "axis_unit": "min",
+          "batch_id": null,
+          "channel": "UV 254 nm",
+          "detector": "UV",
+          "injection_id": "injection-reference",
+          "run_order": null,
+          "sample_id": "synthetic-reference",
+          "sample_type": "reference",
+          "separation": "LC",
+          "signal_unit": "mAU",
+          "trace_id": "uv-254"
+        },
+        "trace_id": "uv-254"
+      },
+      {
+        "analysis_id": "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+        "attempt_count": 1,
+        "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+        "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+        "dataset_title": "Synthetic blank UV chromatogram",
+        "evidence_sha256": "abe49e760d6e8eccd7b86acc9fcb8f4720aa9e750a8f8d2455faecbdd5dd3929",
+        "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+        "internal_standard_references": [],
+        "item_id": "ad33b751-54b3-472b-9d67-cb2c28bf5592",
+        "ordinal": 1,
+        "point_count": 501,
+        "result": {
+          "analysis_id": "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+          "artifact": true,
+          "created_at": "2026-11-07T16:33:05.063459+00:00",
+          "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+          "diagnostics": null,
+          "kind": "chromatogram",
+          "notes": [
+            "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+            "Peak area is detector response, not concentration or compound identity."
+          ],
+          "provenance": {
+            "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "qualification": "experimental",
+          "status": "completed",
+          "summary": {
+            "peak_count": 0
+          },
+          "trace_id": "uv-254",
+          "warnings": []
+        },
+        "result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363",
+        "role": "blank",
+        "source_sha256": null,
+        "state": "completed",
+        "trace": {
+          "axis_unit": "min",
+          "batch_id": null,
+          "channel": "UV 254 nm",
+          "detector": "UV",
+          "injection_id": "injection-blank",
+          "run_order": null,
+          "sample_id": "synthetic-blank",
+          "sample_type": "blank",
+          "separation": "LC",
+          "signal_unit": "mAU",
+          "trace_id": "uv-254"
+        },
+        "trace_id": "uv-254"
+      },
+      {
+        "analysis_id": null,
+        "attempt_count": 1,
+        "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+        "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+        "dataset_title": "Synthetic qc UV chromatogram",
+        "evidence_sha256": null,
+        "input_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+        "internal_standard_references": [],
+        "item_id": "2002baa4-a1bf-48e5-b6a1-76e6c47ad440",
+        "ordinal": 2,
+        "point_count": 501,
+        "result": null,
+        "result_sha256": null,
+        "role": "qc",
+        "source_sha256": null,
+        "state": "failed",
+        "trace": {
+          "axis_unit": "min",
+          "batch_id": null,
+          "channel": "UV 254 nm",
+          "detector": "UV",
+          "injection_id": "injection-qc",
+          "run_order": null,
+          "sample_id": "synthetic-qc",
+          "sample_type": "qc",
+          "separation": "LC",
+          "signal_unit": "mAU",
+          "trace_id": "uv-254"
+        },
+        "trace_id": "uv-254"
+      },
+      {
+        "analysis_id": null,
+        "attempt_count": 0,
+        "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+        "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+        "dataset_title": "Synthetic unknown UV chromatogram",
+        "evidence_sha256": null,
+        "input_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+        "internal_standard_references": [
+          "caller-declared reference label"
+        ],
+        "item_id": "5b922af4-28b2-4f5b-8844-14e69da58e98",
+        "ordinal": 3,
+        "point_count": 501,
+        "result": null,
+        "result_sha256": null,
+        "role": "unknown",
+        "source_sha256": null,
+        "state": "cancelled",
+        "trace": {
+          "axis_unit": "min",
+          "batch_id": null,
+          "channel": "UV 254 nm",
+          "detector": "UV",
+          "injection_id": "injection-unknown",
+          "run_order": null,
+          "sample_id": "synthetic-unknown",
+          "sample_type": "unknown",
+          "separation": "LC",
+          "signal_unit": "mAU",
+          "trace_id": "uv-254"
+        },
+        "trace_id": "uv-254"
+      }
+    ],
+    "limit": 4,
+    "next_offset": null,
+    "offset": 0,
+    "revision": 7,
+    "total": 4
+  },
+  "canonical_file_hashes": {
+    "attempts.csv": "09ccdc25c3ea72eb761383e69742a303bd82f2968b9862ee23d9beb382bc5ee1",
+    "control-events.csv": "64646bdd1390a4863e9ffbe42d31669897637ecc36455cacda7098b614bf59ef",
+    "control-items.csv": "09bf963332acbf29276835d2b346bf5240e94989ef1d91bc45763acf25e9ca33",
+    "items.csv": "3536f3611248142ea0bc8d0257eb7efd44edb1ed95ec35e17c2bc098ceb5080c",
+    "items/000/chromatogram.svg": "e130bd2895b53c180a5926efeec00fe2bb04773721b3115494ae166116dacffd",
+    "items/000/evidence.json": "f2ad7342132aeec051530b2ee176ab91bb9821ed32b8950d6939c8dcf7f7c336",
+    "items/000/peaks.csv": "442381a46e4b2738ca305ed87e5c3a47e86698dc662f9aae8fc9d15a613a1b3d",
+    "items/000/report.html": "a8ae4d43e2ea89b121fa725923567945d36811807d172c9890c82ff6dc849465",
+    "items/000/trace.csv": "1d1fef30770f28f1f5633eb9d595d4bce02d016062e9dd70dd5a1c70a2b7689a",
+    "items/001/chromatogram.svg": "bab1a6c5a8b91109c4ed2bffff7d5210302326ce9316ad23a54774b4c9b4d679",
+    "items/001/evidence.json": "778ce5d7338248e9a594b7b652d2c5c4c73b6488edcea49629248134e3f97dd6",
+    "items/001/peaks.csv": "25414810281593e767f6c605a7784930c9667cf95ba5150d96ee4b1a462d26f1",
+    "items/001/report.html": "f8198c2da2a318101d76087dc83b0d4d7dd343fa45c67bcd02dfc63db0f2859a",
+    "items/001/trace.csv": "0669cc6677618cd18e1aafe8e07661155999522a3018751ba6109c2ab9c89b24",
+    "items/002/chromatogram.svg": "8ff2d058fa8d4a1d93e0ff3fe0fa663d4629a2a1c3dc609e6061a9308c726feb",
+    "items/002/evidence.json": "5907cccacd6bfcff56811ae2241f482ffe811aac1764e845d9222da79788348b",
+    "items/002/peaks.csv": "dfc7f678cf63e22c894373e44b225de3e5544fbd2b6a56f5cf063043cf45532a",
+    "items/002/report.html": "0668d47888048473f3840b07768325afd8833f127cee00cc1c43ce4e8196d85c",
+    "items/002/trace.csv": "a4bf08d71f61a73427c0d05e20fd5efdb0b4e18c37725bc4ec6995884c585713",
+    "items/003/chromatogram.svg": "94a462bda39e86fb43d5116d16dde60b9a26b703682936fad62ad82855deffbd",
+    "items/003/evidence.json": "ef37d350795cbd8356a59862bda01cdbda2c8d8ca0cefedd25ed49dbac5824f9",
+    "items/003/peaks.csv": "daccfb946c83a3effcfb4025a80ef22280f0fa2c03919615afb8ca47cf57ccf7",
+    "items/003/report.html": "2141cc85c12f6c1222462ed73440d924e0628d61e60083b411d1b9343bc5129a",
+    "items/003/trace.csv": "64a57040f2709157bd56d428c7711c79aa44a513209bf64c9851f07aa4681f8d",
+    "summary.html": "544e682ea90012cefcc1ac616fdac4fe281c03e0a0ca2dd366131d18a466b88b"
+  },
+  "control_history": {
+    "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+    "count": 2,
+    "events": [
+      {
+        "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+        "created_at": "2026-11-07T16:33:05.801986+00:00",
+        "event_id": "f0ac840b-7d98-4a40-8f37-8f777374b693",
+        "event_no": 1,
+        "event_sha256": "4f6c124344258a217e14dc48e57c1cf9cc59ab70f87e4fcbfd306a518b0572fa",
+        "idempotency_key_sha256": "90a9d03465f4f204e98c2175db318caaf5bc29111f22cd023760fed78d1e9aa6",
+        "items": [
+          {
+            "from_state": "pending",
+            "ordinal": 3,
+            "to_state": "cancelled"
+          }
+        ],
+        "kind": "cancel_requested",
+        "profile": "measure-chromatogram-batch-control/1",
+        "revision_after": 7,
+        "revision_before": 6
+      },
+      {
+        "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+        "created_at": "2026-11-07T16:33:05.812018+00:00",
+        "event_id": "a5698c4b-85c0-4ff2-86f0-cd2b943e4321",
+        "event_no": 2,
+        "event_sha256": "3b61ac10fbdd6ec9a330b296e667a4fc800dbf7beb58e4add7a865f02ac06b7b",
+        "idempotency_key_sha256": "ce27342998049ef49273116a9492f6a59b5ce59500cc1e5d5f9ae2b293df9a68",
+        "items": [
+          {
+            "from_state": "failed",
+            "ordinal": 2,
+            "to_state": "pending"
+          },
+          {
+            "from_state": "cancelled",
+            "ordinal": 3,
+            "to_state": "pending"
+          }
+        ],
+        "kind": "retry_selected",
+        "profile": "measure-chromatogram-batch-control/1",
+        "revision_after": 8,
+        "revision_before": 7
+      }
+    ],
+    "next_offset": null,
+    "offset": 0,
+    "total": 2
+  },
+  "counts": {
+    "cancelled": 0,
+    "completed": 4,
+    "failed": 0,
+    "interrupted": 0,
+    "pending": 0,
+    "running": 0
+  },
+  "datasets": {
+    "blank": {
+      "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+      "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+      "original_sample_type": "blank",
+      "point_count": 501,
+      "role": "blank",
+      "trace_id": "uv-254"
+    },
+    "qc": {
+      "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+      "input_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+      "original_sample_type": "qc",
+      "point_count": 501,
+      "role": "qc",
+      "trace_id": "uv-254"
+    },
+    "reference": {
+      "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+      "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+      "original_sample_type": "reference",
+      "point_count": 501,
+      "role": "reference",
+      "trace_id": "uv-254"
+    },
+    "unknown": {
+      "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+      "input_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+      "original_sample_type": "unknown",
+      "point_count": 501,
+      "role": "unknown",
+      "trace_id": "uv-254"
+    }
+  },
+  "first_two_analysis_ids": [
+    "9af15e67-7c5b-4c52-813c-cec40833615e",
+    "a69adc08-1ca1-457e-a5ed-41b45a8d4103"
+  ],
+  "internal_standard_references_scope": "The unknown trace label is a caller declaration only; it does not establish an assignment, correction or calibration.",
+  "method": {
+    "baseline": "als",
+    "baseline_lambda": 1000000.0,
+    "baseline_p": 0.01,
+    "integration_baseline": "local",
+    "min_distance": 0,
+    "min_height": 0,
+    "min_prominence": 0.3,
+    "smoothing": "gaussian",
+    "smoothing_sigma": 2
+  },
+  "original_failure_unknowns": {
+    "attempt_id": "87a6eaa7-0731-4b13-929c-823799dbfca5",
+    "error": {
+      "code": "chromatogram_worker_error",
+      "exception_type": "ValueError",
+      "message": "The R analysis worker could not start or timed out",
+      "r_runtime_evidence": "unknown_until_success"
+    },
+    "ordinal": 2,
+    "r_runtime_evidence": "unknown_until_success",
+    "run_id": "7a288e15-f5b5-4aca-b5b4-4daf81130ad9",
+    "runtime": {
+      "runtime_status": "unknown"
+    },
+    "state": "failed"
+  },
+  "profile": "measure-chromatogram-batch-example/1",
+  "reports": [
+    {
+      "analysis_id": "9af15e67-7c5b-4c52-813c-cec40833615e",
+      "evidence_sha256": "815a338d340d27f47210ede5c2f5e53427a0074d382ec7d8d289bf484b11e882",
+      "files": {
+        "chromatogram.svg": {
+          "path": "items/000/chromatogram.svg",
+          "sha256": "e130bd2895b53c180a5926efeec00fe2bb04773721b3115494ae166116dacffd"
+        },
+        "evidence.json": {
+          "path": "items/000/evidence.json",
+          "sha256": "f2ad7342132aeec051530b2ee176ab91bb9821ed32b8950d6939c8dcf7f7c336"
+        },
+        "peaks.csv": {
+          "path": "items/000/peaks.csv",
+          "sha256": "442381a46e4b2738ca305ed87e5c3a47e86698dc662f9aae8fc9d15a613a1b3d"
+        },
+        "report.html": {
+          "path": "items/000/report.html",
+          "sha256": "a8ae4d43e2ea89b121fa725923567945d36811807d172c9890c82ff6dc849465"
+        },
+        "trace.csv": {
+          "path": "items/000/trace.csv",
+          "sha256": "1d1fef30770f28f1f5633eb9d595d4bce02d016062e9dd70dd5a1c70a2b7689a"
+        }
+      },
+      "ordinal": 0,
+      "peak_count": 2,
+      "point_count": 501,
+      "result_metadata": {
+        "installed_r_code_md5": {
+          "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+          "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+        },
+        "kind": "chromatogram",
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "packages": {
+          "measure": "0.0.1.9003",
+          "measure.sec": "0.0.0.9000",
+          "recipes": "1.3.1"
+        },
+        "peak_count": 2,
+        "r_version": "4.5.2",
+        "warnings": []
+      },
+      "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+      "stored_result_sha256": "95adf1656d965a36294c49b52c8f2f39a73a1bd38eb3cbb8f242060ad6d09d59"
+    },
+    {
+      "analysis_id": "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+      "evidence_sha256": "abe49e760d6e8eccd7b86acc9fcb8f4720aa9e750a8f8d2455faecbdd5dd3929",
+      "files": {
+        "chromatogram.svg": {
+          "path": "items/001/chromatogram.svg",
+          "sha256": "bab1a6c5a8b91109c4ed2bffff7d5210302326ce9316ad23a54774b4c9b4d679"
+        },
+        "evidence.json": {
+          "path": "items/001/evidence.json",
+          "sha256": "778ce5d7338248e9a594b7b652d2c5c4c73b6488edcea49629248134e3f97dd6"
+        },
+        "peaks.csv": {
+          "path": "items/001/peaks.csv",
+          "sha256": "25414810281593e767f6c605a7784930c9667cf95ba5150d96ee4b1a462d26f1"
+        },
+        "report.html": {
+          "path": "items/001/report.html",
+          "sha256": "f8198c2da2a318101d76087dc83b0d4d7dd343fa45c67bcd02dfc63db0f2859a"
+        },
+        "trace.csv": {
+          "path": "items/001/trace.csv",
+          "sha256": "0669cc6677618cd18e1aafe8e07661155999522a3018751ba6109c2ab9c89b24"
+        }
+      },
+      "ordinal": 1,
+      "peak_count": 0,
+      "point_count": 501,
+      "result_metadata": {
+        "installed_r_code_md5": {
+          "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+          "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+        },
+        "kind": "chromatogram",
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "packages": {
+          "measure": "0.0.1.9003",
+          "measure.sec": "0.0.0.9000",
+          "recipes": "1.3.1"
+        },
+        "peak_count": 0,
+        "r_version": "4.5.2",
+        "warnings": []
+      },
+      "result_metadata_sha256": "1308d838ffa1d600bd3f78e40fd3101534d7993bae682cd9befbb8011313cc7c",
+      "stored_result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363"
+    },
+    {
+      "analysis_id": "fdd3e18a-2371-4e0e-bdab-cc0b528d1c07",
+      "evidence_sha256": "3ebeaf0a1783f826f33983f202c4e9bcc6a8b9f520f6044541886d45a53f4f30",
+      "files": {
+        "chromatogram.svg": {
+          "path": "items/002/chromatogram.svg",
+          "sha256": "8ff2d058fa8d4a1d93e0ff3fe0fa663d4629a2a1c3dc609e6061a9308c726feb"
+        },
+        "evidence.json": {
+          "path": "items/002/evidence.json",
+          "sha256": "5907cccacd6bfcff56811ae2241f482ffe811aac1764e845d9222da79788348b"
+        },
+        "peaks.csv": {
+          "path": "items/002/peaks.csv",
+          "sha256": "dfc7f678cf63e22c894373e44b225de3e5544fbd2b6a56f5cf063043cf45532a"
+        },
+        "report.html": {
+          "path": "items/002/report.html",
+          "sha256": "0668d47888048473f3840b07768325afd8833f127cee00cc1c43ce4e8196d85c"
+        },
+        "trace.csv": {
+          "path": "items/002/trace.csv",
+          "sha256": "a4bf08d71f61a73427c0d05e20fd5efdb0b4e18c37725bc4ec6995884c585713"
+        }
+      },
+      "ordinal": 2,
+      "peak_count": 2,
+      "point_count": 501,
+      "result_metadata": {
+        "installed_r_code_md5": {
+          "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+          "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+        },
+        "kind": "chromatogram",
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "packages": {
+          "measure": "0.0.1.9003",
+          "measure.sec": "0.0.0.9000",
+          "recipes": "1.3.1"
+        },
+        "peak_count": 2,
+        "r_version": "4.5.2",
+        "warnings": []
+      },
+      "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+      "stored_result_sha256": "b6f339e21f9851ff798c9c94f97b73a0ee987e40d87ef68eb9993e3625399fb0"
+    },
+    {
+      "analysis_id": "8e677c52-057a-4329-a05d-2fb60803a0fd",
+      "evidence_sha256": "51ad9a227a6f5ad5bde0c6021ee952db4767f828ac80c10308c05c740fbfa086",
+      "files": {
+        "chromatogram.svg": {
+          "path": "items/003/chromatogram.svg",
+          "sha256": "94a462bda39e86fb43d5116d16dde60b9a26b703682936fad62ad82855deffbd"
+        },
+        "evidence.json": {
+          "path": "items/003/evidence.json",
+          "sha256": "ef37d350795cbd8356a59862bda01cdbda2c8d8ca0cefedd25ed49dbac5824f9"
+        },
+        "peaks.csv": {
+          "path": "items/003/peaks.csv",
+          "sha256": "daccfb946c83a3effcfb4025a80ef22280f0fa2c03919615afb8ca47cf57ccf7"
+        },
+        "report.html": {
+          "path": "items/003/report.html",
+          "sha256": "2141cc85c12f6c1222462ed73440d924e0628d61e60083b411d1b9343bc5129a"
+        },
+        "trace.csv": {
+          "path": "items/003/trace.csv",
+          "sha256": "64a57040f2709157bd56d428c7711c79aa44a513209bf64c9851f07aa4681f8d"
+        }
+      },
+      "ordinal": 3,
+      "peak_count": 2,
+      "point_count": 501,
+      "result_metadata": {
+        "installed_r_code_md5": {
+          "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+          "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+        },
+        "kind": "chromatogram",
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "packages": {
+          "measure": "0.0.1.9003",
+          "measure.sec": "0.0.0.9000",
+          "recipes": "1.3.1"
+        },
+        "peak_count": 2,
+        "r_version": "4.5.2",
+        "warnings": []
+      },
+      "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+      "stored_result_sha256": "0cfc2fb5afb175695f034fba292e0fb5e98e0b965abd2ac0bae4d49950e0b872"
+    }
+  ],
+  "run_records": {
+    "controlled_failure": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "created_at": "2026-11-07T16:33:05.769068+00:00",
+      "expected_revision": 4,
+      "items": [
+        {
+          "analysis_id": null,
+          "attempt_id": "87a6eaa7-0731-4b13-929c-823799dbfca5",
+          "attempt_no": 1,
+          "attempt_state": "failed",
+          "error": {
+            "code": "chromatogram_worker_error",
+            "exception_type": "ValueError",
+            "message": "The R analysis worker could not start or timed out",
+            "r_runtime_evidence": "unknown_until_success"
+          },
+          "evidence_sha256": null,
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:05.781851+00:00",
+          "item_id": "2002baa4-a1bf-48e5-b6a1-76e6c47ad440",
+          "item_state": "failed",
+          "lease_expires_at": "2026-11-07T16:35:35.769371+00:00",
+          "ordinal": 2,
+          "result": null,
+          "result_sha256": null,
+          "runtime": {
+            "runtime_status": "unknown"
+          },
+          "started_at": "2026-11-07T16:33:05.769068+00:00",
+          "state": "failed"
+        }
+      ],
+      "max_items": 1,
+      "request_key_sha256": "bb351228a267e590819959bb56db38851d387d74b15720b345c8f2d82c420516",
+      "request_sha256": "ef455470279202d045585c12cd0e9c2b7d9b90a078b8d9bb94d09243b9d166d0",
+      "run_id": "7a288e15-f5b5-4aca-b5b4-4daf81130ad9",
+      "selected_count": 1,
+      "status": "failed"
+    },
+    "first_success": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "created_at": "2026-11-07T16:33:03.437591+00:00",
+      "expected_revision": 1,
+      "items": [
+        {
+          "analysis_id": "9af15e67-7c5b-4c52-813c-cec40833615e",
+          "attempt_id": "5364ba5f-1151-4003-83d3-2fb47bb5c184",
+          "attempt_no": 1,
+          "attempt_state": "completed",
+          "error": null,
+          "evidence_sha256": "815a338d340d27f47210ede5c2f5e53427a0074d382ec7d8d289bf484b11e882",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:05.352875+00:00",
+          "item_id": "10491ec2-f4e5-40a0-bcf4-46f527105da5",
+          "item_state": "completed",
+          "lease_expires_at": "2026-11-07T16:35:33.437775+00:00",
+          "ordinal": 0,
+          "result": {
+            "analysis_id": "9af15e67-7c5b-4c52-813c-cec40833615e",
+            "artifact": true,
+            "created_at": "2026-11-07T16:33:05.343733+00:00",
+            "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+            "diagnostics": null,
+            "kind": "chromatogram",
+            "notes": [
+              "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+              "Peak area is detector response, not concentration or compound identity."
+            ],
+            "provenance": {
+              "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+              "installed_r_code_md5": {
+                "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+              },
+              "measure_revision": null,
+              "measure_sec_revision": null,
+              "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+              "packages": {
+                "measure": "0.0.1.9003",
+                "measure.sec": "0.0.0.9000",
+                "recipes": "1.3.1"
+              },
+              "r_version": "4.5.2",
+              "source_sha256": null,
+              "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+            },
+            "qualification": "experimental",
+            "status": "completed",
+            "summary": {
+              "peak_count": 2
+            },
+            "trace_id": "uv-254",
+            "warnings": []
+          },
+          "result_sha256": "95adf1656d965a36294c49b52c8f2f39a73a1bd38eb3cbb8f242060ad6d09d59",
+          "runtime": {
+            "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:03.437591+00:00",
+          "state": "completed"
+        },
+        {
+          "analysis_id": "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+          "attempt_id": "cb181368-3986-49c1-b04b-0a6f224041dc",
+          "attempt_no": 1,
+          "attempt_state": "completed",
+          "error": null,
+          "evidence_sha256": "abe49e760d6e8eccd7b86acc9fcb8f4720aa9e750a8f8d2455faecbdd5dd3929",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:05.075076+00:00",
+          "item_id": "ad33b751-54b3-472b-9d67-cb2c28bf5592",
+          "item_state": "completed",
+          "lease_expires_at": "2026-11-07T16:35:33.437968+00:00",
+          "ordinal": 1,
+          "result": {
+            "analysis_id": "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+            "artifact": true,
+            "created_at": "2026-11-07T16:33:05.063459+00:00",
+            "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+            "diagnostics": null,
+            "kind": "chromatogram",
+            "notes": [
+              "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+              "Peak area is detector response, not concentration or compound identity."
+            ],
+            "provenance": {
+              "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+              "installed_r_code_md5": {
+                "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+              },
+              "measure_revision": null,
+              "measure_sec_revision": null,
+              "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+              "packages": {
+                "measure": "0.0.1.9003",
+                "measure.sec": "0.0.0.9000",
+                "recipes": "1.3.1"
+              },
+              "r_version": "4.5.2",
+              "source_sha256": null,
+              "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+            },
+            "qualification": "experimental",
+            "status": "completed",
+            "summary": {
+              "peak_count": 0
+            },
+            "trace_id": "uv-254",
+            "warnings": []
+          },
+          "result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363",
+          "runtime": {
+            "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:03.437591+00:00",
+          "state": "completed"
+        }
+      ],
+      "max_items": 2,
+      "request_key_sha256": "66f348be127fdb9e22f1fa1d1f3693db777d957072ee561b104b28be4a59df01",
+      "request_sha256": "7188027be340f8bdd365f6f45e13559a5e450e164a1e450825aa554744f108d7",
+      "run_id": "2365031c-f778-4763-b028-c3c28ffbe3b0",
+      "selected_count": 2,
+      "status": "completed"
+    },
+    "replay_first_success_no_r": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "created_at": "2026-11-07T16:33:03.437591+00:00",
+      "expected_revision": 1,
+      "items": [
+        {
+          "analysis_id": "9af15e67-7c5b-4c52-813c-cec40833615e",
+          "attempt_id": "5364ba5f-1151-4003-83d3-2fb47bb5c184",
+          "attempt_no": 1,
+          "attempt_state": "completed",
+          "error": null,
+          "evidence_sha256": "815a338d340d27f47210ede5c2f5e53427a0074d382ec7d8d289bf484b11e882",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:05.352875+00:00",
+          "item_id": "10491ec2-f4e5-40a0-bcf4-46f527105da5",
+          "item_state": "completed",
+          "lease_expires_at": "2026-11-07T16:35:33.437775+00:00",
+          "ordinal": 0,
+          "result": {
+            "analysis_id": "9af15e67-7c5b-4c52-813c-cec40833615e",
+            "artifact": true,
+            "created_at": "2026-11-07T16:33:05.343733+00:00",
+            "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+            "diagnostics": null,
+            "kind": "chromatogram",
+            "notes": [
+              "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+              "Peak area is detector response, not concentration or compound identity."
+            ],
+            "provenance": {
+              "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+              "installed_r_code_md5": {
+                "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+              },
+              "measure_revision": null,
+              "measure_sec_revision": null,
+              "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+              "packages": {
+                "measure": "0.0.1.9003",
+                "measure.sec": "0.0.0.9000",
+                "recipes": "1.3.1"
+              },
+              "r_version": "4.5.2",
+              "source_sha256": null,
+              "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+            },
+            "qualification": "experimental",
+            "status": "completed",
+            "summary": {
+              "peak_count": 2
+            },
+            "trace_id": "uv-254",
+            "warnings": []
+          },
+          "result_sha256": "95adf1656d965a36294c49b52c8f2f39a73a1bd38eb3cbb8f242060ad6d09d59",
+          "runtime": {
+            "input_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:03.437591+00:00",
+          "state": "completed"
+        },
+        {
+          "analysis_id": "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+          "attempt_id": "cb181368-3986-49c1-b04b-0a6f224041dc",
+          "attempt_no": 1,
+          "attempt_state": "completed",
+          "error": null,
+          "evidence_sha256": "abe49e760d6e8eccd7b86acc9fcb8f4720aa9e750a8f8d2455faecbdd5dd3929",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:05.075076+00:00",
+          "item_id": "ad33b751-54b3-472b-9d67-cb2c28bf5592",
+          "item_state": "completed",
+          "lease_expires_at": "2026-11-07T16:35:33.437968+00:00",
+          "ordinal": 1,
+          "result": {
+            "analysis_id": "a69adc08-1ca1-457e-a5ed-41b45a8d4103",
+            "artifact": true,
+            "created_at": "2026-11-07T16:33:05.063459+00:00",
+            "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+            "diagnostics": null,
+            "kind": "chromatogram",
+            "notes": [
+              "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+              "Peak area is detector response, not concentration or compound identity."
+            ],
+            "provenance": {
+              "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+              "installed_r_code_md5": {
+                "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+              },
+              "measure_revision": null,
+              "measure_sec_revision": null,
+              "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+              "packages": {
+                "measure": "0.0.1.9003",
+                "measure.sec": "0.0.0.9000",
+                "recipes": "1.3.1"
+              },
+              "r_version": "4.5.2",
+              "source_sha256": null,
+              "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+            },
+            "qualification": "experimental",
+            "status": "completed",
+            "summary": {
+              "peak_count": 0
+            },
+            "trace_id": "uv-254",
+            "warnings": []
+          },
+          "result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363",
+          "runtime": {
+            "input_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:03.437591+00:00",
+          "state": "completed"
+        }
+      ],
+      "max_items": 2,
+      "request_key_sha256": "66f348be127fdb9e22f1fa1d1f3693db777d957072ee561b104b28be4a59df01",
+      "request_sha256": "7188027be340f8bdd365f6f45e13559a5e450e164a1e450825aa554744f108d7",
+      "run_id": "2365031c-f778-4763-b028-c3c28ffbe3b0",
+      "selected_count": 2,
+      "status": "completed"
+    },
+    "replay_original_failure_no_r": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "created_at": "2026-11-07T16:33:05.769068+00:00",
+      "expected_revision": 4,
+      "items": [
+        {
+          "analysis_id": null,
+          "attempt_id": "87a6eaa7-0731-4b13-929c-823799dbfca5",
+          "attempt_no": 1,
+          "attempt_state": "failed",
+          "error": {
+            "code": "chromatogram_worker_error",
+            "exception_type": "ValueError",
+            "message": "The R analysis worker could not start or timed out",
+            "r_runtime_evidence": "unknown_until_success"
+          },
+          "evidence_sha256": null,
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:05.781851+00:00",
+          "item_id": "2002baa4-a1bf-48e5-b6a1-76e6c47ad440",
+          "item_state": "completed",
+          "lease_expires_at": "2026-11-07T16:35:35.769371+00:00",
+          "ordinal": 2,
+          "result": null,
+          "result_sha256": null,
+          "runtime": {
+            "runtime_status": "unknown"
+          },
+          "started_at": "2026-11-07T16:33:05.769068+00:00",
+          "state": "failed"
+        }
+      ],
+      "max_items": 1,
+      "request_key_sha256": "bb351228a267e590819959bb56db38851d387d74b15720b345c8f2d82c420516",
+      "request_sha256": "ef455470279202d045585c12cd0e9c2b7d9b90a078b8d9bb94d09243b9d166d0",
+      "run_id": "7a288e15-f5b5-4aca-b5b4-4daf81130ad9",
+      "selected_count": 1,
+      "status": "failed"
+    },
+    "retry_success": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "created_at": "2026-11-07T16:33:06.220573+00:00",
+      "expected_revision": 8,
+      "items": [
+        {
+          "analysis_id": "fdd3e18a-2371-4e0e-bdab-cc0b528d1c07",
+          "attempt_id": "98fb26b1-95f2-46ce-9fad-8c3f5f82035c",
+          "attempt_no": 2,
+          "attempt_state": "completed",
+          "error": null,
+          "evidence_sha256": "3ebeaf0a1783f826f33983f202c4e9bcc6a8b9f520f6044541886d45a53f4f30",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:08.140553+00:00",
+          "item_id": "2002baa4-a1bf-48e5-b6a1-76e6c47ad440",
+          "item_state": "completed",
+          "lease_expires_at": "2026-11-07T16:35:36.220878+00:00",
+          "ordinal": 2,
+          "result": {
+            "analysis_id": "fdd3e18a-2371-4e0e-bdab-cc0b528d1c07",
+            "artifact": true,
+            "created_at": "2026-11-07T16:33:08.131474+00:00",
+            "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+            "diagnostics": null,
+            "kind": "chromatogram",
+            "notes": [
+              "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+              "Peak area is detector response, not concentration or compound identity."
+            ],
+            "provenance": {
+              "input_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+              "installed_r_code_md5": {
+                "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+              },
+              "measure_revision": null,
+              "measure_sec_revision": null,
+              "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+              "packages": {
+                "measure": "0.0.1.9003",
+                "measure.sec": "0.0.0.9000",
+                "recipes": "1.3.1"
+              },
+              "r_version": "4.5.2",
+              "source_sha256": null,
+              "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+            },
+            "qualification": "experimental",
+            "status": "completed",
+            "summary": {
+              "peak_count": 2
+            },
+            "trace_id": "uv-254",
+            "warnings": []
+          },
+          "result_sha256": "b6f339e21f9851ff798c9c94f97b73a0ee987e40d87ef68eb9993e3625399fb0",
+          "runtime": {
+            "input_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:06.220573+00:00",
+          "state": "completed"
+        },
+        {
+          "analysis_id": "8e677c52-057a-4329-a05d-2fb60803a0fd",
+          "attempt_id": "4f8d2f01-31ed-4794-8d4c-6722794f1eb4",
+          "attempt_no": 1,
+          "attempt_state": "completed",
+          "error": null,
+          "evidence_sha256": "51ad9a227a6f5ad5bde0c6021ee952db4767f828ac80c10308c05c740fbfa086",
+          "execution_context": {
+            "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+            "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+            "processing_profile": "measure-chromatogram/1",
+            "r_runtime_evidence": "unknown_until_success",
+            "service_version": "0.1.0.dev0",
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "finished_at": "2026-11-07T16:33:08.019383+00:00",
+          "item_id": "5b922af4-28b2-4f5b-8844-14e69da58e98",
+          "item_state": "completed",
+          "lease_expires_at": "2026-11-07T16:35:36.221090+00:00",
+          "ordinal": 3,
+          "result": {
+            "analysis_id": "8e677c52-057a-4329-a05d-2fb60803a0fd",
+            "artifact": true,
+            "created_at": "2026-11-07T16:33:08.005150+00:00",
+            "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+            "diagnostics": null,
+            "kind": "chromatogram",
+            "notes": [
+              "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+              "Peak area is detector response, not concentration or compound identity."
+            ],
+            "provenance": {
+              "input_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+              "installed_r_code_md5": {
+                "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+              },
+              "measure_revision": null,
+              "measure_sec_revision": null,
+              "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+              "packages": {
+                "measure": "0.0.1.9003",
+                "measure.sec": "0.0.0.9000",
+                "recipes": "1.3.1"
+              },
+              "r_version": "4.5.2",
+              "source_sha256": null,
+              "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+            },
+            "qualification": "experimental",
+            "status": "completed",
+            "summary": {
+              "peak_count": 2
+            },
+            "trace_id": "uv-254",
+            "warnings": []
+          },
+          "result_sha256": "0cfc2fb5afb175695f034fba292e0fb5e98e0b965abd2ac0bae4d49950e0b872",
+          "runtime": {
+            "input_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+            "installed_r_code_md5": {
+              "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+              "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+            },
+            "measure_revision": null,
+            "measure_sec_revision": null,
+            "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+            "packages": {
+              "measure": "0.0.1.9003",
+              "measure.sec": "0.0.0.9000",
+              "recipes": "1.3.1"
+            },
+            "r_version": "4.5.2",
+            "source_sha256": null,
+            "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+          },
+          "started_at": "2026-11-07T16:33:06.220573+00:00",
+          "state": "completed"
+        }
+      ],
+      "max_items": 2,
+      "request_key_sha256": "9447971f2b293a347309a7a507db2048a42f410283b80d45f2bae44bbd731330",
+      "request_sha256": "37c3bfd77ca40ec8222448d115d372d232f3774bc156273519f6d8782e9418d1",
+      "run_id": "c73e994e-203c-4e48-a877-e3774cb65c7d",
+      "selected_count": 2,
+      "status": "completed"
+    }
+  },
+  "scope": "Synthetic UV traces only. Stored signal areas and peak rows are reported; no compound identity, concentration, purity, calibration or instrument claim is made.",
+  "snapshots": {
+    "after_cancel": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "cancel_requested": true,
+      "control_event_count": 1,
+      "counts": {
+        "cancelled": 1,
+        "completed": 2,
+        "failed": 1,
+        "interrupted": 0,
+        "pending": 0,
+        "running": 0
+      },
+      "created_at": "2026-11-07T16:33:03.421585+00:00",
+      "input_sha256": "fec0d3891b77f99a2e1324acd2d18561bc2cac4f2c552dcc631497889241625a",
+      "item_count": 4,
+      "manifest": {
+        "inputs": [
+          {
+            "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+            "dataset_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "dataset_title": "Synthetic reference UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 0,
+            "point_count": 501,
+            "role": "reference",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-reference",
+              "run_order": null,
+              "sample_id": "synthetic-reference",
+              "sample_type": "reference",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+            "dataset_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "dataset_title": "Synthetic blank UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 1,
+            "point_count": 501,
+            "role": "blank",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-blank",
+              "run_order": null,
+              "sample_id": "synthetic-blank",
+              "sample_type": "blank",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+            "dataset_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+            "dataset_title": "Synthetic qc UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 2,
+            "point_count": 501,
+            "role": "qc",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-qc",
+              "run_order": null,
+              "sample_id": "synthetic-qc",
+              "sample_type": "qc",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+            "dataset_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+            "dataset_title": "Synthetic unknown UV chromatogram",
+            "internal_standard_references": [
+              "caller-declared reference label"
+            ],
+            "ordinal": 3,
+            "point_count": 501,
+            "role": "unknown",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-unknown",
+              "run_order": null,
+              "sample_id": "synthetic-unknown",
+              "sample_type": "unknown",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          }
+        ],
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "schema_version": "1.0",
+        "title": "Synthetic four-trace resumable chromatogram batch"
+      },
+      "manifest_sha256": "ebcd687779e2426e65f573deff0466237fb2b9079f38526d57d1d2d5fde2fda2",
+      "method": {
+        "baseline": "als",
+        "baseline_lambda": 1000000.0,
+        "baseline_p": 0.01,
+        "integration_baseline": "local",
+        "min_distance": 0.0,
+        "min_height": 0.0,
+        "min_prominence": 0.3,
+        "smoothing": "gaussian",
+        "smoothing_sigma": 2.0
+      },
+      "point_count": 2004,
+      "profile": "measure-chromatogram-batch/1",
+      "revision": 7,
+      "schema_version": "1.0",
+      "status": "cancelled",
+      "title": "Synthetic four-trace resumable chromatogram batch",
+      "updated_at": "2026-11-07T16:33:05.801986+00:00"
+    },
+    "after_failure": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "cancel_requested": false,
+      "control_event_count": 0,
+      "counts": {
+        "cancelled": 0,
+        "completed": 2,
+        "failed": 1,
+        "interrupted": 0,
+        "pending": 1,
+        "running": 0
+      },
+      "created_at": "2026-11-07T16:33:03.421585+00:00",
+      "input_sha256": "fec0d3891b77f99a2e1324acd2d18561bc2cac4f2c552dcc631497889241625a",
+      "item_count": 4,
+      "manifest": {
+        "inputs": [
+          {
+            "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+            "dataset_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "dataset_title": "Synthetic reference UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 0,
+            "point_count": 501,
+            "role": "reference",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-reference",
+              "run_order": null,
+              "sample_id": "synthetic-reference",
+              "sample_type": "reference",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+            "dataset_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "dataset_title": "Synthetic blank UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 1,
+            "point_count": 501,
+            "role": "blank",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-blank",
+              "run_order": null,
+              "sample_id": "synthetic-blank",
+              "sample_type": "blank",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+            "dataset_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+            "dataset_title": "Synthetic qc UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 2,
+            "point_count": 501,
+            "role": "qc",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-qc",
+              "run_order": null,
+              "sample_id": "synthetic-qc",
+              "sample_type": "qc",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+            "dataset_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+            "dataset_title": "Synthetic unknown UV chromatogram",
+            "internal_standard_references": [
+              "caller-declared reference label"
+            ],
+            "ordinal": 3,
+            "point_count": 501,
+            "role": "unknown",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-unknown",
+              "run_order": null,
+              "sample_id": "synthetic-unknown",
+              "sample_type": "unknown",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          }
+        ],
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "schema_version": "1.0",
+        "title": "Synthetic four-trace resumable chromatogram batch"
+      },
+      "manifest_sha256": "ebcd687779e2426e65f573deff0466237fb2b9079f38526d57d1d2d5fde2fda2",
+      "method": {
+        "baseline": "als",
+        "baseline_lambda": 1000000.0,
+        "baseline_p": 0.01,
+        "integration_baseline": "local",
+        "min_distance": 0.0,
+        "min_height": 0.0,
+        "min_prominence": 0.3,
+        "smoothing": "gaussian",
+        "smoothing_sigma": 2.0
+      },
+      "point_count": 2004,
+      "profile": "measure-chromatogram-batch/1",
+      "revision": 6,
+      "schema_version": "1.0",
+      "status": "active",
+      "title": "Synthetic four-trace resumable chromatogram batch",
+      "updated_at": "2026-11-07T16:33:05.781851+00:00"
+    },
+    "after_first_run": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "cancel_requested": false,
+      "control_event_count": 0,
+      "counts": {
+        "cancelled": 0,
+        "completed": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 2,
+        "running": 0
+      },
+      "created_at": "2026-11-07T16:33:03.421585+00:00",
+      "input_sha256": "fec0d3891b77f99a2e1324acd2d18561bc2cac4f2c552dcc631497889241625a",
+      "item_count": 4,
+      "manifest": {
+        "inputs": [
+          {
+            "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+            "dataset_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "dataset_title": "Synthetic reference UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 0,
+            "point_count": 501,
+            "role": "reference",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-reference",
+              "run_order": null,
+              "sample_id": "synthetic-reference",
+              "sample_type": "reference",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+            "dataset_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "dataset_title": "Synthetic blank UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 1,
+            "point_count": 501,
+            "role": "blank",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-blank",
+              "run_order": null,
+              "sample_id": "synthetic-blank",
+              "sample_type": "blank",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+            "dataset_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+            "dataset_title": "Synthetic qc UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 2,
+            "point_count": 501,
+            "role": "qc",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-qc",
+              "run_order": null,
+              "sample_id": "synthetic-qc",
+              "sample_type": "qc",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+            "dataset_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+            "dataset_title": "Synthetic unknown UV chromatogram",
+            "internal_standard_references": [
+              "caller-declared reference label"
+            ],
+            "ordinal": 3,
+            "point_count": 501,
+            "role": "unknown",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-unknown",
+              "run_order": null,
+              "sample_id": "synthetic-unknown",
+              "sample_type": "unknown",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          }
+        ],
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "schema_version": "1.0",
+        "title": "Synthetic four-trace resumable chromatogram batch"
+      },
+      "manifest_sha256": "ebcd687779e2426e65f573deff0466237fb2b9079f38526d57d1d2d5fde2fda2",
+      "method": {
+        "baseline": "als",
+        "baseline_lambda": 1000000.0,
+        "baseline_p": 0.01,
+        "integration_baseline": "local",
+        "min_distance": 0.0,
+        "min_height": 0.0,
+        "min_prominence": 0.3,
+        "smoothing": "gaussian",
+        "smoothing_sigma": 2.0
+      },
+      "point_count": 2004,
+      "profile": "measure-chromatogram-batch/1",
+      "revision": 4,
+      "schema_version": "1.0",
+      "status": "active",
+      "title": "Synthetic four-trace resumable chromatogram batch",
+      "updated_at": "2026-11-07T16:33:05.352875+00:00"
+    },
+    "after_retry_run": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "cancel_requested": false,
+      "control_event_count": 2,
+      "counts": {
+        "cancelled": 0,
+        "completed": 4,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 0,
+        "running": 0
+      },
+      "created_at": "2026-11-07T16:33:03.421585+00:00",
+      "input_sha256": "fec0d3891b77f99a2e1324acd2d18561bc2cac4f2c552dcc631497889241625a",
+      "item_count": 4,
+      "manifest": {
+        "inputs": [
+          {
+            "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+            "dataset_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "dataset_title": "Synthetic reference UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 0,
+            "point_count": 501,
+            "role": "reference",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-reference",
+              "run_order": null,
+              "sample_id": "synthetic-reference",
+              "sample_type": "reference",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+            "dataset_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "dataset_title": "Synthetic blank UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 1,
+            "point_count": 501,
+            "role": "blank",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-blank",
+              "run_order": null,
+              "sample_id": "synthetic-blank",
+              "sample_type": "blank",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+            "dataset_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+            "dataset_title": "Synthetic qc UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 2,
+            "point_count": 501,
+            "role": "qc",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-qc",
+              "run_order": null,
+              "sample_id": "synthetic-qc",
+              "sample_type": "qc",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+            "dataset_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+            "dataset_title": "Synthetic unknown UV chromatogram",
+            "internal_standard_references": [
+              "caller-declared reference label"
+            ],
+            "ordinal": 3,
+            "point_count": 501,
+            "role": "unknown",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-unknown",
+              "run_order": null,
+              "sample_id": "synthetic-unknown",
+              "sample_type": "unknown",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          }
+        ],
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "schema_version": "1.0",
+        "title": "Synthetic four-trace resumable chromatogram batch"
+      },
+      "manifest_sha256": "ebcd687779e2426e65f573deff0466237fb2b9079f38526d57d1d2d5fde2fda2",
+      "method": {
+        "baseline": "als",
+        "baseline_lambda": 1000000.0,
+        "baseline_p": 0.01,
+        "integration_baseline": "local",
+        "min_distance": 0.0,
+        "min_height": 0.0,
+        "min_prominence": 0.3,
+        "smoothing": "gaussian",
+        "smoothing_sigma": 2.0
+      },
+      "point_count": 2004,
+      "profile": "measure-chromatogram-batch/1",
+      "revision": 11,
+      "schema_version": "1.0",
+      "status": "completed",
+      "title": "Synthetic four-trace resumable chromatogram batch",
+      "updated_at": "2026-11-07T16:33:08.140553+00:00"
+    },
+    "after_retry_selection": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "cancel_requested": false,
+      "control_event_count": 2,
+      "counts": {
+        "cancelled": 0,
+        "completed": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 2,
+        "running": 0
+      },
+      "created_at": "2026-11-07T16:33:03.421585+00:00",
+      "input_sha256": "fec0d3891b77f99a2e1324acd2d18561bc2cac4f2c552dcc631497889241625a",
+      "item_count": 4,
+      "manifest": {
+        "inputs": [
+          {
+            "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+            "dataset_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "dataset_title": "Synthetic reference UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 0,
+            "point_count": 501,
+            "role": "reference",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-reference",
+              "run_order": null,
+              "sample_id": "synthetic-reference",
+              "sample_type": "reference",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+            "dataset_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "dataset_title": "Synthetic blank UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 1,
+            "point_count": 501,
+            "role": "blank",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-blank",
+              "run_order": null,
+              "sample_id": "synthetic-blank",
+              "sample_type": "blank",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+            "dataset_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+            "dataset_title": "Synthetic qc UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 2,
+            "point_count": 501,
+            "role": "qc",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-qc",
+              "run_order": null,
+              "sample_id": "synthetic-qc",
+              "sample_type": "qc",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+            "dataset_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+            "dataset_title": "Synthetic unknown UV chromatogram",
+            "internal_standard_references": [
+              "caller-declared reference label"
+            ],
+            "ordinal": 3,
+            "point_count": 501,
+            "role": "unknown",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-unknown",
+              "run_order": null,
+              "sample_id": "synthetic-unknown",
+              "sample_type": "unknown",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          }
+        ],
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "schema_version": "1.0",
+        "title": "Synthetic four-trace resumable chromatogram batch"
+      },
+      "manifest_sha256": "ebcd687779e2426e65f573deff0466237fb2b9079f38526d57d1d2d5fde2fda2",
+      "method": {
+        "baseline": "als",
+        "baseline_lambda": 1000000.0,
+        "baseline_p": 0.01,
+        "integration_baseline": "local",
+        "min_distance": 0.0,
+        "min_height": 0.0,
+        "min_prominence": 0.3,
+        "smoothing": "gaussian",
+        "smoothing_sigma": 2.0
+      },
+      "point_count": 2004,
+      "profile": "measure-chromatogram-batch/1",
+      "revision": 8,
+      "schema_version": "1.0",
+      "status": "active",
+      "title": "Synthetic four-trace resumable chromatogram batch",
+      "updated_at": "2026-11-07T16:33:05.812018+00:00"
+    },
+    "final": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "cancel_requested": false,
+      "control_event_count": 2,
+      "counts": {
+        "cancelled": 0,
+        "completed": 4,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 0,
+        "running": 0
+      },
+      "created_at": "2026-11-07T16:33:03.421585+00:00",
+      "input_sha256": "fec0d3891b77f99a2e1324acd2d18561bc2cac4f2c552dcc631497889241625a",
+      "item_count": 4,
+      "manifest": {
+        "inputs": [
+          {
+            "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+            "dataset_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "dataset_title": "Synthetic reference UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 0,
+            "point_count": 501,
+            "role": "reference",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-reference",
+              "run_order": null,
+              "sample_id": "synthetic-reference",
+              "sample_type": "reference",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+            "dataset_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "dataset_title": "Synthetic blank UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 1,
+            "point_count": 501,
+            "role": "blank",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-blank",
+              "run_order": null,
+              "sample_id": "synthetic-blank",
+              "sample_type": "blank",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+            "dataset_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+            "dataset_title": "Synthetic qc UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 2,
+            "point_count": 501,
+            "role": "qc",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-qc",
+              "run_order": null,
+              "sample_id": "synthetic-qc",
+              "sample_type": "qc",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+            "dataset_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+            "dataset_title": "Synthetic unknown UV chromatogram",
+            "internal_standard_references": [
+              "caller-declared reference label"
+            ],
+            "ordinal": 3,
+            "point_count": 501,
+            "role": "unknown",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-unknown",
+              "run_order": null,
+              "sample_id": "synthetic-unknown",
+              "sample_type": "unknown",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          }
+        ],
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "schema_version": "1.0",
+        "title": "Synthetic four-trace resumable chromatogram batch"
+      },
+      "manifest_sha256": "ebcd687779e2426e65f573deff0466237fb2b9079f38526d57d1d2d5fde2fda2",
+      "method": {
+        "baseline": "als",
+        "baseline_lambda": 1000000.0,
+        "baseline_p": 0.01,
+        "integration_baseline": "local",
+        "min_distance": 0.0,
+        "min_height": 0.0,
+        "min_prominence": 0.3,
+        "smoothing": "gaussian",
+        "smoothing_sigma": 2.0
+      },
+      "point_count": 2004,
+      "profile": "measure-chromatogram-batch/1",
+      "revision": 11,
+      "schema_version": "1.0",
+      "status": "completed",
+      "title": "Synthetic four-trace resumable chromatogram batch",
+      "updated_at": "2026-11-07T16:33:08.140553+00:00"
+    },
+    "initial": {
+      "batch_id": "a470d739-88a8-4294-b162-125f68cf1293",
+      "cancel_requested": false,
+      "control_event_count": 0,
+      "counts": {
+        "cancelled": 0,
+        "completed": 0,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 4,
+        "running": 0
+      },
+      "created_at": "2026-11-07T16:33:03.421585+00:00",
+      "input_sha256": "fec0d3891b77f99a2e1324acd2d18561bc2cac4f2c552dcc631497889241625a",
+      "item_count": 4,
+      "manifest": {
+        "inputs": [
+          {
+            "dataset_id": "d87915ce-dd73-484b-86bc-649aa470227a",
+            "dataset_sha256": "7b5ea46c8d9355f22bef0457c3878438a28d7d72203bad49f9b53393340579cc",
+            "dataset_title": "Synthetic reference UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 0,
+            "point_count": 501,
+            "role": "reference",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-reference",
+              "run_order": null,
+              "sample_id": "synthetic-reference",
+              "sample_type": "reference",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "8f2ecf51-b432-4e6f-8a0e-dbb291f85341",
+            "dataset_sha256": "27341ef1a29d71e832b2b901daf97c1d6fbc037e4a4bb1207ab4709500a07887",
+            "dataset_title": "Synthetic blank UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 1,
+            "point_count": 501,
+            "role": "blank",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-blank",
+              "run_order": null,
+              "sample_id": "synthetic-blank",
+              "sample_type": "blank",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "c6c6ccad-7d3f-4d6e-875b-783b15cc68ed",
+            "dataset_sha256": "14e6076b4528b6ac986e1a5a6bba27837158c9df0501e77db237e75aab7c7c45",
+            "dataset_title": "Synthetic qc UV chromatogram",
+            "internal_standard_references": [],
+            "ordinal": 2,
+            "point_count": 501,
+            "role": "qc",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-qc",
+              "run_order": null,
+              "sample_id": "synthetic-qc",
+              "sample_type": "qc",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          },
+          {
+            "dataset_id": "6b3d2173-96cb-4e4e-b1d3-9ecb9355ba11",
+            "dataset_sha256": "4f988ed18deb4fbbeb1fcc5bcb86c0d00d30029bef86c87eab5f4991f5b62afe",
+            "dataset_title": "Synthetic unknown UV chromatogram",
+            "internal_standard_references": [
+              "caller-declared reference label"
+            ],
+            "ordinal": 3,
+            "point_count": 501,
+            "role": "unknown",
+            "source": null,
+            "source_sha256": null,
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": null,
+              "channel": "UV 254 nm",
+              "detector": "UV",
+              "injection_id": "injection-unknown",
+              "run_order": null,
+              "sample_id": "synthetic-unknown",
+              "sample_type": "unknown",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "uv-254"
+            },
+            "trace_id": "uv-254"
+          }
+        ],
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "schema_version": "1.0",
+        "title": "Synthetic four-trace resumable chromatogram batch"
+      },
+      "manifest_sha256": "ebcd687779e2426e65f573deff0466237fb2b9079f38526d57d1d2d5fde2fda2",
+      "method": {
+        "baseline": "als",
+        "baseline_lambda": 1000000.0,
+        "baseline_p": 0.01,
+        "integration_baseline": "local",
+        "min_distance": 0.0,
+        "min_height": 0.0,
+        "min_prominence": 0.3,
+        "smoothing": "gaussian",
+        "smoothing_sigma": 2.0
+      },
+      "point_count": 2004,
+      "profile": "measure-chromatogram-batch/1",
+      "revision": 1,
+      "schema_version": "1.0",
+      "status": "active",
+      "title": "Synthetic four-trace resumable chromatogram batch",
+      "updated_at": "2026-11-07T16:33:03.421585+00:00"
+    }
+  },
+  "tables": {
+    "attempts.csv": {
+      "row_count": 5,
+      "sha256": "09ccdc25c3ea72eb761383e69742a303bd82f2968b9862ee23d9beb382bc5ee1"
+    },
+    "control-events.csv": {
+      "row_count": 2,
+      "sha256": "64646bdd1390a4863e9ffbe42d31669897637ecc36455cacda7098b614bf59ef"
+    },
+    "control-items.csv": {
+      "row_count": 3,
+      "sha256": "09bf963332acbf29276835d2b346bf5240e94989ef1d91bc45763acf25e9ca33"
+    },
+    "items.csv": {
+      "row_count": 4,
+      "sha256": "3536f3611248142ea0bc8d0257eb7efd44edb1ed95ec35e17c2bc098ceb5080c"
+    }
+  },
+  "transitions": [
+    {
+      "expected_revision": null,
+      "idempotency_key": "batch-example-create-v1",
+      "name": "create_batch"
+    },
+    {
+      "expected_revision": 1,
+      "idempotency_key": "batch-example-run-first-v1",
+      "max_items": 2,
+      "name": "first_success_run"
+    },
+    {
+      "expected_revision": 4,
+      "idempotency_key": "batch-example-run-failure-v1",
+      "max_items": 1,
+      "name": "controlled_failure_run"
+    },
+    {
+      "expected_revision": 6,
+      "idempotency_key": "batch-example-cancel-v1",
+      "name": "cancel_pending_fourth"
+    },
+    {
+      "expected_revision": 7,
+      "idempotency_key": "batch-example-retry-2-3-v1",
+      "name": "retry_selected_ordinals",
+      "ordinals": [
+        2,
+        3
+      ]
+    },
+    {
+      "expected_revision": 8,
+      "idempotency_key": "batch-example-run-retry-v1",
+      "max_items": 2,
+      "name": "retry_success_run"
+    },
+    {
+      "expected_revision": 1,
+      "idempotency_key": "batch-example-run-first-v1",
+      "name": "replay_first_success_without_r",
+      "replay": true
+    },
+    {
+      "expected_revision": 4,
+      "idempotency_key": "batch-example-run-failure-v1",
+      "name": "replay_original_failure_without_r",
+      "replay": true
+    }
+  ]
+}
