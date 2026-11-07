@@ -81,6 +81,10 @@ multi-node service replicas are not supported by the current design.
 
 Application payload limits bound accepted traces and registry records. They do
 not replace an upstream HTTP body limit, rate limit or storage quota. Quotas,
-resource scheduling, audit-log export, authenticated asset ingestion and
-multi-node persistence remain deployment work. Numerical calls run inline;
-there is no cancellation API, durable job state or physical execution control.
+host-wide resource scheduling, audit-log export, authenticated asset ingestion
+and multi-node persistence remain deployment work. Numerical calls run inline
+with at most two R workers per service process. Analytical batches retain
+durable item/run attempts with explicit recovery and pending-item cancellation;
+there is no detached execution queue or physical execution control. See
+[batch execution limits](chromatogram-batches.md). Additional processes and
+orphaned children after a crash are outside that process-local bound.
