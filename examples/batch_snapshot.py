@@ -887,7 +887,10 @@ async def _workflow(
                     "qualification claims."
                 ),
                 "historical_imports": historical_imports,
-                "fresh_reexecution": fresh_reports,
+                "fresh_reexecution": [
+                    {"analysis_id": report["analysis_id"], "report": report}
+                    for report in fresh_reports
+                ],
             }
         ),
     )
