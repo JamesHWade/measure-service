@@ -7,6 +7,47 @@ as `measurement_analyze_chromatogram`. Successful results remain ordinary
 analyses: read their evidence and export reports with the
 [chromatogram evidence client](chromatogram-evidence.md).
 
+## Try the restart and retry example
+
+From an installed service environment with compatible R backends, run:
+
+```sh
+python examples/chromatogram_batch.py \
+  --output-dir /tmp/chromatogram-batch-report \
+  --data-dir /tmp/chromatogram-batch-store
+```
+
+Both paths must be new. The optional `--data-dir` retains a new local store;
+omitting it uses a temporary store. The example never opens an existing store.
+It respects `MEASURE_MCP_R` and the caller's R library configuration.
+
+Four synthetic 501-point UV traces have explicit reference, blank, QC and
+unknown roles. Two complete, a third deliberately fails with an unavailable R
+executable, and the fourth is cancelled while pending. After selected retry,
+all four complete. Process restarts separate those stages. Replaying the
+original success and failure requests with R unavailable performs no new work;
+the first two analysis IDs remain fixed and the original failed run stays
+failed. Cancellation remains visible in retained control history.
+
+Open `summary.html` for links to four evidence reports. `workflow_receipt.json`
+retains the transitions, bounded public reads and report hashes. Four CSV tables
+support analysis without flattening distinct grains:
+
+| Table | One row represents | Constructed example rows |
+| --- | --- | --- |
+| `items.csv` | Selected input, metadata, current state and retained result | 4 |
+| `attempts.csv` | Actual numerical execution attempt | 5 |
+| `control-events.csv` | Cancellation or selected-retry event | 2 |
+| `control-items.csv` | One item affected by a control event | 3 |
+
+The deliberate failed attempt has unknown R runtime evidence; blank CSV runtime
+cells mean unavailable, while the blank trace's zero detected peaks remains
+numeric zero. CSV exports escape spreadsheet formula prefixes and control
+characters in text; JSON retains original values. This example exercises local
+stdio MCP restarts and retained outcomes. It does not simulate instrument
+acquisition or prove physical method performance. Explicit expired-claim
+recovery is covered separately by the public subprocess crash contract test.
+
 Batch declarations, progress and attempt history are available without R.
 Executing a pending item requires compatible `measure` and `recipes`
 backends (`measure.sec` is required for SEC tools). This workflow performs numerical processing of existing traces;
