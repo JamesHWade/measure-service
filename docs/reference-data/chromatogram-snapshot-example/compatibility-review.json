@@ -1,0 +1,281 @@
+{
+  "status": "accepted_bounded_postfix_review",
+  "reviewed_at_utc": "2026-11-07T20:58:37.018707+00:00",
+  "scope": [
+    "Dataset-scoped grain validation repair",
+    "Restored input ordering by validated ordinal",
+    "Combined cross-dataset and reordered archive cases",
+    "Read-only compatibility of retained execution using copies and current public MCP with R unavailable"
+  ],
+  "heads": {
+    "format": "7ba9727312f211873ed7a746f25979391ca743eb",
+    "archive": "7800d8cddae876c60cc5394794348d4f0bf9b3af",
+    "public": "d7ffc60506e4be7ce38f5a968c4192cb42422908",
+    "reproduction": "ef8ae91a72d6f0aec45cb2da68df6403a6dd1d6a"
+  },
+  "original_execution_head": "9d365268618cda45fa7ffccf9a8bbefc5bfa24a1",
+  "original_execution_wheel_sha256": "87afcefa02d382211f8f677399e00529607025797c96fe0afc61b3311e2e2d03",
+  "validation_wheel_sha256": "64379871ddf18895a81821a162329b96aefb271a5a15267857b1785efdd1053b",
+  "all_69_installed_package_members_match_wheel_and_commit": true,
+  "source_sha256": {
+    "batch_snapshot": "f8fa60db2ce62d0fbdc6956d0016f241bfbedb988841a485b87dbef99f67e60d",
+    "batch_restore": "d6bc476f82b2123197d6017623f24f8c2282938190185b44027347794bcf61c4",
+    "batch_bundle": "8fcf1cf061c0d2f6cbd12e1e42c88b1aeddf12c72103c7de22142fc2c97bac07",
+    "batch_capture": "597f8424eeaba16136032994a296bfff86ebd9f9ecdb08b61ac498834670707b",
+    "batch_exports": "7d2ace368188d92971ba5c003d1f12fe1a652026aed72d3a825c7b026a0051fc",
+    "batch_snapshot_client": "00f51105c62930338152cdfb3cc58d8ed9c9a4895ff454fea730077114bd6c69",
+    "import_origins": "1245b94fe01a1187ca7e4ec69c99d5646894f56cf37c9fe660ab8b732a2bccbd",
+    "storage": "ffa81a86ac7f2fa2a4af5d91bb955ba2144f0114cb1f5db0cee5027bc511ae55",
+    "batches": "8ae7ab9aab6b432e7108fd6a47b78e92557532565e55cc0195bb34b75298c632",
+    "server": "f388a341d3ba3225ccec5832dfc0ecbac6903833937c69e27b713557357550d7"
+  },
+  "permanent_test_sha256": {
+    "tests/test_batch_snapshot_dataset_grain.py": "322ec1b60e9b4e4004afdf113c75bd4b18ee8bfcc69cfc18baf5d7ab775264f7",
+    "tests/test_batch_restore.py": "48289be35ec6afda4a86f872d89ff231fb1b387a1e44bd6e1c7a27a2437b5c14"
+  },
+  "checks": {
+    "independent_passed": 25,
+    "independent_total": 25,
+    "permanent_regressions_passed": 3,
+    "permanent_regressions_seconds": 0.63,
+    "details": [
+      {
+        "probe": "distinct_dataset_same_grain_accepted",
+        "passed": true,
+        "mode": "references",
+        "dataset_count": 3,
+        "trace_id": "same-trace",
+        "snapshot_sha256": "1d4eef73cb9738b4f841235386a44bf9840fbbf0124d08f725cc806a98f769e5"
+      },
+      {
+        "probe": "distinct_dataset_same_grain_accepted",
+        "passed": true,
+        "mode": "self_contained",
+        "dataset_count": 3,
+        "trace_id": "same-trace",
+        "snapshot_sha256": "e1db8d242a886aa3b9753ae4fd774a4b84d0fcd5e4601783fd240cf89fbafc3c"
+      },
+      {
+        "probe": "same_dataset_duplicate_selection_rejected",
+        "passed": true
+      },
+      {
+        "probe": "combined_cross_dataset_reordered_restore",
+        "passed": true,
+        "permutation": [
+          0,
+          1,
+          2
+        ],
+        "mapping_order_preserved": true,
+        "exact_archive_preserved": true,
+        "first_claim_ordinal": 0,
+        "archive_sha256": "57b0ccd2c04cee4aab8eef18785d5492d79bbb66da6298be503d1cc7ae63aba9"
+      },
+      {
+        "probe": "combined_cross_dataset_reordered_restore",
+        "passed": true,
+        "permutation": [
+          0,
+          2,
+          1
+        ],
+        "mapping_order_preserved": true,
+        "exact_archive_preserved": true,
+        "first_claim_ordinal": 0,
+        "archive_sha256": "de2d6ad8a11d7011cd32be2429bd1d21ec8aa8c7a01e2431f058271de73f84aa"
+      },
+      {
+        "probe": "combined_cross_dataset_reordered_restore",
+        "passed": true,
+        "permutation": [
+          1,
+          0,
+          2
+        ],
+        "mapping_order_preserved": true,
+        "exact_archive_preserved": true,
+        "first_claim_ordinal": 0,
+        "archive_sha256": "e15c451ec7052131433892bfc86d575c211d47353ed1a45fa9357be1b8883230"
+      },
+      {
+        "probe": "combined_cross_dataset_reordered_restore",
+        "passed": true,
+        "permutation": [
+          1,
+          2,
+          0
+        ],
+        "mapping_order_preserved": true,
+        "exact_archive_preserved": true,
+        "first_claim_ordinal": 0,
+        "archive_sha256": "064d296d09c77632f59c4fbc7f353b2c037c3ec1875580da1777315b7be1bca4"
+      },
+      {
+        "probe": "combined_cross_dataset_reordered_restore",
+        "passed": true,
+        "permutation": [
+          2,
+          0,
+          1
+        ],
+        "mapping_order_preserved": true,
+        "exact_archive_preserved": true,
+        "first_claim_ordinal": 0,
+        "archive_sha256": "f3c3cc63d7289a9412dd99ed830ad8190659ceb7593d4e5e4679e79e243cbc28"
+      },
+      {
+        "probe": "combined_cross_dataset_reordered_restore",
+        "passed": true,
+        "permutation": [
+          2,
+          1,
+          0
+        ],
+        "mapping_order_preserved": true,
+        "exact_archive_preserved": true,
+        "first_claim_ordinal": 0,
+        "archive_sha256": "b5c38da388d67720c5777038a5f56192061d66ece9e788c7436dde1231f44615"
+      },
+      {
+        "probe": "retained_source_capture_body_unchanged",
+        "passed": true,
+        "mode": "self_contained",
+        "original_capture_time": "2026-11-07T20:33:55.630724+00:00",
+        "current_capture_time": "2026-11-07T20:56:55.794171+00:00",
+        "body_sha256": "3fc6ea51642cad76997fed08b736a73e77888a0a4589c7e5446fbf36670e82db",
+        "current_snapshot_sha256": "d760ebf761d2b7e2c35a2b6be1f1842215f490d428cd60c6d08bba2ac1fc9a0a"
+      },
+      {
+        "probe": "retained_source_capture_body_unchanged",
+        "passed": true,
+        "mode": "references",
+        "original_capture_time": "2026-11-07T20:33:55.583285+00:00",
+        "current_capture_time": "2026-11-07T20:56:55.985772+00:00",
+        "body_sha256": "f461e969d66e12b1b157a510a981c046ccbfffcb71a67d0a1200848f44975528",
+        "current_snapshot_sha256": "547eb6f3aca20b4ff854071e37ab7baa7620def1e035fa182c2f85971e6686c9"
+      },
+      {
+        "probe": "retained_source_text_unchanged",
+        "passed": true,
+        "characters": 41412,
+        "source_utf8_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+        "pages": 42,
+        "mapping_kind_digest_checked_every_page": true
+      },
+      {
+        "probe": "retained_original_analysis_read",
+        "passed": true,
+        "analysis_id": "69d95502-e893-4fc6-8dac-2b60ceae2f59"
+      },
+      {
+        "probe": "retained_original_analysis_read",
+        "passed": true,
+        "analysis_id": "949dc664-7081-464f-ab81-f903b7d26d75"
+      },
+      {
+        "probe": "retained_public_import_receipt_exact",
+        "passed": true,
+        "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f"
+      },
+      {
+        "probe": "retained_restored_analysis_exact",
+        "passed": true,
+        "analysis_id": "4b145a8e-6fa9-4907-95b6-a72247147507",
+        "historical": true,
+        "analysis_sha256": "527af1316ba259bae749449018a24da379a135237e4324f0f3645611ba0ebca2"
+      },
+      {
+        "probe": "retained_restored_analysis_exact",
+        "passed": true,
+        "analysis_id": "176a80b1-cf7e-4a17-b63f-755b28231d50",
+        "historical": true,
+        "analysis_sha256": "8d1fe76ddd712c2514e43cb2c1e351442a1f02173d2f3bffbe6f83522fb6ad7e"
+      },
+      {
+        "probe": "retained_restored_analysis_exact",
+        "passed": true,
+        "analysis_id": "124a32e7-70b9-4793-af8a-f8c56909200a",
+        "historical": false,
+        "analysis_sha256": "0706b35a9afd41ac32a2dc0b2d12e999a8d75820e1e91ed0ee5ec4c96bd9fa0d"
+      },
+      {
+        "probe": "retained_restored_analysis_exact",
+        "passed": true,
+        "analysis_id": "e06edd2e-6b8f-40b6-8d13-f9250a6d4312",
+        "historical": false,
+        "analysis_sha256": "54e96e325e0ee211bd53b242619b2ab697e2b27099162492fd8525601228210e"
+      },
+      {
+        "probe": "retained_restored_analysis_exact",
+        "passed": true,
+        "analysis_id": "cf59afaa-b9e4-405f-9c59-b226f0a58a82",
+        "historical": false,
+        "analysis_sha256": "117cc27af42c7173743ed6eab922bb8b8f68b423b5497ef58eecf062b23c9af1"
+      },
+      {
+        "probe": "retained_restored_analysis_exact",
+        "passed": true,
+        "analysis_id": "3b02df0d-6bdb-48f9-a70e-ac41f13f9a88",
+        "historical": false,
+        "analysis_sha256": "514640f6cf6b3681732b52678aeb33a21ed0b1991fa09c11b44e25b0cb5e28c9"
+      },
+      {
+        "probe": "retained_and_copy_store_bytes_unchanged",
+        "passed": true,
+        "copied_databases_before": {
+          "source-store": "0b6c11b2e2dc168df84f6c8200f6a4cb29ea31276a61c3b541773b10868531b8",
+          "restored-store": "9bd45ccb0752934882347d34cb6a7057a1ba49e9cb9874206a62262398617572"
+        },
+        "copied_databases_after": {
+          "source-store": "0b6c11b2e2dc168df84f6c8200f6a4cb29ea31276a61c3b541773b10868531b8",
+          "restored-store": "9bd45ccb0752934882347d34cb6a7057a1ba49e9cb9874206a62262398617572"
+        },
+        "retained_files_sha256": {
+          "/tmp/measure-snapshots-delivery-run-20261107/source-store/measure.sqlite3": "0b6c11b2e2dc168df84f6c8200f6a4cb29ea31276a61c3b541773b10868531b8",
+          "/tmp/measure-snapshots-delivery-run-20261107/restored-store/source-snapshot.zip": "bcd9e2ea269638c2e5697afd0eba02ec39df891809bb9453004a4fa14155fb19",
+          "/tmp/measure-snapshots-delivery-run-20261107/restored-store/restore-receipt.json": "13f6f0ab054da4b4cc4ef7d6a924edbf9bf54f96ced2291d3aab5678b4c7792d",
+          "/tmp/measure-snapshots-delivery-run-20261107/restored-store/measure.sqlite3": "9bd45ccb0752934882347d34cb6a7057a1ba49e9cb9874206a62262398617572"
+        }
+      },
+      {
+        "probe": "dataset_writer_rejects_same_dataset_grain_across_distinct_trace_ids",
+        "passed": true
+      },
+      {
+        "probe": "codec_rejects_rehashed_same_dataset_grain",
+        "mode": "references",
+        "passed": true
+      },
+      {
+        "probe": "codec_rejects_rehashed_same_dataset_grain",
+        "mode": "self_contained",
+        "passed": true
+      }
+    ]
+  },
+  "artifacts_sha256": {
+    "/tmp/measure-snapshots-postfix-proof-v2-20261107.json": "5fa298d9b17540717bde2012e59fd15be25ac301a88700666ea5d94ce6cc49da",
+    "/tmp/measure-snapshots-postfix-negative-proof-v2-20261107.json": "66879f16ca005b876d50c98b584cc8cb6c983f57bd8d99ac08c9d81abc428d27",
+    "/tmp/measure-snapshots-postfix-installed-proof-20261107.json": "8e36f6d9bc5e35bc465a350cea1394978ffc2b20c2f1107662f8209f44227b9d",
+    "/tmp/measure-snapshots-postfix-focused-tests-20261107.log": "02c51daf251563f2396035faf75f57a87ac5258be4afd2deacc8a724b513d8b7",
+    "/tmp/measure-snapshots-postfix-probes-v2-20261107.py": "19d0575648cce2b7fbb661b73a8469508a0f32c9d4afa38eb8d691b2346124e7",
+    "/tmp/measure-snapshots-postfix-negative-probes-v2-20261107.py": "8a5e85baf46bbf1a099b1ac761303a0aadf67b885dd8607dfde7181ccda8e5fd",
+    "/tmp/measure-snapshots-postfix-probes-v2-20261107.log": "cad2e39f50b5183eb222dc46e96c22db544f2eb139450ba0bb4264cd939627b3",
+    "/tmp/measure-snapshots-postfix-negative-probes-v2-20261107.log": "66879f16ca005b876d50c98b584cc8cb6c983f57bd8d99ac08c9d81abc428d27"
+  },
+  "original_stores_opened_as_sqlite": false,
+  "normal_api_store_access": "New filesystem copies only; all original files and both copied databases hashed before/after and unchanged.",
+  "no_R_execution": true,
+  "findings": [],
+  "scope_limits": [
+    "This is compatibility validation at ef8ae91a; retained numerical execution remains 9d365268 and is not relabeled.",
+    "All 69 installed package files were independently compared with wheel and committed source, separate from the primary full installed test suite.",
+    "No production edits, original-store SQLite opens, old-runtime execution, new R execution, GitHub messages or delegation.",
+    "Uncommitted publication changes are excluded. Current-head CI, completed reviews, final installed-suite acceptance and protected merge are primary-owned gates."
+  ],
+  "harness_notes": [
+    "The extra same-dataset two-trace negative fixture was rejected at the Dataset constructor before reaching the registry; the final probe explicitly checks this boundary and separately rehashes a valid cross-dataset snapshot to exercise the codec duplicate-grain guard in both modes.",
+    "The first passing 22-case proof was preserved; v2 additionally verifies source kind, mapping, digest and character count on every public source-text page."
+  ]
+}

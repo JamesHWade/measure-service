@@ -1,0 +1,3 @@
+analysis_id,evidence_sha256,axis_unit,signal_unit,area_unit,peak_id,location,height,left_base,right_base,area,area_basis
+4b145a8e-6fa9-4907-95b6-a72247147507,23260a78ba863299a636f6175b2df5d6b889a97855b429ab341da873b80d50f5,min,mAU,mAU * min,1,1.5,1.948661681391768,0.88,2.68,0.8333994258655235,observed_signal
+4b145a8e-6fa9-4907-95b6-a72247147507,23260a78ba863299a636f6175b2df5d6b889a97855b429ab341da873b80d50f5,min,mAU,mAU * min,2,3.5,1.3409492096440296,2.68,4.27,0.7651966344485064,observed_signal

@@ -40,9 +40,22 @@ def db_path() -> Path:
 
 
 def connect() -> sqlite3.Connection:
-    con = sqlite3.connect(db_path(), timeout=30)
+    path = db_path()
+    if os.path.lexists(path.parent / "INCOMPLETE"):
+        raise ValueError("Store contains an incomplete analytical import; inspect it before use")
+    return _connect_at(path)
+
+
+def _connect_at(path: Path) -> sqlite3.Connection:
+    """Initialize a caller-selected local database without changing process configuration."""
+    con = sqlite3.connect(path, timeout=30)
     con.execute("PRAGMA foreign_keys=ON")
     try:
+        from .import_origins import validate_import_schema
+
+        # Optional imported evidence must fail closed before any unrelated DDL.
+        # Validation observes an absent component without creating it.
+        validate_import_schema(con)
         batch_schema_exists = validate_batch_schema(con)
     except BaseException:
         con.close()

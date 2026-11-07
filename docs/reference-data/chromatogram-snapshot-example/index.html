@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chromatogram batch snapshot publication</title>
+<style>
+:root { color-scheme: light; --paper: #fbf7ef; --ink: #152c3b; --muted: #5b6d73; --teal: #007f78; --teal-dark: #005c58; --gold: #b77a15; --line: #d9d3c8; --card: #fffdf8; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 system-ui, sans-serif; }
+a { color: var(--teal-dark); text-decoration-thickness: .1em; text-underline-offset: .15em; }
+a:hover { color: #003d3a; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #e1a62d; outline-offset: 3px; }
+main, header, footer { width: min(1160px, calc(100% - 2rem)); margin-inline: auto; }
+header { padding: 4.5rem 0 2.5rem; }
+.eyebrow { color: var(--teal-dark); font-size: .82rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+h1 { max-width: 900px; margin: .5rem 0 1rem; font-size: clamp(2.2rem, 5vw, 4.6rem); line-height: 1.03; letter-spacing: -.045em; }
+h2 { margin: 3.5rem 0 1rem; font-size: clamp(1.5rem, 2vw, 2.2rem); line-height: 1.1; }
+h3 { margin: 0; line-height: 1.2; }
+.lede { max-width: 760px; margin: 0; color: #314954; font-size: 1.2rem; }
+.scope { max-width: 760px; margin: 1.25rem 0 0; padding: .8rem 1rem; border-left: 4px solid var(--gold); background: #fff4dc; }
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 2rem 0 1rem; }
+.stat { min-height: 7.3rem; padding: 1.2rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--card); box-shadow: 0 8px 28px rgba(21,44,59,.06); }
+.stat dt { color: var(--muted); font-size: .88rem; }
+.stat dd { margin: .3rem 0 0; font-size: clamp(1.65rem, 3vw, 2.6rem); font-weight: 760; letter-spacing: -.04em; }
+.stat small { display: block; margin-top: .1rem; color: var(--muted); font-size: .86rem; }
+.support-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+.support { padding: 1.1rem 1.2rem; border-top: 3px solid var(--teal); background: rgba(255,253,248,.68); }
+.support strong { display: block; font-size: 1.2rem; }
+.support span { color: var(--muted); }
+.flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: .75rem; }
+.phase { padding: 1.3rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--card); }
+.phase-number { display: inline-grid; width: 2rem; height: 2rem; place-items: center; margin-bottom: .75rem; border-radius: 50%; background: var(--teal); color: white; font-weight: 800; }
+.phase p { margin: .55rem 0 0; color: var(--muted); }
+.flow-arrow { display: grid; place-items: center; color: var(--teal); font-size: 2rem; }
+.downloads { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
+.download { display: inline-block; padding: .65rem .9rem; border: 1px solid var(--teal); border-radius: 999px; background: #e6f3ef; font-weight: 700; }
+.table-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: .8rem; background: var(--card); }
+.table-scroll:focus { outline: 3px solid #e1a62d; outline-offset: 3px; }
+table { width: 100%; border-collapse: collapse; }
+caption { padding: .9rem 1rem; text-align: left; color: var(--muted); font-weight: 700; }
+th, td { padding: .7rem .8rem; border-top: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { font-weight: 750; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+code { overflow-wrap: anywhere; }
+.comparison-table { min-width: 58rem; }
+.comparison-table td code { font-size: .8rem; }
+.report-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.report-card { min-width: 0; padding: 1.25rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--card); box-shadow: 0 8px 28px rgba(21,44,59,.05); }
+.card-meta { margin: .45rem 0 1rem; color: var(--muted); font-size: .88rem; overflow-wrap: anywhere; }
+figure { margin: 0; }
+figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: white; }
+figcaption { margin-top: .5rem; color: var(--muted); font-size: .87rem; }
+.card-links { display: flex; flex-wrap: wrap; gap: .35rem .7rem; margin: 1rem 0 .7rem; font-size: .9rem; }
+.primary-link { font-weight: 750; }
+details { margin: 1rem 0; padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: .8rem; background: var(--card); }
+summary { cursor: pointer; font-weight: 750; }
+pre { max-width: 100%; overflow: auto; padding: 1rem; background: #f3eee4; color: #223944; font-size: .8rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.note { color: var(--muted); }
+footer { padding: 3rem 0 4rem; color: var(--muted); font-size: .9rem; }
+@media (max-width: 850px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } .support-grid { grid-template-columns: 1fr; } .flow { grid-template-columns: 1fr; } .flow-arrow { transform: rotate(90deg); min-height: 1.5rem; } .report-grid { grid-template-columns: 1fr; } }
+@media (max-width: 500px) { main, header, footer { width: min(100% - 1.25rem, 1160px); } header { padding-top: 2.5rem; } .stat-grid { gap: .65rem; } .stat { min-height: 6.5rem; padding: .9rem; } .stat dd { font-size: 1.55rem; } }
+</style>
+</head>
+<body>
+<header>
+  <p class="eyebrow">Portable chromatogram evidence · snapshot publication</p>
+  <h1>2 archived successes are matched to fresh R executions.</h1>
+  <p class="lede">The source batch retained 4 selected traces, 2 successful analyses, a controlled failed attempt, cancellation, and an explicit retry selection. A new store imported the historical results and then produced 4 fresh analyses.</p>
+  <p class="scope">Synthetic scalar LC workflow. Physical qualification and MoSeS reproduction remain open.</p>
+  <dl class="stat-grid"><div class="stat"><dt>Matched comparisons</dt><dd>2/2</dd><small>original successes compared</small></div><div class="stat"><dt>Checked values</dt><dd>5,038</dd><small>4,020 numeric · 1,018 categorical</small></div><div class="stat"><dt>Largest observed error</dt><dd>0 / 0</dd><small>absolute / relative; declared tolerances retained</small></div><div class="stat"><dt>Fresh analyses</dt><dd>4</dd><small>new-store R re-executions</small></div></dl>
+  <div class="support-grid">
+    <div class="support"><strong>Source: 2 completed / 2 pending</strong><span>3 retained attempts · 2 controls</span></div>
+    <div class="support"><strong>5 traces · 2,505 raw points</strong><span>4 selected traces · 2,004 selected points</span></div>
+    <div class="support"><strong>2 historical + 4 fresh</strong><span>Historical copies and fresh results retain separate identities.</span></div>
+  </div>
+</header>
+<main>
+  <section aria-labelledby="flow-heading">
+    <h2 id="flow-heading">Source → archive → new store</h2>
+    <div class="flow" aria-label="Three phase snapshot workflow">
+      <article class="phase"><span class="phase-number">1</span><h3>Source batch</h3><p>5 traces were imported; 4 were selected. The source was frozen at 2 completed and 2 pending.</p></article>
+      <div class="flow-arrow" aria-hidden="true">→</div>
+      <article class="phase"><span class="phase-number">2</span><h3>Portable archive</h3><p>Reference metadata and a self-contained result archive are retained as separate modes. The reference mode is not restorable.</p><div class="downloads"><a class="download" href="output/source-references.zip">Download references ZIP</a><a class="download" href="output/source-self-contained.zip">Download self-contained ZIP</a></div></article>
+      <div class="flow-arrow" aria-hidden="true">→</div>
+      <article class="phase"><span class="phase-number">3</span><h3>New store</h3><p>2 historical results were read without R; 4 fresh R analyses were then executed explicitly.</p></article>
+    </div>
+    <p class="note">The references ZIP contains metadata only and cannot be restored. The self-contained ZIP carries the dataset closure and stored results.</p>
+  </section>
+
+  <section aria-labelledby="comparison-heading">
+    <h2 id="comparison-heading">Declared comparison scope</h2>
+    <p>Only 2 of 4 fresh outcomes are compared: the 2 originally successful source traces. QC and unknown source items remain pending; no source outcome is reclassified. <span class="note">Receipt states: qc (pending), unknown (pending)</span></p>
+    <div class="table-scroll" role="region" aria-label="Matched chromatogram comparisons" tabindex="0">
+      <table class="comparison-table"><caption>Matched historical and fresh evidence</caption><thead><tr><th scope="col">Trace</th><th scope="col">Historical analysis</th><th scope="col">Fresh analysis</th><th scope="col">Points</th><th scope="col">Peaks</th><th scope="col">Max absolute error</th><th scope="col">Max relative error</th></tr></thead><tbody><tr><th scope="row">Reference</th><td><code>69d95502-e893-4fc6-8dac-2b60ceae2f59</code><br><a href="output/historical/000/report.html">historical report</a></td><td><code>124a32e7-70b9-4793-af8a-f8c56909200a</code><br><a href="output/fresh/000/report.html">fresh report</a></td><td>501</td><td>2</td><td>0</td><td>0</td></tr><tr><th scope="row">Blank</th><td><code>949dc664-7081-464f-ab81-f903b7d26d75</code><br><a href="output/historical/001/report.html">historical report</a></td><td><code>e06edd2e-6b8f-40b6-8d13-f9250a6d4312</code><br><a href="output/fresh/001/report.html">fresh report</a></td><td>501</td><td>0</td><td>0</td><td>0</td></tr></tbody></table>
+    </div>
+    <p class="note">Declared numerical tolerances are absolute 1e-10 and relative 1e-08. Trace identity, method, categorical fields, nulls, and structural identifiers are compared exactly. Backend versions are observations, not an equality gate.</p>
+  </section>
+
+  <section aria-labelledby="reports-heading">
+    <h2 id="reports-heading">6 retained report views</h2>
+    <p>Each card links directly to the unchanged report bytes, SVG preview, evidence JSON, and CSV exports. Historical cards are imported stored results; fresh cards are new-store R re-executions.</p>
+    <div class="report-grid"><article class="report-card"><h3>Historical import · Reference</h3><p class="card-meta">4b145a8e-6fa9-4907-95b6-a72247147507 · 501 points · 2 peaks</p><figure><a href="output/historical/000/chromatogram.svg"><img src="output/historical/000/chromatogram.svg" alt="Reference historical stored chromatogram trace" loading="lazy"></a><figcaption>Stored SVG preview; the report and raw evidence remain the source artifacts.</figcaption></figure><p class="card-links"><a href="output/historical/000/report.html">Open report</a> <a href="output/historical/000/chromatogram.svg">SVG</a> <a href="output/historical/000/evidence.json">Evidence JSON</a> <a href="output/historical/000/trace.csv">Trace CSV</a> <a href="output/historical/000/peaks.csv">Peaks CSV</a></p><p><a class="primary-link" href="output/historical/000/report.html">Read historical import report for Reference</a></p></article><article class="report-card"><h3>Historical import · Blank</h3><p class="card-meta">176a80b1-cf7e-4a17-b63f-755b28231d50 · 501 points · 0 peaks</p><figure><a href="output/historical/001/chromatogram.svg"><img src="output/historical/001/chromatogram.svg" alt="Blank historical stored chromatogram trace" loading="lazy"></a><figcaption>Stored SVG preview; the report and raw evidence remain the source artifacts.</figcaption></figure><p class="card-links"><a href="output/historical/001/report.html">Open report</a> <a href="output/historical/001/chromatogram.svg">SVG</a> <a href="output/historical/001/evidence.json">Evidence JSON</a> <a href="output/historical/001/trace.csv">Trace CSV</a> <a href="output/historical/001/peaks.csv">Peaks CSV</a></p><p><a class="primary-link" href="output/historical/001/report.html">Read historical import report for Blank</a></p></article><article class="report-card"><h3>Fresh R · Reference</h3><p class="card-meta">124a32e7-70b9-4793-af8a-f8c56909200a · 501 points · 2 peaks</p><figure><a href="output/fresh/000/chromatogram.svg"><img src="output/fresh/000/chromatogram.svg" alt="Reference fresh stored chromatogram trace" loading="lazy"></a><figcaption>Stored SVG preview; the report and raw evidence remain the source artifacts.</figcaption></figure><p class="card-links"><a href="output/fresh/000/report.html">Open report</a> <a href="output/fresh/000/chromatogram.svg">SVG</a> <a href="output/fresh/000/evidence.json">Evidence JSON</a> <a href="output/fresh/000/trace.csv">Trace CSV</a> <a href="output/fresh/000/peaks.csv">Peaks CSV</a></p><p><a class="primary-link" href="output/fresh/000/report.html">Read fresh r report for Reference</a></p></article><article class="report-card"><h3>Fresh R · Blank</h3><p class="card-meta">e06edd2e-6b8f-40b6-8d13-f9250a6d4312 · 501 points · 0 peaks</p><figure><a href="output/fresh/001/chromatogram.svg"><img src="output/fresh/001/chromatogram.svg" alt="Blank fresh stored chromatogram trace" loading="lazy"></a><figcaption>Stored SVG preview; the report and raw evidence remain the source artifacts.</figcaption></figure><p class="card-links"><a href="output/fresh/001/report.html">Open report</a> <a href="output/fresh/001/chromatogram.svg">SVG</a> <a href="output/fresh/001/evidence.json">Evidence JSON</a> <a href="output/fresh/001/trace.csv">Trace CSV</a> <a href="output/fresh/001/peaks.csv">Peaks CSV</a></p><p><a class="primary-link" href="output/fresh/001/report.html">Read fresh r report for Blank</a></p></article><article class="report-card"><h3>Fresh R · QC</h3><p class="card-meta">cf59afaa-b9e4-405f-9c59-b226f0a58a82 · 501 points · 2 peaks</p><figure><a href="output/fresh/002/chromatogram.svg"><img src="output/fresh/002/chromatogram.svg" alt="QC fresh stored chromatogram trace" loading="lazy"></a><figcaption>Stored SVG preview; the report and raw evidence remain the source artifacts.</figcaption></figure><p class="card-links"><a href="output/fresh/002/report.html">Open report</a> <a href="output/fresh/002/chromatogram.svg">SVG</a> <a href="output/fresh/002/evidence.json">Evidence JSON</a> <a href="output/fresh/002/trace.csv">Trace CSV</a> <a href="output/fresh/002/peaks.csv">Peaks CSV</a></p><p><a class="primary-link" href="output/fresh/002/report.html">Read fresh r report for QC</a></p></article><article class="report-card"><h3>Fresh R · Unknown</h3><p class="card-meta">3b02df0d-6bdb-48f9-a70e-ac41f13f9a88 · 501 points · 2 peaks</p><figure><a href="output/fresh/003/chromatogram.svg"><img src="output/fresh/003/chromatogram.svg" alt="Unknown fresh stored chromatogram trace" loading="lazy"></a><figcaption>Stored SVG preview; the report and raw evidence remain the source artifacts.</figcaption></figure><p class="card-links"><a href="output/fresh/003/report.html">Open report</a> <a href="output/fresh/003/chromatogram.svg">SVG</a> <a href="output/fresh/003/evidence.json">Evidence JSON</a> <a href="output/fresh/003/trace.csv">Trace CSV</a> <a href="output/fresh/003/peaks.csv">Peaks CSV</a></p><p><a class="primary-link" href="output/fresh/003/report.html">Read fresh r report for Unknown</a></p></article></div>
+  </section>
+
+  <section aria-labelledby="details-heading">
+    <h2 id="details-heading">Methods, trace identity, and reproduction</h2>
+    <details><summary>Exact method and selected trace identity</summary>
+      <p>Selected trace metadata and the frozen method are shown as recorded by the workflow receipt.</p>
+      <div class="table-scroll" role="region" aria-label="Selected trace identity" tabindex="0"><table><caption>Selected trace identities</caption><thead><tr><th scope="col">Label</th><th scope="col">Trace ID</th><th scope="col">Role</th><th scope="col">Sample type</th><th scope="col">Axis unit</th><th scope="col">Signal unit</th><th scope="col">Points</th></tr></thead><tbody><tr><th scope="row">Reference</th><td>reference</td><td>reference</td><td>reference</td><td>min</td><td>mAU</td><td>501</td></tr><tr><th scope="row">Blank</th><td>blank</td><td>blank</td><td>blank</td><td>min</td><td>mAU</td><td>501</td></tr><tr><th scope="row">QC</th><td>qc</td><td>qc</td><td>qc</td><td>min</td><td>mAU</td><td>501</td></tr><tr><th scope="row">Unknown</th><td>unknown</td><td>unknown</td><td>unknown</td><td>min</td><td>mAU</td><td>501</td></tr></tbody></table></div>
+      <h3>Frozen method JSON</h3><pre>{
+  &quot;baseline&quot;: &quot;als&quot;,
+  &quot;baseline_lambda&quot;: 1000000.0,
+  &quot;baseline_p&quot;: 0.01,
+  &quot;integration_baseline&quot;: &quot;local&quot;,
+  &quot;min_distance&quot;: 0.0,
+  &quot;min_height&quot;: 0.0,
+  &quot;min_prominence&quot;: 0.3,
+  &quot;smoothing&quot;: &quot;gaussian&quot;,
+  &quot;smoothing_sigma&quot;: 2.0
+}</pre>
+    </details>
+    <details><summary>Observed runtime provenance</summary>
+      <p>These are the exact source and fresh observations retained in the receipt. They document runtime context; they are not asserted equal across executions.</p>
+      <pre>[
+  {
+    &quot;comparison&quot;: 1,
+    &quot;equality_required&quot;: false,
+    &quot;fresh&quot;: {
+      &quot;provenance&quot;: {
+        &quot;input_sha256&quot;: &quot;a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c&quot;,
+        &quot;installed_r_code_md5&quot;: {
+          &quot;measure&quot;: &quot;9f7d9a7f04dca9e15c50ff3616f417f2&quot;,
+          &quot;measure.sec&quot;: &quot;57dd3e21b2b0d6cda6db6356c1582414&quot;
+        },
+        &quot;measure_revision&quot;: null,
+        &quot;measure_sec_revision&quot;: null,
+        &quot;method_sha256&quot;: &quot;6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e&quot;,
+        &quot;packages&quot;: {
+          &quot;measure&quot;: &quot;0.0.1.9003&quot;,
+          &quot;measure.sec&quot;: &quot;0.0.0.9000&quot;,
+          &quot;recipes&quot;: &quot;1.3.1&quot;
+        },
+        &quot;r_version&quot;: &quot;4.5.2&quot;,
+        &quot;source_sha256&quot;: &quot;4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804&quot;,
+        &quot;worker_sha256&quot;: &quot;63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca&quot;
+      },
+      &quot;result_fields&quot;: {
+        &quot;installed_r_code_md5&quot;: {
+          &quot;measure&quot;: &quot;9f7d9a7f04dca9e15c50ff3616f417f2&quot;,
+          &quot;measure.sec&quot;: &quot;57dd3e21b2b0d6cda6db6356c1582414&quot;
+        },
+        &quot;packages&quot;: {
+          &quot;measure&quot;: &quot;0.0.1.9003&quot;,
+          &quot;measure.sec&quot;: &quot;0.0.0.9000&quot;,
+          &quot;recipes&quot;: &quot;1.3.1&quot;
+        },
+        &quot;r_version&quot;: &quot;4.5.2&quot;
+      }
+    },
+    &quot;source&quot;: {
+      &quot;provenance&quot;: {
+        &quot;input_sha256&quot;: &quot;a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c&quot;,
+        &quot;installed_r_code_md5&quot;: {
+          &quot;measure&quot;: &quot;9f7d9a7f04dca9e15c50ff3616f417f2&quot;,
+          &quot;measure.sec&quot;: &quot;57dd3e21b2b0d6cda6db6356c1582414&quot;
+        },
+        &quot;measure_revision&quot;: null,
+        &quot;measure_sec_revision&quot;: null,
+        &quot;method_sha256&quot;: &quot;6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e&quot;,
+        &quot;packages&quot;: {
+          &quot;measure&quot;: &quot;0.0.1.9003&quot;,
+          &quot;measure.sec&quot;: &quot;0.0.0.9000&quot;,
+          &quot;recipes&quot;: &quot;1.3.1&quot;
+        },
+        &quot;r_version&quot;: &quot;4.5.2&quot;,
+        &quot;source_sha256&quot;: &quot;4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804&quot;,
+        &quot;worker_sha256&quot;: &quot;63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca&quot;
+      },
+      &quot;result_fields&quot;: {
+        &quot;installed_r_code_md5&quot;: {
+          &quot;measure&quot;: &quot;9f7d9a7f04dca9e15c50ff3616f417f2&quot;,
+          &quot;measure.sec&quot;: &quot;57dd3e21b2b0d6cda6db6356c1582414&quot;
+        },
+        &quot;packages&quot;: {
+          &quot;measure&quot;: &quot;0.0.1.9003&quot;,
+          &quot;measure.sec&quot;: &quot;0.0.0.9000&quot;,
+          &quot;recipes&quot;: &quot;1.3.1&quot;
+        },
+        &quot;r_version&quot;: &quot;4.5.2&quot;
+      }
+    }
+  },
+  {
+    &quot;comparison&quot;: 2,
+    &quot;equality_required&quot;: false,
+    &quot;fresh&quot;: {
+      &quot;provenance&quot;: {
+        &quot;input_sha256&quot;: &quot;a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c&quot;,
+        &quot;installed_r_code_md5&quot;: {
+          &quot;measure&quot;: &quot;9f7d9a7f04dca9e15c50ff3616f417f2&quot;,
+          &quot;measure.sec&quot;: &quot;57dd3e21b2b0d6cda6db6356c1582414&quot;
+        },
+        &quot;measure_revision&quot;: null,
+        &quot;measure_sec_revision&quot;: null,
+        &quot;method_sha256&quot;: &quot;6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e&quot;,
+        &quot;packages&quot;: {
+          &quot;measure&quot;: &quot;0.0.1.9003&quot;,
+          &quot;measure.sec&quot;: &quot;0.0.0.9000&quot;,
+          &quot;recipes&quot;: &quot;1.3.1&quot;
+        },
+        &quot;r_version&quot;: &quot;4.5.2&quot;,
+        &quot;source_sha256&quot;: &quot;4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804&quot;,
+        &quot;worker_sha256&quot;: &quot;63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca&quot;
+      },
+      &quot;result_fields&quot;: {
+        &quot;installed_r_code_md5&quot;: {
+          &quot;measure&quot;: &quot;9f7d9a7f04dca9e15c50ff3616f417f2&quot;,
+          &quot;measure.sec&quot;: &quot;57dd3e21b2b0d6cda6db6356c1582414&quot;
+        },
+        &quot;packages&quot;: {
+          &quot;measure&quot;: &quot;0.0.1.9003&quot;,
+          &quot;measure.sec&quot;: &quot;0.0.0.9000&quot;,
+          &quot;recipes&quot;: &quot;1.3.1&quot;
+        },
+        &quot;r_version&quot;: &quot;4.5.2&quot;
+      }
+    },
+    &quot;source&quot;: {
+      &quot;provenance&quot;: {
+        &quot;input_sha256&quot;: &quot;a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c&quot;,
+        &quot;installed_r_code_md5&quot;: {
+          &quot;measure&quot;: &quot;9f7d9a7f04dca9e15c50ff3616f417f2&quot;,
+          &quot;measure.sec&quot;: &quot;57dd3e21b2b0d6cda6db6356c1582414&quot;
+        },
+        &quot;measure_revision&quot;: null,
+        &quot;measure_sec_revision&quot;: null,
+        &quot;method_sha256&quot;: &quot;6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e&quot;,
+        &quot;packages&quot;: {
+          &quot;measure&quot;: &quot;0.0.1.9003&quot;,
+          &quot;measure.sec&quot;: &quot;0.0.0.9000&quot;,
+          &quot;recipes&quot;: &quot;1.3.1&quot;
+        },
+        &quot;r_version&quot;: &quot;4.5.2&quot;,
+        &quot;source_sha256&quot;: &quot;4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804&quot;,
+        &quot;worker_sha256&quot;: &quot;63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca&quot;
+      },
+      &quot;result_fields&quot;: {
+        &quot;installed_r_code_md5&quot;: {
+          &quot;measure&quot;: &quot;9f7d9a7f04dca9e15c50ff3616f417f2&quot;,
+          &quot;measure.sec&quot;: &quot;57dd3e21b2b0d6cda6db6356c1582414&quot;
+        },
+        &quot;packages&quot;: {
+          &quot;measure&quot;: &quot;0.0.1.9003&quot;,
+          &quot;measure.sec&quot;: &quot;0.0.0.9000&quot;,
+          &quot;recipes&quot;: &quot;1.3.1&quot;
+        },
+        &quot;r_version&quot;: &quot;4.5.2&quot;
+      }
+    }
+  }
+]</pre>
+    </details>
+    <details><summary>Scope of the retained run</summary><p>Synthetic chromatogram evidence only; stored results are retained and compared without optimization, identity, purity, concentration, calibration, or instrument qualification claims.</p></details>
+    <details><summary>Reproduction instructions</summary>
+      <ol><li>Place this index beside the unchanged report directory published at <code>output</code>.</li><li>Open this local HTML file without a web server; all links are local relative paths and no JavaScript or external resources are required.</li><li>To regenerate, use <code>python scripts/render_batch_snapshot_publication.py --report-dir output --destination index.html --report-prefix output</code>. The destination must be new.</li></ol>
+    </details>
+  </section>
+</main>
+<footer><p>Generated from the frozen workflow receipt and verified report hashes. Original report, CSV, JSON, SVG, and ZIP bytes are not rewritten.</p></footer>
+</body>
+</html>

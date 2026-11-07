@@ -208,9 +208,13 @@ successful analyses expose numeric trace pages through the evidence tools.
 The SQLite batch schema is additive and version checked; unsupported
 versions fail rather than being guessed or silently reinterpreted.
 
-This is the single-trace execution slice of service #11. The manifest is an
-inspectable declaration with local references. It is not a self-contained
-source bundle or a restoration format. Portable raw-asset restoration,
-MOCCA2 interoperability, DAD/MS, cross-run component assignments and calibration
-revisions remain separate work. Optimizer campaign state and consumed
-observation snapshots are not modified by analytical batch retry or recovery.
+The batch manifest is an inspectable declaration with local references. Use
+the separate [portable evidence snapshot](batch-snapshots.md) to retain complete
+datasets, source assets, results and history, or to import that evidence into a
+new store with a fresh pending batch. Import does not recreate active historical
+claims or establish fresh numerical reproduction.
+
+This is the single-trace slice of service #11. MOCCA2 interoperability, DAD/MS,
+cross-run component assignments and calibration revisions remain separate work.
+Optimizer campaign state and consumed observation snapshots are not modified
+by analytical batch retry, recovery or local evidence import.

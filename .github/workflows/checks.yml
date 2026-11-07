@@ -115,6 +115,34 @@ jobs:
               assert "src/measure_service/" + name + ".py" in members
           for name in ("test_batch_example", "test_batch_mcp", "test_batch_mcp_crash", "test_batch_mcp_concurrency", "test_batches", "test_batch_schema", "test_batch_schema_contract", "test_batch_mutation_validation", "test_batch_boundaries", "test_batch_control_events", "test_batch_execution", "test_analysis_runtime"):
               assert "tests/" + name + ".py" in members
+          assert "src/measure_service/import_origins.py" in members
+          assert "tests/test_import_origins.py" in members
+          assert "src/measure_service/batch_bundle.py" in members
+          assert "tests/test_batch_bundle.py" in members
+          assert "docs/batch-snapshots.md" in members
+          assert "docs/batch-snapshot-example.md" in members
+          assert "docs/chromatogram-snapshot-results.md" in members
+          assert "scripts/render_batch_snapshot_publication.py" in members
+          assert "tests/test_batch_snapshot_publication.py" in members
+          assert "tests/test_batch_snapshot_published_replay.py" in members
+          for name in ("README.md", "index.html", "publication.json", "execution.json", "independent-review.json", "compatibility-review.json"):
+              assert "docs/reference-data/chromatogram-snapshot-example/" + name in members
+          for name in ("summary.html", "workflow_receipt.json", "source-self-contained.zip", "source-references.zip", "analysis-index.csv"):
+              assert "docs/reference-data/chromatogram-snapshot-example/output/" + name in members
+          for kind, count in (("historical", 2), ("fresh", 4)):
+              for ordinal in range(count):
+                  for name in ("report.html", "chromatogram.svg", "evidence.json", "trace.csv", "peaks.csv"):
+                      assert f"docs/reference-data/chromatogram-snapshot-example/output/{kind}/{ordinal:03d}/{name}" in members
+          assert "examples/batch_snapshot.py" in members
+          assert "tests/test_batch_snapshot_example.py" in members
+          for name in ("batch_exports", "batch_snapshot_client", "batch_restore"):
+              assert "src/measure_service/" + name + ".py" in members
+          for name in ("test_batch_restore", "test_batch_snapshot_client", "test_batch_snapshot_mcp"):
+              assert "tests/" + name + ".py" in members
+          for name in ("batch_snapshot", "batch_capture"):
+              assert "src/measure_service/" + name + ".py" in members
+          for name in ("test_batch_snapshot", "test_batch_capture", "test_batch_snapshot_integrity", "test_batch_snapshot_compatibility", "test_batch_snapshot_history", "test_batch_snapshot_attempt_budget", "test_batch_snapshot_dataset_grain", "snapshot_store_support"):
+              assert "tests/" + name + ".py" in members
           assert "examples/chromatogram_report.py" in members
           assert "docs/figures/chromatogram-evidence-example.png" in members
           for name in ("report.html", "chromatogram.svg", "evidence.json", "trace.csv", "peaks.csv", "publication.json"):

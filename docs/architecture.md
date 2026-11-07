@@ -31,6 +31,16 @@ the item. Receipt replay grants no execution authority. See
 [batch execution and recovery](chromatogram-batches.md) for lease, revision,
 cancellation and explicit retry semantics.
 
+Portable batch snapshots read a bounded coherent transaction and carry complete
+dataset closure, stored results and public history. Client collection verifies
+immutable byte pages; a strict two-member ZIP transports the validated document.
+The local operator importer reserves a new directory and copies analytical
+evidence with new local IDs and separate import-origin metadata, then declares
+a new pending batch through the same batch creation path. It preserves the
+source archive rather than adopting historical execution authority. Optional
+import schema validation runs before unrelated DDL; malformed components are
+rejected without repair. See [batch snapshots](batch-snapshots.md).
+
 ## Repository boundaries
 
 | Component | Responsibility |

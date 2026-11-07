@@ -1,0 +1,7 @@
+section,ordinal,source_analysis_id,local_analysis_id,report_path,comparison
+historical_import,0,69d95502-e893-4fc6-8dac-2b60ceae2f59,4b145a8e-6fa9-4907-95b6-a72247147507,historical/000/report.html,not fresh computation
+historical_import,1,949dc664-7081-464f-ab81-f903b7d26d75,176a80b1-cf7e-4a17-b63f-755b28231d50,historical/001/report.html,not fresh computation
+fresh_reexecution,0,not applicable,124a32e7-70b9-4793-af8a-f8c56909200a,fresh/000/report.html,compared
+fresh_reexecution,1,not applicable,e06edd2e-6b8f-40b6-8d13-f9250a6d4312,fresh/001/report.html,compared
+fresh_reexecution,2,not applicable,cf59afaa-b9e4-405f-9c59-b226f0a58a82,fresh/002/report.html,outside comparison scope
+fresh_reexecution,3,not applicable,3b02df0d-6bdb-48f9-a70e-ac41f13f9a88,fresh/003/report.html,outside comparison scope

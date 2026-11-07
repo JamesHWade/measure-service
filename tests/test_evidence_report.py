@@ -201,6 +201,65 @@ def test_report_preserves_complete_bundle_and_all_csv_rows() -> None:
     assert report.index("Provenance digests") > details_start
 
 
+def test_responsive_tables_keep_accessible_structure_and_exact_values() -> None:
+    peak = {
+        "peak_id": 42,
+        "location": 2.345678901234567,
+        "height": 1.2345678901234567,
+        "left_base": 1.1234567890123457,
+        "right_base": 3.987654321098765,
+        "area": 987654321.0123457,
+        "prominence": 0.00000012345678901234567,
+    }
+    bundle = _bundle(
+        axis=[0.0, 1.0, 2.0, 3.0, 4.0],
+        raw=[0.0, -1.0, 2.0, 0.0, 0.0],
+        processed=[0.0, -0.5, 1.5, 0.0, 0.0],
+        peak=peak,
+    )
+    report = evidence_report.render_report(bundle)["report.html"].decode("utf-8")
+
+    assert (
+        '<div class="table-scroll peak-table-region" role="region" '
+        'aria-label="Stored peak rows" aria-describedby="peak-table-scroll-hint" tabindex="0">'
+        in report
+    )
+    assert (
+        '<p class="scroll-hint" id="peak-table-scroll-hint">'
+        "Scroll horizontally to view all peak columns.</p>"
+    ) in report
+    assert '<table class="peak-table"><thead>' in report
+    assert report.count('class="table-scroll metadata-table-region"') == 4
+    assert '<th scope="row">Stored method details</th>' in report
+    assert '<th scope="row">Evidence SHA-256</th>' in report
+    for value in (
+        peak["location"],
+        peak["height"],
+        peak["left_base"],
+        peak["right_base"],
+        peak["area"],
+        peak["prominence"],
+    ):
+        assert json.dumps(value) in report
+    assert "Apex location (min)" in report
+    assert "Area (mAU * min)" in report
+    assert "Unavailable" in report
+    assert '<pre class="provenance-json">' in report
+
+
+def test_responsive_html_change_keeps_other_artifacts_byte_identical() -> None:
+    artifacts = evidence_report.render_report(_bundle())
+    expected_hashes = {
+        "chromatogram.svg": "dbfc1ad7cc932dcd07420b954ee26a8839a2319997b1be1d56eda8a359ca78b6",
+        "evidence.json": "4b21ee12af03a15d751a41d5273c1c22d851b939e2634e561be26f7c3ab541ec",
+        "peaks.csv": "e2405e3d29e84bd0819cd97aa52942500b2b39834d664f3d92976c5d8c1bbfb1",
+        "trace.csv": "246c782e72a8a3dd743b394e6a47aee2d53e3cf1691a4feae07afa831427b72a",
+    }
+
+    for filename, expected in expected_hashes.items():
+        assert hashlib.sha256(artifacts[filename]).hexdigest() == expected
+
+
 def test_report_escapes_metadata_and_keeps_complete_provenance_visible() -> None:
     bundle = _bundle(
         method_name='<script>alert("method")</script>',

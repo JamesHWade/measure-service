@@ -91,7 +91,8 @@ def test_public_batch_failure_replay_and_ownership_over_http(tmp_path):
         assert (await call(None, "measurement_registry_capabilities", {})).isError
         caps = _value(await call(owner, "measurement_registry_capabilities", {}))
         assert caps["chromatogram_batches"]["r_workers_per_process"] == 2
-        assert caps["chromatogram_batches"]["portable_source_bundle_restore"] is False
+        assert caps["chromatogram_batches"]["portable_source_bundle_restore"] is True
+        assert caps["chromatogram_batches"]["historical_execution_authority_restore"] is False
         dataset = _value(
             await call(
                 owner,
