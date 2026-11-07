@@ -361,12 +361,14 @@ def _run_public(
     batch = _batch_row(con, owner, row["batch_id"])
     _batch_method, manifest = _stored_batch_spec(batch)
     selections = []
+    token_column = ", ri.execution_token" if include_tokens else ""
     for selected in con.execute(
-        """SELECT ri.*, i.id AS item_id, i.state AS item_state,
+        f"""SELECT ri.run_id, ri.owner, ri.batch_id, ri.ordinal, ri.attempt_id,
+          ri.created_at {token_column}, i.id AS item_id, i.state AS item_state,
           a.attempt_no, a.state AS attempt_state, a.lease_expires_at,
           a.error, a.analysis_id, a.result_digest, a.evidence_digest,
           a.compact_result, a.execution_context, a.runtime, a.started_at,
-          a.finished_at, a.execution_token AS attempt_token
+          a.finished_at
         FROM analysis_batch_run_items ri
         JOIN analysis_batch_items i
           ON i.owner=ri.owner AND i.batch_id=ri.batch_id AND i.ordinal=ri.ordinal
@@ -582,6 +584,77 @@ def _freeze_inputs(
     return frozen, point_count
 
 
+def _create_batch_record(con: sqlite3.Connection, owner: str, spec: BatchSpec) -> dict[str, Any]:
+    """Create the same pending declaration inside a caller-owned transaction."""
+    requested = spec.model_dump(mode="json")
+    frozen, point_count = _freeze_inputs(con, owner, spec)
+    batch_id = str(uuid.uuid4())
+    timestamp = now()
+    manifest = {
+        "schema_version": SCHEMA_VERSION,
+        "profile": PROFILE,
+        "title": spec.title,
+        "method": spec.method.model_dump(mode="json"),
+        "inputs": frozen,
+        "point_count": point_count,
+    }
+    manifest_serialized = _validate_json(
+        manifest, "Batch manifest", MAX_MANIFEST_BYTES, object_only=True
+    )
+    method_serialized = _validate_json(
+        manifest["method"], "Batch method", MAX_MANIFEST_BYTES, object_only=True
+    )
+    con.execute(
+        """INSERT INTO analysis_batches(
+          id, owner, profile, schema_version, title, method, manifest,
+          manifest_digest, input_digest, point_count, item_count, revision, status,
+          cancel_requested, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'active', 0, ?, ?)""",
+        (
+            batch_id,
+            owner,
+            PROFILE,
+            SCHEMA_VERSION,
+            spec.title,
+            method_serialized,
+            manifest_serialized,
+            sha256(manifest),
+            sha256(requested),
+            point_count,
+            len(frozen),
+            timestamp,
+            timestamp,
+        ),
+    )
+    for item in frozen:
+        item_serialized = _validate_json(
+            item, "Batch item manifest", MAX_MANIFEST_BYTES, object_only=True
+        )
+        con.execute(
+            """INSERT INTO analysis_batch_items(
+              id, owner, batch_id, ordinal, dataset_id, trace_id, role,
+              input_sha256, source_sha256, payload, state, attempt_count,
+              analysis_id, result_digest, evidence_digest, compact_result,
+              created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 0, NULL, NULL, NULL, NULL, ?, ?)""",
+            (
+                str(uuid.uuid4()),
+                owner,
+                batch_id,
+                item["ordinal"],
+                item["dataset_id"],
+                item["trace_id"],
+                item["role"],
+                item["dataset_sha256"],
+                item["source_sha256"],
+                item_serialized,
+                timestamp,
+                timestamp,
+            ),
+        )
+    return {"batch_id": batch_id}
+
+
 def create_batch(owner: str, spec: BatchSpec | Mapping[str, Any], key: str) -> dict[str, Any]:
     """Freeze an owned bounded batch declaration with an idempotent receipt."""
     owner = _owner(owner)
@@ -591,72 +664,7 @@ def create_batch(owner: str, spec: BatchSpec | Mapping[str, Any], key: str) -> d
     request = {"operation": "create_batch", "spec": requested}
 
     def write(con: sqlite3.Connection) -> dict[str, Any]:
-        frozen, point_count = _freeze_inputs(con, owner, spec)
-        batch_id = str(uuid.uuid4())
-        timestamp = now()
-        manifest = {
-            "schema_version": SCHEMA_VERSION,
-            "profile": PROFILE,
-            "title": spec.title,
-            "method": spec.method.model_dump(mode="json"),
-            "inputs": frozen,
-            "point_count": point_count,
-        }
-        manifest_serialized = _validate_json(
-            manifest, "Batch manifest", MAX_MANIFEST_BYTES, object_only=True
-        )
-        method_serialized = _validate_json(
-            manifest["method"], "Batch method", MAX_MANIFEST_BYTES, object_only=True
-        )
-        con.execute(
-            """INSERT INTO analysis_batches(
-              id, owner, profile, schema_version, title, method, manifest,
-              manifest_digest, input_digest, point_count, item_count, revision, status,
-              cancel_requested, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'active', 0, ?, ?)""",
-            (
-                batch_id,
-                owner,
-                PROFILE,
-                SCHEMA_VERSION,
-                spec.title,
-                method_serialized,
-                manifest_serialized,
-                sha256(manifest),
-                sha256(requested),
-                point_count,
-                len(frozen),
-                timestamp,
-                timestamp,
-            ),
-        )
-        for item in frozen:
-            item_serialized = _validate_json(
-                item, "Batch item manifest", MAX_MANIFEST_BYTES, object_only=True
-            )
-            con.execute(
-                """INSERT INTO analysis_batch_items(
-                  id, owner, batch_id, ordinal, dataset_id, trace_id, role,
-                  input_sha256, source_sha256, payload, state, attempt_count,
-                  analysis_id, result_digest, evidence_digest, compact_result,
-                  created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 0, NULL, NULL, NULL, NULL, ?, ?)""",
-                (
-                    str(uuid.uuid4()),
-                    owner,
-                    batch_id,
-                    item["ordinal"],
-                    item["dataset_id"],
-                    item["trace_id"],
-                    item["role"],
-                    item["dataset_sha256"],
-                    item["source_sha256"],
-                    item_serialized,
-                    timestamp,
-                    timestamp,
-                ),
-            )
-        return {"batch_id": batch_id}
+        return _create_batch_record(con, owner, spec)
 
     response = registry_mutation(owner, key, request, write)
     batch_id = response.get("batch_id") if isinstance(response, dict) else None
