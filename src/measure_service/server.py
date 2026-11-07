@@ -7,6 +7,7 @@ explicit proxy/identity configuration documented in docs/deployment.md.
 
 from __future__ import annotations
 
+import asyncio
 import csv
 import hashlib
 import io
@@ -1149,7 +1150,7 @@ def measurement_read_chromatogram_batch_control_events(
 
 
 @mcp.tool(annotations=RETRY_WRITE, structured_output=True)
-def measurement_run_chromatogram_batch(
+async def measurement_run_chromatogram_batch(
     batch_id: RecordId,
     idempotency_key: RequestKey,
     expected_revision: Annotated[StrictInt, Field(ge=1)],
@@ -1157,9 +1158,12 @@ def measurement_run_chromatogram_batch(
     max_items: Annotated[StrictInt, Field(ge=1, le=2)] = 2,
 ) -> dict[str, Any]:
     """Run at most two pending items with shared bounded R capacity and atomic result retention; replaying the same request key never executes more items."""
+    owner = identity(ctx)
     from .batch_execution import run_batch
 
-    return run_batch(identity(ctx), batch_id, idempotency_key, expected_revision, max_items)
+    return await asyncio.to_thread(
+        run_batch, owner, batch_id, idempotency_key, expected_revision, max_items
+    )
 
 
 @mcp.tool(annotations=READ, structured_output=True)

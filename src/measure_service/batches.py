@@ -442,7 +442,10 @@ def _run_public(
     return result
 
 
-def _batch_public(con: sqlite3.Connection, owner: str, row: sqlite3.Row) -> dict[str, Any]:
+def _validated_batch(
+    con: sqlite3.Connection, owner: str, row: sqlite3.Row
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, int]]:
+    """Validate the declaration and every item binding in the caller's transaction."""
     method, manifest = _stored_batch_spec(row)
     for item in con.execute(
         "SELECT * FROM analysis_batch_items WHERE owner=? AND batch_id=? ORDER BY ordinal",
@@ -452,6 +455,11 @@ def _batch_public(con: sqlite3.Connection, owner: str, row: sqlite3.Row) -> dict
     counts = _counts(con, owner, row["id"])
     if sum(counts.values()) != row["item_count"]:
         raise ValueError("Stored batch item count is inconsistent")
+    return method, manifest, counts
+
+
+def _batch_public(con: sqlite3.Connection, owner: str, row: sqlite3.Row) -> dict[str, Any]:
+    method, manifest, counts = _validated_batch(con, owner, row)
     result = {
         "batch_id": row["id"],
         "schema_version": row["schema_version"],
@@ -779,6 +787,7 @@ def _reserve_action(
     execution_context: str,
 ) -> dict[str, Any]:
     batch = _batch_row(con, owner, batch_id)
+    _validated_batch(con, owner, batch)
     if batch["revision"] != expected_revision:
         raise ValueError("Batch revision conflict")
     if batch["cancel_requested"]:
@@ -1401,7 +1410,11 @@ def _mutation_result(
     action: Any,
     batch_id: str,
 ) -> dict[str, Any]:
-    response = registry_mutation(owner, key, request, action)
+    def validated_action(con: sqlite3.Connection) -> dict[str, Any]:
+        _validated_batch(con, owner, _batch_row(con, owner, batch_id))
+        return action(con)
+
+    response = registry_mutation(owner, key, request, validated_action)
     if not isinstance(response, dict) or response.get("batch_id") != batch_id:
         raise ValueError("Stored batch mutation receipt is malformed")
     return get_batch(owner, batch_id)
