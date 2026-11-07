@@ -34,6 +34,7 @@ MAX_PAGE = 1_000
 MAX_ITEM_PAGE = 20
 MAX_ATTEMPT_PAGE = 20
 MAX_ERROR_BYTES = 4_000
+MAX_RUNTIME_BYTES = 4_000
 MAX_EXECUTION_CONTEXT_BYTES = 4_000
 MAX_COMPACT_RESULT_BYTES = 8_000
 MAX_BATCH_RESPONSE_BYTES = MAX_MANIFEST_BYTES + 16_384
@@ -329,7 +330,7 @@ def _attempt_public(row: sqlite3.Row, *, include_token: bool = False) -> dict[st
             object_only=True,
         ),
         "runtime": _decode_json(
-            row["runtime"], "attempt runtime", MAX_ERROR_BYTES, object_only=True
+            row["runtime"], "attempt runtime", MAX_RUNTIME_BYTES, object_only=True
         ),
         "error": None
         if row["error"] is None
@@ -402,7 +403,7 @@ def _run_public(
                 object_only=True,
             ),
             "runtime": _decode_json(
-                selected["runtime"], "attempt runtime", MAX_ERROR_BYTES, object_only=True
+                selected["runtime"], "attempt runtime", MAX_RUNTIME_BYTES, object_only=True
             ),
             "started_at": selected["started_at"],
             "finished_at": selected["finished_at"],
@@ -678,19 +679,32 @@ def read_items(owner: str, batch_id: str, offset: int = 0, limit: int = 20) -> d
             WHERE owner=? AND batch_id=? ORDER BY ordinal LIMIT ? OFFSET ?""",
             (owner, batch_id, limit + 1, offset),
         ).fetchall()
-        page = rows[:limit]
+        total = con.execute(
+            "SELECT COUNT(*) FROM analysis_batch_items WHERE owner=? AND batch_id=?",
+            (owner, batch_id),
+        ).fetchone()[0]
         result = {
             "batch_id": batch_id,
+            "revision": batch["revision"],
             "offset": offset,
             "limit": limit,
-            "count": len(page),
-            "total": con.execute(
-                "SELECT COUNT(*) FROM analysis_batch_items WHERE owner=? AND batch_id=?",
-                (owner, batch_id),
-            ).fetchone()[0],
-            "next_offset": offset + limit if len(rows) > limit else None,
-            "items": [_bound_item_public(item, manifest) for item in page],
+            "count": 0,
+            "total": total,
+            "next_offset": None,
+            "items": [],
         }
+        for row in rows[:limit]:
+            count = len(result["items"]) + 1
+            candidate = result | {
+                "count": count,
+                "next_offset": offset + count if offset + count < total else None,
+                "items": result["items"] + [_bound_item_public(row, manifest)],
+            }
+            if len(canonical(candidate).encode("utf-8")) > 256 * 1024:
+                if not result["items"]:
+                    raise ValueError("One batch item exceeds the page byte limit")
+                break
+            result = candidate
         _validate_json(result, "Batch item page", 256 * 1024, object_only=True)
         return result
 
@@ -1165,6 +1179,9 @@ def complete_item(
             or provenance.get("source_sha256") != item["source_sha256"]
         ):
             raise ValueError("Analysis record evidence does not match the frozen input")
+        runtime_serialized = _validate_json(
+            provenance, "attempt runtime", MAX_RUNTIME_BYTES, object_only=True
+        )
         dataset, digest, _source = _live_dataset_and_source(con, owner, item)
         evidence = analysis_evidence.build_evidence(record, dataset, digest)
         result_digest = sha256(record["result"])
@@ -1189,7 +1206,7 @@ def complete_item(
               analysis_id=?, result_digest=?, evidence_digest=?, compact_result=?, finished_at=?
             WHERE id=? AND owner=? AND state='running' AND execution_token=?""",
             (
-                canonical(provenance),
+                runtime_serialized,
                 record["analysis_id"],
                 result_digest,
                 evidence_digest,

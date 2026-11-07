@@ -74,6 +74,16 @@ def test_unmarked_partial_namespace_is_not_adopted():
     assert _digest() == before
 
 
+@pytest.mark.parametrize("name", ["analysis_batches", "measure_batch_schema"])
+def test_view_cannot_occupy_a_reserved_batch_table_name(name):
+    with sqlite3.connect(db_path()) as con:
+        con.execute(f'CREATE VIEW "{name}" AS SELECT 1 AS placeholder')
+    before = _digest()
+    with pytest.raises(ValueError, match="reserved analytical batch table"):
+        connect()
+    assert _digest() == before
+
+
 def test_two_initializers_commit_one_complete_component_schema():
     ready = threading.Barrier(2)
 

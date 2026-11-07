@@ -105,9 +105,13 @@ _TABLE_COLUMNS: dict[str, tuple[str, ...]] = {
 
 def validate_batch_schema(con: sqlite3.Connection) -> bool:
     """Check an existing component without changing it; return False for a new namespace."""
-    names = {row[0] for row in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    objects = con.execute("SELECT type, name FROM sqlite_master").fetchall()
+    reserved = set(_TABLE_COLUMNS) | {"measure_batch_schema"}
+    if any(name in reserved and kind != "table" for kind, name in objects):
+        raise ValueError("A reserved analytical batch table name is occupied by another object")
+    names = {name for kind, name in objects if kind == "table"}
     if "measure_batch_schema" not in names:
-        if any(name.startswith("analysis_batch") for name in names):
+        if any(name.startswith("analysis_batch") for _, name in objects):
             raise ValueError("Unmarked analytical batch tables cannot be interpreted")
         return False
     if tuple(row[1] for row in con.execute("PRAGMA table_info(measure_batch_schema)")) != (
