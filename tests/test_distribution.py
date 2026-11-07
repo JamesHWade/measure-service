@@ -30,6 +30,12 @@ def test_service_distribution_contains_both_import_packages_and_worker():
         "measure_service/analysis_evidence.py",
         "measure_service/evidence_client.py",
         "measure_service/evidence_report.py",
+        "measure_service/analysis_models.py",
+        "measure_service/analysis_runtime.py",
+        "measure_service/batch_models.py",
+        "measure_service/batch_schema.py",
+        "measure_service/batches.py",
+        "measure_service/batch_execution.py",
     } <= files
     assert {
         "measure_service/benchmarks/reference_data/suggestion_sequences_v1/" + name

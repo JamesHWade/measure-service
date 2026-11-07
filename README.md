@@ -36,6 +36,7 @@ configuration and a numerical analysis example.
 | --- | --- | --- |
 | Import | JSON traces; single, wide or grouped-long CSV/TSV with explicit mappings | Scalar numeric traces; no vendor files or spectra |
 | Chromatograms | Baseline correction, smoothing, peak detection and area integration | No compound identification or overlapping-peak deconvolution |
+| Analytical batches | Frozen owned inputs, bounded parallel processing, retained attempts and explicit cancellation/recovery/retry | Single-trace processing; no portable raw-bundle restoration or instrument execution |
 | Peak quantitation | Linear response calibration from supplied standards | Caller assigns the peak; no automatic dilution, LOD or uncertainty |
 | Relative SEC | Calibration, molecular-weight averages and distributions | Requires corrected `measure.sec`; results are relative to supplied standards |
 | Comparison | SEC deltas and method/backend/unit comparability flags | No statistical equivalence claim |
@@ -60,6 +61,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Input formats and limits](docs/inputs.md)
 - [Scientific methods and interpretation](docs/analysis.md)
 - [Inspect linked chromatogram evidence and export a local report](docs/chromatogram-evidence.md)
+- [Run and resume declared chromatogram batches](docs/chromatogram-batches.md)
 - [Chromatography method declarations](docs/methods.md)
 - [Experiment and result contracts](docs/experiments.md)
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)

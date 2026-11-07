@@ -1,0 +1,4 @@
+batch_id,event_id,event_no,ordinal,from_state,to_state
+a470d739-88a8-4294-b162-125f68cf1293,f0ac840b-7d98-4a40-8f37-8f777374b693,1,3,pending,cancelled
+a470d739-88a8-4294-b162-125f68cf1293,a5698c4b-85c0-4ff2-86f0-cd2b943e4321,2,2,failed,pending
+a470d739-88a8-4294-b162-125f68cf1293,a5698c4b-85c0-4ff2-86f0-cd2b943e4321,2,3,cancelled,pending

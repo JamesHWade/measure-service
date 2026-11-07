@@ -7,13 +7,12 @@ explicit proxy/identity configuration documented in docs/deployment.md.
 
 from __future__ import annotations
 
+import asyncio
 import csv
 import hashlib
 import io
 import json
-import math
 import os
-import subprocess
 import threading
 import uuid
 from collections import OrderedDict
@@ -22,10 +21,12 @@ from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import Context, FastMCP
 from mcp.types import ToolAnnotations
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
+from pydantic import Field, StrictInt, model_validator
 
 from . import (
     analysis_evidence,
+    analysis_runtime,
+    batches,
     campaign_protocol_registry,
     campaign_suggestion_attempts,
     campaigns,
@@ -35,6 +36,27 @@ from . import (
     retention,
 )
 from . import experiments as registry
+from .analysis_models import (
+    MAX_DATASET_POINTS,
+    MAX_POINTS,
+    MAX_TRACES,
+    ChromatogramMethod,
+    CSVChannel,
+    CSVGroup,
+    Dataset,
+    StrictModel,
+    Trace,
+    TraceMetadata,
+)
+from .batch_models import (
+    MAX_BATCH_ITEMS,
+    MAX_BATCH_POINTS,
+    MAX_MANIFEST_BYTES,
+    BatchSpec,
+)
+from .batch_models import (
+    PROFILE as BATCH_PROFILE,
+)
 from .campaign_protocol import (
     ABLATION_CAMPAIGN_PROFILE,
     CAMPAIGN_PROFILE,
@@ -59,9 +81,6 @@ from .retention import RetentionModelSpec
 from .storage import canonical, connect, db_path, now, sha256
 
 ROOT = Path(__file__).resolve().parent
-MAX_TRACES = 32
-MAX_POINTS = 50_000
-MAX_DATASET_POINTS = 150_000
 MAX_PAYLOAD_BYTES = 4_000_000
 MAX_PAGE = 1000
 MAX_EVIDENCE_SNAPSHOTS = 4
@@ -69,119 +88,6 @@ MAX_EVIDENCE_CACHE_BYTES = 64 * 1024 * 1024
 _EVIDENCE_SNAPSHOTS: OrderedDict[tuple, Any] = OrderedDict()
 _EVIDENCE_SNAPSHOT_BYTES = 0
 _EVIDENCE_SNAPSHOT_LOCK = threading.Lock()
-
-
-class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
-
-
-class TraceMetadata(StrictModel):
-    trace_id: str = Field(min_length=1, max_length=100)
-    sample_id: str = Field(min_length=1, max_length=100)
-    injection_id: str = Field(min_length=1, max_length=100)
-    channel: str = Field(min_length=1, max_length=100)
-    separation: Literal["SEC", "LC", "GC", "CE", "other"]
-    detector: str = Field(min_length=1, max_length=100)
-    axis_unit: str = Field(min_length=1, max_length=40)
-    signal_unit: str = Field(min_length=1, max_length=40)
-    sample_type: Literal["unknown", "blank", "standard", "qc", "reference"] = "unknown"
-    batch_id: str | None = Field(default=None, max_length=100)
-    run_order: int | None = Field(default=None, ge=0)
-
-
-class Trace(TraceMetadata):
-    axis: list[float] = Field(
-        min_length=3,
-        max_length=MAX_POINTS,
-        description="Finite, strictly increasing elution times or volumes in axis_unit.",
-    )
-    signal: list[float] = Field(
-        min_length=3,
-        max_length=MAX_POINTS,
-        description="Finite detector response values in signal_unit; same length as axis.",
-    )
-
-    @model_validator(mode="after")
-    def validate_trace(self) -> Trace:
-        if len(self.axis) != len(self.signal):
-            raise ValueError("axis and signal must have the same number of points")
-        if any(not math.isfinite(v) for v in self.axis + self.signal):
-            raise ValueError("axis and signal must contain only finite numbers")
-        if any(b <= a for a, b in zip(self.axis, self.axis[1:])):
-            raise ValueError("axis values must be strictly increasing and unique")
-        return self
-
-
-class CSVChannel(StrictModel):
-    column: str = Field(
-        min_length=1, max_length=200, description="Name of the numeric signal column in the table."
-    )
-    metadata: TraceMetadata
-
-
-class CSVGroup(StrictModel):
-    values: list[str] = Field(
-        min_length=1, max_length=4, description="Group values in the same order as group_columns."
-    )
-    metadata: TraceMetadata
-
-
-class Dataset(StrictModel):
-    title: str = Field(min_length=1, max_length=200)
-    traces: list[Trace] = Field(min_length=1, max_length=MAX_TRACES)
-
-    @model_validator(mode="after")
-    def validate_dataset(self) -> Dataset:
-        if sum(len(t.axis) for t in self.traces) > MAX_DATASET_POINTS:
-            raise ValueError("dataset exceeds the total point limit")
-        if len({t.trace_id for t in self.traces}) != len(self.traces):
-            raise ValueError("trace_id values must be unique within a dataset")
-        injection_samples: dict[str, tuple] = {}
-        injection_channels: set[tuple[str, str]] = set()
-        for trace in self.traces:
-            details = (
-                trace.sample_id,
-                trace.sample_type,
-                trace.batch_id,
-                trace.run_order,
-                trace.separation,
-            )
-            if (
-                trace.injection_id in injection_samples
-                and injection_samples[trace.injection_id] != details
-            ):
-                raise ValueError(
-                    "traces of an injection must share sample, type, batch, run order and separation"
-                )
-            injection_samples[trace.injection_id] = details
-            key = (trace.injection_id, trace.channel)
-            if key in injection_channels:
-                raise ValueError("each injection/channel combination must be unique")
-            injection_channels.add(key)
-        return self
-
-
-class ChromatogramMethod(StrictModel):
-    baseline: Literal["none", "als"] = "none"
-    baseline_lambda: float = Field(
-        default=1e6, gt=0, le=1e12, description="ALS baseline smoothness on the sample-index grid."
-    )
-    baseline_p: float = Field(default=0.01, gt=0, lt=1, description="ALS asymmetry parameter.")
-    smoothing: Literal["none", "gaussian"] = "none"
-    smoothing_sigma: float = Field(
-        default=1,
-        gt=0,
-        le=100,
-        description="Gaussian kernel standard deviation in sample points, not axis units.",
-    )
-    min_height: float = Field(default=0, ge=0, description="Minimum peak height in signal units.")
-    min_prominence: float = Field(
-        default=0, ge=0, description="Minimum peak prominence in signal units."
-    )
-    min_distance: float = Field(
-        default=0, ge=0, description="Minimum separation between peaks in axis units."
-    )
-    integration_baseline: Literal["local", "none", "global"] = "local"
 
 
 class Standard(StrictModel):
@@ -487,82 +393,26 @@ def analysis_for(owner: str, analysis_id: str) -> dict[str, Any]:
 
 
 def run_worker(payload: dict) -> dict[str, Any]:
-    command = os.environ.get("MEASURE_MCP_R", "R")
-    try:
-        process = subprocess.run(
-            [command, "--vanilla", "--slave", "-f", str(ROOT / "worker.R")],
-            input=canonical(payload),
-            text=True,
-            capture_output=True,
-            timeout=90,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        raise ValueError("The R analysis worker could not start or timed out") from exc
-    if process.returncode != 0:
-        raise ValueError("The R analysis worker failed; check the service environment")
-    try:
-        output = json.loads(process.stdout)
-    except json.JSONDecodeError as exc:
-        raise ValueError("The R analysis worker returned an invalid response") from exc
-    if not output.get("ok"):
-        raise ValueError("Analysis failed: " + str(output.get("error", "unknown worker error")))
-    warnings = output.get("warnings", [])
-    if isinstance(warnings, str):
-        warnings = [warnings]
-    result = output["result"]
-    result["warnings"] = warnings
-    return result
+    return analysis_runtime.run_worker(payload, worker_path=ROOT / "worker.R")
 
 
 def save_analysis(
     owner: str, dataset_id: str, trace_id: str, kind: str, method: dict, result: dict, digest: str
 ) -> dict[str, Any]:
-    analysis_id = str(uuid.uuid4())
-    worker_digest = hashlib.sha256((ROOT / "worker.R").read_bytes()).hexdigest()
     source = source_for(owner, dataset_id)
-    provenance = {
-        "input_sha256": digest,
-        "method_sha256": sha256(method),
-        "worker_sha256": worker_digest,
-        "source_sha256": None if source is None else source["source_sha256"],
-        "packages": result.get("packages"),
-        "installed_r_code_md5": result.get("installed_r_code_md5"),
-        "r_version": result.get("r_version"),
-        "measure_revision": os.environ.get("MEASURE_MCP_MEASURE_REVISION"),
-        "measure_sec_revision": os.environ.get("MEASURE_MCP_SEC_REVISION"),
-    }
-    created = now()
+    record = analysis_runtime.make_analysis_record(
+        dataset_id,
+        trace_id,
+        kind,
+        method,
+        result,
+        digest,
+        None if source is None else source["source_sha256"],
+        worker_path=ROOT / "worker.R",
+    )
     with connect() as con:
-        con.execute(
-            "INSERT INTO analyses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                analysis_id,
-                owner,
-                dataset_id,
-                trace_id,
-                kind,
-                canonical(method),
-                canonical(result),
-                canonical(provenance),
-                created,
-            ),
-        )
-    return {
-        "analysis_id": analysis_id,
-        "dataset_id": dataset_id,
-        "trace_id": trace_id,
-        "kind": kind,
-        "status": "completed_with_warnings" if result.get("warnings") else "completed",
-        "qualification": "experimental",
-        "summary": result.get("summary", {"peak_count": result.get("peak_count")}),
-        "diagnostics": result.get("diagnostics"),
-        "warnings": result.get("warnings", []),
-        "notes": result.get("notes", []),
-        "provenance": provenance,
-        "created_at": created,
-        "artifact": True,
-    }
+        analysis_runtime.insert_analysis(con, owner, record)
+    return analysis_runtime.compact_analysis(record)
 
 
 mcp = FastMCP(
@@ -611,6 +461,21 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "observation_snapshots": "immutable_explicit_membership_without_duplicate_attempts",
         "retention_models": "explicit_ideal_reference_inputs_with_immutable_predictions",
         "gaussian_observation_producer": "predeclared_synthetic_widths_and_exact_prediction_bound_results",
+        "chromatogram_batches": {
+            "profile": BATCH_PROFILE,
+            "items": MAX_BATCH_ITEMS,
+            "total_points": MAX_BATCH_POINTS,
+            "manifest_bytes": MAX_MANIFEST_BYTES,
+            "items_per_run": 2,
+            "r_workers_per_process": analysis_runtime.MAX_R_WORKERS,
+            "claim_lease_seconds": batches.LEASE_SECONDS,
+            "attempts_per_item": batches.MAX_ATTEMPTS,
+            "replay": "same_key_reads_retained_run_without_execution",
+            "recovery": "explicit_expired_claim_interruption_then_selected_retry",
+            "cancellation": "pending_items_stop_running_work_may_finish",
+            "portable_source_bundle_restore": False,
+            "instrument_actuation": False,
+        },
         "chromatogram_evidence": {
             "profile": analysis_evidence.PROFILE,
             "retrieval": "owned_stored_results_without_reanalysis",
@@ -1236,6 +1101,113 @@ def measurement_read_source(
     }
 
 
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_create_chromatogram_batch(
+    batch: BatchSpec, idempotency_key: RequestKey, ctx: Context
+) -> dict[str, Any]:
+    """Freeze owned trace selections, caller roles, import identities and versioned chromatogram settings; does not start analysis or verify assignments."""
+    return batches.create_batch(identity(ctx), batch, idempotency_key)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_chromatogram_batch(batch_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read an owned batch's frozen metadata manifest, dataset references, current revision and per-state counts without R; this response omits raw arrays."""
+    return batches.get_batch(identity(ctx), batch_id)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_chromatogram_batch_items(
+    batch_id: RecordId,
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 20,
+) -> dict[str, Any]:
+    """Read bounded owned batch-item metadata, states and retained analysis links; does not return raw arrays or execution tokens."""
+    return batches.read_items(identity(ctx), batch_id, offset, limit)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_chromatogram_batch_attempts(
+    batch_id: RecordId,
+    ordinal: Annotated[StrictInt, Field(ge=0, lt=MAX_BATCH_ITEMS)],
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 20,
+) -> dict[str, Any]:
+    """Read one owned item's attempt history with failures, interruption and observed or unavailable runtime evidence; ordinals start at zero."""
+    return batches.read_attempts(identity(ctx), batch_id, ordinal, offset, limit)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_chromatogram_batch_control_events(
+    batch_id: RecordId,
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 20,
+) -> dict[str, Any]:
+    """Read owned immutable cancellation, recovery and selected-retry outcomes, including controls that affected no items; history survives later retries."""
+    return batches.read_control_events(identity(ctx), batch_id, offset, limit)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+async def measurement_run_chromatogram_batch(
+    batch_id: RecordId,
+    idempotency_key: RequestKey,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    ctx: Context,
+    max_items: Annotated[StrictInt, Field(ge=1, le=2)] = 2,
+) -> dict[str, Any]:
+    """Run at most two pending items with shared bounded R capacity and atomic result retention; replaying the same request key never executes more items."""
+    owner = identity(ctx)
+    from .batch_execution import run_batch
+
+    return await asyncio.to_thread(
+        run_batch, owner, batch_id, idempotency_key, expected_revision, max_items
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_chromatogram_batch_run(run_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read a retained run's fixed item membership and current durable outcomes without execution or R; claim tokens remain private."""
+    return batches.get_run(identity(ctx), run_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_cancel_chromatogram_batch(
+    batch_id: RecordId,
+    idempotency_key: RequestKey,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    ctx: Context,
+) -> dict[str, Any]:
+    """Cancel pending items using a revision check; preserve successes and allow already running numerical work to finish."""
+    return batches.cancel_batch(identity(ctx), batch_id, idempotency_key, expected_revision)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_recover_chromatogram_batch(
+    batch_id: RecordId,
+    idempotency_key: RequestKey,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    ctx: Context,
+) -> dict[str, Any]:
+    """Mark expired owned claims interrupted and fence late results; does not kill a process, repeat analysis or automatically retry."""
+    return batches.recover_batch(identity(ctx), batch_id, idempotency_key, expected_revision)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_retry_chromatogram_batch_items(
+    batch_id: RecordId,
+    ordinals: Annotated[list[StrictInt], Field(min_length=1, max_length=MAX_BATCH_ITEMS)],
+    idempotency_key: RequestKey,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    ctx: Context,
+) -> dict[str, Any]:
+    """Reset explicitly selected failed, interrupted or cancelled items to pending with a revision check; preserve attempt history and never reset completed items."""
+    return batches.retry_items(
+        identity(ctx), batch_id, idempotency_key, expected_revision, ordinals
+    )
+
+
 @mcp.tool(annotations=WRITE, structured_output=True)
 def measurement_analyze_chromatogram(
     dataset_id: str, trace_id: str, method: ChromatogramMethod, ctx: Context
@@ -1245,13 +1217,7 @@ def measurement_analyze_chromatogram(
     dataset, digest = dataset_for(owner, dataset_id)
     trace = trace_for(dataset, trace_id)
     spec = method.model_dump(mode="json")
-    result = run_worker({"operation": "chromatogram", "trace": trace, "method": spec})
-    if method.baseline == "als" or method.smoothing == "gaussian":
-        steps = [b - a for a, b in zip(trace["axis"], trace["axis"][1:])]
-        if max(steps) - min(steps) > 1e-6 * max(steps):
-            result["warnings"].append(
-                "ALS baseline and Gaussian smoothing use sample indices; spacing is irregular, so their physical width varies along the axis."
-            )
+    result = analysis_runtime.process_chromatogram(trace, spec, worker=run_worker)
     return save_analysis(owner, dataset_id, trace_id, "chromatogram", spec, result, digest)
 
 

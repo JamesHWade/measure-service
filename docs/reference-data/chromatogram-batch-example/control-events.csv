@@ -1,0 +1,3 @@
+batch_id,event_id,event_no,kind,revision_before,revision_after,affected_item_count,created_at,event_sha256
+a470d739-88a8-4294-b162-125f68cf1293,f0ac840b-7d98-4a40-8f37-8f777374b693,1,cancel_requested,6,7,1,2026-11-07T16:33:05.801986+00:00,4f6c124344258a217e14dc48e57c1cf9cc59ab70f87e4fcbfd306a518b0572fa
+a470d739-88a8-4294-b162-125f68cf1293,a5698c4b-85c0-4ff2-86f0-cd2b943e4321,2,retry_selected,7,8,2,2026-11-07T16:33:05.812018+00:00,3b61ac10fbdd6ec9a330b296e667a4fc800dbf7beb58e4add7a865f02ac06b7b

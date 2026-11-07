@@ -102,6 +102,13 @@ _SERVICE_TABLES = {
     "registry_receipts",
     "retention_models",
     "retention_predictions",
+    "measure_batch_schema",
+    "analysis_batches",
+    "analysis_batch_items",
+    "analysis_batch_runs",
+    "analysis_batch_run_items",
+    "analysis_batch_attempts",
+    "analysis_batch_control_events",
 }
 _SERVICE_INDEXES = {
     "analytical_observations_contract_attempt",
@@ -123,10 +130,18 @@ _SERVICE_INDEXES = {
     "results_owner_attempt",
     "retention_models_owner_order",
     "retention_predictions_owner_order",
+    "analysis_batches_owner_order",
+    "analysis_batch_items_owner_batch_order",
+    "analysis_batch_items_owner_state",
+    "analysis_batch_runs_owner_batch_order",
+    "analysis_batch_attempts_owner_batch_order",
+    "analysis_batch_attempts_owner_run_order",
+    "analysis_batch_events_owner_order",
 }
 _SERVICE_OWNER_TABLES = _SERVICE_TABLES - {
     "attempt_revisions",
     "dataset_sources",
+    "measure_batch_schema",
 }
 _EVALUATION_CSV_FIELDS = (
     "campaign_id",
@@ -469,6 +484,16 @@ def _check_owned_store(
         raise ValueError("isolated data_dir ownership marker does not match this frozen runner")
 
     table_names = {name for object_type, name in objects if object_type == "table"}
+    if "measure_batch_schema" in table_names:
+        from ..batch_schema import SCHEMA_NAME, SCHEMA_VERSION
+
+        if con.execute("SELECT name, version FROM measure_batch_schema").fetchall() != [
+            (SCHEMA_NAME, SCHEMA_VERSION)
+        ]:
+            raise ValueError("isolated data_dir contains unsupported analytical batch metadata")
+    for table in sorted(name for name in table_names if name.startswith("analysis_batch")):
+        if con.execute(f'SELECT 1 FROM "{table}" LIMIT 1').fetchone() is not None:
+            raise ValueError("isolated synthetic runner store must not contain analytical batches")
     for table in sorted(_SERVICE_OWNER_TABLES):
         if table not in table_names:
             continue
