@@ -144,11 +144,15 @@ def _prepare_plan(
     items = snapshot.get("items")
     if not isinstance(items, list) or not items:
         raise ValueError("Snapshot items must be a nonempty flat array")
+    if any(not isinstance(item, dict) for item in items):
+        raise ValueError("Snapshot batch items must be objects")
+    # The codec validates item ordinals as an exact set, but the serialized
+    # array is allowed to arrive in any order.  BatchSpec.inputs is positional:
+    # rebuild it from the frozen ordinal order rather than archive list order.
+    items_by_ordinal = sorted(items, key=lambda item: item["ordinal"])
     input_rows = []
     completed_analysis_ids: set[str] = set()
-    for item in items:
-        if not isinstance(item, dict):
-            raise ValueError("Snapshot batch items must be objects")
+    for item in items_by_ordinal:
         dataset_id = item.get("dataset_id")
         if dataset_id not in dataset_map:
             raise ValueError("Snapshot item references an unavailable dataset")
