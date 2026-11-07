@@ -22,6 +22,14 @@ MAX_R_WORKERS = 2
 _R_WORKER_SLOTS = threading.BoundedSemaphore(MAX_R_WORKERS)
 
 
+class _WorkerResult(dict[str, Any]):
+    """Carry execution provenance in memory without adding scientific result fields."""
+
+    def __init__(self, result: dict[str, Any], worker_sha256: str) -> None:
+        super().__init__(result)
+        self.worker_sha256 = worker_sha256
+
+
 class _WorkerSlot:
     """One process-local R permit, reserved before claiming a durable batch item."""
 
@@ -116,7 +124,7 @@ def _execute_worker(payload: dict, *, worker_path: Path | None = None) -> dict[s
         warnings = [warnings]
     result = output["result"]
     result["warnings"] = warnings
-    return result
+    return _WorkerResult(result, worker_digest)
 
 
 def process_chromatogram(
@@ -154,7 +162,11 @@ def make_analysis_record(
     provenance = {
         "input_sha256": input_sha256,
         "method_sha256": sha256(method),
-        "worker_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "worker_sha256": (
+            result.worker_sha256
+            if isinstance(result, _WorkerResult)
+            else hashlib.sha256(path.read_bytes()).hexdigest()
+        ),
         "source_sha256": source_sha256,
         "packages": result.get("packages"),
         "installed_r_code_md5": result.get("installed_r_code_md5"),

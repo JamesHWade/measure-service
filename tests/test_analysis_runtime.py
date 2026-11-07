@@ -1,5 +1,6 @@
 """Shared preview/batch execution and process-wide resource boundaries."""
 
+import hashlib
 import json
 import subprocess
 import threading
@@ -147,3 +148,32 @@ def test_failed_attempt_context_does_not_infer_an_R_build():
     assert context["r_runtime_evidence"] == "unknown_until_success"
     assert "packages" not in context
     assert "r_version" not in context
+
+
+def test_record_binds_executed_worker_even_if_installed_source_changes_later(tmp_path, monkeypatch):
+    worker = tmp_path / "worker.R"
+    worker.write_text("executed source")
+    observed = hashlib.sha256(worker.read_bytes()).hexdigest()
+    monkeypatch.setattr(
+        runtime.subprocess,
+        "run",
+        lambda *args, **kwargs: SimpleNamespace(
+            returncode=0,
+            stdout=json.dumps({"ok": True, "result": {"peak_count": 0}, "warnings": []}),
+        ),
+    )
+    result = runtime.run_worker({"operation": "chromatogram"}, worker_path=worker)
+    worker.write_text("replacement installed after computation")
+    record = runtime.make_analysis_record(
+        "dataset",
+        "trace",
+        "chromatogram",
+        {},
+        result,
+        "a" * 64,
+        None,
+        worker_path=worker,
+    )
+    assert record["provenance"]["worker_sha256"] == observed
+    assert observed != hashlib.sha256(worker.read_bytes()).hexdigest()
+    assert json.loads(runtime.canonical(record["result"])) == {"peak_count": 0, "warnings": []}
