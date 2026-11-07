@@ -292,12 +292,63 @@ def _decode_member(raw: bytes, info: zipfile.ZipInfo, maximum: int) -> bytes:
     return decoded
 
 
+def _preflight_central_directory(archive_bytes: bytes) -> tuple[int, int]:
+    """Validate the physical two-record central directory before ZipFile parses it."""
+    eocd = archive_bytes.rfind(_EOCD_SIGNATURE)
+    if eocd < 0 or eocd + 22 > len(archive_bytes):
+        _fail("bundle has an invalid end-of-central-directory record")
+    disk_number = int.from_bytes(archive_bytes[eocd + 4 : eocd + 6], "little")
+    central_disk = int.from_bytes(archive_bytes[eocd + 6 : eocd + 8], "little")
+    entries_on_disk = int.from_bytes(archive_bytes[eocd + 8 : eocd + 10], "little")
+    entries_total = int.from_bytes(archive_bytes[eocd + 10 : eocd + 12], "little")
+    central_size = int.from_bytes(archive_bytes[eocd + 12 : eocd + 16], "little")
+    central_offset = int.from_bytes(archive_bytes[eocd + 16 : eocd + 20], "little")
+    comment_length = int.from_bytes(archive_bytes[eocd + 20 : eocd + 22], "little")
+    if (
+        disk_number != 0
+        or central_disk != 0
+        or entries_on_disk != len(_MEMBER_NAMES)
+        or entries_total != len(_MEMBER_NAMES)
+        or comment_length != 0
+        or eocd + 22 + comment_length != len(archive_bytes)
+        or central_offset > eocd
+        or central_size != eocd - central_offset
+    ):
+        _fail("bundle must be a single-disk exact archive")
+
+    cursor = central_offset
+    names: set[str] = set()
+    for _ in range(len(_MEMBER_NAMES)):
+        if cursor + 46 > eocd or archive_bytes[cursor : cursor + 4] != _CENTRAL_SIGNATURE:
+            _fail("bundle central directory is malformed")
+        name_length = int.from_bytes(archive_bytes[cursor + 28 : cursor + 30], "little")
+        extra_length = int.from_bytes(archive_bytes[cursor + 30 : cursor + 32], "little")
+        comment_length = int.from_bytes(archive_bytes[cursor + 32 : cursor + 34], "little")
+        record_end = cursor + 46 + name_length + extra_length + comment_length
+        if record_end > eocd or extra_length or comment_length:
+            _fail("bundle central members must not contain extras or comments")
+        name_start = cursor + 46
+        name_end = name_start + name_length
+        try:
+            name = archive_bytes[name_start:name_end].decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError("bundle central filename is not UTF-8") from exc
+        if name not in _MEMBER_NAMES or name in names:
+            _fail("bundle must contain exactly manifest.json and snapshot.json")
+        names.add(name)
+        cursor = record_end
+    if cursor != eocd:
+        _fail("bundle central directory contains unexamined records")
+    return eocd, central_offset
+
+
 def unpack_bundle(archive_bytes: bytes) -> bytes:
     """Validate an archive and return its exact canonical snapshot bytes."""
     if type(archive_bytes) is not bytes:
         _fail("archive must be bytes")
     if not 1 <= len(archive_bytes) <= batch_snapshot.MAX_ARCHIVE_BYTES:
         _fail("bundle exceeds its byte limit")
+    eocd, central_offset = _preflight_central_directory(archive_bytes)
     try:
         archive = zipfile.ZipFile(io.BytesIO(archive_bytes), mode="r")
     except (OSError, ValueError, zipfile.BadZipFile) as exc:
@@ -308,24 +359,8 @@ def unpack_bundle(archive_bytes: bytes) -> bytes:
         # ``zipfile`` intentionally accepts arbitrary bytes after EOCD.  An
         # exact two-member container must reject that trailing data rather
         # than silently treating it as an unexamined archive extension.
-        eocd = archive_bytes.rfind(_EOCD_SIGNATURE)
-        if eocd < archive.start_dir or eocd + 22 > len(archive_bytes):
+        if eocd < archive.start_dir or central_offset != archive.start_dir:
             _fail("bundle has an invalid end-of-central-directory record")
-        disk_number = int.from_bytes(archive_bytes[eocd + 4 : eocd + 6], "little")
-        central_disk = int.from_bytes(archive_bytes[eocd + 6 : eocd + 8], "little")
-        entries_on_disk = int.from_bytes(archive_bytes[eocd + 8 : eocd + 10], "little")
-        entries_total = int.from_bytes(archive_bytes[eocd + 10 : eocd + 12], "little")
-        central_size = int.from_bytes(archive_bytes[eocd + 12 : eocd + 16], "little")
-        central_offset = int.from_bytes(archive_bytes[eocd + 16 : eocd + 20], "little")
-        if (
-            disk_number != 0
-            or central_disk != 0
-            or entries_on_disk != len(_MEMBER_NAMES)
-            or entries_total != len(_MEMBER_NAMES)
-            or central_offset != archive.start_dir
-            or central_size != eocd - archive.start_dir
-        ):
-            _fail("bundle must be a single-disk exact archive")
         comment_length = int.from_bytes(archive_bytes[eocd + 20 : eocd + 22], "little")
         if eocd + 22 + comment_length != len(archive_bytes):
             _fail("bundle contains trailing data")
