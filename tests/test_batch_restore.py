@@ -295,6 +295,67 @@ def test_restore_preserves_structured_only_input_without_fabricating_source(tmp_
     assert receipt["no_execution_performed"] is True
 
 
+def test_restore_rebuilds_manifest_inputs_by_ordinal_when_items_are_reordered(
+    tmp_path, monkeypatch
+):
+    source, _, snapshot_bytes, _, _ = _make_archive(tmp_path, monkeypatch)
+    bundle = pytest.importorskip("measure_service.batch_bundle")
+    from measure_service import batch_snapshot
+
+    document = batch_snapshot.decode_snapshot(snapshot_bytes)
+    original_inputs = document["batch"]["manifest"]["inputs"]
+    expected = [
+        (
+            item["ordinal"],
+            item["dataset_id"],
+            item["trace_id"],
+            item["role"],
+            item["internal_standard_references"],
+        )
+        for item in original_inputs
+    ]
+    items_by_ordinal = {item["ordinal"]: item for item in document["items"]}
+    document["items"] = [items_by_ordinal[2], items_by_ordinal[0], items_by_ordinal[1]]
+    reordered_snapshot = batch_snapshot.encode_snapshot(document)
+    reordered_archive = bundle.pack_bundle(reordered_snapshot)
+    source.write_bytes(reordered_archive)
+
+    destination = tmp_path / "reordered-restore"
+    receipt = batch_restore.restore_bundle(source, destination)
+    assert (destination / batch_restore.ARCHIVE_NAME).read_bytes() == reordered_archive
+
+    manifest_row = _rows(
+        destination / "measure.sqlite3",
+        "SELECT manifest FROM analysis_batches WHERE id=?",
+        (receipt["new_batch_id"],),
+    )[0]
+    manifest = json.loads(manifest_row["manifest"])
+    actual = [
+        (
+            item["ordinal"],
+            next(
+                source_id
+                for source_id, local_id in receipt["dataset_map"].items()
+                if local_id == item["dataset_id"]
+            ),
+            item["trace_id"],
+            item["role"],
+            item["internal_standard_references"],
+        )
+        for item in manifest["inputs"]
+    ]
+    assert actual == expected
+
+    monkeypatch.setenv("MEASURE_MCP_DATA_DIR", str(destination))
+    from measure_service import batches
+
+    restored_batch = batches.get_batch("local", receipt["new_batch_id"])
+    run, _ = batches.reserve_run(
+        "local", receipt["new_batch_id"], "ordinal-order-check", restored_batch["revision"], 1
+    )
+    assert run["items"][0]["ordinal"] == 0
+
+
 @pytest.mark.parametrize(
     "tamper",
     ["source-content", "source-mapping", "analysis-method", "analysis-trace", "analysis-created"],
