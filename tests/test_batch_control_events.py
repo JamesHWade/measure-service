@@ -89,16 +89,27 @@ def test_cancelled_item_history_survives_successful_retry_and_old_key_replay(dec
         batches.read_control_events("other", identifier)
 
 
-def test_control_event_failure_rolls_back_state_revision_and_retry_receipt(declared):
+def test_control_event_failure_rolls_back_state_revision_and_retry_receipt(declared, monkeypatch):
     batch, _, _ = declared
-    with connect() as con:
+    original = batches._record_control_event
+
+    def reject_insert(con, *args, **kwargs):
+        # Inject only after supported-schema validation, inside the mutation.
+        # Preexisting custom triggers now correctly reject before any writes.
         con.execute("""CREATE TRIGGER fail_control_event BEFORE INSERT ON analysis_batch_control_events
           BEGIN SELECT RAISE(ABORT, 'controlled event insertion failure'); END""")
+        return original(con, *args, **kwargs)
+
+    monkeypatch.setattr(batches, "_record_control_event", reject_insert)
     with pytest.raises(sqlite3.IntegrityError, match="controlled event insertion"):
         batches.cancel_batch("owner", batch["batch_id"], "cancel", batch["revision"])
     assert batches.get_batch("owner", batch["batch_id"]) == batch
     assert batches.read_control_events("owner", batch["batch_id"])["total"] == 0
     with connect() as con:
+        assert (
+            con.execute("SELECT 1 FROM sqlite_master WHERE name='fail_control_event'").fetchone()
+            is None
+        )
         assert (
             con.execute("SELECT 1 FROM registry_receipts WHERE request_key='cancel'").fetchone()
             is None
