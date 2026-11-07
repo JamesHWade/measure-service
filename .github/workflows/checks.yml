@@ -117,6 +117,8 @@ jobs:
               assert "tests/" + name + ".py" in members
           assert "src/measure_service/import_origins.py" in members
           assert "tests/test_import_origins.py" in members
+          assert "src/measure_service/batch_bundle.py" in members
+          assert "tests/test_batch_bundle.py" in members
           for name in ("batch_snapshot", "batch_capture"):
               assert "src/measure_service/" + name + ".py" in members
           for name in ("test_batch_snapshot", "test_batch_capture", "test_batch_snapshot_integrity", "test_batch_snapshot_compatibility", "test_batch_snapshot_history", "snapshot_store_support"):

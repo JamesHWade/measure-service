@@ -39,6 +39,7 @@ def test_service_distribution_contains_both_import_packages_and_worker():
         "measure_service/import_origins.py",
         "measure_service/batch_snapshot.py",
         "measure_service/batch_capture.py",
+        "measure_service/batch_bundle.py",
     } <= files
     assert {
         "measure_service/benchmarks/reference_data/suggestion_sequences_v1/" + name
