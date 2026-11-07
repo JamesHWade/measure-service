@@ -1110,7 +1110,7 @@ def measurement_create_chromatogram_batch(
 
 @mcp.tool(annotations=READ, structured_output=True)
 def measurement_get_chromatogram_batch(batch_id: RecordId, ctx: Context) -> dict[str, Any]:
-    """Read an owned batch's frozen metadata manifest, current revision and per-state counts without R; raw arrays remain in dataset pages."""
+    """Read an owned batch's frozen metadata manifest, dataset references, current revision and per-state counts without R; this response omits raw arrays."""
     return batches.get_batch(identity(ctx), batch_id)
 
 

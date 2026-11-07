@@ -161,7 +161,7 @@ Read an owned suggestion claim, immutable terminal or late evidence, exact reque
 
 ### `measurement_get_chromatogram_batch`
 
-Read an owned batch's frozen metadata manifest, current revision and per-state counts without R; raw arrays remain in dataset pages.
+Read an owned batch's frozen metadata manifest, dataset references, current revision and per-state counts without R; this response omits raw arrays.
 
 ### `measurement_get_chromatogram_batch_run`
 

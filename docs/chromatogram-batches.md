@@ -8,8 +8,8 @@ analyses: read their evidence and export reports with the
 [chromatogram evidence client](chromatogram-evidence.md).
 
 Batch declarations, progress and attempt history are available without R.
-Executing a pending item requires compatible `measure` and `measure.sec`
-backends. This workflow performs numerical processing of existing traces;
+Executing a pending item requires compatible `measure` and `recipes`
+backends (`measure.sec` is required for SEC tools). This workflow performs numerical processing of existing traces;
 it does not acquire a sample or control an instrument.
 
 ## Declare inputs and settings
@@ -158,8 +158,10 @@ method. Peak IDs and caller labels establish no chemical identity or purity.
 A declaration accepts at most 32 items and 500,000 total selected points.
 Existing per-trace and dataset limits still apply. Normalized declaration/mutation requests are limited to 64,000 bytes;
 manifests are limited to 256 KiB; their response envelope adds at most 16 KiB.
-Public pages are limited to 256 KiB. Raw values remain
-in dataset/evidence pages. The SQLite batch schema is additive and version checked; unsupported
+Public pages are limited to 256 KiB. The manifest stores dataset references.
+`measurement_read_source` pages retained CSV/TSV source text when available;
+successful analyses expose numeric trace pages through the evidence tools.
+The SQLite batch schema is additive and version checked; unsupported
 versions fail rather than being guessed or silently reinterpreted.
 
 This is the single-trace execution slice of service #11. The manifest is an
