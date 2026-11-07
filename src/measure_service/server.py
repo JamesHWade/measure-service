@@ -25,6 +25,7 @@ from pydantic import Field, StrictInt, model_validator
 from . import (
     analysis_evidence,
     analysis_runtime,
+    batches,
     campaign_protocol_registry,
     campaign_suggestion_attempts,
     campaigns,
@@ -45,6 +46,15 @@ from .analysis_models import (
     StrictModel,
     Trace,
     TraceMetadata,
+)
+from .batch_models import (
+    MAX_BATCH_ITEMS,
+    MAX_BATCH_POINTS,
+    MAX_MANIFEST_BYTES,
+    BatchSpec,
+)
+from .batch_models import (
+    PROFILE as BATCH_PROFILE,
 )
 from .campaign_protocol import (
     ABLATION_CAMPAIGN_PROFILE,
@@ -450,6 +460,21 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "observation_snapshots": "immutable_explicit_membership_without_duplicate_attempts",
         "retention_models": "explicit_ideal_reference_inputs_with_immutable_predictions",
         "gaussian_observation_producer": "predeclared_synthetic_widths_and_exact_prediction_bound_results",
+        "chromatogram_batches": {
+            "profile": BATCH_PROFILE,
+            "items": MAX_BATCH_ITEMS,
+            "total_points": MAX_BATCH_POINTS,
+            "manifest_bytes": MAX_MANIFEST_BYTES,
+            "items_per_run": 2,
+            "r_workers_per_process": analysis_runtime.MAX_R_WORKERS,
+            "claim_lease_seconds": batches.LEASE_SECONDS,
+            "attempts_per_item": batches.MAX_ATTEMPTS,
+            "replay": "same_key_reads_retained_run_without_execution",
+            "recovery": "explicit_expired_claim_interruption_then_selected_retry",
+            "cancellation": "pending_items_stop_running_work_may_finish",
+            "portable_source_bundle_restore": False,
+            "instrument_actuation": False,
+        },
         "chromatogram_evidence": {
             "profile": analysis_evidence.PROFILE,
             "retrieval": "owned_stored_results_without_reanalysis",
@@ -1073,6 +1098,110 @@ def measurement_read_source(
         "next_offset": offset + limit if offset + limit < len(content) else None,
         "text": content[offset : offset + limit],
     }
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_create_chromatogram_batch(
+    batch: BatchSpec, idempotency_key: RequestKey, ctx: Context
+) -> dict[str, Any]:
+    """Freeze owned trace selections, caller roles, import identities and versioned chromatogram settings; does not start analysis or verify assignments."""
+    return batches.create_batch(identity(ctx), batch, idempotency_key)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_chromatogram_batch(batch_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read an owned batch's frozen metadata manifest, current revision and per-state counts without R; raw arrays remain in dataset pages."""
+    return batches.get_batch(identity(ctx), batch_id)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_chromatogram_batch_items(
+    batch_id: RecordId,
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 20,
+) -> dict[str, Any]:
+    """Read bounded owned batch-item metadata, states and retained analysis links; does not return raw arrays or execution tokens."""
+    return batches.read_items(identity(ctx), batch_id, offset, limit)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_chromatogram_batch_attempts(
+    batch_id: RecordId,
+    ordinal: Annotated[StrictInt, Field(ge=0, lt=MAX_BATCH_ITEMS)],
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 20,
+) -> dict[str, Any]:
+    """Read one owned item's attempt history with failures, interruption and observed or unavailable runtime evidence; ordinals start at zero."""
+    return batches.read_attempts(identity(ctx), batch_id, ordinal, offset, limit)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_chromatogram_batch_control_events(
+    batch_id: RecordId,
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 20,
+) -> dict[str, Any]:
+    """Read owned immutable cancellation, recovery and selected-retry outcomes, including controls that affected no items; history survives later retries."""
+    return batches.read_control_events(identity(ctx), batch_id, offset, limit)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_run_chromatogram_batch(
+    batch_id: RecordId,
+    idempotency_key: RequestKey,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    ctx: Context,
+    max_items: Annotated[StrictInt, Field(ge=1, le=2)] = 2,
+) -> dict[str, Any]:
+    """Run at most two pending items with shared bounded R capacity and atomic result retention; replaying the same request key never executes more items."""
+    from .batch_execution import run_batch
+
+    return run_batch(identity(ctx), batch_id, idempotency_key, expected_revision, max_items)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_chromatogram_batch_run(run_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read a retained run's fixed item membership and current durable outcomes without execution or R; claim tokens remain private."""
+    return batches.get_run(identity(ctx), run_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_cancel_chromatogram_batch(
+    batch_id: RecordId,
+    idempotency_key: RequestKey,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    ctx: Context,
+) -> dict[str, Any]:
+    """Cancel pending items using a revision check; preserve successes and allow already running numerical work to finish."""
+    return batches.cancel_batch(identity(ctx), batch_id, idempotency_key, expected_revision)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_recover_chromatogram_batch(
+    batch_id: RecordId,
+    idempotency_key: RequestKey,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    ctx: Context,
+) -> dict[str, Any]:
+    """Mark expired owned claims interrupted and fence late results; does not kill a process, repeat analysis or automatically retry."""
+    return batches.recover_batch(identity(ctx), batch_id, idempotency_key, expected_revision)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_retry_chromatogram_batch_items(
+    batch_id: RecordId,
+    ordinals: Annotated[list[StrictInt], Field(min_length=1, max_length=MAX_BATCH_ITEMS)],
+    idempotency_key: RequestKey,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    ctx: Context,
+) -> dict[str, Any]:
+    """Reset explicitly selected failed, interrupted or cancelled items to pending with a revision check; preserve attempt history and never reset completed items."""
+    return batches.retry_items(
+        identity(ctx), batch_id, idempotency_key, expected_revision, ordinals
+    )
 
 
 @mcp.tool(annotations=WRITE, structured_output=True)
