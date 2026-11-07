@@ -121,3 +121,7 @@ carry linked component correspondences or calibration revisions, restore
 campaign/optimizer or historical operational state, establish physical
 validation, or claim MOCCA2 interoperability. Those limits are explicit in the
 snapshot's availability fields.
+
+Run the [complete synthetic example](batch-snapshot-example.md) to retain a
+partially completed source batch, import its evidence, and compare explicit
+fresh computations with the two original successes.

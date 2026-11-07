@@ -63,6 +63,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Inspect linked chromatogram evidence and export a local report](docs/chromatogram-evidence.md)
 - [Run and resume declared chromatogram batches](docs/chromatogram-batches.md)
 - [Export batch evidence and import into a new local store](docs/batch-snapshots.md)
+- [Reproduce the source-to-archive-to-fresh-execution workflow](docs/batch-snapshot-example.md)
 - [Chromatography method declarations](docs/methods.md)
 - [Experiment and result contracts](docs/experiments.md)
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)

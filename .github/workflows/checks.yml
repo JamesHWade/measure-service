@@ -120,6 +120,9 @@ jobs:
           assert "src/measure_service/batch_bundle.py" in members
           assert "tests/test_batch_bundle.py" in members
           assert "docs/batch-snapshots.md" in members
+          assert "docs/batch-snapshot-example.md" in members
+          assert "examples/batch_snapshot.py" in members
+          assert "tests/test_batch_snapshot_example.py" in members
           for name in ("batch_exports", "batch_snapshot_client", "batch_restore"):
               assert "src/measure_service/" + name + ".py" in members
           for name in ("test_batch_restore", "test_batch_snapshot_client", "test_batch_snapshot_mcp"):
