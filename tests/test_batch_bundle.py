@@ -252,6 +252,39 @@ def test_bundle_rejects_local_extras_prefix_and_bad_eocd(snapshot_bytes):
         unpack_bundle(bytes(broken))
 
 
+def test_bundle_preflights_physical_central_directory_before_zipfile(snapshot_bytes, monkeypatch):
+    from measure_service import batch_bundle
+    from measure_service.batch_bundle import pack_bundle, unpack_bundle
+
+    original = pack_bundle(snapshot_bytes)
+    eocd = original.rfind(b"PK\x05\x06")
+    central_offset = struct.unpack_from("<I", original, eocd + 16)[0]
+    central_size = struct.unpack_from("<I", original, eocd + 12)[0]
+    first_name_length = struct.unpack_from("<H", original, central_offset + 28)[0]
+    first_extra_length = struct.unpack_from("<H", original, central_offset + 30)[0]
+    first_comment_length = struct.unpack_from("<H", original, central_offset + 32)[0]
+    first_record_end = (
+        central_offset + 46 + first_name_length + first_extra_length + first_comment_length
+    )
+    first_record = original[central_offset:first_record_end]
+    extra_records = first_record * 100_000
+    central = original[central_offset:eocd] + extra_records
+    eocd_record = bytearray(original[eocd:])
+    struct.pack_into("<I", eocd_record, 12, central_size + len(extra_records))
+    malicious = original[:central_offset] + central + bytes(eocd_record)
+
+    constructed = []
+
+    def forbidden_constructor(*args, **kwargs):
+        constructed.append((args, kwargs))
+        raise AssertionError("ZipFile must not be constructed for an oversized central directory")
+
+    monkeypatch.setattr(batch_bundle.zipfile, "ZipFile", forbidden_constructor)
+    with pytest.raises(ValueError, match="central"):
+        unpack_bundle(malicious)
+    assert constructed == []
+
+
 def test_bundle_reader_defends_against_fifo_swap(snapshot_bytes, tmp_path, monkeypatch):
     from measure_service import batch_bundle
     from measure_service.batch_bundle import read_bundle
