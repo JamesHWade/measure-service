@@ -5,6 +5,7 @@ import json
 import subprocess
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -148,6 +149,33 @@ def test_failed_attempt_context_does_not_infer_an_R_build():
     assert context["r_runtime_evidence"] == "unknown_until_success"
     assert "packages" not in context
     assert "r_version" not in context
+
+
+def test_worker_change_and_restore_executes_the_hashed_snapshot(tmp_path, monkeypatch):
+    worker = tmp_path / "worker.R"
+    original = b"original source"
+    worker.write_bytes(original)
+    snapshots = []
+
+    def replace_and_restore(command, **kwargs):
+        snapshot = Path(command[-1])
+        snapshots.append(snapshot)
+        assert snapshot != worker
+        worker.write_bytes(b"temporary replacement R could otherwise open")
+        assert snapshot.read_bytes() == original
+        assert snapshot.stat().st_mode & 0o777 == 0o400
+        worker.write_bytes(original)
+        return SimpleNamespace(
+            returncode=0,
+            stdout=json.dumps({"ok": True, "result": {"peak_count": 0}}),
+        )
+
+    monkeypatch.setattr(runtime.subprocess, "run", replace_and_restore)
+    result = runtime.run_worker({"operation": "chromatogram"}, worker_path=worker)
+    assert result.worker_sha256 == hashlib.sha256(original).hexdigest()
+    assert worker.read_bytes() == original
+    assert snapshots and not snapshots[0].exists()
+    assert not snapshots[0].parent.exists()
 
 
 def test_record_binds_executed_worker_even_if_installed_source_changes_later(tmp_path, monkeypatch):
