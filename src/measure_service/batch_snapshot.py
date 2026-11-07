@@ -856,13 +856,14 @@ def _validate_batch(batch: Any) -> tuple[str, dict[str, Any], dict[int, dict[str
             }
         )
     source_by_dataset: dict[str, Any] = {}
-    grains: set[tuple[str, str, str]] = set()
+    grains: set[tuple[str, str, str, str]] = set()
     for item in manifest_inputs.values():
         prior = source_by_dataset.setdefault(item["dataset_id"], item["source"])
         if prior != item["source"]:
             _fail("manifest source declarations for one dataset disagree")
         trace = item["trace"]
         grain = (
+            item["dataset_id"],
             trace["sample_id"],
             trace["injection_id"],
             trace["channel"],

@@ -121,7 +121,7 @@ jobs:
           assert "tests/test_batch_bundle.py" in members
           for name in ("batch_snapshot", "batch_capture"):
               assert "src/measure_service/" + name + ".py" in members
-          for name in ("test_batch_snapshot", "test_batch_capture", "test_batch_snapshot_integrity", "test_batch_snapshot_compatibility", "test_batch_snapshot_history", "test_batch_snapshot_attempt_budget", "snapshot_store_support"):
+          for name in ("test_batch_snapshot", "test_batch_capture", "test_batch_snapshot_integrity", "test_batch_snapshot_compatibility", "test_batch_snapshot_history", "test_batch_snapshot_attempt_budget", "test_batch_snapshot_dataset_grain", "snapshot_store_support"):
               assert "tests/" + name + ".py" in members
           assert "examples/chromatogram_report.py" in members
           assert "docs/figures/chromatogram-evidence-example.png" in members
