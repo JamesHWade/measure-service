@@ -16,7 +16,11 @@ server file writes. See the [evidence contract](chromatogram-evidence.md).
 No tool accepts executable code, a server file path or an arbitrary URL. The R
 worker path comes from the installed Python package. An R-backed call is
 synchronous and has a 90-second subprocess timeout. There is no job queue or
-worker pool.
+detached worker daemon. The bounded input models and fixed worker adapter are
+shared internal interfaces. At most two R subprocesses run per service
+process across chromatogram, SEC, quantitation and capability requests. A busy
+process returns an explicit capacity error; it does not enqueue another R call.
+Additional service processes have independent limits.
 
 ## Repository boundaries
 

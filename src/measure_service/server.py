@@ -11,9 +11,7 @@ import csv
 import hashlib
 import io
 import json
-import math
 import os
-import subprocess
 import threading
 import uuid
 from collections import OrderedDict
@@ -22,10 +20,11 @@ from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import Context, FastMCP
 from mcp.types import ToolAnnotations
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
+from pydantic import Field, StrictInt, model_validator
 
 from . import (
     analysis_evidence,
+    analysis_runtime,
     campaign_protocol_registry,
     campaign_suggestion_attempts,
     campaigns,
@@ -35,6 +34,18 @@ from . import (
     retention,
 )
 from . import experiments as registry
+from .analysis_models import (
+    MAX_DATASET_POINTS,
+    MAX_POINTS,
+    MAX_TRACES,
+    ChromatogramMethod,
+    CSVChannel,
+    CSVGroup,
+    Dataset,
+    StrictModel,
+    Trace,
+    TraceMetadata,
+)
 from .campaign_protocol import (
     ABLATION_CAMPAIGN_PROFILE,
     CAMPAIGN_PROFILE,
@@ -59,9 +70,6 @@ from .retention import RetentionModelSpec
 from .storage import canonical, connect, db_path, now, sha256
 
 ROOT = Path(__file__).resolve().parent
-MAX_TRACES = 32
-MAX_POINTS = 50_000
-MAX_DATASET_POINTS = 150_000
 MAX_PAYLOAD_BYTES = 4_000_000
 MAX_PAGE = 1000
 MAX_EVIDENCE_SNAPSHOTS = 4
@@ -69,119 +77,6 @@ MAX_EVIDENCE_CACHE_BYTES = 64 * 1024 * 1024
 _EVIDENCE_SNAPSHOTS: OrderedDict[tuple, Any] = OrderedDict()
 _EVIDENCE_SNAPSHOT_BYTES = 0
 _EVIDENCE_SNAPSHOT_LOCK = threading.Lock()
-
-
-class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
-
-
-class TraceMetadata(StrictModel):
-    trace_id: str = Field(min_length=1, max_length=100)
-    sample_id: str = Field(min_length=1, max_length=100)
-    injection_id: str = Field(min_length=1, max_length=100)
-    channel: str = Field(min_length=1, max_length=100)
-    separation: Literal["SEC", "LC", "GC", "CE", "other"]
-    detector: str = Field(min_length=1, max_length=100)
-    axis_unit: str = Field(min_length=1, max_length=40)
-    signal_unit: str = Field(min_length=1, max_length=40)
-    sample_type: Literal["unknown", "blank", "standard", "qc", "reference"] = "unknown"
-    batch_id: str | None = Field(default=None, max_length=100)
-    run_order: int | None = Field(default=None, ge=0)
-
-
-class Trace(TraceMetadata):
-    axis: list[float] = Field(
-        min_length=3,
-        max_length=MAX_POINTS,
-        description="Finite, strictly increasing elution times or volumes in axis_unit.",
-    )
-    signal: list[float] = Field(
-        min_length=3,
-        max_length=MAX_POINTS,
-        description="Finite detector response values in signal_unit; same length as axis.",
-    )
-
-    @model_validator(mode="after")
-    def validate_trace(self) -> Trace:
-        if len(self.axis) != len(self.signal):
-            raise ValueError("axis and signal must have the same number of points")
-        if any(not math.isfinite(v) for v in self.axis + self.signal):
-            raise ValueError("axis and signal must contain only finite numbers")
-        if any(b <= a for a, b in zip(self.axis, self.axis[1:])):
-            raise ValueError("axis values must be strictly increasing and unique")
-        return self
-
-
-class CSVChannel(StrictModel):
-    column: str = Field(
-        min_length=1, max_length=200, description="Name of the numeric signal column in the table."
-    )
-    metadata: TraceMetadata
-
-
-class CSVGroup(StrictModel):
-    values: list[str] = Field(
-        min_length=1, max_length=4, description="Group values in the same order as group_columns."
-    )
-    metadata: TraceMetadata
-
-
-class Dataset(StrictModel):
-    title: str = Field(min_length=1, max_length=200)
-    traces: list[Trace] = Field(min_length=1, max_length=MAX_TRACES)
-
-    @model_validator(mode="after")
-    def validate_dataset(self) -> Dataset:
-        if sum(len(t.axis) for t in self.traces) > MAX_DATASET_POINTS:
-            raise ValueError("dataset exceeds the total point limit")
-        if len({t.trace_id for t in self.traces}) != len(self.traces):
-            raise ValueError("trace_id values must be unique within a dataset")
-        injection_samples: dict[str, tuple] = {}
-        injection_channels: set[tuple[str, str]] = set()
-        for trace in self.traces:
-            details = (
-                trace.sample_id,
-                trace.sample_type,
-                trace.batch_id,
-                trace.run_order,
-                trace.separation,
-            )
-            if (
-                trace.injection_id in injection_samples
-                and injection_samples[trace.injection_id] != details
-            ):
-                raise ValueError(
-                    "traces of an injection must share sample, type, batch, run order and separation"
-                )
-            injection_samples[trace.injection_id] = details
-            key = (trace.injection_id, trace.channel)
-            if key in injection_channels:
-                raise ValueError("each injection/channel combination must be unique")
-            injection_channels.add(key)
-        return self
-
-
-class ChromatogramMethod(StrictModel):
-    baseline: Literal["none", "als"] = "none"
-    baseline_lambda: float = Field(
-        default=1e6, gt=0, le=1e12, description="ALS baseline smoothness on the sample-index grid."
-    )
-    baseline_p: float = Field(default=0.01, gt=0, lt=1, description="ALS asymmetry parameter.")
-    smoothing: Literal["none", "gaussian"] = "none"
-    smoothing_sigma: float = Field(
-        default=1,
-        gt=0,
-        le=100,
-        description="Gaussian kernel standard deviation in sample points, not axis units.",
-    )
-    min_height: float = Field(default=0, ge=0, description="Minimum peak height in signal units.")
-    min_prominence: float = Field(
-        default=0, ge=0, description="Minimum peak prominence in signal units."
-    )
-    min_distance: float = Field(
-        default=0, ge=0, description="Minimum separation between peaks in axis units."
-    )
-    integration_baseline: Literal["local", "none", "global"] = "local"
 
 
 class Standard(StrictModel):
@@ -487,82 +382,26 @@ def analysis_for(owner: str, analysis_id: str) -> dict[str, Any]:
 
 
 def run_worker(payload: dict) -> dict[str, Any]:
-    command = os.environ.get("MEASURE_MCP_R", "R")
-    try:
-        process = subprocess.run(
-            [command, "--vanilla", "--slave", "-f", str(ROOT / "worker.R")],
-            input=canonical(payload),
-            text=True,
-            capture_output=True,
-            timeout=90,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        raise ValueError("The R analysis worker could not start or timed out") from exc
-    if process.returncode != 0:
-        raise ValueError("The R analysis worker failed; check the service environment")
-    try:
-        output = json.loads(process.stdout)
-    except json.JSONDecodeError as exc:
-        raise ValueError("The R analysis worker returned an invalid response") from exc
-    if not output.get("ok"):
-        raise ValueError("Analysis failed: " + str(output.get("error", "unknown worker error")))
-    warnings = output.get("warnings", [])
-    if isinstance(warnings, str):
-        warnings = [warnings]
-    result = output["result"]
-    result["warnings"] = warnings
-    return result
+    return analysis_runtime.run_worker(payload, worker_path=ROOT / "worker.R")
 
 
 def save_analysis(
     owner: str, dataset_id: str, trace_id: str, kind: str, method: dict, result: dict, digest: str
 ) -> dict[str, Any]:
-    analysis_id = str(uuid.uuid4())
-    worker_digest = hashlib.sha256((ROOT / "worker.R").read_bytes()).hexdigest()
     source = source_for(owner, dataset_id)
-    provenance = {
-        "input_sha256": digest,
-        "method_sha256": sha256(method),
-        "worker_sha256": worker_digest,
-        "source_sha256": None if source is None else source["source_sha256"],
-        "packages": result.get("packages"),
-        "installed_r_code_md5": result.get("installed_r_code_md5"),
-        "r_version": result.get("r_version"),
-        "measure_revision": os.environ.get("MEASURE_MCP_MEASURE_REVISION"),
-        "measure_sec_revision": os.environ.get("MEASURE_MCP_SEC_REVISION"),
-    }
-    created = now()
+    record = analysis_runtime.make_analysis_record(
+        dataset_id,
+        trace_id,
+        kind,
+        method,
+        result,
+        digest,
+        None if source is None else source["source_sha256"],
+        worker_path=ROOT / "worker.R",
+    )
     with connect() as con:
-        con.execute(
-            "INSERT INTO analyses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                analysis_id,
-                owner,
-                dataset_id,
-                trace_id,
-                kind,
-                canonical(method),
-                canonical(result),
-                canonical(provenance),
-                created,
-            ),
-        )
-    return {
-        "analysis_id": analysis_id,
-        "dataset_id": dataset_id,
-        "trace_id": trace_id,
-        "kind": kind,
-        "status": "completed_with_warnings" if result.get("warnings") else "completed",
-        "qualification": "experimental",
-        "summary": result.get("summary", {"peak_count": result.get("peak_count")}),
-        "diagnostics": result.get("diagnostics"),
-        "warnings": result.get("warnings", []),
-        "notes": result.get("notes", []),
-        "provenance": provenance,
-        "created_at": created,
-        "artifact": True,
-    }
+        analysis_runtime.insert_analysis(con, owner, record)
+    return analysis_runtime.compact_analysis(record)
 
 
 mcp = FastMCP(
@@ -1245,13 +1084,7 @@ def measurement_analyze_chromatogram(
     dataset, digest = dataset_for(owner, dataset_id)
     trace = trace_for(dataset, trace_id)
     spec = method.model_dump(mode="json")
-    result = run_worker({"operation": "chromatogram", "trace": trace, "method": spec})
-    if method.baseline == "als" or method.smoothing == "gaussian":
-        steps = [b - a for a, b in zip(trace["axis"], trace["axis"][1:])]
-        if max(steps) - min(steps) > 1e-6 * max(steps):
-            result["warnings"].append(
-                "ALS baseline and Gaussian smoothing use sample indices; spacing is irregular, so their physical width varies along the axis."
-            )
+    result = analysis_runtime.process_chromatogram(trace, spec, worker=run_worker)
     return save_analysis(owner, dataset_id, trace_id, "chromatogram", spec, result, digest)
 
 
