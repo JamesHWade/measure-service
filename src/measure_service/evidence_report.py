@@ -492,9 +492,19 @@ def _html(bundle: dict[str, Any], svg: bytes) -> bytes:
 <title>Chromatogram evidence report</title>
 <style>
 body {{ max-width: 1120px; margin: 2rem auto; padding: 0 1rem; color: #23313a; font: 16px/1.5 system-ui, sans-serif; }}
-h1, h2 {{ line-height: 1.2; }} table {{ border-collapse: collapse; width: 100%; margin: 1rem 0 2rem; }}
-th, td {{ border: 1px solid #cbd3d8; padding: .45rem .6rem; text-align: left; vertical-align: top; overflow-wrap: anywhere; }}
+h1, h2 {{ line-height: 1.2; }} table {{ border-collapse: collapse; width: 100%; margin: 0; }}
+th, td {{ border: 1px solid #cbd3d8; padding: .45rem .6rem; text-align: left; vertical-align: top; }}
 th {{ background: #f1f5f6; }} figure {{ margin: 1.5rem 0; }} figure svg {{ width: 100%; height: auto; border: 1px solid #d4dbdf; }}
+.table-scroll {{ max-width: 100%; box-sizing: border-box; overflow-x: auto; margin: 1rem 0 2rem; border: 1px solid #d4dbdf; -webkit-overflow-scrolling: touch; }}
+.table-scroll:focus {{ outline: 3px solid #007f78; outline-offset: 2px; }}
+.table-scroll table {{ margin: 0; }}
+.peak-table {{ min-width: 48rem; }}
+.peak-table th, .peak-table td {{ white-space: nowrap; overflow-wrap: normal; }}
+.metadata-table {{ min-width: 30rem; }}
+.metadata-table th {{ min-width: 12rem; white-space: nowrap; overflow-wrap: normal; }}
+.metadata-table td {{ overflow-wrap: anywhere; word-break: normal; }}
+.scroll-hint {{ margin: .45rem .75rem; color: #4b5a62; font-size: .9rem; }}
+.provenance-json {{ max-width: 100%; box-sizing: border-box; margin: 1rem 0 2rem; padding: .8rem; border: 1px solid #d4dbdf; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; }}
 .notice {{ padding: .8rem 1rem; background: #fff6df; border-left: 4px solid #b77a15; }}
 </style>
 </head>
@@ -504,14 +514,17 @@ th {{ background: #f1f5f6; }} figure {{ margin: 1.5rem 0; }} figure svg {{ width
 <p>{point_count} {point_noun}; {bundle["peak_count"]} peak rows.</p></header>
 <figure>{embed_svg}<figcaption>All supplied points are plotted in sample order. The vertical scale is shared between raw and processed signal. Shaded bands mark recorded peak-boundary intervals. {grid_caption}</figcaption></figure>
 <h2>Stored peak rows</h2><p>Peak IDs identify stored rows; they are not analyte assignments. Null measurements are shown as “Unavailable” in HTML and blank in CSV. An unavailable area_basis means the source record did not state a basis; none is inferred. Numeric values are shown as stored.</p>
-<table><thead><tr>{peak_header}</tr></thead><tbody>{peak_rows}</tbody></table>
-<h2>Trace and method</h2><table><tbody>{identifier_rows}</tbody></table>
-<h2>Availability</h2><table><tbody>{availability_rows}</tbody></table>
-<h2>Stored result metadata</h2><table><tbody>{result_rows}</tbody></table>
+<div class="table-scroll peak-table-region" role="region" aria-label="Stored peak rows" aria-describedby="peak-table-scroll-hint" tabindex="0">
+<p class="scroll-hint" id="peak-table-scroll-hint">Scroll horizontally to view all peak columns.</p>
+<table class="peak-table"><thead><tr>{peak_header}</tr></thead><tbody>{peak_rows}</tbody></table>
+</div>
+<h2>Trace and method</h2><div class="table-scroll metadata-table-region" role="region" aria-label="Trace and method" tabindex="0"><table class="metadata-table"><tbody>{identifier_rows}</tbody></table></div>
+<h2>Availability</h2><div class="table-scroll metadata-table-region" role="region" aria-label="Availability" tabindex="0"><table class="metadata-table"><tbody>{availability_rows}</tbody></table></div>
+<h2>Stored result metadata</h2><div class="table-scroll metadata-table-region" role="region" aria-label="Stored result metadata" tabindex="0"><table class="metadata-table"><tbody>{result_rows}</tbody></table></div>
 <p class="notice">Peak area is the stored signal-area value. Chemical assignment, calibration, deconvolution, and physical qualification are unavailable in this report; no purity or concentration inference is made.</p>
 <details><summary>Provenance digests and backend metadata</summary>
-<h2>Provenance digests</h2><table><tbody>{digest_rows}</tbody></table>
-<h2>Complete stored provenance</h2><pre>{provenance_json}</pre>
+<h2>Provenance digests</h2><div class="table-scroll metadata-table-region" role="region" aria-label="Provenance digests" tabindex="0"><table class="metadata-table"><tbody>{digest_rows}</tbody></table></div>
+<h2>Complete stored provenance</h2><pre class="provenance-json">{provenance_json}</pre>
 </details>
 <h2>Download evidence</h2><p>{artifacts}</p>
 </body></html>
