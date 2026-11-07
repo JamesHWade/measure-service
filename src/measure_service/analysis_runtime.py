@@ -8,6 +8,7 @@ import json
 import os
 import sqlite3
 import subprocess
+import tempfile
 import threading
 import uuid
 from pathlib import Path
@@ -97,16 +98,23 @@ def run_worker(payload: dict, *, worker_path: Path | None = None) -> dict[str, A
 def _execute_worker(payload: dict, *, worker_path: Path | None = None) -> dict[str, Any]:
     command = os.environ.get("MEASURE_MCP_R", "R")
     path = ROOT / "worker.R" if worker_path is None else worker_path
-    worker_digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    worker_bytes = path.read_bytes()
+    worker_digest = hashlib.sha256(worker_bytes).hexdigest()
     try:
-        process = subprocess.run(
-            [command, "--vanilla", "--slave", "-f", str(path)],
-            input=canonical(payload),
-            text=True,
-            capture_output=True,
-            timeout=90,
-            check=False,
-        )
+        # R must open exactly the bytes identified by the retained digest,
+        # even if an installed worker is upgraded and restored during the call.
+        with tempfile.TemporaryDirectory(prefix="measure-r-worker-") as directory:
+            snapshot = Path(directory) / "worker.R"
+            snapshot.write_bytes(worker_bytes)
+            snapshot.chmod(0o400)
+            process = subprocess.run(
+                [command, "--vanilla", "--slave", "-f", str(snapshot)],
+                input=canonical(payload),
+                text=True,
+                capture_output=True,
+                timeout=90,
+                check=False,
+            )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise ValueError("The R analysis worker could not start or timed out") from exc
     if process.returncode != 0:
