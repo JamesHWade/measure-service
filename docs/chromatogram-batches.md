@@ -17,7 +17,7 @@ python examples/chromatogram_batch.py \
   --data-dir /tmp/chromatogram-batch-store
 ```
 
-Both paths must be new. The optional `--data-dir` retains a new local store;
+Both paths must be new, separate and non-nested. The optional `--data-dir` retains a new local store;
 omitting it uses a temporary store. The example never opens an existing store.
 It respects `MEASURE_MCP_R` and the caller's R library configuration.
 

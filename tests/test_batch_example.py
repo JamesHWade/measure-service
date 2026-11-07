@@ -43,6 +43,24 @@ def test_demo_rejects_existing_store_without_registering_inputs(tmp_path: Path) 
     assert marker.read_bytes() == b"owned data"
 
 
+@pytest.mark.parametrize("layout", ["same", "output-in-store", "store-in-output"])
+def test_demo_rejects_nested_directories_before_creating_either(
+    tmp_path: Path, layout: str
+) -> None:
+    root = tmp_path / "new-parent"
+    output = root if layout != "output-in-store" else root / "output"
+    store = root if layout != "store-in-output" else root / "store"
+    command = [sys.executable, str(EXAMPLE), "--output-dir", str(output), "--data-dir", str(store)]
+    environment = dict(_child_environment(), MEASURE_MCP_R=str(tmp_path / "unavailable-R"))
+    for _ in range(2):
+        result = subprocess.run(
+            command, cwd=tmp_path, env=environment, capture_output=True, text=True, timeout=20
+        )
+        assert result.returncode != 0
+        assert "separate, non-nested" in result.stderr
+        assert not root.exists(), "Preflight must not leave either path behind on rejection"
+
+
 @pytest.mark.r_backend
 def test_installed_batch_example_restarts_replays_and_renders(tmp_path: Path) -> None:
     """Run the real stdio/MCP workflow outside the checkout's import path."""

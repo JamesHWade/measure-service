@@ -769,8 +769,14 @@ async def run(output_dir: Path, *, data_dir: str | None = None) -> dict[str, Any
     retained = None if data_dir is None else Path(data_dir)
     if retained is not None and (retained.exists() or retained.is_symlink()):
         raise FileExistsError(f"Use a new batch demonstration data directory: {retained}")
-    if retained is not None and retained.resolve() == output_dir.resolve():
-        raise ValueError("Use separate output and data directories")
+    if retained is not None:
+        output_path, store_path = output_dir.resolve(), retained.resolve()
+        if (
+            output_path == store_path
+            or store_path in output_path.parents
+            or output_path in store_path.parents
+        ):
+            raise ValueError("Use separate, non-nested output and data directories")
     _preflight_output(output_dir)
     (output_dir / "items").mkdir()
     if retained is not None:
