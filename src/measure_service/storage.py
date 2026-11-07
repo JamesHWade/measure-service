@@ -43,7 +43,7 @@ def connect() -> sqlite3.Connection:
     con = sqlite3.connect(db_path(), timeout=30)
     con.execute("PRAGMA foreign_keys=ON")
     try:
-        validate_batch_schema(con)
+        batch_schema_exists = validate_batch_schema(con)
     except BaseException:
         con.close()
         raise
@@ -236,9 +236,11 @@ def connect() -> sqlite3.Connection:
     """)
     try:
         ensure_proposal_repetition_schema(con)
-        con.execute("BEGIN IMMEDIATE")
-        ensure_batch_schema(con)
-        con.commit()
+        if not batch_schema_exists:
+            con.execute("BEGIN IMMEDIATE")
+            # Another first-time caller may have initialized while we waited.
+            ensure_batch_schema(con)
+            con.commit()
     except BaseException:
         con.rollback()
         con.close()
