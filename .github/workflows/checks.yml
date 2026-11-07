@@ -115,6 +115,8 @@ jobs:
               assert "src/measure_service/" + name + ".py" in members
           for name in ("test_batch_example", "test_batch_mcp", "test_batch_mcp_crash", "test_batch_mcp_concurrency", "test_batches", "test_batch_schema", "test_batch_schema_contract", "test_batch_mutation_validation", "test_batch_boundaries", "test_batch_control_events", "test_batch_execution", "test_analysis_runtime"):
               assert "tests/" + name + ".py" in members
+          assert "src/measure_service/import_origins.py" in members
+          assert "tests/test_import_origins.py" in members
           assert "examples/chromatogram_report.py" in members
           assert "docs/figures/chromatogram-evidence-example.png" in members
           for name in ("report.html", "chromatogram.svg", "evidence.json", "trace.csv", "peaks.csv", "publication.json"):
