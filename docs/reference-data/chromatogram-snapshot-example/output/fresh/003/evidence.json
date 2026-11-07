@@ -1,0 +1,3610 @@
+{
+  "analysis": {
+    "analysis_id": "3b02df0d-6bdb-48f9-a70e-ac41f13f9a88",
+    "created_at": "2026-11-07T20:34:01.706131+00:00",
+    "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+    "kind": "chromatogram",
+    "method": {
+      "baseline": "als",
+      "baseline_lambda": 1000000.0,
+      "baseline_p": 0.01,
+      "integration_baseline": "local",
+      "min_distance": 0.0,
+      "min_height": 0.0,
+      "min_prominence": 0.3,
+      "smoothing": "gaussian",
+      "smoothing_sigma": 2.0
+    },
+    "provenance": {
+      "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+      "installed_r_code_md5": {
+        "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+        "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+      },
+      "measure_revision": null,
+      "measure_sec_revision": null,
+      "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+      "packages": {
+        "measure": "0.0.1.9003",
+        "measure.sec": "0.0.0.9000",
+        "recipes": "1.3.1"
+      },
+      "r_version": "4.5.2",
+      "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+      "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+    },
+    "stored_result_sha256": "dcadecb5d66aa75a577c5f01f75f591edad436c0e7e0b9eae62d3dde2116462a",
+    "trace_id": "unknown"
+  },
+  "availability": {
+    "calibration": "not_linked",
+    "compound_identity": "not_assigned",
+    "deconvolution": "not_performed",
+    "physical_validation": "not_established"
+  },
+  "evidence_sha256": "d6dfbcf7f50033eb23daf854c240b8257c3c3d6a490d820236ead97b98d5281a",
+  "peak_count": 2,
+  "peaks": [
+    {
+      "area": 0.6033815508722128,
+      "area_basis": "observed_signal",
+      "height": 1.412705471109873,
+      "left_base": 0.88,
+      "location": 1.5,
+      "peak_id": 1,
+      "right_base": 2.15
+    },
+    {
+      "area": 0.5471835938522893,
+      "area_basis": "observed_signal",
+      "height": 0.9578978381904171,
+      "left_base": 2.15,
+      "location": 3.5,
+      "peak_id": 2,
+      "right_base": 4.27
+    }
+  ],
+  "point_count": 501,
+  "points": [
+    {
+      "axis": 0.0,
+      "processed_axis": 0,
+      "processed_signal": 0.023935906241929792,
+      "raw_signal": 0.12,
+      "sample_index": 0
+    },
+    {
+      "axis": 0.01,
+      "processed_axis": 0.01,
+      "processed_signal": 0.023853728640189968,
+      "raw_signal": 0.12,
+      "sample_index": 1
+    },
+    {
+      "axis": 0.02,
+      "processed_axis": 0.02,
+      "processed_signal": 0.02362650785758914,
+      "raw_signal": 0.1200000000000001,
+      "sample_index": 2
+    },
+    {
+      "axis": 0.03,
+      "processed_axis": 0.03,
+      "processed_signal": 0.02329959977135031,
+      "raw_signal": 0.1200000000000001,
+      "sample_index": 3
+    },
+    {
+      "axis": 0.04,
+      "processed_axis": 0.04,
+      "processed_signal": 0.022919331648370036,
+      "raw_signal": 0.1200000000000001,
+      "sample_index": 4
+    },
+    {
+      "axis": 0.05,
+      "processed_axis": 0.05,
+      "processed_signal": 0.022516817685230364,
+      "raw_signal": 0.1200000000000002,
+      "sample_index": 5
+    },
+    {
+      "axis": 0.06,
+      "processed_axis": 0.06,
+      "processed_signal": 0.022107078438250362,
+      "raw_signal": 0.1200000000000004,
+      "sample_index": 6
+    },
+    {
+      "axis": 0.07,
+      "processed_axis": 0.07,
+      "processed_signal": 0.02169550792355988,
+      "raw_signal": 0.1200000000000006,
+      "sample_index": 7
+    },
+    {
+      "axis": 0.08,
+      "processed_axis": 0.08,
+      "processed_signal": 0.02128393032931741,
+      "raw_signal": 0.120000000000001,
+      "sample_index": 8
+    },
+    {
+      "axis": 0.09,
+      "processed_axis": 0.09,
+      "processed_signal": 0.020872343812775678,
+      "raw_signal": 0.1200000000000017,
+      "sample_index": 9
+    },
+    {
+      "axis": 0.1,
+      "processed_axis": 0.1,
+      "processed_signal": 0.020460746318348183,
+      "raw_signal": 0.1200000000000027,
+      "sample_index": 10
+    },
+    {
+      "axis": 0.11,
+      "processed_axis": 0.11,
+      "processed_signal": 0.02004913558172511,
+      "raw_signal": 0.1200000000000044,
+      "sample_index": 11
+    },
+    {
+      "axis": 0.12,
+      "processed_axis": 0.12,
+      "processed_signal": 0.019637509133989327,
+      "raw_signal": 0.1200000000000071,
+      "sample_index": 12
+    },
+    {
+      "axis": 0.13,
+      "processed_axis": 0.13,
+      "processed_signal": 0.019225864305732678,
+      "raw_signal": 0.1200000000000114,
+      "sample_index": 13
+    },
+    {
+      "axis": 0.14,
+      "processed_axis": 0.14,
+      "processed_signal": 0.01881419823117238,
+      "raw_signal": 0.1200000000000184,
+      "sample_index": 14
+    },
+    {
+      "axis": 0.15,
+      "processed_axis": 0.15,
+      "processed_signal": 0.018402507852267762,
+      "raw_signal": 0.1200000000000293,
+      "sample_index": 15
+    },
+    {
+      "axis": 0.16,
+      "processed_axis": 0.16,
+      "processed_signal": 0.01799078992283734,
+      "raw_signal": 0.1200000000000467,
+      "sample_index": 16
+    },
+    {
+      "axis": 0.17,
+      "processed_axis": 0.17,
+      "processed_signal": 0.017579041012676433,
+      "raw_signal": 0.1200000000000742,
+      "sample_index": 17
+    },
+    {
+      "axis": 0.18,
+      "processed_axis": 0.18,
+      "processed_signal": 0.01716725751167529,
+      "raw_signal": 0.1200000000001173,
+      "sample_index": 18
+    },
+    {
+      "axis": 0.19,
+      "processed_axis": 0.19,
+      "processed_signal": 0.016755435633938102,
+      "raw_signal": 0.1200000000001849,
+      "sample_index": 19
+    },
+    {
+      "axis": 0.2,
+      "processed_axis": 0.2,
+      "processed_signal": 0.016343571421903142,
+      "raw_signal": 0.1200000000002905,
+      "sample_index": 20
+    },
+    {
+      "axis": 0.21,
+      "processed_axis": 0.21,
+      "processed_signal": 0.015931660750464406,
+      "raw_signal": 0.1200000000004547,
+      "sample_index": 21
+    },
+    {
+      "axis": 0.22,
+      "processed_axis": 0.22,
+      "processed_signal": 0.015519699331095423,
+      "raw_signal": 0.1200000000007093,
+      "sample_index": 22
+    },
+    {
+      "axis": 0.23,
+      "processed_axis": 0.23,
+      "processed_signal": 0.015107682715976083,
+      "raw_signal": 0.1200000000011027,
+      "sample_index": 23
+    },
+    {
+      "axis": 0.24,
+      "processed_axis": 0.24,
+      "processed_signal": 0.014695606302123744,
+      "raw_signal": 0.1200000000017082,
+      "sample_index": 24
+    },
+    {
+      "axis": 0.25,
+      "processed_axis": 0.25,
+      "processed_signal": 0.014283465335530432,
+      "raw_signal": 0.1200000000026372,
+      "sample_index": 25
+    },
+    {
+      "axis": 0.26,
+      "processed_axis": 0.26,
+      "processed_signal": 0.013871254915308766,
+      "raw_signal": 0.1200000000040573,
+      "sample_index": 26
+    },
+    {
+      "axis": 0.27,
+      "processed_axis": 0.27,
+      "processed_signal": 0.013458969997850435,
+      "raw_signal": 0.1200000000062205,
+      "sample_index": 27
+    },
+    {
+      "axis": 0.28,
+      "processed_axis": 0.28,
+      "processed_signal": 0.01304660540100263,
+      "raw_signal": 0.1200000000095041,
+      "sample_index": 28
+    },
+    {
+      "axis": 0.29,
+      "processed_axis": 0.29,
+      "processed_signal": 0.012634155808270231,
+      "raw_signal": 0.1200000000144708,
+      "sample_index": 29
+    },
+    {
+      "axis": 0.3,
+      "processed_axis": 0.3,
+      "processed_signal": 0.012221615773054932,
+      "raw_signal": 0.1200000000219571,
+      "sample_index": 30
+    },
+    {
+      "axis": 0.31,
+      "processed_axis": 0.31,
+      "processed_signal": 0.01180897972294706,
+      "raw_signal": 0.1200000000332011,
+      "sample_index": 31
+    },
+    {
+      "axis": 0.32,
+      "processed_axis": 0.32,
+      "processed_signal": 0.011396241964092595,
+      "raw_signal": 0.1200000000500298,
+      "sample_index": 32
+    },
+    {
+      "axis": 0.33,
+      "processed_axis": 0.33,
+      "processed_signal": 0.010983396685667049,
+      "raw_signal": 0.120000000075128,
+      "sample_index": 33
+    },
+    {
+      "axis": 0.34,
+      "processed_axis": 0.34,
+      "processed_signal": 0.010570437964500754,
+      "raw_signal": 0.1200000001124274,
+      "sample_index": 34
+    },
+    {
+      "axis": 0.35,
+      "processed_axis": 0.35,
+      "processed_signal": 0.01015735976991789,
+      "raw_signal": 0.120000000167664,
+      "sample_index": 35
+    },
+    {
+      "axis": 0.36,
+      "processed_axis": 0.36,
+      "processed_signal": 0.009744155968876265,
+      "raw_signal": 0.120000000249175,
+      "sample_index": 36
+    },
+    {
+      "axis": 0.37,
+      "processed_axis": 0.37,
+      "processed_signal": 0.009330820331528624,
+      "raw_signal": 0.1200000003690341,
+      "sample_index": 37
+    },
+    {
+      "axis": 0.38,
+      "processed_axis": 0.38,
+      "processed_signal": 0.008917346537372485,
+      "raw_signal": 0.1200000005446604,
+      "sample_index": 38
+    },
+    {
+      "axis": 0.39,
+      "processed_axis": 0.39,
+      "processed_signal": 0.008503728182218541,
+      "raw_signal": 0.1200000008010919,
+      "sample_index": 39
+    },
+    {
+      "axis": 0.4,
+      "processed_axis": 0.4,
+      "processed_signal": 0.008089958786293004,
+      "raw_signal": 0.1200000011741839,
+      "sample_index": 40
+    },
+    {
+      "axis": 0.41,
+      "processed_axis": 0.41,
+      "processed_signal": 0.007676031803904518,
+      "raw_signal": 0.1200000017150909,
+      "sample_index": 41
+    },
+    {
+      "axis": 0.42,
+      "processed_axis": 0.42,
+      "processed_signal": 0.007261940635260888,
+      "raw_signal": 0.1200000024965221,
+      "sample_index": 42
+    },
+    {
+      "axis": 0.43,
+      "processed_axis": 0.43,
+      "processed_signal": 0.006847678641227977,
+      "raw_signal": 0.120000003621437,
+      "sample_index": 43
+    },
+    {
+      "axis": 0.44,
+      "processed_axis": 0.44,
+      "processed_signal": 0.006433239162098097,
+      "raw_signal": 0.1200000052350847,
+      "sample_index": 44
+    },
+    {
+      "axis": 0.45,
+      "processed_axis": 0.45,
+      "processed_signal": 0.006018615541800041,
+      "raw_signal": 0.1200000075416043,
+      "sample_index": 45
+    },
+    {
+      "axis": 0.46,
+      "processed_axis": 0.46,
+      "processed_signal": 0.005603801159463116,
+      "raw_signal": 0.1200000108268225,
+      "sample_index": 46
+    },
+    {
+      "axis": 0.47,
+      "processed_axis": 0.47,
+      "processed_signal": 0.0051887894708777475,
+      "raw_signal": 0.120000015489434,
+      "sample_index": 47
+    },
+    {
+      "axis": 0.48,
+      "processed_axis": 0.48,
+      "processed_signal": 0.004773574063217518,
+      "raw_signal": 0.1200000220834706,
+      "sample_index": 48
+    },
+    {
+      "axis": 0.49,
+      "processed_axis": 0.49,
+      "processed_signal": 0.004358148727455229,
+      "raw_signal": 0.120000031375912,
+      "sample_index": 49
+    },
+    {
+      "axis": 0.5,
+      "processed_axis": 0.5,
+      "processed_signal": 0.003942507554285272,
+      "raw_signal": 0.1200000444245094,
+      "sample_index": 50
+    },
+    {
+      "axis": 0.51,
+      "processed_axis": 0.51,
+      "processed_signal": 0.003526645061137803,
+      "raw_signal": 0.1200000626824804,
+      "sample_index": 51
+    },
+    {
+      "axis": 0.52,
+      "processed_axis": 0.52,
+      "processed_signal": 0.003110556360137653,
+      "raw_signal": 0.1200000881387642,
+      "sample_index": 52
+    },
+    {
+      "axis": 0.53,
+      "processed_axis": 0.53,
+      "processed_signal": 0.002694237379744845,
+      "raw_signal": 0.1200001235051284,
+      "sample_index": 53
+    },
+    {
+      "axis": 0.54,
+      "processed_axis": 0.54,
+      "processed_signal": 0.002277685156461861,
+      "raw_signal": 0.1200001724647237,
+      "sample_index": 54
+    },
+    {
+      "axis": 0.55,
+      "processed_axis": 0.55,
+      "processed_signal": 0.0018608982175827085,
+      "raw_signal": 0.1200002400008685,
+      "sample_index": 55
+    },
+    {
+      "axis": 0.56,
+      "processed_axis": 0.56,
+      "processed_signal": 0.0014438770821924034,
+      "raw_signal": 0.120000332830104,
+      "sample_index": 56
+    },
+    {
+      "axis": 0.57,
+      "processed_axis": 0.57,
+      "processed_signal": 0.0010266249161462956,
+      "raw_signal": 0.1200004599701395,
+      "sample_index": 57
+    },
+    {
+      "axis": 0.58,
+      "processed_axis": 0.58,
+      "processed_signal": 0.0006091483889985539,
+      "raw_signal": 0.1200006334814879,
+      "sample_index": 58
+    },
+    {
+      "axis": 0.59,
+      "processed_axis": 0.59,
+      "processed_signal": 0.00019145879823904134,
+      "raw_signal": 0.1200008694316949,
+      "sample_index": 59
+    },
+    {
+      "axis": 0.6,
+      "processed_axis": 0.6,
+      "processed_signal": -0.00022642645276388327,
+      "raw_signal": 0.1200011891434808,
+      "sample_index": 60
+    },
+    {
+      "axis": 0.61,
+      "processed_axis": 0.61,
+      "processed_signal": -0.0006444819173994792,
+      "raw_signal": 0.120001620803259,
+      "sample_index": 61
+    },
+    {
+      "axis": 0.62,
+      "processed_axis": 0.62,
+      "processed_signal": -0.0010626715911331067,
+      "raw_signal": 0.1200022015248611,
+      "sample_index": 62
+    },
+    {
+      "axis": 0.63,
+      "processed_axis": 0.63,
+      "processed_signal": -0.0014809456947179444,
+      "raw_signal": 0.1200029799854116,
+      "sample_index": 63
+    },
+    {
+      "axis": 0.64,
+      "processed_axis": 0.64,
+      "processed_signal": -0.0018992366187243232,
+      "raw_signal": 0.120004019776739,
+      "sample_index": 64
+    },
+    {
+      "axis": 0.65,
+      "processed_axis": 0.65,
+      "processed_signal": -0.0023174538664303785,
+      "raw_signal": 0.1200054036470995,
+      "sample_index": 65
+    },
+    {
+      "axis": 0.66,
+      "processed_axis": 0.66,
+      "processed_signal": -0.0027354777900767823,
+      "raw_signal": 0.1200072388449592,
+      "sample_index": 66
+    },
+    {
+      "axis": 0.67,
+      "processed_axis": 0.67,
+      "processed_signal": -0.0031531518633451106,
+      "raw_signal": 0.1200096638197883,
+      "sample_index": 67
+    },
+    {
+      "axis": 0.68,
+      "processed_axis": 0.68,
+      "processed_signal": -0.0035702731755996786,
+      "raw_signal": 0.1200128565848698,
+      "sample_index": 68
+    },
+    {
+      "axis": 0.69,
+      "processed_axis": 0.69,
+      "processed_signal": -0.003986580772035938,
+      "raw_signal": 0.1200170451045909,
+      "sample_index": 69
+    },
+    {
+      "axis": 0.7,
+      "processed_axis": 0.7,
+      "processed_signal": -0.004401741396805391,
+      "raw_signal": 0.1200225201340229,
+      "sample_index": 70
+    },
+    {
+      "axis": 0.71,
+      "processed_axis": 0.71,
+      "processed_signal": -0.004815332122309468,
+      "raw_signal": 0.1200296510120987,
+      "sample_index": 71
+    },
+    {
+      "axis": 0.72,
+      "processed_axis": 0.72,
+      "processed_signal": -0.0052268192667829115,
+      "raw_signal": 0.12003890499145,
+      "sample_index": 72
+    },
+    {
+      "axis": 0.73,
+      "processed_axis": 0.73,
+      "processed_signal": -0.005635532914011283,
+      "raw_signal": 0.1200508707777286,
+      "sample_index": 73
+    },
+    {
+      "axis": 0.74,
+      "processed_axis": 0.74,
+      "processed_signal": -0.006040636254367174,
+      "raw_signal": 0.1200662870483953,
+      "sample_index": 74
+    },
+    {
+      "axis": 0.75,
+      "processed_axis": 0.75,
+      "processed_signal": -0.006441088866632806,
+      "raw_signal": 0.1200860768243908,
+      "sample_index": 75
+    },
+    {
+      "axis": 0.76,
+      "processed_axis": 0.76,
+      "processed_signal": -0.006835602957241269,
+      "raw_signal": 0.1201113886760968,
+      "sample_index": 76
+    },
+    {
+      "axis": 0.77,
+      "processed_axis": 0.77,
+      "processed_signal": -0.007222591470267154,
+      "raw_signal": 0.1201436458551224,
+      "sample_index": 77
+    },
+    {
+      "axis": 0.78,
+      "processed_axis": 0.78,
+      "processed_signal": -0.007600106881202711,
+      "raw_signal": 0.1201846045524472,
+      "sample_index": 78
+    },
+    {
+      "axis": 0.79,
+      "processed_axis": 0.79,
+      "processed_signal": -0.007965769394657323,
+      "raw_signal": 0.1202364225871292,
+      "sample_index": 79
+    },
+    {
+      "axis": 0.8,
+      "processed_axis": 0.8,
+      "processed_signal": -0.008316683186006662,
+      "raw_signal": 0.1203017399228951,
+      "sample_index": 80
+    },
+    {
+      "axis": 0.81,
+      "processed_axis": 0.81,
+      "processed_signal": -0.008649339266146548,
+      "raw_signal": 0.1203837724861224,
+      "sample_index": 81
+    },
+    {
+      "axis": 0.82,
+      "processed_axis": 0.82,
+      "processed_signal": -0.008959503514422837,
+      "raw_signal": 0.1204864208104586,
+      "sample_index": 82
+    },
+    {
+      "axis": 0.83,
+      "processed_axis": 0.83,
+      "processed_signal": -0.00924208842614198,
+      "raw_signal": 0.1206143950518906,
+      "sample_index": 83
+    },
+    {
+      "axis": 0.84,
+      "processed_axis": 0.84,
+      "processed_signal": -0.00949100716746629,
+      "raw_signal": 0.1207733578936097,
+      "sample_index": 84
+    },
+    {
+      "axis": 0.85,
+      "processed_axis": 0.85,
+      "processed_signal": -0.009699008632501569,
+      "raw_signal": 0.1209700867816187,
+      "sample_index": 85
+    },
+    {
+      "axis": 0.86,
+      "processed_axis": 0.86,
+      "processed_signal": -0.009857492366217918,
+      "raw_signal": 0.1212126567879306,
+      "sample_index": 86
+    },
+    {
+      "axis": 0.87,
+      "processed_axis": 0.87,
+      "processed_signal": -0.009956302464126725,
+      "raw_signal": 0.1215106451760703,
+      "sample_index": 87
+    },
+    {
+      "axis": 0.88,
+      "processed_axis": 0.88,
+      "processed_signal": -0.009983499897000491,
+      "raw_signal": 0.1218753584308495,
+      "sample_index": 88
+    },
+    {
+      "axis": 0.89,
+      "processed_axis": 0.89,
+      "processed_signal": -0.009925113147525205,
+      "raw_signal": 0.1223200820987372,
+      "sample_index": 89
+    },
+    {
+      "axis": 0.9,
+      "processed_axis": 0.9,
+      "processed_signal": -0.009764867595718362,
+      "raw_signal": 0.1228603532551541,
+      "sample_index": 90
+    },
+    {
+      "axis": 0.91,
+      "processed_axis": 0.91,
+      "processed_signal": -0.009483894759587478,
+      "raw_signal": 0.1235142547607714,
+      "sample_index": 91
+    },
+    {
+      "axis": 0.92,
+      "processed_axis": 0.92,
+      "processed_signal": -0.009060423292689447,
+      "raw_signal": 0.1243027296828687,
+      "sample_index": 92
+    },
+    {
+      "axis": 0.93,
+      "processed_axis": 0.93,
+      "processed_signal": -0.008469454563467165,
+      "raw_signal": 0.1252499133356846,
+      "sample_index": 93
+    },
+    {
+      "axis": 0.94,
+      "processed_axis": 0.94,
+      "processed_signal": -0.007682426690725799,
+      "raw_signal": 0.1263834793353939,
+      "sample_index": 94
+    },
+    {
+      "axis": 0.95,
+      "processed_axis": 0.95,
+      "processed_signal": -0.006666872078448469,
+      "raw_signal": 0.1277349948759413,
+      "sample_index": 95
+    },
+    {
+      "axis": 0.96,
+      "processed_axis": 0.96,
+      "processed_signal": -0.005386074763452842,
+      "raw_signal": 0.1293402791227101,
+      "sample_index": 96
+    },
+    {
+      "axis": 0.97,
+      "processed_axis": 0.97,
+      "processed_signal": -0.0037987352395684702,
+      "raw_signal": 0.1312397572102324,
+      "sample_index": 97
+    },
+    {
+      "axis": 0.98,
+      "processed_axis": 0.98,
+      "processed_signal": -0.0018586518119268704,
+      "raw_signal": 0.1334788008440834,
+      "sample_index": 98
+    },
+    {
+      "axis": 0.99,
+      "processed_axis": 0.99,
+      "processed_signal": 0.00048557107794569766,
+      "raw_signal": 0.1361080449804513,
+      "sample_index": 99
+    },
+    {
+      "axis": 1.0,
+      "processed_axis": 1,
+      "processed_signal": 0.003290775759928782,
+      "raw_signal": 0.1391836685332424,
+      "sample_index": 100
+    },
+    {
+      "axis": 1.01,
+      "processed_axis": 1.01,
+      "processed_signal": 0.0066194523631871545,
+      "raw_signal": 0.1427676255904404,
+      "sample_index": 101
+    },
+    {
+      "axis": 1.02,
+      "processed_axis": 1.02,
+      "processed_signal": 0.010539873593336494,
+      "raw_signal": 0.1469278122698404,
+      "sample_index": 102
+    },
+    {
+      "axis": 1.03,
+      "processed_axis": 1.03,
+      "processed_signal": 0.015126147769139826,
+      "raw_signal": 0.1517381531779708,
+      "sample_index": 103
+    },
+    {
+      "axis": 1.04,
+      "processed_axis": 1.04,
+      "processed_signal": 0.020458173785179383,
+      "raw_signal": 0.1572785905301638,
+      "sample_index": 104
+    },
+    {
+      "axis": 1.05,
+      "processed_axis": 1.05,
+      "processed_signal": 0.02662148122404121,
+      "raw_signal": 0.1636349584240198,
+      "sample_index": 105
+    },
+    {
+      "axis": 1.06,
+      "processed_axis": 1.06,
+      "processed_signal": 0.033706938870673615,
+      "raw_signal": 0.1708987246146793,
+      "sample_index": 106
+    },
+    {
+      "axis": 1.07,
+      "processed_axis": 1.07,
+      "processed_signal": 0.04181031542061392,
+      "raw_signal": 0.1791665824992439,
+      "sample_index": 107
+    },
+    {
+      "axis": 1.08,
+      "processed_axis": 1.08,
+      "processed_signal": 0.051031677265743224,
+      "raw_signal": 0.1885398769558213,
+      "sample_index": 108
+    },
+    {
+      "axis": 1.09,
+      "processed_axis": 1.09,
+      "processed_signal": 0.061474609940860105,
+      "raw_signal": 0.1991238492682032,
+      "sample_index": 109
+    },
+    {
+      "axis": 1.1,
+      "processed_axis": 1.1,
+      "processed_signal": 0.07324525217781458,
+      "raw_signal": 0.2110266886557313,
+      "sample_index": 110
+    },
+    {
+      "axis": 1.11,
+      "processed_axis": 1.11,
+      "processed_signal": 0.08645113457280644,
+      "raw_signal": 0.2243583809582379,
+      "sample_index": 111
+    },
+    {
+      "axis": 1.12,
+      "processed_axis": 1.12,
+      "processed_signal": 0.10119981864042071,
+      "raw_signal": 0.2392293488155452,
+      "sample_index": 112
+    },
+    {
+      "axis": 1.13,
+      "processed_axis": 1.13,
+      "processed_signal": 0.11759733649130966,
+      "raw_signal": 0.2557488822219881,
+      "sample_index": 113
+    },
+    {
+      "axis": 1.14,
+      "processed_axis": 1.14,
+      "processed_signal": 0.13574643648694823,
+      "raw_signal": 0.2740233635919538,
+      "sample_index": 114
+    },
+    {
+      "axis": 1.15,
+      "processed_axis": 1.15,
+      "processed_signal": 0.15574464592239942,
+      "raw_signal": 0.2941542973736928,
+      "sample_index": 115
+    },
+    {
+      "axis": 1.16,
+      "processed_axis": 1.16,
+      "processed_signal": 0.17768216796283987,
+      "raw_signal": 0.3162361606930882,
+      "sample_index": 116
+    },
+    {
+      "axis": 1.17,
+      "processed_axis": 1.17,
+      "processed_signal": 0.2016396365762289,
+      "raw_signal": 0.3403540983594767,
+      "sample_index": 117
+    },
+    {
+      "axis": 1.18,
+      "processed_axis": 1.18,
+      "processed_signal": 0.22768575989661877,
+      "raw_signal": 0.3665814926509918,
+      "sample_index": 118
+    },
+    {
+      "axis": 1.19,
+      "processed_axis": 1.19,
+      "processed_signal": 0.25587488912555734,
+      "raw_signal": 0.3949774454146865,
+      "sample_index": 119
+    },
+    {
+      "axis": 1.2,
+      "processed_axis": 1.2,
+      "processed_signal": 0.28624455651385217,
+      "raw_signal": 0.4255842169366902,
+      "sample_index": 120
+    },
+    {
+      "axis": 1.21,
+      "processed_axis": 1.21,
+      "processed_signal": 0.3188130319249628,
+      "raw_signal": 0.4584246725078792,
+      "sample_index": 121
+    },
+    {
+      "axis": 1.22,
+      "processed_axis": 1.22,
+      "processed_signal": 0.3535769527152037,
+      "raw_signal": 0.4934997933644327,
+      "sample_index": 122
+    },
+    {
+      "axis": 1.23,
+      "processed_axis": 1.23,
+      "processed_signal": 0.39050908592232475,
+      "raw_signal": 0.5307863134481874,
+      "sample_index": 123
+    },
+    {
+      "axis": 1.24,
+      "processed_axis": 1.24,
+      "processed_signal": 0.4295562847869428,
+      "raw_signal": 0.5702345469414541,
+      "sample_index": 124
+    },
+    {
+      "axis": 1.25,
+      "processed_axis": 1.25,
+      "processed_signal": 0.4706377032115507,
+      "raw_signal": 0.6117664735334483,
+      "sample_index": 125
+    },
+    {
+      "axis": 1.26,
+      "processed_axis": 1.26,
+      "processed_signal": 0.513643331687979,
+      "raw_signal": 0.6552741486467724,
+      "sample_index": 126
+    },
+    {
+      "axis": 1.27,
+      "processed_axis": 1.27,
+      "processed_signal": 0.5584329163331152,
+      "raw_signal": 0.7006185042080466,
+      "sample_index": 127
+    },
+    {
+      "axis": 1.28,
+      "processed_axis": 1.28,
+      "processed_signal": 0.6048353188499852,
+      "raw_signal": 0.747628601853065,
+      "sample_index": 128
+    },
+    {
+      "axis": 1.29,
+      "processed_axis": 1.29,
+      "processed_signal": 0.6526483694203119,
+      "raw_signal": 0.7961013946410979,
+      "sample_index": 129
+    },
+    {
+      "axis": 1.3,
+      "processed_axis": 1.3,
+      "processed_signal": 0.7016392567440691,
+      "raw_signal": 0.8458020454120159,
+      "sample_index": 130
+    },
+    {
+      "axis": 1.31,
+      "processed_axis": 1.31,
+      "processed_signal": 0.7515454897508695,
+      "raw_signal": 0.8964648399267304,
+      "sample_index": 131
+    },
+    {
+      "axis": 1.32,
+      "processed_axis": 1.32,
+      "processed_signal": 0.8020764540704753,
+      "raw_signal": 0.9477947210385481,
+      "sample_index": 132
+    },
+    {
+      "axis": 1.33,
+      "processed_axis": 1.33,
+      "processed_signal": 0.8529155733923725,
+      "raw_signal": 0.9994694565833188,
+      "sample_index": 133
+    },
+    {
+      "axis": 1.34,
+      "processed_axis": 1.34,
+      "processed_signal": 0.9037230716649493,
+      "raw_signal": 1.051142438759946,
+      "sample_index": 134
+    },
+    {
+      "axis": 1.35,
+      "processed_axis": 1.35,
+      "processed_signal": 0.9541393170456471,
+      "raw_signal": 1.102446096881302,
+      "sample_index": 135
+    },
+    {
+      "axis": 1.36,
+      "processed_axis": 1.36,
+      "processed_signal": 1.0037887130317447,
+      "raw_signal": 1.15299588895145,
+      "sample_index": 136
+    },
+    {
+      "axis": 1.37,
+      "processed_axis": 1.37,
+      "processed_signal": 1.0522840867371113,
+      "raw_signal": 1.202394821059006,
+      "sample_index": 137
+    },
+    {
+      "axis": 1.38,
+      "processed_axis": 1.38,
+      "processed_signal": 1.0992315093207794,
+      "raw_signal": 1.250238427591142,
+      "sample_index": 138
+    },
+    {
+      "axis": 1.39,
+      "processed_axis": 1.39,
+      "processed_signal": 1.1442354696166397,
+      "raw_signal": 1.296120130304574,
+      "sample_index": 139
+    },
+    {
+      "axis": 1.4,
+      "processed_axis": 1.4,
+      "processed_signal": 1.1869043095499707,
+      "raw_signal": 1.339636880868532,
+      "sample_index": 140
+    },
+    {
+      "axis": 1.41,
+      "processed_axis": 1.41,
+      "processed_signal": 1.2268558194188637,
+      "raw_signal": 1.38039498012291,
+      "sample_index": 141
+    },
+    {
+      "axis": 1.42,
+      "processed_axis": 1.42,
+      "processed_signal": 1.2637228829836724,
+      "raw_signal": 1.418015958426556,
+      "sample_index": 142
+    },
+    {
+      "axis": 1.43,
+      "processed_axis": 1.43,
+      "processed_signal": 1.2971590568980513,
+      "raw_signal": 1.452142395492462,
+      "sample_index": 143
+    },
+    {
+      "axis": 1.44,
+      "processed_axis": 1.44,
+      "processed_signal": 1.3268439666033847,
+      "raw_signal": 1.482443555318919,
+      "sample_index": 144
+    },
+    {
+      "axis": 1.45,
+      "processed_axis": 1.45,
+      "processed_signal": 1.3524884015732512,
+      "raw_signal": 1.508620712428392,
+      "sample_index": 145
+    },
+    {
+      "axis": 1.46,
+      "processed_axis": 1.46,
+      "processed_signal": 1.373838996811074,
+      "raw_signal": 1.530412049706986,
+      "sample_index": 146
+    },
+    {
+      "axis": 1.47,
+      "processed_axis": 1.47,
+      "processed_signal": 1.3906823947376927,
+      "raw_signal": 1.547597015666077,
+      "sample_index": 147
+    },
+    {
+      "axis": 1.48,
+      "processed_axis": 1.48,
+      "processed_signal": 1.40284879191013,
+      "raw_signal": 1.560000039772311,
+      "sample_index": 148
+    },
+    {
+      "axis": 1.49,
+      "processed_axis": 1.49,
+      "processed_signal": 1.4102147881336067,
+      "raw_signal": 1.567493518342909,
+      "sample_index": 149
+    },
+    {
+      "axis": 1.5,
+      "processed_axis": 1.5,
+      "processed_signal": 1.412705471109873,
+      "raw_signal": 1.57,
+      "sample_index": 150
+    },
+    {
+      "axis": 1.51,
+      "processed_axis": 1.51,
+      "processed_signal": 1.4102956873605716,
+      "raw_signal": 1.567493518342909,
+      "sample_index": 151
+    },
+    {
+      "axis": 1.52,
+      "processed_axis": 1.52,
+      "processed_signal": 1.4030104692548917,
+      "raw_signal": 1.560000039772311,
+      "sample_index": 152
+    },
+    {
+      "axis": 1.53,
+      "processed_axis": 1.53,
+      "processed_signal": 1.3909246079811055,
+      "raw_signal": 1.547597015666077,
+      "sample_index": 153
+    },
+    {
+      "axis": 1.54,
+      "processed_axis": 1.54,
+      "processed_signal": 1.3741613826223986,
+      "raw_signal": 1.530412049706986,
+      "sample_index": 154
+    },
+    {
+      "axis": 1.55,
+      "processed_axis": 1.55,
+      "processed_signal": 1.3528904755077318,
+      "raw_signal": 1.508620712428392,
+      "sample_index": 155
+    },
+    {
+      "axis": 1.56,
+      "processed_axis": 1.56,
+      "processed_signal": 1.3273251230990268,
+      "raw_signal": 1.482443555318919,
+      "sample_index": 156
+    },
+    {
+      "axis": 1.57,
+      "processed_axis": 1.57,
+      "processed_signal": 1.2977185692715987,
+      "raw_signal": 1.452142395492463,
+      "sample_index": 157
+    },
+    {
+      "axis": 1.58,
+      "processed_axis": 1.58,
+      "processed_signal": 1.264359903425797,
+      "raw_signal": 1.418015958426557,
+      "sample_index": 158
+    },
+    {
+      "axis": 1.59,
+      "processed_axis": 1.59,
+      "processed_signal": 1.2275693789885698,
+      "raw_signal": 1.380394980122911,
+      "sample_index": 159
+    },
+    {
+      "axis": 1.6,
+      "processed_axis": 1.6,
+      "processed_signal": 1.187693318168226,
+      "raw_signal": 1.339636880868533,
+      "sample_index": 160
+    },
+    {
+      "axis": 1.61,
+      "processed_axis": 1.61,
+      "processed_signal": 1.1450987160592387,
+      "raw_signal": 1.296120130304576,
+      "sample_index": 161
+    },
+    {
+      "axis": 1.62,
+      "processed_axis": 1.62,
+      "processed_signal": 1.1001676612104527,
+      "raw_signal": 1.250238427591145,
+      "sample_index": 162
+    },
+    {
+      "axis": 1.63,
+      "processed_axis": 1.63,
+      "processed_signal": 1.0532916905348948,
+      "raw_signal": 1.202394821059011,
+      "sample_index": 163
+    },
+    {
+      "axis": 1.64,
+      "processed_axis": 1.64,
+      "processed_signal": 1.0048661940276171,
+      "raw_signal": 1.152995888951457,
+      "sample_index": 164
+    },
+    {
+      "axis": 1.65,
+      "processed_axis": 1.65,
+      "processed_signal": 0.9552849793484542,
+      "raw_signal": 1.102446096881311,
+      "sample_index": 165
+    },
+    {
+      "axis": 1.66,
+      "processed_axis": 1.66,
+      "processed_signal": 0.9049350981916294,
+      "raw_signal": 1.051142438759959,
+      "sample_index": 166
+    },
+    {
+      "axis": 1.67,
+      "processed_axis": 1.67,
+      "processed_signal": 0.8541920258564994,
+      "raw_signal": 0.9994694565833366,
+      "sample_index": 167
+    },
+    {
+      "axis": 1.68,
+      "processed_axis": 1.68,
+      "processed_signal": 0.8034152729701394,
+      "raw_signal": 0.9477947210385734,
+      "sample_index": 168
+    },
+    {
+      "axis": 1.69,
+      "processed_axis": 1.69,
+      "processed_signal": 0.752944494355912,
+      "raw_signal": 0.8964648399267661,
+      "sample_index": 169
+    },
+    {
+      "axis": 1.7,
+      "processed_axis": 1.7,
+      "processed_signal": 0.7030961450826959,
+      "raw_signal": 0.845802045412066,
+      "sample_index": 170
+    },
+    {
+      "axis": 1.71,
+      "processed_axis": 1.71,
+      "processed_signal": 0.6541607182651025,
+      "raw_signal": 0.7961013946411682,
+      "sample_index": 171
+    },
+    {
+      "axis": 1.72,
+      "processed_axis": 1.72,
+      "processed_signal": 0.6064005837033254,
+      "raw_signal": 0.7476286018531637,
+      "sample_index": 172
+    },
+    {
+      "axis": 1.73,
+      "processed_axis": 1.73,
+      "processed_signal": 0.5600484314120747,
+      "raw_signal": 0.7006185042081846,
+      "sample_index": 173
+    },
+    {
+      "axis": 1.74,
+      "processed_axis": 1.74,
+      "processed_signal": 0.5153063099086593,
+      "raw_signal": 0.655274148646965,
+      "sample_index": 174
+    },
+    {
+      "axis": 1.75,
+      "processed_axis": 1.75,
+      "processed_signal": 0.47234523617293284,
+      "raw_signal": 0.6117664735337167,
+      "sample_index": 175
+    },
+    {
+      "axis": 1.76,
+      "processed_axis": 1.76,
+      "processed_signal": 0.4313053427542594,
+      "raw_signal": 0.5702345469418275,
+      "sample_index": 176
+    },
+    {
+      "axis": 1.77,
+      "processed_axis": 1.77,
+      "processed_signal": 0.39229651780998875,
+      "raw_signal": 0.5307863134487056,
+      "sample_index": 177
+    },
+    {
+      "axis": 1.78,
+      "processed_axis": 1.78,
+      "processed_signal": 0.3553994860693217,
+      "raw_signal": 0.4934997933651508,
+      "sample_index": 178
+    },
+    {
+      "axis": 1.79,
+      "processed_axis": 1.79,
+      "processed_signal": 0.3206672729054681,
+      "raw_signal": 0.4584246725088722,
+      "sample_index": 179
+    },
+    {
+      "axis": 1.8,
+      "processed_axis": 1.8,
+      "processed_signal": 0.2881269898762874,
+      "raw_signal": 0.425584216938061,
+      "sample_index": 180
+    },
+    {
+      "axis": 1.81,
+      "processed_axis": 1.81,
+      "processed_signal": 0.257781878202544,
+      "raw_signal": 0.3949774454165749,
+      "sample_index": 181
+    },
+    {
+      "axis": 1.82,
+      "processed_axis": 1.82,
+      "processed_signal": 0.22961354657904845,
+      "raw_signal": 0.3665814926535886,
+      "sample_index": 182
+    },
+    {
+      "axis": 1.83,
+      "processed_axis": 1.83,
+      "processed_signal": 0.20358434129421443,
+      "raw_signal": 0.3403540983630408,
+      "sample_index": 183
+    },
+    {
+      "axis": 1.84,
+      "processed_axis": 1.84,
+      "processed_signal": 0.17963978966646513,
+      "raw_signal": 0.3162361606979707,
+      "sample_index": 184
+    },
+    {
+      "axis": 1.85,
+      "processed_axis": 1.85,
+      "processed_signal": 0.15771106206231025,
+      "raw_signal": 0.2941542973803687,
+      "sample_index": 185
+    },
+    {
+      "axis": 1.86,
+      "processed_axis": 1.86,
+      "processed_signal": 0.1377174029948256,
+      "raw_signal": 0.2740233636010647,
+      "sample_index": 186
+    },
+    {
+      "axis": 1.87,
+      "processed_axis": 1.87,
+      "processed_signal": 0.11956848776027174,
+      "raw_signal": 0.2557488822343986,
+      "sample_index": 187
+    },
+    {
+      "axis": 1.88,
+      "processed_axis": 1.88,
+      "processed_signal": 0.10316666750540121,
+      "raw_signal": 0.2392293488324184,
+      "sample_index": 188
+    },
+    {
+      "axis": 1.89,
+      "processed_axis": 1.89,
+      "processed_signal": 0.08840907229095905,
+      "raw_signal": 0.2243583809811353,
+      "sample_index": 189
+    },
+    {
+      "axis": 1.9,
+      "processed_axis": 1.9,
+      "processed_signal": 0.07518954840899826,
+      "raw_signal": 0.2110266886867448,
+      "sample_index": 190
+    },
+    {
+      "axis": 1.91,
+      "processed_axis": 1.91,
+      "processed_signal": 0.06340041272826188,
+      "raw_signal": 0.1991238493101304,
+      "sample_index": 191
+    },
+    {
+      "axis": 1.92,
+      "processed_axis": 1.92,
+      "processed_signal": 0.05293401301670165,
+      "raw_signal": 0.1885398770123958,
+      "sample_index": 192
+    },
+    {
+      "axis": 1.93,
+      "processed_axis": 1.93,
+      "processed_signal": 0.04368408888771065,
+      "raw_signal": 0.1791665825754384,
+      "sample_index": 193
+    },
+    {
+      "axis": 1.94,
+      "processed_axis": 1.94,
+      "processed_signal": 0.0355469331331681,
+      "raw_signal": 0.1708987247171043,
+      "sample_index": 194
+    },
+    {
+      "axis": 1.95,
+      "processed_axis": 1.95,
+      "processed_signal": 0.02842235766973205,
+      "raw_signal": 0.1636349585614452,
+      "sample_index": 195
+    },
+    {
+      "axis": 1.96,
+      "processed_axis": 1.96,
+      "processed_signal": 0.02221447209278592,
+      "raw_signal": 0.1572785907142017,
+      "sample_index": 196
+    },
+    {
+      "axis": 1.97,
+      "processed_axis": 1.97,
+      "processed_signal": 0.01683228589041385,
+      "raw_signal": 0.151738153423966,
+      "sample_index": 197
+    },
+    {
+      "axis": 1.98,
+      "processed_axis": 1.98,
+      "processed_signal": 0.0121901477302736,
+      "raw_signal": 0.1469278125980301,
+      "sample_index": 198
+    },
+    {
+      "axis": 1.99,
+      "processed_axis": 1.99,
+      "processed_signal": 0.008208036927073996,
+      "raw_signal": 0.1427676260274615,
+      "sample_index": 199
+    },
+    {
+      "axis": 2.0,
+      "processed_axis": 2,
+      "processed_signal": 0.004811723280561861,
+      "raw_signal": 0.1391836691140854,
+      "sample_index": 200
+    },
+    {
+      "axis": 2.01,
+      "processed_axis": 2.01,
+      "processed_signal": 0.0019328120069761747,
+      "raw_signal": 0.1361080457509896,
+      "sample_index": 201
+    },
+    {
+      "axis": 2.02,
+      "processed_axis": 2.02,
+      "processed_signal": -0.0004913094732106579,
+      "raw_signal": 0.133478801864338,
+      "sample_index": 202
+    },
+    {
+      "axis": 2.03,
+      "processed_axis": 2.03,
+      "processed_signal": -0.0025176065385875165,
+      "raw_signal": 0.1312397585585805,
+      "sample_index": 203
+    },
+    {
+      "axis": 2.04,
+      "processed_axis": 2.04,
+      "processed_signal": -0.0041975986169313865,
+      "raw_signal": 0.1293402809012946,
+      "sample_index": 204
+    },
+    {
+      "axis": 2.05,
+      "processed_axis": 2.05,
+      "processed_signal": -0.005577612250910301,
+      "raw_signal": 0.1277349972176131,
+      "sample_index": 205
+    },
+    {
+      "axis": 2.06,
+      "processed_axis": 2.06,
+      "processed_signal": -0.006699072836655243,
+      "raw_signal": 0.1263834824125997,
+      "sample_index": 206
+    },
+    {
+      "axis": 2.07,
+      "processed_axis": 2.07,
+      "processed_signal": -0.0075988232485925435,
+      "raw_signal": 0.1252499173718235,
+      "sample_index": 207
+    },
+    {
+      "axis": 2.08,
+      "processed_axis": 2.08,
+      "processed_signal": -0.008309458939007027,
+      "raw_signal": 0.12430273496677,
+      "sample_index": 208
+    },
+    {
+      "axis": 2.09,
+      "processed_axis": 2.09,
+      "processed_signal": -0.008859670484488125,
+      "raw_signal": 0.1235142616651137,
+      "sample_index": 209
+    },
+    {
+      "axis": 2.1,
+      "processed_axis": 2.1,
+      "processed_signal": -0.009274585929441099,
+      "raw_signal": 0.122860362259848,
+      "sample_index": 210
+    },
+    {
+      "axis": 2.11,
+      "processed_axis": 2.11,
+      "processed_signal": -0.009576106618267806,
+      "raw_signal": 0.1223200938205459,
+      "sample_index": 211
+    },
+    {
+      "axis": 2.12,
+      "processed_axis": 2.12,
+      "processed_signal": -0.009783231474829932,
+      "raw_signal": 0.1218753736608292,
+      "sample_index": 212
+    },
+    {
+      "axis": 2.13,
+      "processed_axis": 2.13,
+      "processed_signal": -0.009912365854294067,
+      "raw_signal": 0.1215106649267958,
+      "sample_index": 213
+    },
+    {
+      "axis": 2.14,
+      "processed_axis": 2.14,
+      "processed_signal": -0.009977612141852145,
+      "raw_signal": 0.1212126823529311,
+      "sample_index": 214
+    },
+    {
+      "axis": 2.15,
+      "processed_axis": 2.15,
+      "processed_signal": -0.009991040195917447,
+      "raw_signal": 0.1209701198100226,
+      "sample_index": 215
+    },
+    {
+      "axis": 2.16,
+      "processed_axis": 2.16,
+      "processed_signal": -0.009962936528449751,
+      "raw_signal": 0.1207734004836838,
+      "sample_index": 216
+    },
+    {
+      "axis": 2.17,
+      "processed_axis": 2.17,
+      "processed_signal": -0.009902031784547781,
+      "raw_signal": 0.1206144498680031,
+      "sample_index": 217
+    },
+    {
+      "axis": 2.18,
+      "processed_axis": 2.18,
+      "processed_signal": -0.009815706633202255,
+      "raw_signal": 0.1204864912290115,
+      "sample_index": 218
+    },
+    {
+      "axis": 2.19,
+      "processed_axis": 2.19,
+      "processed_signal": -0.009710176619482487,
+      "raw_signal": 0.1203838627772313,
+      "sample_index": 219
+    },
+    {
+      "axis": 2.2,
+      "processed_axis": 2.2,
+      "processed_signal": -0.009590656865527673,
+      "raw_signal": 0.1203018554760761,
+      "sample_index": 220
+    },
+    {
+      "axis": 2.21,
+      "processed_axis": 2.21,
+      "processed_signal": -0.00946150775468257,
+      "raw_signal": 0.1202365701910355,
+      "sample_index": 221
+    },
+    {
+      "axis": 2.22,
+      "processed_axis": 2.22,
+      "processed_signal": -0.00932636290158004,
+      "raw_signal": 0.1201847927408363,
+      "sample_index": 222
+    },
+    {
+      "axis": 2.23,
+      "processed_axis": 2.23,
+      "processed_signal": -0.009188240812541578,
+      "raw_signal": 0.1201438853337858,
+      "sample_index": 223
+    },
+    {
+      "axis": 2.24,
+      "processed_axis": 2.24,
+      "processed_signal": -0.009049641686556215,
+      "raw_signal": 0.1201116928485314,
+      "sample_index": 224
+    },
+    {
+      "axis": 2.25,
+      "processed_axis": 2.25,
+      "processed_signal": -0.0089126308078356,
+      "raw_signal": 0.1200864624376064,
+      "sample_index": 225
+    },
+    {
+      "axis": 2.26,
+      "processed_axis": 2.26,
+      "processed_signal": -0.008778909946165623,
+      "raw_signal": 0.1200667749845425,
+      "sample_index": 226
+    },
+    {
+      "axis": 2.27,
+      "processed_axis": 2.27,
+      "processed_signal": -0.00864987811959843,
+      "raw_signal": 0.1200514870222954,
+      "sample_index": 227
+    },
+    {
+      "axis": 2.28,
+      "processed_axis": 2.28,
+      "processed_signal": -0.008526682992986164,
+      "raw_signal": 0.1200396818147465,
+      "sample_index": 228
+    },
+    {
+      "axis": 2.29,
+      "processed_axis": 2.29,
+      "processed_signal": -0.008410264091886605,
+      "raw_signal": 0.12003062840776,
+      "sample_index": 229
+    },
+    {
+      "axis": 2.3,
+      "processed_axis": 2.3,
+      "processed_signal": -0.008301388909844491,
+      "raw_signal": 0.1200237475664704,
+      "sample_index": 230
+    },
+    {
+      "axis": 2.31,
+      "processed_axis": 2.31,
+      "processed_signal": -0.008200682882342197,
+      "raw_signal": 0.1200185836269784,
+      "sample_index": 231
+    },
+    {
+      "axis": 2.32,
+      "processed_axis": 2.32,
+      "processed_signal": -0.008108654096272795,
+      "raw_signal": 0.1200147814001959,
+      "sample_index": 232
+    },
+    {
+      "axis": 2.33,
+      "processed_axis": 2.33,
+      "processed_signal": -0.008025713502250401,
+      "raw_signal": 0.1200120673707974,
+      "sample_index": 233
+    },
+    {
+      "axis": 2.34,
+      "processed_axis": 2.34,
+      "processed_signal": -0.007952191300354503,
+      "raw_signal": 0.1200102345334165,
+      "sample_index": 234
+    },
+    {
+      "axis": 2.35,
+      "processed_axis": 2.35,
+      "processed_signal": -0.007888350079313013,
+      "raw_signal": 0.1200091303002716,
+      "sample_index": 235
+    },
+    {
+      "axis": 2.36,
+      "processed_axis": 2.36,
+      "processed_signal": -0.007834395205462662,
+      "raw_signal": 0.1200086469987145,
+      "sample_index": 236
+    },
+    {
+      "axis": 2.37,
+      "processed_axis": 2.37,
+      "processed_signal": -0.00779048288147214,
+      "raw_signal": 0.1200087145535694,
+      "sample_index": 237
+    },
+    {
+      "axis": 2.38,
+      "processed_axis": 2.38,
+      "processed_signal": -0.007756726225837174,
+      "raw_signal": 0.1200092950176469,
+      "sample_index": 238
+    },
+    {
+      "axis": 2.39,
+      "processed_axis": 2.39,
+      "processed_signal": -0.007733199662375151,
+      "raw_signal": 0.1200103786748119,
+      "sample_index": 239
+    },
+    {
+      "axis": 2.4,
+      "processed_axis": 2.4,
+      "processed_signal": -0.007719941854000622,
+      "raw_signal": 0.1200119814939156,
+      "sample_index": 240
+    },
+    {
+      "axis": 2.41,
+      "processed_axis": 2.41,
+      "processed_signal": -0.007716957366471845,
+      "raw_signal": 0.1200141437593584,
+      "sample_index": 241
+    },
+    {
+      "axis": 2.42,
+      "processed_axis": 2.42,
+      "processed_signal": -0.007724217205010667,
+      "raw_signal": 0.1200169297456458,
+      "sample_index": 242
+    },
+    {
+      "axis": 2.43,
+      "processed_axis": 2.43,
+      "processed_signal": -0.007741658329127848,
+      "raw_signal": 0.1200204283396942,
+      "sample_index": 243
+    },
+    {
+      "axis": 2.44,
+      "processed_axis": 2.44,
+      "processed_signal": -0.007769182218045516,
+      "raw_signal": 0.1200247545464531,
+      "sample_index": 244
+    },
+    {
+      "axis": 2.45,
+      "processed_axis": 2.45,
+      "processed_signal": -0.00780665253023078,
+      "raw_signal": 0.1200300518412558,
+      "sample_index": 245
+    },
+    {
+      "axis": 2.46,
+      "processed_axis": 2.46,
+      "processed_signal": -0.007853891875211289,
+      "raw_signal": 0.1200364953567236,
+      "sample_index": 246
+    },
+    {
+      "axis": 2.47,
+      "processed_axis": 2.47,
+      "processed_signal": -0.007910677693557574,
+      "raw_signal": 0.1200442959135375,
+      "sample_index": 247
+    },
+    {
+      "axis": 2.48,
+      "processed_axis": 2.48,
+      "processed_signal": -0.007976737221270824,
+      "raw_signal": 0.1200537049233744,
+      "sample_index": 248
+    },
+    {
+      "axis": 2.49,
+      "processed_axis": 2.49,
+      "processed_signal": -0.008051741497455857,
+      "raw_signal": 0.1200650202091425,
+      "sample_index": 249
+    },
+    {
+      "axis": 2.5,
+      "processed_axis": 2.5,
+      "processed_signal": -0.008135298358802218,
+      "raw_signal": 0.1200785928026299,
+      "sample_index": 250
+    },
+    {
+      "axis": 2.51,
+      "processed_axis": 2.51,
+      "processed_signal": -0.00822694435082508,
+      "raw_signal": 0.1200948347930144,
+      "sample_index": 251
+    },
+    {
+      "axis": 2.52,
+      "processed_axis": 2.52,
+      "processed_signal": -0.008326135473883048,
+      "raw_signal": 0.1201142283115197,
+      "sample_index": 252
+    },
+    {
+      "axis": 2.53,
+      "processed_axis": 2.53,
+      "processed_signal": -0.008432236671609236,
+      "raw_signal": 0.1201373357479227,
+      "sample_index": 253
+    },
+    {
+      "axis": 2.54,
+      "processed_axis": 2.54,
+      "processed_signal": -0.008544509960546502,
+      "raw_signal": 0.1201648113036275,
+      "sample_index": 254
+    },
+    {
+      "axis": 2.55,
+      "processed_axis": 2.55,
+      "processed_signal": -0.008662101092509372,
+      "raw_signal": 0.1201974139935852,
+      "sample_index": 255
+    },
+    {
+      "axis": 2.56,
+      "processed_axis": 2.56,
+      "processed_signal": -0.008784024635603996,
+      "raw_signal": 0.1202360222153399,
+      "sample_index": 256
+    },
+    {
+      "axis": 2.57,
+      "processed_axis": 2.57,
+      "processed_signal": -0.008909147356077151,
+      "raw_signal": 0.1202816500077671,
+      "sample_index": 257
+    },
+    {
+      "axis": 2.58,
+      "processed_axis": 2.58,
+      "processed_signal": -0.009036169781439564,
+      "raw_signal": 0.1203354651244246,
+      "sample_index": 258
+    },
+    {
+      "axis": 2.59,
+      "processed_axis": 2.59,
+      "processed_signal": -0.009163605825866852,
+      "raw_signal": 0.120398809046606,
+      "sample_index": 259
+    },
+    {
+      "axis": 2.6,
+      "processed_axis": 2.6,
+      "processed_signal": -0.009289760362011967,
+      "raw_signal": 0.1204732190588698,
+      "sample_index": 260
+    },
+    {
+      "axis": 2.61,
+      "processed_axis": 2.61,
+      "processed_signal": -0.009412704629390414,
+      "raw_signal": 0.1205604525046803,
+      "sample_index": 261
+    },
+    {
+      "axis": 2.62,
+      "processed_axis": 2.62,
+      "processed_signal": -0.00953024937877446,
+      "raw_signal": 0.1206625133314784,
+      "sample_index": 262
+    },
+    {
+      "axis": 2.63,
+      "processed_axis": 2.63,
+      "processed_signal": -0.009639915664926944,
+      "raw_signal": 0.1207816810226099,
+      "sample_index": 263
+    },
+    {
+      "axis": 2.64,
+      "processed_axis": 2.64,
+      "processed_signal": -0.00973890321690237,
+      "raw_signal": 0.1209205419976801,
+      "sample_index": 264
+    },
+    {
+      "axis": 2.65,
+      "processed_axis": 2.65,
+      "processed_signal": -0.00982405633642789,
+      "raw_signal": 0.1210820235426695,
+      "sample_index": 265
+    },
+    {
+      "axis": 2.66,
+      "processed_axis": 2.66,
+      "processed_signal": -0.009891827300925693,
+      "raw_signal": 0.1212694303061437,
+      "sample_index": 266
+    },
+    {
+      "axis": 2.67,
+      "processed_axis": 2.67,
+      "processed_signal": -0.009938237278906319,
+      "raw_signal": 0.1214864833677299,
+      "sample_index": 267
+    },
+    {
+      "axis": 2.68,
+      "processed_axis": 2.68,
+      "processed_signal": -0.009958834802070122,
+      "raw_signal": 0.1217373618493829,
+      "sample_index": 268
+    },
+    {
+      "axis": 2.69,
+      "processed_axis": 2.69,
+      "processed_signal": -0.009948651880772508,
+      "raw_signal": 0.1220267469985074,
+      "sample_index": 269
+    },
+    {
+      "axis": 2.7,
+      "processed_axis": 2.7,
+      "processed_signal": -0.009902157897744427,
+      "raw_signal": 0.1223598686245211,
+      "sample_index": 270
+    },
+    {
+      "axis": 2.71,
+      "processed_axis": 2.71,
+      "processed_signal": -0.009813211469237533,
+      "raw_signal": 0.1227425537167553,
+      "sample_index": 271
+    },
+    {
+      "axis": 2.72,
+      "processed_axis": 2.72,
+      "processed_signal": -0.009675010523109897,
+      "raw_signal": 0.1231812770116659,
+      "sample_index": 272
+    },
+    {
+      "axis": 2.73,
+      "processed_axis": 2.73,
+      "processed_signal": -0.009480040909692615,
+      "raw_signal": 0.1236832132111916,
+      "sample_index": 273
+    },
+    {
+      "axis": 2.74,
+      "processed_axis": 2.74,
+      "processed_signal": -0.009220023933355786,
+      "raw_signal": 0.1242562904819689,
+      "sample_index": 274
+    },
+    {
+      "axis": 2.75,
+      "processed_axis": 2.75,
+      "processed_signal": -0.008885863270148226,
+      "raw_signal": 0.1249092447873149,
+      "sample_index": 275
+    },
+    {
+      "axis": 2.76,
+      "processed_axis": 2.76,
+      "processed_signal": -0.008467591819175366,
+      "raw_signal": 0.1256516745209537,
+      "sample_index": 276
+    },
+    {
+      "axis": 2.77,
+      "processed_axis": 2.77,
+      "processed_signal": -0.007954319121777641,
+      "raw_signal": 0.1264940948240708,
+      "sample_index": 277
+    },
+    {
+      "axis": 2.78,
+      "processed_axis": 2.78,
+      "processed_signal": -0.00733418007215591,
+      "raw_signal": 0.1274479908763503,
+      "sample_index": 278
+    },
+    {
+      "axis": 2.79,
+      "processed_axis": 2.79,
+      "processed_signal": -0.00659428573473379,
+      "raw_signal": 0.1285258693582844,
+      "sample_index": 279
+    },
+    {
+      "axis": 2.8,
+      "processed_axis": 2.8,
+      "processed_signal": -0.0057206771759101835,
+      "raw_signal": 0.1297413071875739,
+      "sample_index": 280
+    },
+    {
+      "axis": 2.81,
+      "processed_axis": 2.81,
+      "processed_signal": -0.00469828330776317,
+      "raw_signal": 0.1311089965384273,
+      "sample_index": 281
+    },
+    {
+      "axis": 2.82,
+      "processed_axis": 2.82,
+      "processed_signal": -0.0035108838243231247,
+      "raw_signal": 0.1326447850607772,
+      "sample_index": 282
+    },
+    {
+      "axis": 2.83,
+      "processed_axis": 2.83,
+      "processed_signal": -0.002141078380989201,
+      "raw_signal": 0.1343657101288738,
+      "sample_index": 283
+    },
+    {
+      "axis": 2.84,
+      "processed_axis": 2.84,
+      "processed_signal": -0.0005702632150148006,
+      "raw_signal": 0.1362900258675639,
+      "sample_index": 284
+    },
+    {
+      "axis": 2.85,
+      "processed_axis": 2.85,
+      "processed_signal": 0.0012213835686657238,
+      "raw_signal": 0.1384372216322201,
+      "sample_index": 285
+    },
+    {
+      "axis": 2.86,
+      "processed_axis": 2.86,
+      "processed_signal": 0.003254906796948395,
+      "raw_signal": 0.1408280305572565,
+      "sample_index": 286
+    },
+    {
+      "axis": 2.87,
+      "processed_axis": 2.87,
+      "processed_signal": 0.005552567812566098,
+      "raw_signal": 0.1434844267411406,
+      "sample_index": 287
+    },
+    {
+      "axis": 2.88,
+      "processed_axis": 2.88,
+      "processed_signal": 0.00813782545976705,
+      "raw_signal": 0.1464296096054893,
+      "sample_index": 288
+    },
+    {
+      "axis": 2.89,
+      "processed_axis": 2.89,
+      "processed_signal": 0.01103530301213643,
+      "raw_signal": 0.1496879739550203,
+      "sample_index": 289
+    },
+    {
+      "axis": 2.9,
+      "processed_axis": 2.9,
+      "processed_signal": 0.014270739557979266,
+      "raw_signal": 0.1532850642765262,
+      "sample_index": 290
+    },
+    {
+      "axis": 2.91,
+      "processed_axis": 2.91,
+      "processed_signal": 0.017870924401258582,
+      "raw_signal": 0.1572475118513252,
+      "sample_index": 291
+    },
+    {
+      "axis": 2.92,
+      "processed_axis": 2.92,
+      "processed_signal": 0.021863613128931973,
+      "raw_signal": 0.1616029533192773,
+      "sample_index": 292
+    },
+    {
+      "axis": 2.93,
+      "processed_axis": 2.93,
+      "processed_signal": 0.026277424116519697,
+      "raw_signal": 0.166379929425727,
+      "sample_index": 293
+    },
+    {
+      "axis": 2.94,
+      "processed_axis": 2.94,
+      "processed_signal": 0.031141714384768822,
+      "raw_signal": 0.1716077628075348,
+      "sample_index": 294
+    },
+    {
+      "axis": 2.95,
+      "processed_axis": 2.95,
+      "processed_signal": 0.0364864338855662,
+      "raw_signal": 0.1773164138322885,
+      "sample_index": 295
+    },
+    {
+      "axis": 2.96,
+      "processed_axis": 2.96,
+      "processed_signal": 0.04234195749038203,
+      "raw_signal": 0.1835363136968421,
+      "sample_index": 296
+    },
+    {
+      "axis": 2.97,
+      "processed_axis": 2.97,
+      "processed_signal": 0.04873889418090949,
+      "raw_signal": 0.1902981742180979,
+      "sample_index": 297
+    },
+    {
+      "axis": 2.98,
+      "processed_axis": 2.98,
+      "processed_signal": 0.05570787320113377,
+      "raw_signal": 0.1976327740102242,
+      "sample_index": 298
+    },
+    {
+      "axis": 2.99,
+      "processed_axis": 2.99,
+      "processed_signal": 0.06327930722187734,
+      "raw_signal": 0.2055707210375497,
+      "sample_index": 299
+    },
+    {
+      "axis": 3.0,
+      "processed_axis": 3,
+      "processed_signal": 0.07148313289125387,
+      "raw_signal": 0.2141421918595233,
+      "sample_index": 300
+    },
+    {
+      "axis": 3.01,
+      "processed_axis": 3.01,
+      "processed_signal": 0.08034852949496317,
+      "raw_signal": 0.2233766482410726,
+      "sample_index": 301
+    },
+    {
+      "axis": 3.02,
+      "processed_axis": 3.02,
+      "processed_signal": 0.08990361682570498,
+      "raw_signal": 0.2333025321851138,
+      "sample_index": 302
+    },
+    {
+      "axis": 3.03,
+      "processed_axis": 3.03,
+      "processed_signal": 0.10017513375708482,
+      "raw_signal": 0.2439469408498253,
+      "sample_index": 303
+    },
+    {
+      "axis": 3.04,
+      "processed_axis": 3.04,
+      "processed_signal": 0.11118809942931382,
+      "raw_signal": 0.2553352832366128,
+      "sample_index": 304
+    },
+    {
+      "axis": 3.05,
+      "processed_axis": 3.05,
+      "processed_signal": 0.12296545937605043,
+      "raw_signal": 0.2674909209696286,
+      "sample_index": 305
+    },
+    {
+      "axis": 3.06,
+      "processed_axis": 3.06,
+      "processed_signal": 0.13552771934742458,
+      "raw_signal": 0.2804347959277498,
+      "sample_index": 306
+    },
+    {
+      "axis": 3.07,
+      "processed_axis": 3.07,
+      "processed_signal": 0.1488925700064705,
+      "raw_signal": 0.2941850479276129,
+      "sample_index": 307
+    },
+    {
+      "axis": 3.08,
+      "processed_axis": 3.08,
+      "processed_signal": 0.1630745060871162,
+      "raw_signal": 0.3087566260838044,
+      "sample_index": 308
+    },
+    {
+      "axis": 3.09,
+      "processed_axis": 3.09,
+      "processed_signal": 0.1780844439933009,
+      "raw_signal": 0.3241608978809824,
+      "sample_index": 309
+    },
+    {
+      "axis": 3.1,
+      "processed_axis": 3.1,
+      "processed_signal": 0.19392934218211916,
+      "raw_signal": 0.3404052603737759,
+      "sample_index": 310
+    },
+    {
+      "axis": 3.11,
+      "processed_axis": 3.11,
+      "processed_signal": 0.2106118290003372,
+      "raw_signal": 0.3574927582745212,
+      "sample_index": 311
+    },
+    {
+      "axis": 3.12,
+      "processed_axis": 3.12,
+      "processed_signal": 0.22812984292437227,
+      "raw_signal": 0.3754217139871842,
+      "sample_index": 312
+    },
+    {
+      "axis": 3.13,
+      "processed_axis": 3.13,
+      "processed_signal": 0.24647629038020835,
+      "raw_signal": 0.3941853748889742,
+      "sample_index": 313
+    },
+    {
+      "axis": 3.14,
+      "processed_axis": 3.14,
+      "processed_signal": 0.26563872648344633,
+      "raw_signal": 0.4137715833406303,
+      "sample_index": 314
+    },
+    {
+      "axis": 3.15,
+      "processed_axis": 3.15,
+      "processed_signal": 0.28559906413300135,
+      "raw_signal": 0.4341624750138075,
+      "sample_index": 315
+    },
+    {
+      "axis": 3.16,
+      "processed_axis": 3.16,
+      "processed_signal": 0.306333316907919,
+      "raw_signal": 0.4553342111522113,
+      "sample_index": 316
+    },
+    {
+      "axis": 3.17,
+      "processed_axis": 3.17,
+      "processed_signal": 0.32781138114937086,
+      "raw_signal": 0.4772567503255341,
+      "sample_index": 317
+    },
+    {
+      "axis": 3.18,
+      "processed_axis": 3.18,
+      "processed_signal": 0.34999686245432615,
+      "raw_signal": 0.4998936650868489,
+      "sample_index": 318
+    },
+    {
+      "axis": 3.19,
+      "processed_axis": 3.19,
+      "processed_signal": 0.3728469515602218,
+      "raw_signal": 0.5232020087009199,
+      "sample_index": 319
+    },
+    {
+      "axis": 3.2,
+      "processed_axis": 3.2,
+      "processed_signal": 0.39631235425926303,
+      "raw_signal": 0.5471322367708998,
+      "sample_index": 320
+    },
+    {
+      "axis": 3.21,
+      "processed_axis": 3.21,
+      "processed_signal": 0.4203372795465652,
+      "raw_signal": 0.5716281881534282,
+      "sample_index": 321
+    },
+    {
+      "axis": 3.22,
+      "processed_axis": 3.22,
+      "processed_signal": 0.4448594896797397,
+      "raw_signal": 0.5966271290188329,
+      "sample_index": 322
+    },
+    {
+      "axis": 3.23,
+      "processed_axis": 3.23,
+      "processed_signal": 0.4698104152121957,
+      "raw_signal": 0.6220598632870901,
+      "sample_index": 323
+    },
+    {
+      "axis": 3.24,
+      "processed_axis": 3.24,
+      "processed_signal": 0.4951153373637278,
+      "raw_signal": 0.6478509119570188,
+      "sample_index": 324
+    },
+    {
+      "axis": 3.25,
+      "processed_axis": 3.25,
+      "processed_signal": 0.5206936393171628,
+      "raw_signal": 0.6739187630529754,
+      "sample_index": 325
+    },
+    {
+      "axis": 3.26,
+      "processed_axis": 3.26,
+      "processed_signal": 0.5464591271881154,
+      "raw_signal": 0.7001761930496736,
+      "sample_index": 326
+    },
+    {
+      "axis": 3.27,
+      "processed_axis": 3.27,
+      "processed_signal": 0.5723204205171907,
+      "raw_signal": 0.7265306597126335,
+      "sample_index": 327
+    },
+    {
+      "axis": 3.28,
+      "processed_axis": 3.28,
+      "processed_signal": 0.5981814111928732,
+      "raw_signal": 0.752884765322354,
+      "sample_index": 328
+    },
+    {
+      "axis": 3.29,
+      "processed_axis": 3.29,
+      "processed_signal": 0.6239417887429276,
+      "raw_signal": 0.7791367882489849,
+      "sample_index": 329
+    },
+    {
+      "axis": 3.3,
+      "processed_axis": 3.3,
+      "processed_signal": 0.6494976289477261,
+      "raw_signal": 0.8051812798268941,
+      "sample_index": 330
+    },
+    {
+      "axis": 3.31,
+      "processed_axis": 3.31,
+      "processed_signal": 0.6747420417468338,
+      "raw_signal": 0.8309097224621518,
+      "sample_index": 331
+    },
+    {
+      "axis": 3.32,
+      "processed_axis": 3.32,
+      "processed_signal": 0.6995658734473923,
+      "raw_signal": 0.8562112439079838,
+      "sample_index": 332
+    },
+    {
+      "axis": 3.33,
+      "processed_axis": 3.33,
+      "processed_signal": 0.7238584573167625,
+      "raw_signal": 0.8809733816820596,
+      "sample_index": 333
+    },
+    {
+      "axis": 3.34,
+      "processed_axis": 3.34,
+      "processed_signal": 0.7475084057698208,
+      "raw_signal": 0.9050828906928743,
+      "sample_index": 334
+    },
+    {
+      "axis": 3.35,
+      "processed_axis": 3.35,
+      "processed_signal": 0.7704044365603476,
+      "raw_signal": 0.9284265863085438,
+      "sample_index": 335
+    },
+    {
+      "axis": 3.36,
+      "processed_axis": 3.36,
+      "processed_signal": 0.7924362246723599,
+      "raw_signal": 0.950892214356813,
+      "sample_index": 336
+    },
+    {
+      "axis": 3.37,
+      "processed_axis": 3.37,
+      "processed_signal": 0.8134952709962443,
+      "raw_signal": 0.9723693389062015,
+      "sample_index": 337
+    },
+    {
+      "axis": 3.38,
+      "processed_axis": 3.38,
+      "processed_signal": 0.8334757783799486,
+      "raw_signal": 0.9927502381591681,
+      "sample_index": 338
+    },
+    {
+      "axis": 3.39,
+      "processed_axis": 3.39,
+      "processed_signal": 0.8522755252792317,
+      "raw_signal": 1.01193079840183,
+      "sample_index": 339
+    },
+    {
+      "axis": 3.4,
+      "processed_axis": 3.4,
+      "processed_signal": 0.8697967270030168,
+      "raw_signal": 1.029811395711344,
+      "sample_index": 340
+    },
+    {
+      "axis": 3.41,
+      "processed_axis": 3.41,
+      "processed_signal": 0.8859468744677697,
+      "raw_signal": 1.046297755029781,
+      "sample_index": 341
+    },
+    {
+      "axis": 3.42,
+      "processed_axis": 3.42,
+      "processed_signal": 0.9006395404435498,
+      "raw_signal": 1.061301776277341,
+      "sample_index": 342
+    },
+    {
+      "axis": 3.43,
+      "processed_axis": 3.43,
+      "processed_signal": 0.9137951434961964,
+      "raw_signal": 1.074742317400724,
+      "sample_index": 343
+    },
+    {
+      "axis": 3.44,
+      "processed_axis": 3.44,
+      "processed_signal": 0.9253416602044592,
+      "raw_signal": 1.086545924633718,
+      "sample_index": 344
+    },
+    {
+      "axis": 3.45,
+      "processed_axis": 3.45,
+      "processed_signal": 0.9352152767542457,
+      "raw_signal": 1.096647500783323,
+      "sample_index": 345
+    },
+    {
+      "axis": 3.46,
+      "processed_axis": 3.46,
+      "processed_signal": 0.9433609716782132,
+      "raw_signal": 1.104990903039158,
+      "sample_index": 346
+    },
+    {
+      "axis": 3.47,
+      "processed_axis": 3.47,
+      "processed_signal": 0.9497330223085406,
+      "raw_signal": 1.111529462627429,
+      "sample_index": 347
+    },
+    {
+      "axis": 3.48,
+      "processed_axis": 3.48,
+      "processed_signal": 0.9542954284320408,
+      "raw_signal": 1.116226419580768,
+      "sample_index": 348
+    },
+    {
+      "axis": 3.49,
+      "processed_axis": 3.49,
+      "processed_signal": 0.9570222476656614,
+      "raw_signal": 1.119055266957404,
+      "sample_index": 349
+    },
+    {
+      "axis": 3.5,
+      "processed_axis": 3.5,
+      "processed_signal": 0.9578978381904171,
+      "raw_signal": 1.12,
+      "sample_index": 350
+    },
+    {
+      "axis": 3.51,
+      "processed_axis": 3.51,
+      "processed_signal": 0.9569170056746902,
+      "raw_signal": 1.119055266957404,
+      "sample_index": 351
+    },
+    {
+      "axis": 3.52,
+      "processed_axis": 3.52,
+      "processed_signal": 0.9540850524638899,
+      "raw_signal": 1.116226419580768,
+      "sample_index": 352
+    },
+    {
+      "axis": 3.53,
+      "processed_axis": 3.53,
+      "processed_signal": 0.949417728391845,
+      "raw_signal": 1.111529462627429,
+      "sample_index": 353
+    },
+    {
+      "axis": 3.54,
+      "processed_axis": 3.54,
+      "processed_signal": 0.9429410838585554,
+      "raw_signal": 1.104990903039158,
+      "sample_index": 354
+    },
+    {
+      "axis": 3.55,
+      "processed_axis": 3.55,
+      "processed_signal": 0.9346912270973086,
+      "raw_signal": 1.096647500783323,
+      "sample_index": 355
+    },
+    {
+      "axis": 3.56,
+      "processed_axis": 3.56,
+      "processed_signal": 0.9247139888002254,
+      "raw_signal": 1.086545924633718,
+      "sample_index": 356
+    },
+    {
+      "axis": 3.57,
+      "processed_axis": 3.57,
+      "processed_signal": 0.9130644984641878,
+      "raw_signal": 1.074742317400724,
+      "sample_index": 357
+    },
+    {
+      "axis": 3.58,
+      "processed_axis": 3.58,
+      "processed_signal": 0.8998066779391055,
+      "raw_signal": 1.061301776277341,
+      "sample_index": 358
+    },
+    {
+      "axis": 3.59,
+      "processed_axis": 3.59,
+      "processed_signal": 0.8850126586893517,
+      "raw_signal": 1.046297755029781,
+      "sample_index": 359
+    },
+    {
+      "axis": 3.6,
+      "processed_axis": 3.6,
+      "processed_signal": 0.8687621302005386,
+      "raw_signal": 1.029811395711344,
+      "sample_index": 360
+    },
+    {
+      "axis": 3.61,
+      "processed_axis": 3.61,
+      "processed_signal": 0.8511416277634011,
+      "raw_signal": 1.01193079840183,
+      "sample_index": 361
+    },
+    {
+      "axis": 3.62,
+      "processed_axis": 3.62,
+      "processed_signal": 0.8322437685326131,
+      "raw_signal": 0.9927502381591681,
+      "sample_index": 362
+    },
+    {
+      "axis": 3.63,
+      "processed_axis": 3.63,
+      "processed_signal": 0.8121664452817305,
+      "raw_signal": 0.9723693389062015,
+      "sample_index": 363
+    },
+    {
+      "axis": 3.64,
+      "processed_axis": 3.64,
+      "processed_signal": 0.7910119876497929,
+      "raw_signal": 0.950892214356813,
+      "sample_index": 364
+    },
+    {
+      "axis": 3.65,
+      "processed_axis": 3.65,
+      "processed_signal": 0.7688863008969403,
+      "raw_signal": 0.9284265863085438,
+      "sample_index": 365
+    },
+    {
+      "axis": 3.66,
+      "processed_axis": 3.66,
+      "processed_signal": 0.7458979922551152,
+      "raw_signal": 0.9050828906928743,
+      "sample_index": 366
+    },
+    {
+      "axis": 3.67,
+      "processed_axis": 3.67,
+      "processed_signal": 0.7221574948778122,
+      "raw_signal": 0.8809733816820596,
+      "sample_index": 367
+    },
+    {
+      "axis": 3.68,
+      "processed_axis": 3.68,
+      "processed_signal": 0.6977761991648653,
+      "raw_signal": 0.8562112439079838,
+      "sample_index": 368
+    },
+    {
+      "axis": 3.69,
+      "processed_axis": 3.69,
+      "processed_signal": 0.6728656008720237,
+      "raw_signal": 0.8309097224621518,
+      "sample_index": 369
+    },
+    {
+      "axis": 3.7,
+      "processed_axis": 3.7,
+      "processed_signal": 0.647536474920448,
+      "raw_signal": 0.8051812798268941,
+      "sample_index": 370
+    },
+    {
+      "axis": 3.71,
+      "processed_axis": 3.71,
+      "processed_signal": 0.621898083210282,
+      "raw_signal": 0.7791367882489849,
+      "sample_index": 371
+    },
+    {
+      "axis": 3.72,
+      "processed_axis": 3.72,
+      "processed_signal": 0.5960574240288585,
+      "raw_signal": 0.752884765322354,
+      "sample_index": 372
+    },
+    {
+      "axis": 3.73,
+      "processed_axis": 3.73,
+      "processed_signal": 0.5701185298431399,
+      "raw_signal": 0.7265306597126335,
+      "sample_index": 373
+    },
+    {
+      "axis": 3.74,
+      "processed_axis": 3.74,
+      "processed_signal": 0.5441818193939362,
+      "raw_signal": 0.7001761930496736,
+      "sample_index": 374
+    },
+    {
+      "axis": 3.75,
+      "processed_axis": 3.75,
+      "processed_signal": 0.5183435090833562,
+      "raw_signal": 0.6739187630529754,
+      "sample_index": 375
+    },
+    {
+      "axis": 3.76,
+      "processed_axis": 3.76,
+      "processed_signal": 0.49269508768416126,
+      "raw_signal": 0.6478509119570188,
+      "sample_index": 376
+    },
+    {
+      "axis": 3.77,
+      "processed_axis": 3.77,
+      "processed_signal": 0.4673228574176048,
+      "raw_signal": 0.6220598632870901,
+      "sample_index": 377
+    },
+    {
+      "axis": 3.78,
+      "processed_axis": 3.78,
+      "processed_signal": 0.4423075434619301,
+      "raw_signal": 0.5966271290188329,
+      "sample_index": 378
+    },
+    {
+      "axis": 3.79,
+      "processed_axis": 3.79,
+      "processed_signal": 0.41772397298328867,
+      "raw_signal": 0.5716281881534282,
+      "sample_index": 379
+    },
+    {
+      "axis": 3.8,
+      "processed_axis": 3.8,
+      "processed_signal": 0.39364082383973625,
+      "raw_signal": 0.5471322367708998,
+      "sample_index": 380
+    },
+    {
+      "axis": 3.81,
+      "processed_axis": 3.81,
+      "processed_signal": 0.3701204422112603,
+      "raw_signal": 0.5232020087009199,
+      "sample_index": 381
+    },
+    {
+      "axis": 3.82,
+      "processed_axis": 3.82,
+      "processed_signal": 0.3472187275670589,
+      "raw_signal": 0.4998936650868489,
+      "sample_index": 382
+    },
+    {
+      "axis": 3.83,
+      "processed_axis": 3.83,
+      "processed_signal": 0.32498508260650505,
+      "raw_signal": 0.4772567503255341,
+      "sample_index": 383
+    },
+    {
+      "axis": 3.84,
+      "processed_axis": 3.84,
+      "processed_signal": 0.30346242511152216,
+      "raw_signal": 0.4553342111522113,
+      "sample_index": 384
+    },
+    {
+      "axis": 3.85,
+      "processed_axis": 3.85,
+      "processed_signal": 0.28268725803276407,
+      "raw_signal": 0.4341624750138075,
+      "sample_index": 385
+    },
+    {
+      "axis": 3.86,
+      "processed_axis": 3.86,
+      "processed_signal": 0.2626897936053907,
+      "raw_signal": 0.4137715833406303,
+      "sample_index": 386
+    },
+    {
+      "axis": 3.87,
+      "processed_axis": 3.87,
+      "processed_signal": 0.24349412685580657,
+      "raw_signal": 0.3941853748889742,
+      "sample_index": 387
+    },
+    {
+      "axis": 3.88,
+      "processed_axis": 3.88,
+      "processed_signal": 0.22511845352003557,
+      "raw_signal": 0.3754217139871842,
+      "sample_index": 388
+    },
+    {
+      "axis": 3.89,
+      "processed_axis": 3.89,
+      "processed_signal": 0.207575327147238,
+      "raw_signal": 0.3574927582745212,
+      "sample_index": 389
+    },
+    {
+      "axis": 3.9,
+      "processed_axis": 3.9,
+      "processed_signal": 0.19087195000630441,
+      "raw_signal": 0.3404052603737759,
+      "sample_index": 390
+    },
+    {
+      "axis": 3.91,
+      "processed_axis": 3.91,
+      "processed_signal": 0.17501049234605753,
+      "raw_signal": 0.3241608978809824,
+      "sample_index": 391
+    },
+    {
+      "axis": 3.92,
+      "processed_axis": 3.92,
+      "processed_signal": 0.15998843457554465,
+      "raw_signal": 0.3087566260838044,
+      "sample_index": 392
+    },
+    {
+      "axis": 3.93,
+      "processed_axis": 3.93,
+      "processed_signal": 0.14579892702422456,
+      "raw_signal": 0.2941850479276129,
+      "sample_index": 393
+    },
+    {
+      "axis": 3.94,
+      "processed_axis": 3.94,
+      "processed_signal": 0.13243116210557204,
+      "raw_signal": 0.2804347959277498,
+      "sample_index": 394
+    },
+    {
+      "axis": 3.95,
+      "processed_axis": 3.95,
+      "processed_signal": 0.1198707539340093,
+      "raw_signal": 0.2674909209696286,
+      "sample_index": 395
+    },
+    {
+      "axis": 3.96,
+      "processed_axis": 3.96,
+      "processed_signal": 0.10810012072581818,
+      "raw_signal": 0.2553352832366128,
+      "sample_index": 396
+    },
+    {
+      "axis": 3.97,
+      "processed_axis": 3.97,
+      "processed_signal": 0.09709886564113171,
+      "raw_signal": 0.2439469408498253,
+      "sample_index": 397
+    },
+    {
+      "axis": 3.98,
+      "processed_axis": 3.98,
+      "processed_signal": 0.08684415208743426,
+      "raw_signal": 0.2333025321851138,
+      "sample_index": 398
+    },
+    {
+      "axis": 3.99,
+      "processed_axis": 3.99,
+      "processed_signal": 0.07731106989642018,
+      "raw_signal": 0.2233766482410726,
+      "sample_index": 399
+    },
+    {
+      "axis": 4.0,
+      "processed_axis": 4,
+      "processed_signal": 0.06847298919698407,
+      "raw_signal": 0.2141421918595233,
+      "sample_index": 400
+    },
+    {
+      "axis": 4.01,
+      "processed_axis": 4.01,
+      "processed_signal": 0.06030189922930083,
+      "raw_signal": 0.2055707210375497,
+      "sample_index": 401
+    },
+    {
+      "axis": 4.02,
+      "processed_axis": 4.02,
+      "processed_signal": 0.05276872977064676,
+      "raw_signal": 0.1976327740102245,
+      "sample_index": 402
+    },
+    {
+      "axis": 4.03,
+      "processed_axis": 4.03,
+      "processed_signal": 0.04584365326565838,
+      "raw_signal": 0.1902981742180975,
+      "sample_index": 403
+    },
+    {
+      "axis": 4.04,
+      "processed_axis": 4.04,
+      "processed_signal": 0.039496366165654835,
+      "raw_signal": 0.1835363136968419,
+      "sample_index": 404
+    },
+    {
+      "axis": 4.05,
+      "processed_axis": 4.05,
+      "processed_signal": 0.033696348377744906,
+      "raw_signal": 0.1773164138322882,
+      "sample_index": 405
+    },
+    {
+      "axis": 4.06,
+      "processed_axis": 4.06,
+      "processed_signal": 0.02841310009978529,
+      "raw_signal": 0.1716077628075346,
+      "sample_index": 406
+    },
+    {
+      "axis": 4.07,
+      "processed_axis": 4.07,
+      "processed_signal": 0.02361635566775654,
+      "raw_signal": 0.1663799294257261,
+      "sample_index": 407
+    },
+    {
+      "axis": 4.08,
+      "processed_axis": 4.08,
+      "processed_signal": 0.019276274364508576,
+      "raw_signal": 0.1616029533192763,
+      "sample_index": 408
+    },
+    {
+      "axis": 4.09,
+      "processed_axis": 4.09,
+      "processed_signal": 0.015363608430641775,
+      "raw_signal": 0.1572475118513235,
+      "sample_index": 409
+    },
+    {
+      "axis": 4.1,
+      "processed_axis": 4.1,
+      "processed_signal": 0.011849848777856602,
+      "raw_signal": 0.1532850642765237,
+      "sample_index": 410
+    },
+    {
+      "axis": 4.11,
+      "processed_axis": 4.11,
+      "processed_signal": 0.008707349134003567,
+      "raw_signal": 0.1496879739550158,
+      "sample_index": 411
+    },
+    {
+      "axis": 4.12,
+      "processed_axis": 4.12,
+      "processed_signal": 0.005909429547941517,
+      "raw_signal": 0.1464296096054822,
+      "sample_index": 412
+    },
+    {
+      "axis": 4.13,
+      "processed_axis": 4.13,
+      "processed_signal": 0.0034304603569355863,
+      "raw_signal": 0.1434844267411292,
+      "sample_index": 413
+    },
+    {
+      "axis": 4.14,
+      "processed_axis": 4.14,
+      "processed_signal": 0.0012459278731436305,
+      "raw_signal": 0.1408280305572382,
+      "sample_index": 414
+    },
+    {
+      "axis": 4.15,
+      "processed_axis": 4.15,
+      "processed_signal": -0.0006675168312984176,
+      "raw_signal": 0.1384372216321906,
+      "sample_index": 415
+    },
+    {
+      "axis": 4.16,
+      "processed_axis": 4.16,
+      "processed_signal": -0.0023320245938702505,
+      "raw_signal": 0.1362900258675172,
+      "sample_index": 416
+    },
+    {
+      "axis": 4.17,
+      "processed_axis": 4.17,
+      "processed_signal": -0.003768528845804441,
+      "raw_signal": 0.1343657101287996,
+      "sample_index": 417
+    },
+    {
+      "axis": 4.18,
+      "processed_axis": 4.18,
+      "processed_signal": -0.004996738931749518,
+      "raw_signal": 0.1326447850606599,
+      "sample_index": 418
+    },
+    {
+      "axis": 4.19,
+      "processed_axis": 4.19,
+      "processed_signal": -0.0060351447508470695,
+      "raw_signal": 0.1311089965382422,
+      "sample_index": 419
+    },
+    {
+      "axis": 4.2,
+      "processed_axis": 4.2,
+      "processed_signal": -0.00690103143730933,
+      "raw_signal": 0.1297413071872834,
+      "sample_index": 420
+    },
+    {
+      "axis": 4.21,
+      "processed_axis": 4.21,
+      "processed_signal": -0.0076105028050290425,
+      "raw_signal": 0.1285258693578297,
+      "sample_index": 421
+    },
+    {
+      "axis": 4.22,
+      "processed_axis": 4.22,
+      "processed_signal": -0.00817851229212842,
+      "raw_signal": 0.127447990875641,
+      "sample_index": 422
+    },
+    {
+      "axis": 4.23,
+      "processed_axis": 4.23,
+      "processed_signal": -0.00861890017799906,
+      "raw_signal": 0.1264940948229681,
+      "sample_index": 423
+    },
+    {
+      "axis": 4.24,
+      "processed_axis": 4.24,
+      "processed_signal": -0.008944435908153438,
+      "raw_signal": 0.1256516745192455,
+      "sample_index": 424
+    },
+    {
+      "axis": 4.25,
+      "processed_axis": 4.25,
+      "processed_signal": -0.009166864440443054,
+      "raw_signal": 0.1249092447846777,
+      "sample_index": 425
+    },
+    {
+      "axis": 4.26,
+      "processed_axis": 4.26,
+      "processed_signal": -0.009296955613580902,
+      "raw_signal": 0.1242562904779117,
+      "sample_index": 426
+    },
+    {
+      "axis": 4.27,
+      "processed_axis": 4.27,
+      "processed_signal": -0.009344555630437571,
+      "raw_signal": 0.1236832132049712,
+      "sample_index": 427
+    },
+    {
+      "axis": 4.28,
+      "processed_axis": 4.28,
+      "processed_signal": -0.009318639840946007,
+      "raw_signal": 0.1231812770021618,
+      "sample_index": 428
+    },
+    {
+      "axis": 4.29,
+      "processed_axis": 4.29,
+      "processed_signal": -0.009227366101095761,
+      "raw_signal": 0.1227425537022844,
+      "sample_index": 429
+    },
+    {
+      "axis": 4.3,
+      "processed_axis": 4.3,
+      "processed_signal": -0.009078128074085296,
+      "raw_signal": 0.122359868602564,
+      "sample_index": 430
+    },
+    {
+      "axis": 4.31,
+      "processed_axis": 4.31,
+      "processed_signal": -0.008877607926103275,
+      "raw_signal": 0.1220267469653063,
+      "sample_index": 431
+    },
+    {
+      "axis": 4.32,
+      "processed_axis": 4.32,
+      "processed_signal": -0.008631827951506198,
+      "raw_signal": 0.121737361799353,
+      "sample_index": 432
+    },
+    {
+      "axis": 4.33,
+      "processed_axis": 4.33,
+      "processed_signal": -0.008346200739624183,
+      "raw_signal": 0.1214864832926019,
+      "sample_index": 433
+    },
+    {
+      "axis": 4.34,
+      "processed_axis": 4.34,
+      "processed_signal": -0.008025577567516979,
+      "raw_signal": 0.1212694301937163,
+      "sample_index": 434
+    },
+    {
+      "axis": 4.35,
+      "processed_axis": 4.35,
+      "processed_signal": -0.007674294769343458,
+      "raw_signal": 0.1210820233750055,
+      "sample_index": 435
+    },
+    {
+      "axis": 4.36,
+      "processed_axis": 4.36,
+      "processed_signal": -0.007296217893377626,
+      "raw_signal": 0.120920541748505,
+      "sample_index": 436
+    },
+    {
+      "axis": 4.37,
+      "processed_axis": 4.37,
+      "processed_signal": -0.00689478351201439,
+      "raw_signal": 0.1207816806535758,
+      "sample_index": 437
+    },
+    {
+      "axis": 4.38,
+      "processed_axis": 4.38,
+      "processed_signal": -0.006473038598388525,
+      "raw_signal": 0.1206625127868179,
+      "sample_index": 438
+    },
+    {
+      "axis": 4.39,
+      "processed_axis": 4.39,
+      "processed_signal": -0.006033677425609703,
+      "raw_signal": 0.1205604517035884,
+      "sample_index": 439
+    },
+    {
+      "axis": 4.4,
+      "processed_axis": 4.4,
+      "processed_signal": -0.005579075981306956,
+      "raw_signal": 0.1204732178846859,
+      "sample_index": 440
+    },
+    {
+      "axis": 4.41,
+      "processed_axis": 4.41,
+      "processed_signal": -0.005111323921456512,
+      "raw_signal": 0.1203988073315152,
+      "sample_index": 441
+    },
+    {
+      "axis": 4.42,
+      "processed_axis": 4.42,
+      "processed_signal": -0.00463225411366768,
+      "raw_signal": 0.1203354626279025,
+      "sample_index": 442
+    },
+    {
+      "axis": 4.43,
+      "processed_axis": 4.43,
+      "processed_signal": -0.004143469841589771,
+      "raw_signal": 0.1202816463863301,
+      "sample_index": 443
+    },
+    {
+      "axis": 4.44,
+      "processed_axis": 4.44,
+      "processed_signal": -0.0036463697592718277,
+      "raw_signal": 0.1202360169802552,
+      "sample_index": 444
+    },
+    {
+      "axis": 4.45,
+      "processed_axis": 4.45,
+      "processed_signal": -0.0031421706975617693,
+      "raw_signal": 0.1201974064519809,
+      "sample_index": 445
+    },
+    {
+      "axis": 4.46,
+      "processed_axis": 4.46,
+      "processed_signal": -0.002631928434382735,
+      "raw_signal": 0.120164800476805,
+      "sample_index": 446
+    },
+    {
+      "axis": 4.47,
+      "processed_axis": 4.47,
+      "processed_signal": -0.002116556547376861,
+      "raw_signal": 0.1201373202584887,
+      "sample_index": 447
+    },
+    {
+      "axis": 4.48,
+      "processed_axis": 4.48,
+      "processed_signal": -0.0015968434702465781,
+      "raw_signal": 0.1201142062280491,
+      "sample_index": 448
+    },
+    {
+      "axis": 4.49,
+      "processed_axis": 4.49,
+      "processed_signal": -0.0010734678735252804,
+      "raw_signal": 0.1200948034171023,
+      "sample_index": 449
+    },
+    {
+      "axis": 4.5,
+      "processed_axis": 4.5,
+      "processed_signal": -0.0005470124842102557,
+      "raw_signal": 0.1200785483781205,
+      "sample_index": 450
+    },
+    {
+      "axis": 4.51,
+      "processed_axis": 4.51,
+      "processed_signal": -1.797644664813921e-05,
+      "raw_signal": 0.1200649575266621,
+      "sample_index": 451
+    },
+    {
+      "axis": 4.52,
+      "processed_axis": 4.52,
+      "processed_signal": 0.000513213685979667,
+      "raw_signal": 0.1200536167846102,
+      "sample_index": 452
+    },
+    {
+      "axis": 4.53,
+      "processed_axis": 4.53,
+      "processed_signal": 0.0010461942445022577,
+      "raw_signal": 0.1200441724084091,
+      "sample_index": 453
+    },
+    {
+      "axis": 4.54,
+      "processed_axis": 4.54,
+      "processed_signal": 0.001580655925297763,
+      "raw_signal": 0.1200363228919999,
+      "sample_index": 454
+    },
+    {
+      "axis": 4.55,
+      "processed_axis": 4.55,
+      "processed_signal": 0.0021163363465548676,
+      "raw_signal": 0.1200298118403873,
+      "sample_index": 455
+    },
+    {
+      "axis": 4.56,
+      "processed_axis": 4.56,
+      "processed_signal": 0.002653013554583252,
+      "raw_signal": 0.1200244217163492,
+      "sample_index": 456
+    },
+    {
+      "axis": 4.57,
+      "processed_axis": 4.57,
+      "processed_signal": 0.003190500360542055,
+      "raw_signal": 0.1200199683695547,
+      "sample_index": 457
+    },
+    {
+      "axis": 4.58,
+      "processed_axis": 4.58,
+      "processed_signal": 0.00372863940359656,
+      "raw_signal": 0.1200162962641579,
+      "sample_index": 458
+    },
+    {
+      "axis": 4.59,
+      "processed_axis": 4.59,
+      "processed_signal": 0.004267298853141901,
+      "raw_signal": 0.1200132743276634,
+      "sample_index": 459
+    },
+    {
+      "axis": 4.6,
+      "processed_axis": 4.6,
+      "processed_signal": 0.00480636867538402,
+      "raw_signal": 0.1200107923504348,
+      "sample_index": 460
+    },
+    {
+      "axis": 4.61,
+      "processed_axis": 4.61,
+      "processed_signal": 0.005345757398201124,
+      "raw_signal": 0.1200087578715529,
+      "sample_index": 461
+    },
+    {
+      "axis": 4.62,
+      "processed_axis": 4.62,
+      "processed_signal": 0.005885389315376606,
+      "raw_signal": 0.1200070934927858,
+      "sample_index": 462
+    },
+    {
+      "axis": 4.63,
+      "processed_axis": 4.63,
+      "processed_signal": 0.0064252020770113345,
+      "raw_signal": 0.1200057345681578,
+      "sample_index": 463
+    },
+    {
+      "axis": 4.64,
+      "processed_axis": 4.64,
+      "processed_signal": 0.006965144618260513,
+      "raw_signal": 0.1200046272219755,
+      "sample_index": 464
+    },
+    {
+      "axis": 4.65,
+      "processed_axis": 4.65,
+      "processed_signal": 0.007505175383526326,
+      "raw_signal": 0.1200037266531721,
+      "sample_index": 465
+    },
+    {
+      "axis": 4.66,
+      "processed_axis": 4.66,
+      "processed_signal": 0.008045260807862692,
+      "raw_signal": 0.1200029956884573,
+      "sample_index": 466
+    },
+    {
+      "axis": 4.67,
+      "processed_axis": 4.67,
+      "processed_signal": 0.008585374021610503,
+      "raw_signal": 0.120002403551009,
+      "sample_index": 467
+    },
+    {
+      "axis": 4.68,
+      "processed_axis": 4.68,
+      "processed_signal": 0.009125493748185574,
+      "raw_signal": 0.1200019248153261,
+      "sample_index": 468
+    },
+    {
+      "axis": 4.69,
+      "processed_axis": 4.69,
+      "processed_signal": 0.009665603368496638,
+      "raw_signal": 0.1200015385223876,
+      "sample_index": 469
+    },
+    {
+      "axis": 4.7,
+      "processed_axis": 4.7,
+      "processed_signal": 0.010205690128691049,
+      "raw_signal": 0.1200012274324475,
+      "sample_index": 470
+    },
+    {
+      "axis": 4.71,
+      "processed_axis": 4.71,
+      "processed_signal": 0.010745744470827896,
+      "raw_signal": 0.1200009773956613,
+      "sample_index": 471
+    },
+    {
+      "axis": 4.72,
+      "processed_axis": 4.72,
+      "processed_signal": 0.011285759468680939,
+      "raw_signal": 0.1200007768232965,
+      "sample_index": 472
+    },
+    {
+      "axis": 4.73,
+      "processed_axis": 4.73,
+      "processed_signal": 0.011825730353196985,
+      "raw_signal": 0.1200006162445668,
+      "sample_index": 473
+    },
+    {
+      "axis": 4.74,
+      "processed_axis": 4.74,
+      "processed_signal": 0.012365654114200188,
+      "raw_signal": 0.1200004879361472,
+      "sample_index": 474
+    },
+    {
+      "axis": 4.75,
+      "processed_axis": 4.75,
+      "processed_signal": 0.0129055291667596,
+      "raw_signal": 0.1200003856132156,
+      "sample_index": 475
+    },
+    {
+      "axis": 4.76,
+      "processed_axis": 4.76,
+      "processed_signal": 0.013445355072247594,
+      "raw_signal": 0.1200003041724345,
+      "sample_index": 476
+    },
+    {
+      "axis": 4.77,
+      "processed_axis": 4.77,
+      "processed_signal": 0.013985132305529934,
+      "raw_signal": 0.1200002394786634,
+      "sample_index": 477
+    },
+    {
+      "axis": 4.78,
+      "processed_axis": 4.78,
+      "processed_signal": 0.01452486206096383,
+      "raw_signal": 0.1200001881883891,
+      "sample_index": 478
+    },
+    {
+      "axis": 4.79,
+      "processed_axis": 4.79,
+      "processed_signal": 0.015064546090956808,
+      "raw_signal": 0.1200001476039063,
+      "sample_index": 479
+    },
+    {
+      "axis": 4.8,
+      "processed_axis": 4.8,
+      "processed_signal": 0.015604186571773045,
+      "raw_signal": 0.120000115553181,
+      "sample_index": 480
+    },
+    {
+      "axis": 4.81,
+      "processed_axis": 4.81,
+      "processed_signal": 0.016143785992081765,
+      "raw_signal": 0.1200000902911089,
+      "sample_index": 481
+    },
+    {
+      "axis": 4.82,
+      "processed_axis": 4.82,
+      "processed_signal": 0.016683347060438312,
+      "raw_signal": 0.1200000704185528,
+      "sample_index": 482
+    },
+    {
+      "axis": 4.83,
+      "processed_axis": 4.83,
+      "processed_signal": 0.01722287262848622,
+      "raw_signal": 0.1200000548161124,
+      "sample_index": 483
+    },
+    {
+      "axis": 4.84,
+      "processed_axis": 4.84,
+      "processed_signal": 0.017762365627180417,
+      "raw_signal": 0.1200000425900741,
+      "sample_index": 484
+    },
+    {
+      "axis": 4.85,
+      "processed_axis": 4.85,
+      "processed_signal": 0.018301829013768065,
+      "raw_signal": 0.1200000330284039,
+      "sample_index": 485
+    },
+    {
+      "axis": 4.86,
+      "processed_axis": 4.86,
+      "processed_signal": 0.018841265727634893,
+      "raw_signal": 0.1200000255650005,
+      "sample_index": 486
+    },
+    {
+      "axis": 4.87,
+      "processed_axis": 4.87,
+      "processed_signal": 0.0193806786534394,
+      "raw_signal": 0.1200000197507255,
+      "sample_index": 487
+    },
+    {
+      "axis": 4.88,
+      "processed_axis": 4.88,
+      "processed_signal": 0.019920070590223413,
+      "raw_signal": 0.1200000152299797,
+      "sample_index": 488
+    },
+    {
+      "axis": 4.89,
+      "processed_axis": 4.89,
+      "processed_signal": 0.020459444225411336,
+      "raw_signal": 0.1200000117218086,
+      "sample_index": 489
+    },
+    {
+      "axis": 4.9,
+      "processed_axis": 4.9,
+      "processed_signal": 0.020998802112798698,
+      "raw_signal": 0.1200000090046939,
+      "sample_index": 490
+    },
+    {
+      "axis": 4.91,
+      "processed_axis": 4.91,
+      "processed_signal": 0.021538146653788153,
+      "raw_signal": 0.1200000069043422,
+      "sample_index": 491
+    },
+    {
+      "axis": 4.92,
+      "processed_axis": 4.92,
+      "processed_signal": 0.02207748008126268,
+      "raw_signal": 0.1200000052839013,
+      "sample_index": 492
+    },
+    {
+      "axis": 4.93,
+      "processed_axis": 4.93,
+      "processed_signal": 0.022616804445595225,
+      "raw_signal": 0.1200000040361389,
+      "sample_index": 493
+    },
+    {
+      "axis": 4.94,
+      "processed_axis": 4.94,
+      "processed_signal": 0.02315612160238507,
+      "raw_signal": 0.1200000030772058,
+      "sample_index": 494
+    },
+    {
+      "axis": 4.95,
+      "processed_axis": 4.95,
+      "processed_signal": 0.02369304065435573,
+      "raw_signal": 0.1200000023416717,
+      "sample_index": 495
+    },
+    {
+      "axis": 4.96,
+      "processed_axis": 4.96,
+      "processed_signal": 0.024220492874904985,
+      "raw_signal": 0.1200000017785845,
+      "sample_index": 496
+    },
+    {
+      "axis": 4.97,
+      "processed_axis": 4.97,
+      "processed_signal": 0.024718794987414906,
+      "raw_signal": 0.1200000013483481,
+      "sample_index": 497
+    },
+    {
+      "axis": 4.98,
+      "processed_axis": 4.98,
+      "processed_signal": 0.025147174673881088,
+      "raw_signal": 0.1200000010202546,
+      "sample_index": 498
+    },
+    {
+      "axis": 4.99,
+      "processed_axis": 4.99,
+      "processed_signal": 0.025444924475119916,
+      "raw_signal": 0.1200000007705381,
+      "sample_index": 499
+    },
+    {
+      "axis": 5.0,
+      "processed_axis": 5,
+      "processed_signal": 0.025552609915869936,
+      "raw_signal": 0.120000000580843,
+      "sample_index": 500
+    }
+  ],
+  "profile": "measure-chromatogram-evidence/1",
+  "result": {
+    "installed_r_code_md5": {
+      "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+      "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+    },
+    "kind": "chromatogram",
+    "notes": [
+      "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+      "Peak area is detector response, not concentration or compound identity."
+    ],
+    "packages": {
+      "measure": "0.0.1.9003",
+      "measure.sec": "0.0.0.9000",
+      "recipes": "1.3.1"
+    },
+    "peak_count": 2,
+    "r_version": "4.5.2",
+    "warnings": []
+  },
+  "trace": {
+    "axis_unit": "min",
+    "batch_id": "synthetic-snapshot-source",
+    "channel": "UV-254",
+    "detector": "UV",
+    "injection_id": "injection-unknown",
+    "run_order": 3,
+    "sample_id": "snapshot-unknown",
+    "sample_type": "unknown",
+    "separation": "LC",
+    "signal_unit": "mAU",
+    "trace_id": "unknown"
+  }
+}

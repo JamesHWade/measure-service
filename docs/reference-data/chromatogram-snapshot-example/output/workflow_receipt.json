@@ -1,0 +1,3776 @@
+{
+  "analysis_ids": {
+    "fresh_reexecutions": [
+      "124a32e7-70b9-4793-af8a-f8c56909200a",
+      "e06edd2e-6b8f-40b6-8d13-f9250a6d4312",
+      "cf59afaa-b9e4-405f-9c59-b226f0a58a82",
+      "3b02df0d-6bdb-48f9-a70e-ac41f13f9a88"
+    ],
+    "historical_imports": [
+      "4b145a8e-6fa9-4907-95b6-a72247147507",
+      "176a80b1-cf7e-4a17-b63f-755b28231d50"
+    ],
+    "original_successes": [
+      "69d95502-e893-4fc6-8dac-2b60ceae2f59",
+      "949dc664-7081-464f-ab81-f903b7d26d75"
+    ],
+    "restored_store_unique_total": 6,
+    "source_and_restore_unique_total": 8
+  },
+  "assertions": {
+    "all_analysis_calls_used_public_mcp": true,
+    "failed_runtime_unknown": true,
+    "fresh_analyses_have_dataset_origin_only": true,
+    "historical_imports_are_not_active_attempts": true,
+    "no_hidden_retry_or_optimization_or_physical_claim": true,
+    "references_rejected_before_target_creation": true,
+    "roles_and_original_sample_types_preserved": true,
+    "selected_batch_point_count_is_2004": true,
+    "source_frozen_two_completed_two_pending": true,
+    "source_history_three_attempts_two_controls": true,
+    "two_historical_and_four_fresh_reports": true,
+    "two_original_successes_compare_with_declared_tolerances": true,
+    "unselected_trace_retained_in_complete_closure": true,
+    "wide_csv_retained_five_traces_and_2505_points": true
+  },
+  "canonical_file_hashes": {
+    "analysis-index.csv": "7bf7ed1dc08f9ecb5a03f912ecea74abca68da9fd201178f9f7616f06259f69a",
+    "fresh/000/chromatogram.svg": "f5f136bd6e81f8bb0aaeda559511b12a5e38a8441e06c65b26856cf4df9aa8e1",
+    "fresh/000/evidence.json": "916bd75bac10fa264688f01a1f592d2780ea021674e52b82c6b6e2425fbc5efd",
+    "fresh/000/peaks.csv": "26ccc996ed33c7aed52ba234aa2bfcdf509b5763715643a3e5cf321065644493",
+    "fresh/000/report.html": "cd9e6b65c83fc95e4fdf6c31ca4a2aae5ae607ac42f478f22413960dea914c20",
+    "fresh/000/trace.csv": "e4d5449cb2189c48a401d2ba6bfa3e92a7b2b64b99358a5686944d5667cd387f",
+    "fresh/001/chromatogram.svg": "bab1a6c5a8b91109c4ed2bffff7d5210302326ce9316ad23a54774b4c9b4d679",
+    "fresh/001/evidence.json": "c5b5b748fb1e4fbfea4c00de95745a0c871abf63c3ca9ff04bed6c8a7f7f922d",
+    "fresh/001/peaks.csv": "25414810281593e767f6c605a7784930c9667cf95ba5150d96ee4b1a462d26f1",
+    "fresh/001/report.html": "b9898097f215bfe9146243b3a7995b829bd00b0b8e9d34fe3a3f3653623401a2",
+    "fresh/001/trace.csv": "2749a1b6e29c02cab3d768b3e60ef76a4e5803cdd2dfcc4ecf29814745724819",
+    "fresh/002/chromatogram.svg": "016f715e4929815d3b577f9ef270fbfd41b99cc5a0f2a6a1647195352e87bcfd",
+    "fresh/002/evidence.json": "03cb9ac1b20303e53b12b64aab1566cb246de22eaf4d6a9381509c97efcad3ea",
+    "fresh/002/peaks.csv": "98b9ddd254b391677c1b4853e26d40c63f8ada1ccd3f9bb4eae846f4f2a08877",
+    "fresh/002/report.html": "4de3426988cf0d3c36e5ba535a755db5ed028a31f0d52b2b461d021067a2eeb1",
+    "fresh/002/trace.csv": "a1a576678a95d87aa29878ee95a7dfffd52418f3e37fdd6ac96f3b2938dff660",
+    "fresh/003/chromatogram.svg": "339480c598754b061be1180f67f39181f84d88c0af212670e9cf8181835554e2",
+    "fresh/003/evidence.json": "df901c9faac92d3f8aff76a1a9f92be500d9aca348bec6674e996d90d7272560",
+    "fresh/003/peaks.csv": "b1bfb9f5e38e47c74c5d92995550e2e6dc3875bb6d4d4045a0002825181dbce7",
+    "fresh/003/report.html": "91d3408c11d63d283b0b254caedecfb48725a4662590076e7aeb1917d1012ac4",
+    "fresh/003/trace.csv": "1d92ed9527f3a509cd96df5b5f5d8092eaba36fb529c9fc01f67a5a13ac5cfa2",
+    "historical/000/chromatogram.svg": "f5f136bd6e81f8bb0aaeda559511b12a5e38a8441e06c65b26856cf4df9aa8e1",
+    "historical/000/evidence.json": "2fa2d1393e48f76adc652f2d8d25bdbb56f7686bdcd82db94daff1c9f54eab0f",
+    "historical/000/peaks.csv": "95c7097bf2a01d0ad4b94ef8ef45ed1febae84f9c0c83394c3f1c9c76491e9d9",
+    "historical/000/report.html": "17579dbd63a3fec95708b67151d1e5ba8167c619df2952a270d31faabecf8caa",
+    "historical/000/trace.csv": "3898f2c8a4aa994a3c6d51b88c508f5e2c16578af99154f66c6462da7cc9338e",
+    "historical/001/chromatogram.svg": "bab1a6c5a8b91109c4ed2bffff7d5210302326ce9316ad23a54774b4c9b4d679",
+    "historical/001/evidence.json": "f136fb310da518abb43a9f5b9dfd363b98611caaafb426a1ba925328a87b37f7",
+    "historical/001/peaks.csv": "25414810281593e767f6c605a7784930c9667cf95ba5150d96ee4b1a462d26f1",
+    "historical/001/report.html": "abf9e37cc9262a1bb0de2d09d3720771d0370c19074268730ed306aff0a08439",
+    "historical/001/trace.csv": "ad6e2ffe5afb9f2e1c52b844ffbaeb124e91d8da9d0245b51c852f20224d8369",
+    "source-references.zip": "00f565f33010c1c33d8a3066f75987deb6d58b67b0939ce07b202c815bd8a7e4",
+    "source-self-contained.zip": "bcd9e2ea269638c2e5697afd0eba02ec39df891809bb9453004a4fa14155fb19",
+    "summary.html": "ebb39144caf4304e2b63504085d8df8dd5aa82ffba4fe7be7d8cb63bf40e9ced"
+  },
+  "comparison_scope": {
+    "compared_item_count": 2,
+    "fresh_completed_item_count": 4,
+    "original_successful_item_count": 2,
+    "original_unresolved_source_items": [
+      {
+        "ordinal": 2,
+        "role": "qc",
+        "state": "pending"
+      },
+      {
+        "ordinal": 3,
+        "role": "unknown",
+        "state": "pending"
+      }
+    ],
+    "unresolved_items_are_not_reclassified": true
+  },
+  "comparisons": [
+    {
+      "absolute_tolerance": 1e-10,
+      "categorical_comparison_count": 512,
+      "compared_fields": {
+        "categorical": [
+          "trace_metadata",
+          "method",
+          "sample_index",
+          "peak_id",
+          "area_basis"
+        ],
+        "mixed_metadata": [
+          "scientific_result_metadata"
+        ],
+        "peak_numeric": [
+          "location",
+          "height",
+          "left_base",
+          "right_base",
+          "area",
+          "prominence"
+        ],
+        "point_numeric": [
+          "axis",
+          "processed_axis",
+          "raw_signal",
+          "processed_signal"
+        ],
+        "separately_recorded_execution_metadata": [
+          "packages",
+          "installed_r_code_md5",
+          "r_version"
+        ]
+      },
+      "comparison_count": 2527,
+      "execution_provenance": {
+        "equality_required": false,
+        "fresh": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "fresh_result_fields": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2"
+        },
+        "source": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "source_result_fields": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2"
+        }
+      },
+      "fresh_analysis_id": "124a32e7-70b9-4793-af8a-f8c56909200a",
+      "max_absolute_error": 0.0,
+      "max_relative_error": 0.0,
+      "numeric_comparison_count": 2015,
+      "passed": true,
+      "peak_count": 2,
+      "point_count": 501,
+      "relative_tolerance": 1e-08,
+      "source_analysis_id": "69d95502-e893-4fc6-8dac-2b60ceae2f59"
+    },
+    {
+      "absolute_tolerance": 1e-10,
+      "categorical_comparison_count": 506,
+      "compared_fields": {
+        "categorical": [
+          "trace_metadata",
+          "method",
+          "sample_index",
+          "peak_id",
+          "area_basis"
+        ],
+        "mixed_metadata": [
+          "scientific_result_metadata"
+        ],
+        "peak_numeric": [
+          "location",
+          "height",
+          "left_base",
+          "right_base",
+          "area",
+          "prominence"
+        ],
+        "point_numeric": [
+          "axis",
+          "processed_axis",
+          "raw_signal",
+          "processed_signal"
+        ],
+        "separately_recorded_execution_metadata": [
+          "packages",
+          "installed_r_code_md5",
+          "r_version"
+        ]
+      },
+      "comparison_count": 2511,
+      "execution_provenance": {
+        "equality_required": false,
+        "fresh": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "fresh_result_fields": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2"
+        },
+        "source": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "source_result_fields": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2"
+        }
+      },
+      "fresh_analysis_id": "e06edd2e-6b8f-40b6-8d13-f9250a6d4312",
+      "max_absolute_error": 0.0,
+      "max_relative_error": 0.0,
+      "numeric_comparison_count": 2005,
+      "passed": true,
+      "peak_count": 0,
+      "point_count": 501,
+      "relative_tolerance": 1e-08,
+      "source_analysis_id": "949dc664-7081-464f-ab81-f903b7d26d75"
+    }
+  ],
+  "fresh_reexecution": [
+    {
+      "analysis": {
+        "analysis_id": "124a32e7-70b9-4793-af8a-f8c56909200a",
+        "created_at": "2026-11-07T20:33:58.947066+00:00",
+        "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+        "diagnostics": null,
+        "input_import_origin": {
+          "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+          "imported_at": "2026-11-07T20:33:56.168532+00:00",
+          "local_record_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+          "original_record_sha256": "d098d897b20d540b48211df4cddc4a66271542c3113f21e9c1c86efa607aa0a3",
+          "preserved_content_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "profile": "measure-analytical-import-origin/1",
+          "record_kind": "dataset",
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+          "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "source_record_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8"
+        },
+        "kind": "chromatogram",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "provenance": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "qualification": "experimental",
+        "status": "completed",
+        "summary": {
+          "peak_count": 2
+        },
+        "trace_id": "reference",
+        "warnings": []
+      },
+      "analysis_id": "124a32e7-70b9-4793-af8a-f8c56909200a",
+      "evidence_sha256": "35888fc0e806888e2a05cebb9a23eeb9a906911bf44c47f360b2414a371aebcf",
+      "ordinal": 0,
+      "report": {
+        "analysis_id": "124a32e7-70b9-4793-af8a-f8c56909200a",
+        "evidence_sha256": "35888fc0e806888e2a05cebb9a23eeb9a906911bf44c47f360b2414a371aebcf",
+        "files": {
+          "chromatogram.svg": {
+            "path": "fresh/000/chromatogram.svg",
+            "sha256": "f5f136bd6e81f8bb0aaeda559511b12a5e38a8441e06c65b26856cf4df9aa8e1",
+            "size_bytes": 43790
+          },
+          "evidence.json": {
+            "path": "fresh/000/evidence.json",
+            "sha256": "916bd75bac10fa264688f01a1f592d2780ea021674e52b82c6b6e2425fbc5efd",
+            "size_bytes": 91192
+          },
+          "peaks.csv": {
+            "path": "fresh/000/peaks.csv",
+            "sha256": "26ccc996ed33c7aed52ba234aa2bfcdf509b5763715643a3e5cf321065644493",
+            "size_bytes": 503
+          },
+          "report.html": {
+            "path": "fresh/000/report.html",
+            "sha256": "cd9e6b65c83fc95e4fdf6c31ca4a2aae5ae607ac42f478f22413960dea914c20",
+            "size_bytes": 52825
+          },
+          "trace.csv": {
+            "path": "fresh/000/trace.csv",
+            "sha256": "e4d5449cb2189c48a401d2ba6bfa3e92a7b2b64b99358a5686944d5667cd387f",
+            "size_bytes": 82120
+          }
+        },
+        "ordinal": 0,
+        "peak_count": 2,
+        "point_count": 501,
+        "result_metadata": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "kind": "chromatogram",
+          "notes": [
+            "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+            "Peak area is detector response, not concentration or compound identity."
+          ],
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "peak_count": 2,
+          "r_version": "4.5.2",
+          "warnings": []
+        },
+        "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+        "section": "fresh",
+        "stored_result_sha256": "79bde092fae6ce0980e26a889a3094dfc5543b17ddefc3807e9e12c02701f6b8"
+      },
+      "stored_result_sha256": "79bde092fae6ce0980e26a889a3094dfc5543b17ddefc3807e9e12c02701f6b8"
+    },
+    {
+      "analysis": {
+        "analysis_id": "e06edd2e-6b8f-40b6-8d13-f9250a6d4312",
+        "created_at": "2026-11-07T20:33:58.689780+00:00",
+        "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+        "diagnostics": null,
+        "input_import_origin": {
+          "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+          "imported_at": "2026-11-07T20:33:56.168532+00:00",
+          "local_record_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+          "original_record_sha256": "d098d897b20d540b48211df4cddc4a66271542c3113f21e9c1c86efa607aa0a3",
+          "preserved_content_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "profile": "measure-analytical-import-origin/1",
+          "record_kind": "dataset",
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+          "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "source_record_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8"
+        },
+        "kind": "chromatogram",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "provenance": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "qualification": "experimental",
+        "status": "completed",
+        "summary": {
+          "peak_count": 0
+        },
+        "trace_id": "blank",
+        "warnings": []
+      },
+      "analysis_id": "e06edd2e-6b8f-40b6-8d13-f9250a6d4312",
+      "evidence_sha256": "1753b82c5d2593d3d0d24f4c02f864e9e45c42897c4c2138262cf409bb65b31a",
+      "ordinal": 1,
+      "report": {
+        "analysis_id": "e06edd2e-6b8f-40b6-8d13-f9250a6d4312",
+        "evidence_sha256": "1753b82c5d2593d3d0d24f4c02f864e9e45c42897c4c2138262cf409bb65b31a",
+        "files": {
+          "chromatogram.svg": {
+            "path": "fresh/001/chromatogram.svg",
+            "sha256": "bab1a6c5a8b91109c4ed2bffff7d5210302326ce9316ad23a54774b4c9b4d679",
+            "size_bytes": 26923
+          },
+          "evidence.json": {
+            "path": "fresh/001/evidence.json",
+            "sha256": "c5b5b748fb1e4fbfea4c00de95745a0c871abf63c3ca9ff04bed6c8a7f7f922d",
+            "size_bytes": 74140
+          },
+          "peaks.csv": {
+            "path": "fresh/001/peaks.csv",
+            "sha256": "25414810281593e767f6c605a7784930c9667cf95ba5150d96ee4b1a462d26f1",
+            "size_bytes": 122
+          },
+          "report.html": {
+            "path": "fresh/001/report.html",
+            "sha256": "b9898097f215bfe9146243b3a7995b829bd00b0b8e9d34fe3a3f3653623401a2",
+            "size_bytes": 35729
+          },
+          "trace.csv": {
+            "path": "fresh/001/trace.csv",
+            "sha256": "2749a1b6e29c02cab3d768b3e60ef76a4e5803cdd2dfcc4ecf29814745724819",
+            "size_bytes": 65519
+          }
+        },
+        "ordinal": 1,
+        "peak_count": 0,
+        "point_count": 501,
+        "result_metadata": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "kind": "chromatogram",
+          "notes": [
+            "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+            "Peak area is detector response, not concentration or compound identity."
+          ],
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "peak_count": 0,
+          "r_version": "4.5.2",
+          "warnings": []
+        },
+        "result_metadata_sha256": "1308d838ffa1d600bd3f78e40fd3101534d7993bae682cd9befbb8011313cc7c",
+        "section": "fresh",
+        "stored_result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363"
+      },
+      "stored_result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363"
+    },
+    {
+      "analysis": {
+        "analysis_id": "cf59afaa-b9e4-405f-9c59-b226f0a58a82",
+        "created_at": "2026-11-07T20:34:01.613500+00:00",
+        "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+        "diagnostics": null,
+        "input_import_origin": {
+          "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+          "imported_at": "2026-11-07T20:33:56.168532+00:00",
+          "local_record_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+          "original_record_sha256": "d098d897b20d540b48211df4cddc4a66271542c3113f21e9c1c86efa607aa0a3",
+          "preserved_content_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "profile": "measure-analytical-import-origin/1",
+          "record_kind": "dataset",
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+          "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "source_record_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8"
+        },
+        "kind": "chromatogram",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "provenance": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "qualification": "experimental",
+        "status": "completed",
+        "summary": {
+          "peak_count": 2
+        },
+        "trace_id": "qc",
+        "warnings": []
+      },
+      "analysis_id": "cf59afaa-b9e4-405f-9c59-b226f0a58a82",
+      "evidence_sha256": "219feceb804012187d49ebac0ac4b59bfd4772c943ce69b587b9957761c0d25d",
+      "ordinal": 2,
+      "report": {
+        "analysis_id": "cf59afaa-b9e4-405f-9c59-b226f0a58a82",
+        "evidence_sha256": "219feceb804012187d49ebac0ac4b59bfd4772c943ce69b587b9957761c0d25d",
+        "files": {
+          "chromatogram.svg": {
+            "path": "fresh/002/chromatogram.svg",
+            "sha256": "016f715e4929815d3b577f9ef270fbfd41b99cc5a0f2a6a1647195352e87bcfd",
+            "size_bytes": 44050
+          },
+          "evidence.json": {
+            "path": "fresh/002/evidence.json",
+            "sha256": "03cb9ac1b20303e53b12b64aab1566cb246de22eaf4d6a9381509c97efcad3ea",
+            "size_bytes": 91272
+          },
+          "peaks.csv": {
+            "path": "fresh/002/peaks.csv",
+            "sha256": "98b9ddd254b391677c1b4853e26d40c63f8ada1ccd3f9bb4eae846f4f2a08877",
+            "size_bytes": 505
+          },
+          "report.html": {
+            "path": "fresh/002/report.html",
+            "sha256": "4de3426988cf0d3c36e5ba535a755db5ed028a31f0d52b2b461d021067a2eeb1",
+            "size_bytes": 53059
+          },
+          "trace.csv": {
+            "path": "fresh/002/trace.csv",
+            "sha256": "a1a576678a95d87aa29878ee95a7dfffd52418f3e37fdd6ac96f3b2938dff660",
+            "size_bytes": 82233
+          }
+        },
+        "ordinal": 2,
+        "peak_count": 2,
+        "point_count": 501,
+        "result_metadata": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "kind": "chromatogram",
+          "notes": [
+            "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+            "Peak area is detector response, not concentration or compound identity."
+          ],
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "peak_count": 2,
+          "r_version": "4.5.2",
+          "warnings": []
+        },
+        "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+        "section": "fresh",
+        "stored_result_sha256": "904c013d05120737d0f0b49842481888d3053aa43c07df2950c59778e41370f5"
+      },
+      "stored_result_sha256": "904c013d05120737d0f0b49842481888d3053aa43c07df2950c59778e41370f5"
+    },
+    {
+      "analysis": {
+        "analysis_id": "3b02df0d-6bdb-48f9-a70e-ac41f13f9a88",
+        "created_at": "2026-11-07T20:34:01.706131+00:00",
+        "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+        "diagnostics": null,
+        "input_import_origin": {
+          "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+          "imported_at": "2026-11-07T20:33:56.168532+00:00",
+          "local_record_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+          "original_record_sha256": "d098d897b20d540b48211df4cddc4a66271542c3113f21e9c1c86efa607aa0a3",
+          "preserved_content_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "profile": "measure-analytical-import-origin/1",
+          "record_kind": "dataset",
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+          "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "source_record_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8"
+        },
+        "kind": "chromatogram",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "provenance": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "qualification": "experimental",
+        "status": "completed",
+        "summary": {
+          "peak_count": 2
+        },
+        "trace_id": "unknown",
+        "warnings": []
+      },
+      "analysis_id": "3b02df0d-6bdb-48f9-a70e-ac41f13f9a88",
+      "evidence_sha256": "d6dfbcf7f50033eb23daf854c240b8257c3c3d6a490d820236ead97b98d5281a",
+      "ordinal": 3,
+      "report": {
+        "analysis_id": "3b02df0d-6bdb-48f9-a70e-ac41f13f9a88",
+        "evidence_sha256": "d6dfbcf7f50033eb23daf854c240b8257c3c3d6a490d820236ead97b98d5281a",
+        "files": {
+          "chromatogram.svg": {
+            "path": "fresh/003/chromatogram.svg",
+            "sha256": "339480c598754b061be1180f67f39181f84d88c0af212670e9cf8181835554e2",
+            "size_bytes": 43540
+          },
+          "evidence.json": {
+            "path": "fresh/003/evidence.json",
+            "sha256": "df901c9faac92d3f8aff76a1a9f92be500d9aca348bec6674e996d90d7272560",
+            "size_bytes": 91278
+          },
+          "peaks.csv": {
+            "path": "fresh/003/peaks.csv",
+            "sha256": "b1bfb9f5e38e47c74c5d92995550e2e6dc3875bb6d4d4045a0002825181dbce7",
+            "size_bytes": 503
+          },
+          "report.html": {
+            "path": "fresh/003/report.html",
+            "sha256": "91d3408c11d63d283b0b254caedecfb48725a4662590076e7aeb1917d1012ac4",
+            "size_bytes": 52567
+          },
+          "trace.csv": {
+            "path": "fresh/003/trace.csv",
+            "sha256": "1d92ed9527f3a509cd96df5b5f5d8092eaba36fb529c9fc01f67a5a13ac5cfa2",
+            "size_bytes": 82216
+          }
+        },
+        "ordinal": 3,
+        "peak_count": 2,
+        "point_count": 501,
+        "result_metadata": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "kind": "chromatogram",
+          "notes": [
+            "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+            "Peak area is detector response, not concentration or compound identity."
+          ],
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "peak_count": 2,
+          "r_version": "4.5.2",
+          "warnings": []
+        },
+        "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+        "section": "fresh",
+        "stored_result_sha256": "dcadecb5d66aa75a577c5f01f75f591edad436c0e7e0b9eae62d3dde2116462a"
+      },
+      "stored_result_sha256": "dcadecb5d66aa75a577c5f01f75f591edad436c0e7e0b9eae62d3dde2116462a"
+    }
+  ],
+  "historical_imports": [
+    {
+      "analysis": {
+        "analysis_id": "4b145a8e-6fa9-4907-95b6-a72247147507",
+        "created_at": "2026-11-07T20:33:55.007812+00:00",
+        "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+        "diagnostics": null,
+        "import_origin": {
+          "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+          "imported_at": "2026-11-07T20:33:56.168532+00:00",
+          "local_record_id": "4b145a8e-6fa9-4907-95b6-a72247147507",
+          "original_record_sha256": "6d9a4dcf9d7a81674c808a956cb53b12f573dec3b19f81aab7b54046ac4ed900",
+          "preserved_content_sha256": "79bde092fae6ce0980e26a889a3094dfc5543b17ddefc3807e9e12c02701f6b8",
+          "profile": "measure-analytical-import-origin/1",
+          "record_kind": "analysis",
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+          "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "source_record_id": "69d95502-e893-4fc6-8dac-2b60ceae2f59"
+        },
+        "input_import_origin": {
+          "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+          "imported_at": "2026-11-07T20:33:56.168532+00:00",
+          "local_record_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+          "original_record_sha256": "d098d897b20d540b48211df4cddc4a66271542c3113f21e9c1c86efa607aa0a3",
+          "preserved_content_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "profile": "measure-analytical-import-origin/1",
+          "record_kind": "dataset",
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+          "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "source_record_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8"
+        },
+        "kind": "chromatogram",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "provenance": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "qualification": "experimental",
+        "status": "completed",
+        "summary": {
+          "peak_count": 2
+        },
+        "trace_id": "reference",
+        "warnings": []
+      },
+      "analysis_id": "4b145a8e-6fa9-4907-95b6-a72247147507",
+      "evidence_sha256": "23260a78ba863299a636f6175b2df5d6b889a97855b429ab341da873b80d50f5",
+      "report": {
+        "analysis_id": "4b145a8e-6fa9-4907-95b6-a72247147507",
+        "evidence_sha256": "23260a78ba863299a636f6175b2df5d6b889a97855b429ab341da873b80d50f5",
+        "files": {
+          "chromatogram.svg": {
+            "path": "historical/000/chromatogram.svg",
+            "sha256": "f5f136bd6e81f8bb0aaeda559511b12a5e38a8441e06c65b26856cf4df9aa8e1",
+            "size_bytes": 43790
+          },
+          "evidence.json": {
+            "path": "historical/000/evidence.json",
+            "sha256": "2fa2d1393e48f76adc652f2d8d25bdbb56f7686bdcd82db94daff1c9f54eab0f",
+            "size_bytes": 91192
+          },
+          "peaks.csv": {
+            "path": "historical/000/peaks.csv",
+            "sha256": "95c7097bf2a01d0ad4b94ef8ef45ed1febae84f9c0c83394c3f1c9c76491e9d9",
+            "size_bytes": 503
+          },
+          "report.html": {
+            "path": "historical/000/report.html",
+            "sha256": "17579dbd63a3fec95708b67151d1e5ba8167c619df2952a270d31faabecf8caa",
+            "size_bytes": 52825
+          },
+          "trace.csv": {
+            "path": "historical/000/trace.csv",
+            "sha256": "3898f2c8a4aa994a3c6d51b88c508f5e2c16578af99154f66c6462da7cc9338e",
+            "size_bytes": 82120
+          }
+        },
+        "ordinal": 0,
+        "peak_count": 2,
+        "point_count": 501,
+        "result_metadata": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "kind": "chromatogram",
+          "notes": [
+            "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+            "Peak area is detector response, not concentration or compound identity."
+          ],
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "peak_count": 2,
+          "r_version": "4.5.2",
+          "warnings": []
+        },
+        "result_metadata_sha256": "2c5450ecd8e4ccc77918e6892fc788c1f71edc281e4755f4198a59f3aa408845",
+        "section": "historical",
+        "stored_result_sha256": "79bde092fae6ce0980e26a889a3094dfc5543b17ddefc3807e9e12c02701f6b8"
+      },
+      "source_analysis_id": "69d95502-e893-4fc6-8dac-2b60ceae2f59",
+      "stored_result_sha256": "79bde092fae6ce0980e26a889a3094dfc5543b17ddefc3807e9e12c02701f6b8"
+    },
+    {
+      "analysis": {
+        "analysis_id": "176a80b1-cf7e-4a17-b63f-755b28231d50",
+        "created_at": "2026-11-07T20:33:54.629321+00:00",
+        "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+        "diagnostics": null,
+        "import_origin": {
+          "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+          "imported_at": "2026-11-07T20:33:56.168532+00:00",
+          "local_record_id": "176a80b1-cf7e-4a17-b63f-755b28231d50",
+          "original_record_sha256": "c88e050de69bfd60a1150b80bbbf2dc5a8cc1a7483af947e3f15089a7effee99",
+          "preserved_content_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363",
+          "profile": "measure-analytical-import-origin/1",
+          "record_kind": "analysis",
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+          "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "source_record_id": "949dc664-7081-464f-ab81-f903b7d26d75"
+        },
+        "input_import_origin": {
+          "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+          "imported_at": "2026-11-07T20:33:56.168532+00:00",
+          "local_record_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+          "original_record_sha256": "d098d897b20d540b48211df4cddc4a66271542c3113f21e9c1c86efa607aa0a3",
+          "preserved_content_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "profile": "measure-analytical-import-origin/1",
+          "record_kind": "dataset",
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+          "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "source_record_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8"
+        },
+        "kind": "chromatogram",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "notes": [
+          "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+          "Peak area is detector response, not concentration or compound identity."
+        ],
+        "provenance": {
+          "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "measure_revision": null,
+          "measure_sec_revision": null,
+          "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "r_version": "4.5.2",
+          "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+          "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+        },
+        "qualification": "experimental",
+        "status": "completed",
+        "summary": {
+          "peak_count": 0
+        },
+        "trace_id": "blank",
+        "warnings": []
+      },
+      "analysis_id": "176a80b1-cf7e-4a17-b63f-755b28231d50",
+      "evidence_sha256": "354eb970bf7d96fe06219b51668f6b5898ad06c9605d433b8c3d99144264eee8",
+      "report": {
+        "analysis_id": "176a80b1-cf7e-4a17-b63f-755b28231d50",
+        "evidence_sha256": "354eb970bf7d96fe06219b51668f6b5898ad06c9605d433b8c3d99144264eee8",
+        "files": {
+          "chromatogram.svg": {
+            "path": "historical/001/chromatogram.svg",
+            "sha256": "bab1a6c5a8b91109c4ed2bffff7d5210302326ce9316ad23a54774b4c9b4d679",
+            "size_bytes": 26923
+          },
+          "evidence.json": {
+            "path": "historical/001/evidence.json",
+            "sha256": "f136fb310da518abb43a9f5b9dfd363b98611caaafb426a1ba925328a87b37f7",
+            "size_bytes": 74140
+          },
+          "peaks.csv": {
+            "path": "historical/001/peaks.csv",
+            "sha256": "25414810281593e767f6c605a7784930c9667cf95ba5150d96ee4b1a462d26f1",
+            "size_bytes": 122
+          },
+          "report.html": {
+            "path": "historical/001/report.html",
+            "sha256": "abf9e37cc9262a1bb0de2d09d3720771d0370c19074268730ed306aff0a08439",
+            "size_bytes": 35729
+          },
+          "trace.csv": {
+            "path": "historical/001/trace.csv",
+            "sha256": "ad6e2ffe5afb9f2e1c52b844ffbaeb124e91d8da9d0245b51c852f20224d8369",
+            "size_bytes": 65519
+          }
+        },
+        "ordinal": 1,
+        "peak_count": 0,
+        "point_count": 501,
+        "result_metadata": {
+          "installed_r_code_md5": {
+            "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+            "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+          },
+          "kind": "chromatogram",
+          "notes": [
+            "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+            "Peak area is detector response, not concentration or compound identity."
+          ],
+          "packages": {
+            "measure": "0.0.1.9003",
+            "measure.sec": "0.0.0.9000",
+            "recipes": "1.3.1"
+          },
+          "peak_count": 0,
+          "r_version": "4.5.2",
+          "warnings": []
+        },
+        "result_metadata_sha256": "1308d838ffa1d600bd3f78e40fd3101534d7993bae682cd9befbb8011313cc7c",
+        "section": "historical",
+        "stored_result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363"
+      },
+      "source_analysis_id": "949dc664-7081-464f-ab81-f903b7d26d75",
+      "stored_result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363"
+    }
+  ],
+  "profile": "measure-chromatogram-batch-snapshot-example/1",
+  "restore": {
+    "public_receipt": {
+      "analysis_map": {
+        "69d95502-e893-4fc6-8dac-2b60ceae2f59": "4b145a8e-6fa9-4907-95b6-a72247147507",
+        "949dc664-7081-464f-ab81-f903b7d26d75": "176a80b1-cf7e-4a17-b63f-755b28231d50"
+      },
+      "dataset_map": {
+        "ac7a12e1-3e3c-484c-88bd-a607cdb756a8": "12e56b78-13f8-48ca-949e-26975bf6b5ac"
+      },
+      "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+      "limits": {
+        "max_archive_bytes": 67371008,
+        "max_snapshot_bytes": 67108864
+      },
+      "new_batch_id": "c789e38c-03f2-4148-9bd6-b1411bfa5732",
+      "no_execution_performed": true,
+      "profile": "measure-chromatogram-batch-restore/1",
+      "restored_at": "2026-11-07T20:33:56.168532+00:00",
+      "schema_version": "1.0",
+      "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+      "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187"
+    },
+    "receipt": {
+      "analysis_map": {
+        "69d95502-e893-4fc6-8dac-2b60ceae2f59": "4b145a8e-6fa9-4907-95b6-a72247147507",
+        "949dc664-7081-464f-ab81-f903b7d26d75": "176a80b1-cf7e-4a17-b63f-755b28231d50"
+      },
+      "dataset_map": {
+        "ac7a12e1-3e3c-484c-88bd-a607cdb756a8": "12e56b78-13f8-48ca-949e-26975bf6b5ac"
+      },
+      "import_id": "7253abd2-67c7-4160-bb45-afbd98a84b3f",
+      "limits": {
+        "max_archive_bytes": 67371008,
+        "max_snapshot_bytes": 67108864
+      },
+      "new_batch_id": "c789e38c-03f2-4148-9bd6-b1411bfa5732",
+      "no_execution_performed": true,
+      "profile": "measure-chromatogram-batch-restore/1",
+      "restored_at": "2026-11-07T20:33:56.168532+00:00",
+      "schema_version": "1.0",
+      "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c",
+      "source_batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187"
+    },
+    "reference_restore_error": "Only self-contained snapshots can be restored",
+    "reference_restore_rejected": true,
+    "reference_target_created": false,
+    "restored_batch_before_fresh": {
+      "batch_id": "c789e38c-03f2-4148-9bd6-b1411bfa5732",
+      "cancel_requested": false,
+      "control_event_count": 0,
+      "counts": {
+        "cancelled": 0,
+        "completed": 0,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 4,
+        "running": 0
+      },
+      "created_at": "2026-11-07T20:33:56.189178+00:00",
+      "input_sha256": "3c82952c0705b4c4a63de15c03f9e1e3a5f342dec98e19104b19b468280a3e9a",
+      "item_count": 4,
+      "manifest": {
+        "inputs": [
+          {
+            "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+            "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+            "dataset_title": "Synthetic five-trace snapshot source",
+            "internal_standard_references": [],
+            "ordinal": 0,
+            "point_count": 501,
+            "role": "reference",
+            "source": {
+              "kind": "delimited_text",
+              "mapping": {
+                "axis_column": "time",
+                "delimiter": ",",
+                "signal_columns": [
+                  {
+                    "column": "reference",
+                    "trace_id": "reference"
+                  },
+                  {
+                    "column": "blank",
+                    "trace_id": "blank"
+                  },
+                  {
+                    "column": "qc",
+                    "trace_id": "qc"
+                  },
+                  {
+                    "column": "unknown",
+                    "trace_id": "unknown"
+                  },
+                  {
+                    "column": "unselected",
+                    "trace_id": "unselected"
+                  }
+                ]
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+            },
+            "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": "synthetic-snapshot-source",
+              "channel": "UV-254",
+              "detector": "UV",
+              "injection_id": "injection-reference",
+              "run_order": 0,
+              "sample_id": "snapshot-reference",
+              "sample_type": "reference",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "reference"
+            },
+            "trace_id": "reference"
+          },
+          {
+            "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+            "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+            "dataset_title": "Synthetic five-trace snapshot source",
+            "internal_standard_references": [],
+            "ordinal": 1,
+            "point_count": 501,
+            "role": "blank",
+            "source": {
+              "kind": "delimited_text",
+              "mapping": {
+                "axis_column": "time",
+                "delimiter": ",",
+                "signal_columns": [
+                  {
+                    "column": "reference",
+                    "trace_id": "reference"
+                  },
+                  {
+                    "column": "blank",
+                    "trace_id": "blank"
+                  },
+                  {
+                    "column": "qc",
+                    "trace_id": "qc"
+                  },
+                  {
+                    "column": "unknown",
+                    "trace_id": "unknown"
+                  },
+                  {
+                    "column": "unselected",
+                    "trace_id": "unselected"
+                  }
+                ]
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+            },
+            "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": "synthetic-snapshot-source",
+              "channel": "UV-254",
+              "detector": "UV",
+              "injection_id": "injection-blank",
+              "run_order": 1,
+              "sample_id": "snapshot-blank",
+              "sample_type": "blank",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "blank"
+            },
+            "trace_id": "blank"
+          },
+          {
+            "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+            "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+            "dataset_title": "Synthetic five-trace snapshot source",
+            "internal_standard_references": [],
+            "ordinal": 2,
+            "point_count": 501,
+            "role": "qc",
+            "source": {
+              "kind": "delimited_text",
+              "mapping": {
+                "axis_column": "time",
+                "delimiter": ",",
+                "signal_columns": [
+                  {
+                    "column": "reference",
+                    "trace_id": "reference"
+                  },
+                  {
+                    "column": "blank",
+                    "trace_id": "blank"
+                  },
+                  {
+                    "column": "qc",
+                    "trace_id": "qc"
+                  },
+                  {
+                    "column": "unknown",
+                    "trace_id": "unknown"
+                  },
+                  {
+                    "column": "unselected",
+                    "trace_id": "unselected"
+                  }
+                ]
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+            },
+            "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": "synthetic-snapshot-source",
+              "channel": "UV-254",
+              "detector": "UV",
+              "injection_id": "injection-qc",
+              "run_order": 2,
+              "sample_id": "snapshot-qc",
+              "sample_type": "qc",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "qc"
+            },
+            "trace_id": "qc"
+          },
+          {
+            "dataset_id": "12e56b78-13f8-48ca-949e-26975bf6b5ac",
+            "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+            "dataset_title": "Synthetic five-trace snapshot source",
+            "internal_standard_references": [
+              "caller-declared reference label"
+            ],
+            "ordinal": 3,
+            "point_count": 501,
+            "role": "unknown",
+            "source": {
+              "kind": "delimited_text",
+              "mapping": {
+                "axis_column": "time",
+                "delimiter": ",",
+                "signal_columns": [
+                  {
+                    "column": "reference",
+                    "trace_id": "reference"
+                  },
+                  {
+                    "column": "blank",
+                    "trace_id": "blank"
+                  },
+                  {
+                    "column": "qc",
+                    "trace_id": "qc"
+                  },
+                  {
+                    "column": "unknown",
+                    "trace_id": "unknown"
+                  },
+                  {
+                    "column": "unselected",
+                    "trace_id": "unselected"
+                  }
+                ]
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+            },
+            "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": "synthetic-snapshot-source",
+              "channel": "UV-254",
+              "detector": "UV",
+              "injection_id": "injection-unknown",
+              "run_order": 3,
+              "sample_id": "snapshot-unknown",
+              "sample_type": "unknown",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "unknown"
+            },
+            "trace_id": "unknown"
+          }
+        ],
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "schema_version": "1.0",
+        "title": "Synthetic portable batch snapshot"
+      },
+      "manifest_sha256": "575b545abfaf846a96222388fdd4ccac7458e2275b39c240c8f992a800cb7a5f",
+      "method": {
+        "baseline": "als",
+        "baseline_lambda": 1000000.0,
+        "baseline_p": 0.01,
+        "integration_baseline": "local",
+        "min_distance": 0.0,
+        "min_height": 0.0,
+        "min_prominence": 0.3,
+        "smoothing": "gaussian",
+        "smoothing_sigma": 2.0
+      },
+      "point_count": 2004,
+      "profile": "measure-chromatogram-batch/1",
+      "revision": 1,
+      "schema_version": "1.0",
+      "status": "active",
+      "title": "Synthetic portable batch snapshot",
+      "updated_at": "2026-11-07T20:33:56.189178+00:00"
+    },
+    "restored_history_before_fresh": {
+      "attempts": 0,
+      "controls": 0,
+      "no_execution_performed": true,
+      "runs": 0
+    }
+  },
+  "scope": "Synthetic chromatogram evidence only; stored results are retained and compared without optimization, identity, purity, concentration, calibration, or instrument qualification claims.",
+  "source": {
+    "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+    "database_sha256_after_exports": "0b6c11b2e2dc168df84f6c8200f6a4cb29ea31276a61c3b541773b10868531b8",
+    "database_sha256_before_exports": "0b6c11b2e2dc168df84f6c8200f6a4cb29ea31276a61c3b541773b10868531b8",
+    "dataset": {
+      "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+      "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+      "original_sample_types": {
+        "blank": "blank",
+        "qc": "qc",
+        "reference": "reference",
+        "unknown": "unknown",
+        "unselected": "unknown"
+      },
+      "point_count": 2505,
+      "selected_point_count": 2004,
+      "selected_trace_ids": [
+        "reference",
+        "blank",
+        "qc",
+        "unknown"
+      ],
+      "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+      "source_text_line_ending": "CRLF",
+      "trace_count": 5,
+      "unselected_trace_ids": [
+        "unselected"
+      ]
+    },
+    "freeze_revision": 8,
+    "history": {
+      "after_cancel": {
+        "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+        "cancel_requested": true,
+        "control_event_count": 1,
+        "counts": {
+          "cancelled": 1,
+          "completed": 2,
+          "failed": 1,
+          "interrupted": 0,
+          "pending": 0,
+          "running": 0
+        },
+        "created_at": "2026-11-07T20:33:52.903291+00:00",
+        "input_sha256": "cc5aa6a588d41c387e6c9ab5fb032facd1331a071bc5855f8352b107cc4792be",
+        "item_count": 4,
+        "manifest": {
+          "inputs": [
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 0,
+              "point_count": 501,
+              "role": "reference",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-reference",
+                "run_order": 0,
+                "sample_id": "snapshot-reference",
+                "sample_type": "reference",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "reference"
+              },
+              "trace_id": "reference"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 1,
+              "point_count": 501,
+              "role": "blank",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-blank",
+                "run_order": 1,
+                "sample_id": "snapshot-blank",
+                "sample_type": "blank",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "blank"
+              },
+              "trace_id": "blank"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 2,
+              "point_count": 501,
+              "role": "qc",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-qc",
+                "run_order": 2,
+                "sample_id": "snapshot-qc",
+                "sample_type": "qc",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "qc"
+              },
+              "trace_id": "qc"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [
+                "caller-declared reference label"
+              ],
+              "ordinal": 3,
+              "point_count": 501,
+              "role": "unknown",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-unknown",
+                "run_order": 3,
+                "sample_id": "snapshot-unknown",
+                "sample_type": "unknown",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "unknown"
+              },
+              "trace_id": "unknown"
+            }
+          ],
+          "method": {
+            "baseline": "als",
+            "baseline_lambda": 1000000.0,
+            "baseline_p": 0.01,
+            "integration_baseline": "local",
+            "min_distance": 0.0,
+            "min_height": 0.0,
+            "min_prominence": 0.3,
+            "smoothing": "gaussian",
+            "smoothing_sigma": 2.0
+          },
+          "point_count": 2004,
+          "profile": "measure-chromatogram-batch/1",
+          "schema_version": "1.0",
+          "title": "Synthetic portable batch snapshot"
+        },
+        "manifest_sha256": "2b18a5a4d265602a2564fc48572ed7c940106a3f77093a63a5c985de5f79c9ef",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "revision": 7,
+        "schema_version": "1.0",
+        "status": "cancelled",
+        "title": "Synthetic portable batch snapshot",
+        "updated_at": "2026-11-07T20:33:55.525538+00:00"
+      },
+      "after_failure": {
+        "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+        "cancel_requested": false,
+        "control_event_count": 0,
+        "counts": {
+          "cancelled": 0,
+          "completed": 2,
+          "failed": 1,
+          "interrupted": 0,
+          "pending": 1,
+          "running": 0
+        },
+        "created_at": "2026-11-07T20:33:52.903291+00:00",
+        "input_sha256": "cc5aa6a588d41c387e6c9ab5fb032facd1331a071bc5855f8352b107cc4792be",
+        "item_count": 4,
+        "manifest": {
+          "inputs": [
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 0,
+              "point_count": 501,
+              "role": "reference",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-reference",
+                "run_order": 0,
+                "sample_id": "snapshot-reference",
+                "sample_type": "reference",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "reference"
+              },
+              "trace_id": "reference"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 1,
+              "point_count": 501,
+              "role": "blank",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-blank",
+                "run_order": 1,
+                "sample_id": "snapshot-blank",
+                "sample_type": "blank",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "blank"
+              },
+              "trace_id": "blank"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 2,
+              "point_count": 501,
+              "role": "qc",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-qc",
+                "run_order": 2,
+                "sample_id": "snapshot-qc",
+                "sample_type": "qc",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "qc"
+              },
+              "trace_id": "qc"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [
+                "caller-declared reference label"
+              ],
+              "ordinal": 3,
+              "point_count": 501,
+              "role": "unknown",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-unknown",
+                "run_order": 3,
+                "sample_id": "snapshot-unknown",
+                "sample_type": "unknown",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "unknown"
+              },
+              "trace_id": "unknown"
+            }
+          ],
+          "method": {
+            "baseline": "als",
+            "baseline_lambda": 1000000.0,
+            "baseline_p": 0.01,
+            "integration_baseline": "local",
+            "min_distance": 0.0,
+            "min_height": 0.0,
+            "min_prominence": 0.3,
+            "smoothing": "gaussian",
+            "smoothing_sigma": 2.0
+          },
+          "point_count": 2004,
+          "profile": "measure-chromatogram-batch/1",
+          "schema_version": "1.0",
+          "title": "Synthetic portable batch snapshot"
+        },
+        "manifest_sha256": "2b18a5a4d265602a2564fc48572ed7c940106a3f77093a63a5c985de5f79c9ef",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "revision": 6,
+        "schema_version": "1.0",
+        "status": "active",
+        "title": "Synthetic portable batch snapshot",
+        "updated_at": "2026-11-07T20:33:55.497968+00:00"
+      },
+      "after_first_run": {
+        "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+        "cancel_requested": false,
+        "control_event_count": 0,
+        "counts": {
+          "cancelled": 0,
+          "completed": 2,
+          "failed": 0,
+          "interrupted": 0,
+          "pending": 2,
+          "running": 0
+        },
+        "created_at": "2026-11-07T20:33:52.903291+00:00",
+        "input_sha256": "cc5aa6a588d41c387e6c9ab5fb032facd1331a071bc5855f8352b107cc4792be",
+        "item_count": 4,
+        "manifest": {
+          "inputs": [
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 0,
+              "point_count": 501,
+              "role": "reference",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-reference",
+                "run_order": 0,
+                "sample_id": "snapshot-reference",
+                "sample_type": "reference",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "reference"
+              },
+              "trace_id": "reference"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 1,
+              "point_count": 501,
+              "role": "blank",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-blank",
+                "run_order": 1,
+                "sample_id": "snapshot-blank",
+                "sample_type": "blank",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "blank"
+              },
+              "trace_id": "blank"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 2,
+              "point_count": 501,
+              "role": "qc",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-qc",
+                "run_order": 2,
+                "sample_id": "snapshot-qc",
+                "sample_type": "qc",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "qc"
+              },
+              "trace_id": "qc"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [
+                "caller-declared reference label"
+              ],
+              "ordinal": 3,
+              "point_count": 501,
+              "role": "unknown",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-unknown",
+                "run_order": 3,
+                "sample_id": "snapshot-unknown",
+                "sample_type": "unknown",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "unknown"
+              },
+              "trace_id": "unknown"
+            }
+          ],
+          "method": {
+            "baseline": "als",
+            "baseline_lambda": 1000000.0,
+            "baseline_p": 0.01,
+            "integration_baseline": "local",
+            "min_distance": 0.0,
+            "min_height": 0.0,
+            "min_prominence": 0.3,
+            "smoothing": "gaussian",
+            "smoothing_sigma": 2.0
+          },
+          "point_count": 2004,
+          "profile": "measure-chromatogram-batch/1",
+          "schema_version": "1.0",
+          "title": "Synthetic portable batch snapshot"
+        },
+        "manifest_sha256": "2b18a5a4d265602a2564fc48572ed7c940106a3f77093a63a5c985de5f79c9ef",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "revision": 4,
+        "schema_version": "1.0",
+        "status": "active",
+        "title": "Synthetic portable batch snapshot",
+        "updated_at": "2026-11-07T20:33:55.023105+00:00"
+      },
+      "after_retry_selection": {
+        "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+        "cancel_requested": false,
+        "control_event_count": 2,
+        "counts": {
+          "cancelled": 0,
+          "completed": 2,
+          "failed": 0,
+          "interrupted": 0,
+          "pending": 2,
+          "running": 0
+        },
+        "created_at": "2026-11-07T20:33:52.903291+00:00",
+        "input_sha256": "cc5aa6a588d41c387e6c9ab5fb032facd1331a071bc5855f8352b107cc4792be",
+        "item_count": 4,
+        "manifest": {
+          "inputs": [
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 0,
+              "point_count": 501,
+              "role": "reference",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-reference",
+                "run_order": 0,
+                "sample_id": "snapshot-reference",
+                "sample_type": "reference",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "reference"
+              },
+              "trace_id": "reference"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 1,
+              "point_count": 501,
+              "role": "blank",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-blank",
+                "run_order": 1,
+                "sample_id": "snapshot-blank",
+                "sample_type": "blank",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "blank"
+              },
+              "trace_id": "blank"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 2,
+              "point_count": 501,
+              "role": "qc",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-qc",
+                "run_order": 2,
+                "sample_id": "snapshot-qc",
+                "sample_type": "qc",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "qc"
+              },
+              "trace_id": "qc"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [
+                "caller-declared reference label"
+              ],
+              "ordinal": 3,
+              "point_count": 501,
+              "role": "unknown",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-unknown",
+                "run_order": 3,
+                "sample_id": "snapshot-unknown",
+                "sample_type": "unknown",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "unknown"
+              },
+              "trace_id": "unknown"
+            }
+          ],
+          "method": {
+            "baseline": "als",
+            "baseline_lambda": 1000000.0,
+            "baseline_p": 0.01,
+            "integration_baseline": "local",
+            "min_distance": 0.0,
+            "min_height": 0.0,
+            "min_prominence": 0.3,
+            "smoothing": "gaussian",
+            "smoothing_sigma": 2.0
+          },
+          "point_count": 2004,
+          "profile": "measure-chromatogram-batch/1",
+          "schema_version": "1.0",
+          "title": "Synthetic portable batch snapshot"
+        },
+        "manifest_sha256": "2b18a5a4d265602a2564fc48572ed7c940106a3f77093a63a5c985de5f79c9ef",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "revision": 8,
+        "schema_version": "1.0",
+        "status": "active",
+        "title": "Synthetic portable batch snapshot",
+        "updated_at": "2026-11-07T20:33:55.541507+00:00"
+      },
+      "attempts": {
+        "0": {
+          "attempts": [
+            {
+              "analysis_id": "69d95502-e893-4fc6-8dac-2b60ceae2f59",
+              "attempt_id": "dfd44dd5-acfc-4e0a-9d1a-e5b79c5f8903",
+              "attempt_no": 1,
+              "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+              "error": null,
+              "evidence_sha256": "3773c37c817d1c87b447318894655ac169dfaa60250420983779b8dc506efd40",
+              "execution_context": {
+                "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+                "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+                "processing_profile": "measure-chromatogram/1",
+                "r_runtime_evidence": "unknown_until_success",
+                "service_version": "0.1.0.dev0",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "finished_at": "2026-11-07T20:33:55.023105+00:00",
+              "lease_expires_at": "2026-11-07T20:36:22.930409+00:00",
+              "ordinal": 0,
+              "result": null,
+              "result_sha256": "79bde092fae6ce0980e26a889a3094dfc5543b17ddefc3807e9e12c02701f6b8",
+              "run_id": "db7f6e1e-655a-43d0-819e-9952ed332806",
+              "runtime": {
+                "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+                "installed_r_code_md5": {
+                  "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                  "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+                },
+                "measure_revision": null,
+                "measure_sec_revision": null,
+                "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+                "packages": {
+                  "measure": "0.0.1.9003",
+                  "measure.sec": "0.0.0.9000",
+                  "recipes": "1.3.1"
+                },
+                "r_version": "4.5.2",
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "started_at": "2026-11-07T20:33:52.930203+00:00",
+              "state": "completed"
+            }
+          ],
+          "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "count": 1,
+          "limit": 20,
+          "next_offset": null,
+          "offset": 0,
+          "ordinal": 0,
+          "total": 1
+        },
+        "1": {
+          "attempts": [
+            {
+              "analysis_id": "949dc664-7081-464f-ab81-f903b7d26d75",
+              "attempt_id": "e1f8e934-1cb3-40b5-b382-751111b5952d",
+              "attempt_no": 1,
+              "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+              "error": null,
+              "evidence_sha256": "2a176c1ce79c22d000e904101f97f0596c0d222a5fee90256783f05a8b17c65f",
+              "execution_context": {
+                "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+                "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+                "processing_profile": "measure-chromatogram/1",
+                "r_runtime_evidence": "unknown_until_success",
+                "service_version": "0.1.0.dev0",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "finished_at": "2026-11-07T20:33:54.662717+00:00",
+              "lease_expires_at": "2026-11-07T20:36:22.930662+00:00",
+              "ordinal": 1,
+              "result": null,
+              "result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363",
+              "run_id": "db7f6e1e-655a-43d0-819e-9952ed332806",
+              "runtime": {
+                "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+                "installed_r_code_md5": {
+                  "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                  "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+                },
+                "measure_revision": null,
+                "measure_sec_revision": null,
+                "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+                "packages": {
+                  "measure": "0.0.1.9003",
+                  "measure.sec": "0.0.0.9000",
+                  "recipes": "1.3.1"
+                },
+                "r_version": "4.5.2",
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "started_at": "2026-11-07T20:33:52.930203+00:00",
+              "state": "completed"
+            }
+          ],
+          "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "count": 1,
+          "limit": 20,
+          "next_offset": null,
+          "offset": 0,
+          "ordinal": 1,
+          "total": 1
+        },
+        "2": {
+          "attempts": [
+            {
+              "analysis_id": null,
+              "attempt_id": "8765c8be-f72c-4319-b65f-f7f95f8246f5",
+              "attempt_no": 1,
+              "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+              "error": {
+                "code": "chromatogram_worker_error",
+                "exception_type": "ValueError",
+                "message": "The R analysis worker could not start or timed out",
+                "r_runtime_evidence": "unknown_until_success"
+              },
+              "evidence_sha256": null,
+              "execution_context": {
+                "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+                "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+                "processing_profile": "measure-chromatogram/1",
+                "r_runtime_evidence": "unknown_until_success",
+                "service_version": "0.1.0.dev0",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "finished_at": "2026-11-07T20:33:55.497968+00:00",
+              "lease_expires_at": "2026-11-07T20:36:25.477589+00:00",
+              "ordinal": 2,
+              "result": null,
+              "result_sha256": null,
+              "run_id": "db5ff68f-7ab4-4c22-b761-456da7450609",
+              "runtime": {
+                "runtime_status": "unknown"
+              },
+              "started_at": "2026-11-07T20:33:55.477141+00:00",
+              "state": "failed"
+            }
+          ],
+          "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "count": 1,
+          "limit": 20,
+          "next_offset": null,
+          "offset": 0,
+          "ordinal": 2,
+          "total": 1
+        },
+        "3": {
+          "attempts": [],
+          "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "count": 0,
+          "limit": 20,
+          "next_offset": null,
+          "offset": 0,
+          "ordinal": 3,
+          "total": 0
+        }
+      },
+      "cancellation_checkpoint": {
+        "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+        "count": 4,
+        "items": [
+          {
+            "analysis_id": "69d95502-e893-4fc6-8dac-2b60ceae2f59",
+            "attempt_count": 1,
+            "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+            "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+            "dataset_title": "Synthetic five-trace snapshot source",
+            "evidence_sha256": "3773c37c817d1c87b447318894655ac169dfaa60250420983779b8dc506efd40",
+            "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+            "internal_standard_references": [],
+            "item_id": "c3876552-8750-49f9-81f0-b3f840d0a591",
+            "ordinal": 0,
+            "point_count": 501,
+            "result": {
+              "analysis_id": "69d95502-e893-4fc6-8dac-2b60ceae2f59",
+              "artifact": true,
+              "created_at": "2026-11-07T20:33:55.007812+00:00",
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "diagnostics": null,
+              "kind": "chromatogram",
+              "notes": [
+                "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+                "Peak area is detector response, not concentration or compound identity."
+              ],
+              "provenance": {
+                "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+                "installed_r_code_md5": {
+                  "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                  "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+                },
+                "measure_revision": null,
+                "measure_sec_revision": null,
+                "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+                "packages": {
+                  "measure": "0.0.1.9003",
+                  "measure.sec": "0.0.0.9000",
+                  "recipes": "1.3.1"
+                },
+                "r_version": "4.5.2",
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "qualification": "experimental",
+              "status": "completed",
+              "summary": {
+                "peak_count": 2
+              },
+              "trace_id": "reference",
+              "warnings": []
+            },
+            "result_sha256": "79bde092fae6ce0980e26a889a3094dfc5543b17ddefc3807e9e12c02701f6b8",
+            "role": "reference",
+            "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+            "state": "completed",
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": "synthetic-snapshot-source",
+              "channel": "UV-254",
+              "detector": "UV",
+              "injection_id": "injection-reference",
+              "run_order": 0,
+              "sample_id": "snapshot-reference",
+              "sample_type": "reference",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "reference"
+            },
+            "trace_id": "reference"
+          },
+          {
+            "analysis_id": "949dc664-7081-464f-ab81-f903b7d26d75",
+            "attempt_count": 1,
+            "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+            "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+            "dataset_title": "Synthetic five-trace snapshot source",
+            "evidence_sha256": "2a176c1ce79c22d000e904101f97f0596c0d222a5fee90256783f05a8b17c65f",
+            "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+            "internal_standard_references": [],
+            "item_id": "edcdcbff-9e98-47cc-ae48-85ebae50c8ee",
+            "ordinal": 1,
+            "point_count": 501,
+            "result": {
+              "analysis_id": "949dc664-7081-464f-ab81-f903b7d26d75",
+              "artifact": true,
+              "created_at": "2026-11-07T20:33:54.629321+00:00",
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "diagnostics": null,
+              "kind": "chromatogram",
+              "notes": [
+                "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+                "Peak area is detector response, not concentration or compound identity."
+              ],
+              "provenance": {
+                "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+                "installed_r_code_md5": {
+                  "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                  "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+                },
+                "measure_revision": null,
+                "measure_sec_revision": null,
+                "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+                "packages": {
+                  "measure": "0.0.1.9003",
+                  "measure.sec": "0.0.0.9000",
+                  "recipes": "1.3.1"
+                },
+                "r_version": "4.5.2",
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "qualification": "experimental",
+              "status": "completed",
+              "summary": {
+                "peak_count": 0
+              },
+              "trace_id": "blank",
+              "warnings": []
+            },
+            "result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363",
+            "role": "blank",
+            "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+            "state": "completed",
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": "synthetic-snapshot-source",
+              "channel": "UV-254",
+              "detector": "UV",
+              "injection_id": "injection-blank",
+              "run_order": 1,
+              "sample_id": "snapshot-blank",
+              "sample_type": "blank",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "blank"
+            },
+            "trace_id": "blank"
+          },
+          {
+            "analysis_id": null,
+            "attempt_count": 1,
+            "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+            "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+            "dataset_title": "Synthetic five-trace snapshot source",
+            "evidence_sha256": null,
+            "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+            "internal_standard_references": [],
+            "item_id": "699d2906-ecb2-417f-b8e6-b326f0cdcca3",
+            "ordinal": 2,
+            "point_count": 501,
+            "result": null,
+            "result_sha256": null,
+            "role": "qc",
+            "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+            "state": "failed",
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": "synthetic-snapshot-source",
+              "channel": "UV-254",
+              "detector": "UV",
+              "injection_id": "injection-qc",
+              "run_order": 2,
+              "sample_id": "snapshot-qc",
+              "sample_type": "qc",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "qc"
+            },
+            "trace_id": "qc"
+          },
+          {
+            "analysis_id": null,
+            "attempt_count": 0,
+            "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+            "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+            "dataset_title": "Synthetic five-trace snapshot source",
+            "evidence_sha256": null,
+            "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+            "internal_standard_references": [
+              "caller-declared reference label"
+            ],
+            "item_id": "4abc1b87-382b-4776-b794-2de80874f946",
+            "ordinal": 3,
+            "point_count": 501,
+            "result": null,
+            "result_sha256": null,
+            "role": "unknown",
+            "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+            "state": "cancelled",
+            "trace": {
+              "axis_unit": "min",
+              "batch_id": "synthetic-snapshot-source",
+              "channel": "UV-254",
+              "detector": "UV",
+              "injection_id": "injection-unknown",
+              "run_order": 3,
+              "sample_id": "snapshot-unknown",
+              "sample_type": "unknown",
+              "separation": "LC",
+              "signal_unit": "mAU",
+              "trace_id": "unknown"
+            },
+            "trace_id": "unknown"
+          }
+        ],
+        "limit": 20,
+        "next_offset": null,
+        "offset": 0,
+        "revision": 7,
+        "total": 4
+      },
+      "controls": {
+        "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+        "count": 2,
+        "events": [
+          {
+            "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+            "created_at": "2026-11-07T20:33:55.525538+00:00",
+            "event_id": "1ba85a20-0284-4267-b4a9-0d84cb0d09e6",
+            "event_no": 1,
+            "event_sha256": "c179945f082e2e843957d8b30ef85c2ff8feca00e9551a97b3978929e5150892",
+            "idempotency_key_sha256": "518474e322454e0d3bc67906ef389f8c9bc63e6a3511b021a300e32ab06a2291",
+            "items": [
+              {
+                "from_state": "pending",
+                "ordinal": 3,
+                "to_state": "cancelled"
+              }
+            ],
+            "kind": "cancel_requested",
+            "profile": "measure-chromatogram-batch-control/1",
+            "revision_after": 7,
+            "revision_before": 6
+          },
+          {
+            "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+            "created_at": "2026-11-07T20:33:55.541507+00:00",
+            "event_id": "e6282be0-73d5-4c2a-b71c-3251ef2113eb",
+            "event_no": 2,
+            "event_sha256": "a4dd20b08061368fcf975c0c1313d1c78d78b03d7197a73468a016f5bc9fba67",
+            "idempotency_key_sha256": "c735fd7598fe90d26724e70329b1ece61e8631c9c36f09cc407adab3817d6840",
+            "items": [
+              {
+                "from_state": "failed",
+                "ordinal": 2,
+                "to_state": "pending"
+              },
+              {
+                "from_state": "cancelled",
+                "ordinal": 3,
+                "to_state": "pending"
+              }
+            ],
+            "kind": "retry_selected",
+            "profile": "measure-chromatogram-batch-control/1",
+            "revision_after": 8,
+            "revision_before": 7
+          }
+        ],
+        "next_offset": null,
+        "offset": 0,
+        "total": 2
+      },
+      "frozen": {
+        "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+        "cancel_requested": false,
+        "control_event_count": 2,
+        "counts": {
+          "cancelled": 0,
+          "completed": 2,
+          "failed": 0,
+          "interrupted": 0,
+          "pending": 2,
+          "running": 0
+        },
+        "created_at": "2026-11-07T20:33:52.903291+00:00",
+        "input_sha256": "cc5aa6a588d41c387e6c9ab5fb032facd1331a071bc5855f8352b107cc4792be",
+        "item_count": 4,
+        "manifest": {
+          "inputs": [
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 0,
+              "point_count": 501,
+              "role": "reference",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-reference",
+                "run_order": 0,
+                "sample_id": "snapshot-reference",
+                "sample_type": "reference",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "reference"
+              },
+              "trace_id": "reference"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 1,
+              "point_count": 501,
+              "role": "blank",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-blank",
+                "run_order": 1,
+                "sample_id": "snapshot-blank",
+                "sample_type": "blank",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "blank"
+              },
+              "trace_id": "blank"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 2,
+              "point_count": 501,
+              "role": "qc",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-qc",
+                "run_order": 2,
+                "sample_id": "snapshot-qc",
+                "sample_type": "qc",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "qc"
+              },
+              "trace_id": "qc"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [
+                "caller-declared reference label"
+              ],
+              "ordinal": 3,
+              "point_count": 501,
+              "role": "unknown",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-unknown",
+                "run_order": 3,
+                "sample_id": "snapshot-unknown",
+                "sample_type": "unknown",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "unknown"
+              },
+              "trace_id": "unknown"
+            }
+          ],
+          "method": {
+            "baseline": "als",
+            "baseline_lambda": 1000000.0,
+            "baseline_p": 0.01,
+            "integration_baseline": "local",
+            "min_distance": 0.0,
+            "min_height": 0.0,
+            "min_prominence": 0.3,
+            "smoothing": "gaussian",
+            "smoothing_sigma": 2.0
+          },
+          "point_count": 2004,
+          "profile": "measure-chromatogram-batch/1",
+          "schema_version": "1.0",
+          "title": "Synthetic portable batch snapshot"
+        },
+        "manifest_sha256": "2b18a5a4d265602a2564fc48572ed7c940106a3f77093a63a5c985de5f79c9ef",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "revision": 8,
+        "schema_version": "1.0",
+        "status": "active",
+        "title": "Synthetic portable batch snapshot",
+        "updated_at": "2026-11-07T20:33:55.541507+00:00"
+      },
+      "initial": {
+        "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+        "cancel_requested": false,
+        "control_event_count": 0,
+        "counts": {
+          "cancelled": 0,
+          "completed": 0,
+          "failed": 0,
+          "interrupted": 0,
+          "pending": 4,
+          "running": 0
+        },
+        "created_at": "2026-11-07T20:33:52.903291+00:00",
+        "input_sha256": "cc5aa6a588d41c387e6c9ab5fb032facd1331a071bc5855f8352b107cc4792be",
+        "item_count": 4,
+        "manifest": {
+          "inputs": [
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 0,
+              "point_count": 501,
+              "role": "reference",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-reference",
+                "run_order": 0,
+                "sample_id": "snapshot-reference",
+                "sample_type": "reference",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "reference"
+              },
+              "trace_id": "reference"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 1,
+              "point_count": 501,
+              "role": "blank",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-blank",
+                "run_order": 1,
+                "sample_id": "snapshot-blank",
+                "sample_type": "blank",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "blank"
+              },
+              "trace_id": "blank"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [],
+              "ordinal": 2,
+              "point_count": 501,
+              "role": "qc",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-qc",
+                "run_order": 2,
+                "sample_id": "snapshot-qc",
+                "sample_type": "qc",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "qc"
+              },
+              "trace_id": "qc"
+            },
+            {
+              "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+              "dataset_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+              "dataset_title": "Synthetic five-trace snapshot source",
+              "internal_standard_references": [
+                "caller-declared reference label"
+              ],
+              "ordinal": 3,
+              "point_count": 501,
+              "role": "unknown",
+              "source": {
+                "kind": "delimited_text",
+                "mapping": {
+                  "axis_column": "time",
+                  "delimiter": ",",
+                  "signal_columns": [
+                    {
+                      "column": "reference",
+                      "trace_id": "reference"
+                    },
+                    {
+                      "column": "blank",
+                      "trace_id": "blank"
+                    },
+                    {
+                      "column": "qc",
+                      "trace_id": "qc"
+                    },
+                    {
+                      "column": "unknown",
+                      "trace_id": "unknown"
+                    },
+                    {
+                      "column": "unselected",
+                      "trace_id": "unselected"
+                    }
+                  ]
+                },
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804"
+              },
+              "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+              "trace": {
+                "axis_unit": "min",
+                "batch_id": "synthetic-snapshot-source",
+                "channel": "UV-254",
+                "detector": "UV",
+                "injection_id": "injection-unknown",
+                "run_order": 3,
+                "sample_id": "snapshot-unknown",
+                "sample_type": "unknown",
+                "separation": "LC",
+                "signal_unit": "mAU",
+                "trace_id": "unknown"
+              },
+              "trace_id": "unknown"
+            }
+          ],
+          "method": {
+            "baseline": "als",
+            "baseline_lambda": 1000000.0,
+            "baseline_p": 0.01,
+            "integration_baseline": "local",
+            "min_distance": 0.0,
+            "min_height": 0.0,
+            "min_prominence": 0.3,
+            "smoothing": "gaussian",
+            "smoothing_sigma": 2.0
+          },
+          "point_count": 2004,
+          "profile": "measure-chromatogram-batch/1",
+          "schema_version": "1.0",
+          "title": "Synthetic portable batch snapshot"
+        },
+        "manifest_sha256": "2b18a5a4d265602a2564fc48572ed7c940106a3f77093a63a5c985de5f79c9ef",
+        "method": {
+          "baseline": "als",
+          "baseline_lambda": 1000000.0,
+          "baseline_p": 0.01,
+          "integration_baseline": "local",
+          "min_distance": 0.0,
+          "min_height": 0.0,
+          "min_prominence": 0.3,
+          "smoothing": "gaussian",
+          "smoothing_sigma": 2.0
+        },
+        "point_count": 2004,
+        "profile": "measure-chromatogram-batch/1",
+        "revision": 1,
+        "schema_version": "1.0",
+        "status": "active",
+        "title": "Synthetic portable batch snapshot",
+        "updated_at": "2026-11-07T20:33:52.903291+00:00"
+      },
+      "original_failure_unknowns": {
+        "error": {
+          "code": "chromatogram_worker_error",
+          "exception_type": "ValueError",
+          "message": "The R analysis worker could not start or timed out",
+          "r_runtime_evidence": "unknown_until_success"
+        },
+        "r_runtime_evidence": "unknown_until_success",
+        "runtime": {
+          "runtime_status": "unknown"
+        },
+        "state": "failed"
+      },
+      "runs": {
+        "controlled_failure": {
+          "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "created_at": "2026-11-07T20:33:55.477141+00:00",
+          "expected_revision": 4,
+          "items": [
+            {
+              "analysis_id": null,
+              "attempt_id": "8765c8be-f72c-4319-b65f-f7f95f8246f5",
+              "attempt_no": 1,
+              "attempt_state": "failed",
+              "error": {
+                "code": "chromatogram_worker_error",
+                "exception_type": "ValueError",
+                "message": "The R analysis worker could not start or timed out",
+                "r_runtime_evidence": "unknown_until_success"
+              },
+              "evidence_sha256": null,
+              "execution_context": {
+                "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+                "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+                "processing_profile": "measure-chromatogram/1",
+                "r_runtime_evidence": "unknown_until_success",
+                "service_version": "0.1.0.dev0",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "finished_at": "2026-11-07T20:33:55.497968+00:00",
+              "item_id": "699d2906-ecb2-417f-b8e6-b326f0cdcca3",
+              "item_state": "failed",
+              "lease_expires_at": "2026-11-07T20:36:25.477589+00:00",
+              "ordinal": 2,
+              "result": null,
+              "result_sha256": null,
+              "runtime": {
+                "runtime_status": "unknown"
+              },
+              "started_at": "2026-11-07T20:33:55.477141+00:00",
+              "state": "failed"
+            }
+          ],
+          "max_items": 1,
+          "request_key_sha256": "f0af1c799396ff9f5017e291ea880c98b9da9e7e417a9f5636a13f125e1d9a36",
+          "request_sha256": "9a2aadc35dd5c829e8d70273537950a1e7f74c3075d3ecafb0cd1d960486a01d",
+          "run_id": "db5ff68f-7ab4-4c22-b761-456da7450609",
+          "selected_count": 1,
+          "status": "failed"
+        },
+        "first_success": {
+          "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "created_at": "2026-11-07T20:33:52.930203+00:00",
+          "expected_revision": 1,
+          "items": [
+            {
+              "analysis_id": "69d95502-e893-4fc6-8dac-2b60ceae2f59",
+              "attempt_id": "dfd44dd5-acfc-4e0a-9d1a-e5b79c5f8903",
+              "attempt_no": 1,
+              "attempt_state": "completed",
+              "error": null,
+              "evidence_sha256": "3773c37c817d1c87b447318894655ac169dfaa60250420983779b8dc506efd40",
+              "execution_context": {
+                "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+                "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+                "processing_profile": "measure-chromatogram/1",
+                "r_runtime_evidence": "unknown_until_success",
+                "service_version": "0.1.0.dev0",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "finished_at": "2026-11-07T20:33:55.023105+00:00",
+              "item_id": "c3876552-8750-49f9-81f0-b3f840d0a591",
+              "item_state": "completed",
+              "lease_expires_at": "2026-11-07T20:36:22.930409+00:00",
+              "ordinal": 0,
+              "result": {
+                "analysis_id": "69d95502-e893-4fc6-8dac-2b60ceae2f59",
+                "artifact": true,
+                "created_at": "2026-11-07T20:33:55.007812+00:00",
+                "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+                "diagnostics": null,
+                "kind": "chromatogram",
+                "notes": [
+                  "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+                  "Peak area is detector response, not concentration or compound identity."
+                ],
+                "provenance": {
+                  "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+                  "installed_r_code_md5": {
+                    "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                    "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+                  },
+                  "measure_revision": null,
+                  "measure_sec_revision": null,
+                  "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+                  "packages": {
+                    "measure": "0.0.1.9003",
+                    "measure.sec": "0.0.0.9000",
+                    "recipes": "1.3.1"
+                  },
+                  "r_version": "4.5.2",
+                  "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+                  "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+                },
+                "qualification": "experimental",
+                "status": "completed",
+                "summary": {
+                  "peak_count": 2
+                },
+                "trace_id": "reference",
+                "warnings": []
+              },
+              "result_sha256": "79bde092fae6ce0980e26a889a3094dfc5543b17ddefc3807e9e12c02701f6b8",
+              "runtime": {
+                "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+                "installed_r_code_md5": {
+                  "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                  "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+                },
+                "measure_revision": null,
+                "measure_sec_revision": null,
+                "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+                "packages": {
+                  "measure": "0.0.1.9003",
+                  "measure.sec": "0.0.0.9000",
+                  "recipes": "1.3.1"
+                },
+                "r_version": "4.5.2",
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "started_at": "2026-11-07T20:33:52.930203+00:00",
+              "state": "completed"
+            },
+            {
+              "analysis_id": "949dc664-7081-464f-ab81-f903b7d26d75",
+              "attempt_id": "e1f8e934-1cb3-40b5-b382-751111b5952d",
+              "attempt_no": 1,
+              "attempt_state": "completed",
+              "error": null,
+              "evidence_sha256": "2a176c1ce79c22d000e904101f97f0596c0d222a5fee90256783f05a8b17c65f",
+              "execution_context": {
+                "analysis_models_sha256": "b6643aab1871f5db292dcffbdf69f19bc061b0707dbba12ff81ff84b633ba5f3",
+                "analysis_runtime_sha256": "8fba5a4d623817145cafdadc1afdd89273163f31114fd8f3e6e1fb2d40414584",
+                "processing_profile": "measure-chromatogram/1",
+                "r_runtime_evidence": "unknown_until_success",
+                "service_version": "0.1.0.dev0",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "finished_at": "2026-11-07T20:33:54.662717+00:00",
+              "item_id": "edcdcbff-9e98-47cc-ae48-85ebae50c8ee",
+              "item_state": "completed",
+              "lease_expires_at": "2026-11-07T20:36:22.930662+00:00",
+              "ordinal": 1,
+              "result": {
+                "analysis_id": "949dc664-7081-464f-ab81-f903b7d26d75",
+                "artifact": true,
+                "created_at": "2026-11-07T20:33:54.629321+00:00",
+                "dataset_id": "ac7a12e1-3e3c-484c-88bd-a607cdb756a8",
+                "diagnostics": null,
+                "kind": "chromatogram",
+                "notes": [
+                  "Peak areas use the specified baseline and trapezoidal integration; negative integrand values are clipped to zero.",
+                  "Peak area is detector response, not concentration or compound identity."
+                ],
+                "provenance": {
+                  "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+                  "installed_r_code_md5": {
+                    "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                    "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+                  },
+                  "measure_revision": null,
+                  "measure_sec_revision": null,
+                  "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+                  "packages": {
+                    "measure": "0.0.1.9003",
+                    "measure.sec": "0.0.0.9000",
+                    "recipes": "1.3.1"
+                  },
+                  "r_version": "4.5.2",
+                  "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+                  "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+                },
+                "qualification": "experimental",
+                "status": "completed",
+                "summary": {
+                  "peak_count": 0
+                },
+                "trace_id": "blank",
+                "warnings": []
+              },
+              "result_sha256": "4e99b64a1f281ace335e0d8ff64d8f82e0d1b153f199d194f6afd41b6738a363",
+              "runtime": {
+                "input_sha256": "a6c516dd40ba37b9fc8fb411e5b050ebf7852a0441cf0905973e2f1cf3dfa66c",
+                "installed_r_code_md5": {
+                  "measure": "9f7d9a7f04dca9e15c50ff3616f417f2",
+                  "measure.sec": "57dd3e21b2b0d6cda6db6356c1582414"
+                },
+                "measure_revision": null,
+                "measure_sec_revision": null,
+                "method_sha256": "6016848c394bec303af6e4d3f37cccd4807be6679df9779449bd18b6090fed6e",
+                "packages": {
+                  "measure": "0.0.1.9003",
+                  "measure.sec": "0.0.0.9000",
+                  "recipes": "1.3.1"
+                },
+                "r_version": "4.5.2",
+                "source_sha256": "4003c567ace399a7839daf5a34167f099d650841dc0b91e023fb0075ed275804",
+                "worker_sha256": "63ec2bedeeda4c4683cf18e29c5b9ca564c0e4d9e3d1dc813eb47e1d17fedaca"
+              },
+              "started_at": "2026-11-07T20:33:52.930203+00:00",
+              "state": "completed"
+            }
+          ],
+          "max_items": 2,
+          "request_key_sha256": "ddaa6898eca21be1e78499e0829444015b51e1412d50630b70f0fdc0d769d316",
+          "request_sha256": "f4d99749dfc07ab63be9556ef3c1a3f81d11bb7ceacb557259f8ac75c0951966",
+          "run_id": "db7f6e1e-655a-43d0-819e-9952ed332806",
+          "selected_count": 2,
+          "status": "completed"
+        }
+      }
+    },
+    "snapshots": {
+      "references": {
+        "analysis_results_present": false,
+        "archive": {
+          "path": "source-references.zip",
+          "sha256": "00f565f33010c1c33d8a3066f75987deb6d58b67b0939ce07b202c815bd8a7e4",
+          "size_bytes": 4074,
+          "snapshot_sha256": "5707e11b2316e7122941a1a83bb513c1ca687ff18fe89d8e93724cbdf4c178a1"
+        },
+        "dataset_payload_present": false,
+        "manifest": {
+          "analysis_count": 2,
+          "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "batch_revision": 8,
+          "dataset_count": 1,
+          "item_count": 4,
+          "mode": "references",
+          "profile": "measure-chromatogram-batch-snapshot/1",
+          "schema_version": "1.0",
+          "size_bytes": 27715,
+          "snapshot_sha256": "5707e11b2316e7122941a1a83bb513c1ca687ff18fe89d8e93724cbdf4c178a1"
+        },
+        "source_text_present": false
+      },
+      "self_contained": {
+        "analysis_results_present": true,
+        "archive": {
+          "path": "source-self-contained.zip",
+          "sha256": "bcd9e2ea269638c2e5697afd0eba02ec39df891809bb9453004a4fa14155fb19",
+          "size_bytes": 34903,
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c"
+        },
+        "attempt_count": 3,
+        "control_event_count": 2,
+        "dataset_point_count": 2505,
+        "dataset_trace_count": 5,
+        "manifest": {
+          "analysis_count": 2,
+          "batch_id": "26e7efe3-429c-4b62-999e-f8cf564dd187",
+          "batch_revision": 8,
+          "dataset_count": 1,
+          "item_count": 4,
+          "mode": "self_contained",
+          "profile": "measure-chromatogram-batch-snapshot/1",
+          "schema_version": "1.0",
+          "size_bytes": 140756,
+          "snapshot_sha256": "04dd8c4d3f3da702058cde9168361aeffcb127b48d692c53c88abe46b6d12c7c"
+        },
+        "original_failed_run_retained": true,
+        "run_count": 2,
+        "source_text_present": true
+      }
+    }
+  },
+  "summary": {
+    "path": "summary.html",
+    "sha256": "ebb39144caf4304e2b63504085d8df8dd5aa82ffba4fe7be7d8cb63bf40e9ced"
+  },
+  "tables": {
+    "analysis-index.csv": {
+      "path": "analysis-index.csv",
+      "row_count": 6,
+      "sha256": "7bf7ed1dc08f9ecb5a03f912ecea74abca68da9fd201178f9f7616f06259f69a"
+    }
+  }
+}

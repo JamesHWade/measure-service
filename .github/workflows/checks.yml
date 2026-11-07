@@ -121,6 +121,18 @@ jobs:
           assert "tests/test_batch_bundle.py" in members
           assert "docs/batch-snapshots.md" in members
           assert "docs/batch-snapshot-example.md" in members
+          assert "docs/chromatogram-snapshot-results.md" in members
+          assert "scripts/render_batch_snapshot_publication.py" in members
+          assert "tests/test_batch_snapshot_publication.py" in members
+          assert "tests/test_batch_snapshot_published_replay.py" in members
+          for name in ("README.md", "index.html", "publication.json", "execution.json", "independent-review.json", "compatibility-review.json"):
+              assert "docs/reference-data/chromatogram-snapshot-example/" + name in members
+          for name in ("summary.html", "workflow_receipt.json", "source-self-contained.zip", "source-references.zip", "analysis-index.csv"):
+              assert "docs/reference-data/chromatogram-snapshot-example/output/" + name in members
+          for kind, count in (("historical", 2), ("fresh", 4)):
+              for ordinal in range(count):
+                  for name in ("report.html", "chromatogram.svg", "evidence.json", "trace.csv", "peaks.csv"):
+                      assert f"docs/reference-data/chromatogram-snapshot-example/output/{kind}/{ordinal:03d}/{name}" in members
           assert "examples/batch_snapshot.py" in members
           assert "tests/test_batch_snapshot_example.py" in members
           for name in ("batch_exports", "batch_snapshot_client", "batch_restore"):

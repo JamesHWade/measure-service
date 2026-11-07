@@ -1,0 +1,26 @@
+{
+  "command": [
+    "/tmp/measure-snapshots-reproduction-fixed-installed-20261107/bin/python",
+    "/tmp/measure-snapshots-reproduction-fixed-build-20261107/source/examples/batch_snapshot.py",
+    "--output-dir",
+    "/tmp/measure-snapshots-delivery-run-20261107/output",
+    "--source-dir",
+    "/tmp/measure-snapshots-delivery-run-20261107/source-store",
+    "--restore-dir",
+    "/tmp/measure-snapshots-delivery-run-20261107/restored-store"
+  ],
+  "completed_at": "2026-11-07T20:34:02.245796+00:00",
+  "elapsed_seconds": 10.019854625687003,
+  "installed_package_members_verified": 69,
+  "profile": "measure-chromatogram-batch-snapshot-execution/1",
+  "returncode": 0,
+  "revision_environment_fields": "unset; unavailable revisions stay unknown",
+  "runtime": "/tmp/measure-snapshots-reproduction-fixed-installed-20261107",
+  "scope": "Synthetic single-trace chromatograms; no optimizer study or physical qualification",
+  "source": {
+    "head": "9d365268618cda45fa7ffccf9a8bbefc5bfa24a1",
+    "tree": "89be4edfa2359704b03f26348068fa3c8560413d"
+  },
+  "started_at": "2026-11-07T20:33:52.225814+00:00",
+  "wheel_sha256": "87afcefa02d382211f8f677399e00529607025797c96fe0afc61b3311e2e2d03"
+}
