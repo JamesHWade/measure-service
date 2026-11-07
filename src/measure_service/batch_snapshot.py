@@ -1348,6 +1348,8 @@ def _validate_control_coverage(
                 _fail("retry must select at least one item")
             for item in affected:
                 ordinal = item["ordinal"]
+                if attempt_positions[ordinal] >= 8:
+                    _fail("retry exceeds the maximum retained attempt count")
                 if states[ordinal] != item["from_state"] or states[ordinal] not in {
                     "failed",
                     "interrupted",
