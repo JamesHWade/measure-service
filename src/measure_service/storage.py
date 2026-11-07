@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterator
 
+from .batch_schema import ensure_batch_schema, validate_batch_schema
 from .campaign_schema import ensure_proposal_repetition_schema
 
 
@@ -41,6 +42,11 @@ def db_path() -> Path:
 def connect() -> sqlite3.Connection:
     con = sqlite3.connect(db_path(), timeout=30)
     con.execute("PRAGMA foreign_keys=ON")
+    try:
+        validate_batch_schema(con)
+    except BaseException:
+        con.close()
+        raise
     con.executescript("""
     CREATE TABLE IF NOT EXISTS datasets (
       id TEXT PRIMARY KEY, owner TEXT NOT NULL, digest TEXT NOT NULL,
@@ -230,7 +236,11 @@ def connect() -> sqlite3.Connection:
     """)
     try:
         ensure_proposal_repetition_schema(con)
+        con.execute("BEGIN IMMEDIATE")
+        ensure_batch_schema(con)
+        con.commit()
     except BaseException:
+        con.rollback()
         con.close()
         raise
     return con
