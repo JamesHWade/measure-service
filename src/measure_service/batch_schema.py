@@ -11,6 +11,7 @@ import sqlite3
 
 SCHEMA_NAME = "measure-chromatogram-batch"
 SCHEMA_VERSION = 1
+_SQLITE_IDENTIFIER_CASE = str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")
 
 _TABLE_COLUMNS: dict[str, tuple[str, ...]] = {
     "analysis_batch_control_events": (
@@ -105,7 +106,10 @@ _TABLE_COLUMNS: dict[str, tuple[str, ...]] = {
 
 def validate_batch_schema(con: sqlite3.Connection) -> bool:
     """Check an existing component without changing it; return False for a new namespace."""
-    objects = con.execute("SELECT type, name FROM sqlite_master").fetchall()
+    objects = [
+        (kind, name.translate(_SQLITE_IDENTIFIER_CASE))
+        for kind, name in con.execute("SELECT type, name FROM sqlite_master")
+    ]
     reserved = set(_TABLE_COLUMNS) | {"measure_batch_schema"}
     if any(name in reserved and kind != "table" for kind, name in objects):
         raise ValueError("A reserved analytical batch table name is occupied by another object")

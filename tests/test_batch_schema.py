@@ -65,16 +65,28 @@ def test_incomplete_known_schema_is_not_repaired_or_given_a_new_content_digest(d
     assert _digest() == before
 
 
-def test_unmarked_partial_namespace_is_not_adopted():
+@pytest.mark.parametrize(
+    "name", ["analysis_batches", "ANALYSIS_BATCHES", "Analysis_Batch_Control_Events"]
+)
+def test_unmarked_partial_namespace_is_not_adopted(name):
     with sqlite3.connect(db_path()) as con:
-        con.execute("CREATE TABLE analysis_batches (id TEXT PRIMARY KEY)")
+        con.execute(f'CREATE TABLE "{name}" (id TEXT PRIMARY KEY)')
     before = _digest()
     with pytest.raises(ValueError, match="Unmarked"):
         connect()
     assert _digest() == before
 
 
-@pytest.mark.parametrize("name", ["analysis_batches", "measure_batch_schema"])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "analysis_batches",
+        "measure_batch_schema",
+        "ANALYSIS_BATCHES",
+        "Measure_Batch_Schema",
+        "Analysis_Batch_Control_Events",
+    ],
+)
 def test_view_cannot_occupy_a_reserved_batch_table_name(name):
     with sqlite3.connect(db_path()) as con:
         con.execute(f'CREATE VIEW "{name}" AS SELECT 1 AS placeholder')
