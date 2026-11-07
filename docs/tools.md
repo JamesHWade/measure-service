@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 66 tools.
+The current catalog contains 69 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -26,7 +26,9 @@ The current catalog contains 66 tools.
 | `measurement_create_experiment` | `spec`, `idempotency_key` | write | idempotent |
 | `measurement_create_observation_snapshot` | `contract_id`, `observation_ids`, `idempotency_key` | write | idempotent |
 | `measurement_evaluate_observation` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
+| `measurement_export_chromatogram_batch` | `batch_id`, `expected_revision`, `mode` | read | idempotent |
 | `measurement_get_analysis` | `analysis_id` | read | idempotent |
+| `measurement_get_analytical_import` | `import_id` | read | idempotent |
 | `measurement_get_attempt` | `attempt_id` | read | idempotent |
 | `measurement_get_campaign` | `campaign_id` | read | idempotent |
 | `measurement_get_campaign_consumption` | `consumption_id` | read | idempotent |
@@ -58,6 +60,7 @@ The current catalog contains 66 tools.
 | `measurement_read_analysis_data` | `analysis_id`, `kind` | read | idempotent |
 | `measurement_read_chromatogram_batch_attempts` | `batch_id`, `ordinal` | read | idempotent |
 | `measurement_read_chromatogram_batch_control_events` | `batch_id` | read | idempotent |
+| `measurement_read_chromatogram_batch_export` | `snapshot_sha256` | read | idempotent |
 | `measurement_read_chromatogram_batch_items` | `batch_id` | read | idempotent |
 | `measurement_read_chromatogram_evidence` | `analysis_id`, `kind`, `evidence_sha256` | read | idempotent |
 | `measurement_read_source` | `dataset_id` | read | idempotent |
@@ -131,9 +134,17 @@ Freeze explicitly selected observation identities and digests for one contract, 
 
 Assess exact owned retention/resolution result records under the experiment's predeclared contract; retain immutable evidence, explicit unknowns and separate fidelity/origin declarations.
 
+### `measurement_export_chromatogram_batch`
+
+Capture owned quiescent batch evidence at a revision without R; explicitly choose metadata references or self-contained source assets, then read immutable byte pages.
+
 ### `measurement_get_analysis`
 
 Retrieve a compact analysis record, method, diagnostics and provenance.
+
+### `measurement_get_analytical_import`
+
+Read the owned receipt mapping an imported evidence snapshot to new local datasets, historical analysis copies and a fresh pending batch; import is not fresh computation.
 
 ### `measurement_get_attempt`
 
@@ -258,6 +269,10 @@ Read one owned item's attempt history with failures, interruption and observed o
 ### `measurement_read_chromatogram_batch_control_events`
 
 Read owned immutable cancellation, recovery and selected-retry outcomes, including controls that affected no items; history survives later retries.
+
+### `measurement_read_chromatogram_batch_export`
+
+Read an owner/store-bound immutable export byte page as base64; restart or eviction requires a new capture, without silently changing the snapshot.
 
 ### `measurement_read_chromatogram_batch_items`
 

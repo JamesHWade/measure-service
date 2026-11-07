@@ -136,5 +136,5 @@ not silently attach it or infer an assignment.
 This is the single-trace slice of [service #10](https://github.com/JamesHWade/measure-service/issues/10).
 DAD/spectral heatmaps, MS evidence, component/residual overlays, failed
 deconvolution displays, batch previews and annotation revisions remain open.
-These reports are not a general portable dataset restore format or a batch
-execution system.
+For complete input closure and archived batch history, use the separate
+[batch snapshot and local import workflow](batch-snapshots.md).

@@ -26,6 +26,7 @@ from pydantic import Field, StrictInt, model_validator
 from . import (
     analysis_evidence,
     analysis_runtime,
+    batch_exports,
     batches,
     campaign_protocol_registry,
     campaign_suggestion_attempts,
@@ -473,7 +474,8 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
             "replay": "same_key_reads_retained_run_without_execution",
             "recovery": "explicit_expired_claim_interruption_then_selected_retry",
             "cancellation": "pending_items_stop_running_work_may_finish",
-            "portable_source_bundle_restore": False,
+            "portable_source_bundle_restore": True,
+            "historical_execution_authority_restore": False,
             "instrument_actuation": False,
         },
         "chromatogram_evidence": {
@@ -489,6 +491,22 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
             "capture_limit": MAX_EVIDENCE_SNAPSHOTS,
             "capture_serialized_bytes": MAX_EVIDENCE_CACHE_BYTES,
             "managed_artifact_upload": False,
+        },
+        "batch_snapshots": {
+            "profile": "measure-chromatogram-batch-snapshot/1",
+            "modes": ["references", "self_contained"],
+            "snapshot_bytes": 64 * 1024 * 1024,
+            "raw_points_in_complete_dataset_closure": 500_000,
+            "control_events": 1024,
+            "export_page_bytes": batch_exports.MAX_EXPORT_PAGE,
+            "process_cache_bytes": batch_exports.MAX_EXPORT_BYTES,
+            "process_capture_count": batch_exports.MAX_EXPORTS,
+            "capture": "owned_coherent_revision_without_running_claims",
+            "restoration": "local_operator_new_store_import_and_fresh_pending_batch",
+            "historical_execution_authority": "not_portable",
+            "numerical_reproduction": "explicit_fresh_execution_separate_from_import",
+            "server_paths_or_archive_upload": False,
+            "mocca2_interoperability": False,
         },
         "synthetic_campaigns": {
             "profile": "synthetic-isocratic-paired/1",
@@ -1116,6 +1134,45 @@ def measurement_get_chromatogram_batch(batch_id: RecordId, ctx: Context) -> dict
 
 
 @mcp.tool(annotations=READ, structured_output=True)
+async def measurement_export_chromatogram_batch(
+    batch_id: RecordId,
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
+    mode: Literal["references", "self_contained"],
+    ctx: Context,
+) -> dict[str, Any]:
+    """Capture owned quiescent batch evidence at a revision without R; explicitly choose metadata references or self-contained source assets, then read immutable byte pages."""
+    owner = identity(ctx)
+    return await asyncio.to_thread(
+        batch_exports.export_batch, owner, batch_id, expected_revision, mode
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_chromatogram_batch_export(
+    snapshot_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")],
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=48_000)] = 48_000,
+) -> dict[str, Any]:
+    """Read an owner/store-bound immutable export byte page as base64; restart or eviction requires a new capture, without silently changing the snapshot."""
+    return batch_exports.read_export(identity(ctx), snapshot_sha256, offset, limit)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_analytical_import(import_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read the owned receipt mapping an imported evidence snapshot to new local datasets, historical analysis copies and a fresh pending batch; import is not fresh computation."""
+    from .import_origins import get_import_receipt
+    from .storage import registry_connection
+
+    owner = identity(ctx)
+    with registry_connection() as con:
+        receipt = get_import_receipt(con, owner, import_id)
+    if receipt is None:
+        raise ValueError("Analytical import was not found for this principal")
+    return receipt
+
+
+@mcp.tool(annotations=READ, structured_output=True)
 def measurement_read_chromatogram_batch_items(
     batch_id: RecordId,
     ctx: Context,
@@ -1350,7 +1407,14 @@ def measurement_read_chromatogram_evidence(
 @mcp.tool(annotations=READ, structured_output=True)
 def measurement_get_analysis(analysis_id: str, ctx: Context) -> dict[str, Any]:
     """Retrieve a compact analysis record, method, diagnostics and provenance."""
-    record = analysis_for(identity(ctx), analysis_id)
+    from .import_origins import get_import_origin
+    from .storage import registry_connection
+
+    owner = identity(ctx)
+    record = analysis_for(owner, analysis_id)
+    with registry_connection() as con:
+        origin = get_import_origin(con, owner, "analysis", analysis_id)
+        input_origin = get_import_origin(con, owner, "dataset", record["dataset_id"])
     result = record.pop("result")
     record.update(
         {
@@ -1362,6 +1426,10 @@ def measurement_get_analysis(analysis_id: str, ctx: Context) -> dict[str, Any]:
             "notes": result.get("notes", []),
         }
     )
+    if origin is not None:
+        record["import_origin"] = origin
+    if input_origin is not None:
+        record["input_import_origin"] = input_origin
     return record
 
 
