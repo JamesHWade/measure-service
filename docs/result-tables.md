@@ -108,3 +108,7 @@ separate attempt; recording or correcting a table does not actuate equipment.
 and separate analytical/optimizer boundaries without requiring an R backend.
 Only table import is a retry-safe write. Preview and source/row/receipt reads
 are read-only operations under the existing MCP identity policy.
+
+The [complete example](result-table-example.md) imports all seven outcome
+states, rejects a partial file atomically, records an explicit correction and
+preserves its earlier observation snapshot across restart.
