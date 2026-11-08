@@ -514,3 +514,12 @@ def test_historical_attempt_digest_is_verified_before_import_and_on_reads(store)
             "a", _spec(f"{attempt['attempt_id']},1,new,observed,1,3,"), "invalid-history"
         )
     assert db_path().read_bytes() == before
+
+
+def test_future_revision_outside_sqlite_integer_range_is_a_conflict_without_writes(store):
+    attempt = _attempt()
+    before = _counts()
+    spec = _spec(f"{attempt['attempt_id']},{'9' * 100},area,observed,1,0,")
+    with pytest.raises(ValueError, match="revision was not found"):
+        result_tables.import_result_table("a", spec, "future")
+    assert _counts() == before

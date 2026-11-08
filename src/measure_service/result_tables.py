@@ -164,7 +164,11 @@ def _canonical_object(text: Any, label: str) -> dict[str, Any]:
 def _verified_attempt(
     con: sqlite3.Connection, owner: str, attempt_id: str, revision: int
 ) -> dict[str, Any]:
-    experiments._owned(con, "experiment_attempts", owner, attempt_id)
+    owned = experiments._owned(con, "experiment_attempts", owner, attempt_id)
+    if type(owned["latest_revision"]) is not int or owned["latest_revision"] < 1:
+        _invalid("latest attempt revision")
+    if revision > owned["latest_revision"]:
+        raise ValueError("Attempt revision was not found")
     raw = con.execute(
         "SELECT payload, digest FROM attempt_revisions WHERE attempt_id=? AND revision=?",
         (attempt_id, revision),
