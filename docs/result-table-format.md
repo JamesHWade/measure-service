@@ -81,6 +81,8 @@ or chemical assignment.
 Choose comma, semicolon or tab explicitly with `delimiter`; comma is the
 default. Quoted delimiters/newlines, LF/CRLF and an optional leading UTF8 BOM
 are retained in the source digest. The Python CSV reader uses `strict=True`.
+Quotes inside unquoted fields reject; quote the whole cell and double literal
+quotes within it.
 Blank data records, ragged rows, duplicate headers, invalid Unicode and NUL
 bytes reject. No global CSV parser setting is changed.
 

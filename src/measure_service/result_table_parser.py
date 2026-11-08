@@ -50,6 +50,36 @@ def _source_bytes(spec: ResultTableSpec) -> bytes:
     return source
 
 
+def _validate_quote_placement(text: str, delimiter: str) -> None:
+    """Reject ambiguous quote placement that csv.reader(strict=True) accepts."""
+    quoted, after_quote, field_start = False, False, True
+    cursor = 0
+    while cursor < len(text):
+        character = text[cursor]
+        if quoted:
+            if character == '"':
+                if cursor + 1 < len(text) and text[cursor + 1] == '"':
+                    cursor += 2
+                    continue
+                quoted, after_quote = False, True
+        elif after_quote:
+            if character == delimiter or character in "\r\n":
+                after_quote, field_start = False, True
+            else:
+                _fail("Result table is not valid strict CSV: text follows a closing quote")
+        elif character == '"':
+            if not field_start:
+                _fail("Result table is not valid strict CSV: quote inside an unquoted field")
+            quoted, field_start = True, False
+        elif character == delimiter or character in "\r\n":
+            field_start = True
+        else:
+            field_start = False
+        cursor += 1
+    if quoted:
+        _fail("Result table is not valid strict CSV: unterminated quoted field")
+
+
 def _validate_mapping(spec: ResultTableSpec) -> str:
     mapping = spec.mapping.model_dump(mode="json")
     encoded = canonical(mapping).encode("utf-8")
@@ -155,6 +185,7 @@ def parse_result_table(spec: ResultTableSpec) -> ResultTablePlan:
     mapping_json = _validate_mapping(spec)
     mapping = json.loads(mapping_json)
     parse_text = spec.csv_text[1:] if spec.csv_text.startswith("\ufeff") else spec.csv_text
+    _validate_quote_placement(parse_text, spec.delimiter)
     try:
         reader = csv.reader(
             io.StringIO(parse_text, newline=""), delimiter=spec.delimiter, strict=True

@@ -443,3 +443,24 @@ def test_oversized_character_source_rejects_before_utf8_allocation():
     )
     with pytest.raises(ValueError, match="byte limit"):
         parse_result_table(spec)
+
+
+@pytest.mark.parametrize("value", ['abc"def', '"abc"tail', ' "abc"'])
+def test_unescaped_quotes_in_unmapped_fields_are_not_accepted_as_strict_csv(value):
+    spec = ResultTableSpec(
+        source_name="quoted.csv",
+        csv_text=f"notes\n{value}\n",
+        mapping=ResultTableMapping(
+            columns={},
+            constants={
+                "attempt_id": "attempt",
+                "expected_attempt_revision": 1,
+                "metric": "area",
+                "status": "observed",
+                "unit": "1",
+                "value": 0,
+            },
+        ),
+    )
+    with pytest.raises(ValueError, match="strict CSV"):
+        parse_result_table(spec)
