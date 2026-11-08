@@ -34,6 +34,7 @@ from . import (
     gaussian_producer,
     method_registry,
     observations,
+    result_tables,
     retention,
 )
 from . import experiments as registry
@@ -78,6 +79,8 @@ from .methods import (
     evaluate_method,
 )
 from .observations import ObservationContractSpec, ObservationEvidenceSpec
+from .result_table_models import ResultTableSpec
+from .result_table_parser import preview_result_table
 from .retention import RetentionModelSpec
 from .storage import canonical, connect, db_path, now, sha256
 
@@ -443,6 +446,20 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "experiment_specs": "immutable",
         "attempts": "append_only_revisions",
         "results": "immutable_with_explicit_supersession",
+        "result_tables": {
+            "profile": result_tables.IMPORT_PROFILE,
+            "mapping": "explicit_columns_and_constants_without_conversion",
+            "source_bytes": 64_000,
+            "outcomes_per_import": 50,
+            "columns": 64,
+            "preview": "pure_parse_without_resolving_target_ownership_or_current_revision",
+            "atomicity": "all_attempts_results_source_rows_and_retry_receipt",
+            "corrections": "explicit_current_result_ids_in_source_order",
+            "source_page_bytes": result_tables.MAX_SOURCE_PAGE_BYTES,
+            "source_access": "owned_raw_utf8_bytes_without_server_paths",
+            "observation_evaluation": "separate_explicit_operation",
+            "optimizer_consumption": "separate_explicit_operation",
+        },
         "conditions": ["numeric_with_units", "categorical", "boolean"],
         "outcome_statuses": [
             "observed",
@@ -662,7 +679,7 @@ def measurement_record_attempt(
 @mcp.tool(annotations=RETRY_WRITE, structured_output=True)
 def measurement_revise_attempt(
     attempt_id: RecordId,
-    expected_revision: Annotated[int, Field(ge=1)],
+    expected_revision: Annotated[StrictInt, Field(ge=1)],
     spec: AttemptSpec,
     reason: Annotated[str, Field(min_length=1, max_length=2000)],
     idempotency_key: RequestKey,
@@ -696,7 +713,7 @@ def measurement_list_attempts(
 @mcp.tool(annotations=RETRY_WRITE, structured_output=True)
 def measurement_record_results(
     attempt_id: RecordId,
-    expected_attempt_revision: Annotated[int, Field(ge=1)],
+    expected_attempt_revision: Annotated[StrictInt, Field(ge=1)],
     results: Annotated[list[ResultSpec], Field(min_length=1, max_length=50)],
     idempotency_key: RequestKey,
     ctx: Context,
@@ -723,6 +740,54 @@ def measurement_list_results(
 ) -> dict[str, Any]:
     """List compact current outcome heads or the full result history for an owned attempt; no missing outcome is converted to zero."""
     return registry.list_results(identity(ctx), attempt_id, include_superseded, offset, limit)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_preview_result_table(
+    spec: ResultTableSpec,
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 10,
+) -> dict[str, Any]:
+    """Parse explicitly mapped CSV outcomes without writing or resolving target records; preview does not reserve current attempt revisions. No values or statuses are inferred."""
+    identity(ctx)
+    return preview_result_table(spec, offset, limit)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_import_result_table(
+    spec: ResultTableSpec, idempotency_key: RequestKey, ctx: Context
+) -> dict[str, Any]:
+    """Atomically import mapped outcomes across owned exact attempt revisions with retained source-row provenance and explicit corrections; no observation is evaluated or consumed automatically."""
+    return result_tables.import_result_table(identity(ctx), spec, idempotency_key)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_result_table_import(import_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read an owned immutable table-import receipt and verify its source, result bindings and historical outcome evidence without R."""
+    return result_tables.get_result_table_import(identity(ctx), import_id)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_result_table_rows(
+    import_id: RecordId,
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 20,
+) -> dict[str, Any]:
+    """Page immutable source-record coordinates and exact result identities; later corrections do not replace these import members."""
+    return result_tables.read_result_table_rows(identity(ctx), import_id, offset, limit)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_result_table_source(
+    import_id: RecordId,
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=12_000)] = 12_000,
+) -> dict[str, Any]:
+    """Page exact retained UTF8 source bytes as base64 using byte offsets, including original quoting, line endings and unmapped columns; no filesystem path is read."""
+    return result_tables.read_result_table_source(identity(ctx), import_id, offset, limit)
 
 
 @mcp.tool(annotations=RETRY_WRITE, structured_output=True)

@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 69 tools.
+The current catalog contains 74 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -46,8 +46,10 @@ The current catalog contains 69 tools.
 | `measurement_get_observation_contract` | `contract_id` | read | idempotent |
 | `measurement_get_observation_snapshot` | `snapshot_id` | read | idempotent |
 | `measurement_get_result` | `result_id` | read | idempotent |
+| `measurement_get_result_table_import` | `import_id` | read | idempotent |
 | `measurement_get_retention_model` | `model_id` | read | idempotent |
 | `measurement_get_retention_prediction` | `prediction_id` | read | idempotent |
+| `measurement_import_result_table` | `spec`, `idempotency_key` | write | idempotent |
 | `measurement_inspect_dataset` | `dataset_id` | read | idempotent |
 | `measurement_list_attempts` | `experiment_id` | read | idempotent |
 | `measurement_list_campaign_suggestion_attempts` | `campaign_id` | read | idempotent |
@@ -56,6 +58,7 @@ The current catalog contains 69 tools.
 | `measurement_list_results` | `attempt_id` | read | idempotent |
 | `measurement_method_capabilities` | — | read | idempotent |
 | `measurement_predict_retention` | `model_id`, `method_id`, `idempotency_key` | write | idempotent |
+| `measurement_preview_result_table` | `spec` | read | idempotent |
 | `measurement_quantify_peak` | `analysis_id`, `peak_id`, `method` | write | creates new record |
 | `measurement_read_analysis_data` | `analysis_id`, `kind` | read | idempotent |
 | `measurement_read_chromatogram_batch_attempts` | `batch_id`, `ordinal` | read | idempotent |
@@ -63,6 +66,8 @@ The current catalog contains 69 tools.
 | `measurement_read_chromatogram_batch_export` | `snapshot_sha256` | read | idempotent |
 | `measurement_read_chromatogram_batch_items` | `batch_id` | read | idempotent |
 | `measurement_read_chromatogram_evidence` | `analysis_id`, `kind`, `evidence_sha256` | read | idempotent |
+| `measurement_read_result_table_rows` | `import_id` | read | idempotent |
+| `measurement_read_result_table_source` | `import_id` | read | idempotent |
 | `measurement_read_source` | `dataset_id` | read | idempotent |
 | `measurement_record_attempt` | `experiment_id`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_record_gaussian_observation` | `producer_id`, `prediction_id`, `attempt_id`, `expected_attempt_revision`, `idempotency_key` | write | idempotent |
@@ -214,6 +219,10 @@ Read immutable owned snapshot membership; later result corrections or attempt re
 
 Retrieve an immutable outcome with evidence provenance, attempt revision and any later superseding result.
 
+### `measurement_get_result_table_import`
+
+Read an owned immutable table-import receipt and verify its source, result bindings and historical outcome evidence without R.
+
 ### `measurement_get_retention_model`
 
 Read an owned immutable retention model declaration, input checks, warnings and source evidence.
@@ -221,6 +230,10 @@ Read an owned immutable retention model declaration, input checks, warnings and 
 ### `measurement_get_retention_prediction`
 
 Retrieve an immutable ideal prediction and its exact model, method, solver and backend evidence.
+
+### `measurement_import_result_table`
+
+Atomically import mapped outcomes across owned exact attempt revisions with retained source-row provenance and explicit corrections; no observation is evaluated or consumed automatically.
 
 ### `measurement_inspect_dataset`
 
@@ -254,6 +267,10 @@ Describe executable LC method validation and storage without an R backend.
 
 Calculate and retain ideal retention times for an owned constant-flow binary inlet program; missing within-window events remain censored, with no peak-width, resolution or instrument claim.
 
+### `measurement_preview_result_table`
+
+Parse explicitly mapped CSV outcomes without writing or resolving target records; preview does not reserve current attempt revisions. No values or statuses are inferred.
+
 ### `measurement_quantify_peak`
 
 Quantify an explicitly assigned chromatogram peak with supplied linear response standards; does not establish peak identity.
@@ -281,6 +298,14 @@ Read bounded owned batch-item metadata, states and retained analysis links; does
 ### `measurement_read_chromatogram_evidence`
 
 Read a bounded page from an owned immutable capture selected by its manifest digest; request a new manifest after cache eviction or server restart.
+
+### `measurement_read_result_table_rows`
+
+Page immutable source-record coordinates and exact result identities; later corrections do not replace these import members.
+
+### `measurement_read_result_table_source`
+
+Page exact retained UTF8 source bytes as base64 using byte offsets, including original quoting, line endings and unmapped columns; no filesystem path is read.
 
 ### `measurement_read_source`
 
