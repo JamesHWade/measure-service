@@ -1035,7 +1035,7 @@ def _html_document(state: dict[str, Any]) -> bytes:
 * {{ box-sizing:border-box; }} body {{ margin:0; background:var(--paper); color:var(--ink); font:16px/1.55 system-ui,-apple-system,sans-serif; }}
 main {{ max-width:1180px; margin:auto; padding:2.5rem 1.25rem 4rem; }} h1,h2 {{ line-height:1.15; color:#102f3a; }} h1 {{ font-size:clamp(2rem,5vw,3.4rem); max-width:16ch; }} h2 {{ margin-top:2.5rem; }}
 .lead {{ max-width:72ch; color:var(--muted); font-size:1.08rem; }} .cards {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:.8rem; margin:1.5rem 0; }}
-.card {{ background:var(--wash); border:1px solid var(--line); border-radius:.8rem; padding:1rem; }} .card strong {{ display:block; font-size:1.7rem; color:var(--teal); }}
+.card {{ background:var(--wash); border:1px solid var(--line); border-radius:.8rem; padding:1rem; }} .card strong {{ display:block; font-size:1.7rem; color:var(--teal); overflow-wrap:anywhere; }}
 .table-wrap {{ overflow:auto; max-width:100%; border:1px solid var(--line); border-radius:.7rem; background:white; }} .table-wrap:focus {{ outline:3px solid #79b8b0; outline-offset:3px; }}
 table {{ border-collapse:collapse; min-width:760px; width:100%; }} caption {{ text-align:left; padding:.9rem 1rem; font-weight:700; color:#102f3a; }} th,td {{ border-bottom:1px solid var(--line); padding:.6rem .75rem; text-align:left; vertical-align:top; }} thead th {{ background:#e5f0ec; position:sticky; top:0; }}
 code {{ overflow-wrap:anywhere; }} a {{ color:var(--teal); }} .note {{ border-left:4px solid var(--teal); padding:.75rem 1rem; background:#f0f6f3; }} ul {{ padding-left:1.25rem; }}
@@ -1053,7 +1053,7 @@ code {{ overflow-wrap:anywhere; }} a {{ color:var(--teal); }} .note {{ border-le
 <div class="card"><strong>{counts["retained_result_records"]}</strong>retained results</div>
 <div class="card"><strong>{counts["attempts"]}</strong>technical replicates</div>
 <div class="card"><strong>{counts["outcome_states"]}</strong>explicit states</div>
-<div class="card"><strong>{esc(state["verification"]["old_assessment"])} → {esc(state["verification"]["corrected_assessment"])}</strong>assessment history</div>
+<div class="card"><strong>{esc(state["verification"]["old_assessment"].replace("_", " "))} → {esc(state["verification"]["corrected_assessment"].replace("_", " "))}</strong>assessment history</div>
 </div></section>
 <p class="note">The original accepted observation and snapshot remain immutable. The corrected zero-resolution result receives a new assessment that is not accepted. Caller-declared synthetic values and labels do not qualify an instrument, physical identity, purity, or optimizer.</p>
 <section aria-labelledby="sources"><h2 id="sources">Retained sources and receipts</h2><ul>{links}</ul>

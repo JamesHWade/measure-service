@@ -1,0 +1,2 @@
+attempt_id,expected_attempt_revision,metric,status,unit,analyte_reference,value,lower_bound,upper_bound,analysis_id,summary_field,supersedes_result_id,explanation,plate,notes
+67d61ee8-9ae4-4464-b9c3-f36b92b63425,1,resolution,observed,1,B,0,,,,,0358b820-c218-4f4c-89cb-a8d34e6fbd62,Synthetic correction reports coelution as zero resolution.,plate-correction,Current result explicitly superseded by a caller-declared correction

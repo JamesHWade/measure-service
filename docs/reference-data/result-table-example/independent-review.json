@@ -1,0 +1,74 @@
+{
+  "profile": "measure-result-table-independent-artifact-review/1",
+  "decision": "accepted",
+  "findings": [],
+  "independent_checks": 522,
+  "source": {
+    "head": "766dcdee9f1fe64104563a2a796dece5f14db1f7",
+    "tree": "902f6c91a57d3563cec039ae63f304e8b51a1e24"
+  },
+  "wheel_sha256": "11fdff91719777947788468393fe44f52a97490ee7955aac6ad3666944dea0d8",
+  "database_sha256": "6f641f274af5dd6729e2076fc1eeaa29f2829e1771909b480833fa500a87b050",
+  "evidence": {
+    "sealed_files_verified": 16,
+    "output_files_verified": 12,
+    "installed_and_source_package_members_matched_to_wheel": 74,
+    "imports": 2,
+    "initial_rows": 11,
+    "correction_rows": 1,
+    "attempts": 2,
+    "retained_results": 12,
+    "current_results": 11,
+    "superseded_results": 1,
+    "explicit_outcome_states": 7,
+    "assessments": [
+      "accepted",
+      "not_accepted"
+    ],
+    "preserved_original_snapshots": 1,
+    "analyses": 0,
+    "optimizer_records": 0,
+    "failed_import_rows_or_receipts": 0
+  },
+  "verification": [
+    "Independently reconstructed raw CSV mapping, record coordinates, normalized rows and all row/input/result/source/binding/receipt SHA-256 identities.",
+    "Matched all twelve exported CSV and HTML rows to stored outcomes, including units, bounds, observed zeros and absent values.",
+    "Verified immutable original assessment and snapshot membership after the separate zero-resolution correction.",
+    "Verified retained manual provenance, unknown runtime source revisions, and installed dependency versions.",
+    "Original files, scratch copy and delivery copy retained their exact pre-audit hashes."
+  ],
+  "method": "Standard-library reconstruction and immutable read-only SQLite queries on a new byte-copy; no service validation helpers or computations executed.",
+  "scope": "Constructed caller-reported scalar outcomes and synthetic labels; no instrument execution, physical qualification, optimizer study or R computation.",
+  "source_files": {
+    "correction.csv": {
+      "bytes": 428,
+      "encoding": "UTF-8",
+      "line_endings": "CRLF",
+      "sha256": "8f419419a91b84cbcf83bd4efbc5ceb5ed9c402db3954a2ceab1df3fdfe4ed4e",
+      "unmapped_columns": [
+        "plate",
+        "notes"
+      ]
+    },
+    "initial.csv": {
+      "bytes": 1876,
+      "encoding": "UTF-8",
+      "line_endings": "CRLF",
+      "sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5",
+      "unmapped_columns": [
+        "plate",
+        "notes"
+      ]
+    },
+    "rejected.csv": {
+      "bytes": 481,
+      "encoding": "UTF-8",
+      "line_endings": "CRLF",
+      "sha256": "3e8d61241b7a8ab7519bfa51b33ee11b210f0f9c4ccad182ea31938757756b94",
+      "unmapped_columns": [
+        "plate",
+        "notes"
+      ]
+    }
+  }
+}

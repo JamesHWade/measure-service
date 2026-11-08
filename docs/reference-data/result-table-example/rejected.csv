@@ -1,0 +1,3 @@
+attempt_id,expected_attempt_revision,metric,status,unit,analyte_reference,value,lower_bound,upper_bound,analysis_id,summary_field,supersedes_result_id,explanation,plate,notes
+67d61ee8-9ae4-4464-b9c3-f36b92b63425,1,preflight_new_metric,observed,1,,9,,,,,,,plate-rejected,Valid first row must roll back with the stale second row
+3301d45b-859a-4c4d-881b-bb723d1534d9,2,stale_revision_metric,observed,1,,8,,,,,,,plate-rejected,Stale final row intentionally rejects the whole import

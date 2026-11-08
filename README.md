@@ -70,6 +70,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Experiment and result contracts](docs/experiments.md)
 - [Explicit outcome-table format](docs/result-table-format.md)
 - [Atomic outcome tables over MCP](docs/result-tables.md)
+- [Executed outcome-table correction and replay](docs/result-table-example.md)
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)
 - [Ideal retention declarations and predictions](docs/retention-predictions.md)
 - [Generate synthetic Gaussian observation evidence](docs/gaussian-observation-producer.md)

@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import runpy
 import subprocess
 import sys
 from pathlib import Path
@@ -58,6 +59,47 @@ def _run_cli(output: Path, data: Path) -> subprocess.CompletedProcess[str]:
 
 def _json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize(
+    ("corrected_assessment", "display"),
+    [
+        ("not_accepted", "not accepted"),
+        ('not_accepted<script>&"', "not accepted&lt;script&gt;&amp;&quot;"),
+    ],
+)
+def test_html_document_displays_readable_escaped_assessments(corrected_assessment, display):
+    render = runpy.run_path(str(_script()))["_html_document"]
+    receipt = {
+        "status_counts": {},
+        "row_count": 0,
+        "source_bytes": 0,
+        "source_sha256": "a" * 64,
+        "result_bindings_sha256": "b" * 64,
+    }
+    state = {
+        "counts": {
+            "initial_rows": 0,
+            "corrected_rows": 0,
+            "retained_result_records": 0,
+            "attempts": 0,
+            "outcome_states": 0,
+        },
+        "initial_import": {"receipt": receipt, "rows": []},
+        "correction_import": {"receipt": receipt, "rows": []},
+        "verification": {
+            "old_assessment": "accepted",
+            "corrected_assessment": corrected_assessment,
+        },
+        "method": {"method_id": "renderer-test"},
+        "scope": "Constructed renderer-only fixture; no workflow execution.",
+    }
+
+    document = render(state).decode("utf-8")
+
+    assert f"<strong>accepted → {display}</strong>assessment history" in document
+    assert "<script" not in document.lower()
+    assert state["verification"]["corrected_assessment"] == corrected_assessment
 
 
 def test_installed_public_workflow_retains_rows_corrections_and_artifact_hashes(tmp_path):

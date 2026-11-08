@@ -15,6 +15,17 @@ target before creating output and rejects existing paths, including dangling
 symlinks. Omitting `--data-dir` uses a temporary store. An
 `EXAMPLE_INCOMPLETE` marker remains in the output if execution fails.
 
+The [executed report and downloads](reference-data/result-table-example/report.html)
+retain the recorded 11-row import, correction, old snapshot and full result
+history. The [independent audit](reference-data/result-table-example/independent-review.json)
+verified 522 source-to-store/artifact checks without invoking service validators
+or recomputing analytical values. The [publication manifest](reference-data/result-table-example/publication.json)
+binds these original output bytes to their recorded execution source and wheel.
+The displayed `report.html` uses the current renderer with those retained
+receipts and rows. It changes label spacing and phone wrapping only; the original
+executed `index.html` and its original manifest remain byte-identical. Renderer
+identity and inputs are recorded separately in the publication manifest.
+
 The workflow uses the installed service over two successive stdio MCP sessions.
 It makes no direct database or registry calls and requires no R backend.
 The [table importer](result-tables.md) still operates on existing owned attempts;
@@ -47,6 +58,11 @@ expected attempt revision. Both rows roll back. A later correction explicitly su
 B's original resolution with observed zero. The original analytical assessment
 stays accepted in its snapshot; the new explicit assessment is not accepted.
 No analytical decision is created automatically by importing a table.
+
+The published CSV files retain that execution's existing attempt/result IDs.
+Run the executable workflow to create new targets and source mappings. New
+IDs and timestamps change file hashes while retaining the demonstrated
+contracts; the frozen reference remains unchanged.
 
 ## Inspect the output
 

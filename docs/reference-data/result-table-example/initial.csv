@@ -1,0 +1,13 @@
+attempt_id,expected_attempt_revision,metric,status,unit,analyte_reference,value,lower_bound,upper_bound,analysis_id,summary_field,supersedes_result_id,explanation,plate,notes
+67d61ee8-9ae4-4464-b9c3-f36b92b63425,1,retention_time,observed,min,A,2,,,,,,,plate-A,"Reference A; Quoted note
+with Unicode Δ"
+67d61ee8-9ae4-4464-b9c3-f36b92b63425,1,resolution,observed,1,A,2,,,,,,,plate-A,Reference A resolution
+67d61ee8-9ae4-4464-b9c3-f36b92b63425,1,retention_time,observed,s,B,240,,,,,,,plate-A,Reference B retention in seconds
+67d61ee8-9ae4-4464-b9c3-f36b92b63425,1,resolution,observed,1,B,1.5,,,,,,,plate-A,Reference B resolution
+3301d45b-859a-4c4d-881b-bb723d1534d9,1,blank_response,observed,mAU,,0,,,,,,,plate-B,Observed zero is retained as zero
+3301d45b-859a-4c4d-881b-bb723d1534d9,1,impurity_presence,not_detected,1,,,,,,,,No caller-declared impurity signal was detected.,plate-B,"Explicit non-detection, not a numeric zero"
+3301d45b-859a-4c4d-881b-bb723d1534d9,1,impurity_amount,below_limit,mg/L,,,,0.05,,,,Caller reports the amount below the reporting limit.,plate-B,Upper bound is retained as declared
+3301d45b-859a-4c4d-881b-bb723d1534d9,1,censored_amount,censored,mg/L,,,0.1,0.2,,,,Caller reports an interval-censored amount.,plate-B,Both declared censoring bounds are retained
+3301d45b-859a-4c4d-881b-bb723d1534d9,1,sample_availability,missing,1,,,,,,,,The synthetic sample was unavailable for this measurement.,plate-B,Missing remains missing; it is not converted to zero
+3301d45b-859a-4c4d-881b-bb723d1534d9,1,instrument_quality,failed,1,,,,,,,,The caller-declared quality check failed before a value was reported.,plate-B,Failure remains an explicit outcome state
+3301d45b-859a-4c4d-881b-bb723d1534d9,1,method_feasibility,infeasible,1,,,,,,,,The caller declares this synthetic condition infeasible.,plate-B,Infeasibility remains explicit and unresolved

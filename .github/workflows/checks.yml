@@ -138,6 +138,9 @@ jobs:
           assert "docs/result-table-example.md" in members
           assert "examples/result_tables.py" in members
           assert "tests/test_result_table_example.py" in members
+          assert "tests/test_result_table_publication.py" in members
+          for name in ("initial.csv", "correction.csv", "rejected.csv", "initial-import.json", "correction-import.json", "results.json", "observations.json", "snapshot.json", "outcome-rows.csv", "workflow_receipt.json", "index.html", "report.html", "manifest.json", "execution.json", "independent-review.json", "publication.json"):
+              assert "docs/reference-data/result-table-example/" + name in members
           assert "scripts/render_batch_snapshot_publication.py" in members
           assert "tests/test_batch_snapshot_publication.py" in members
           assert "tests/test_batch_snapshot_published_replay.py" in members

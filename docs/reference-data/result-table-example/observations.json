@@ -1,0 +1,1093 @@
+{
+  "corrected": {
+    "assessment_sha256": "5e8e17000ad2da441760a53cd1b7d17e064ebd4c7239fc3b42fa5555f9a07f7f",
+    "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+    "attempt_revision": 1,
+    "contract_id": "263d7988-fff9-440e-b566-febf453cb236",
+    "created_at": "2026-11-08T13:11:20.578475+00:00",
+    "evidence_sha256": "1eff7c8a25fdd818bb0b0c73a926b0e56a1fcdc59db3f30dd299a2c1ae975c6a",
+    "experiment_id": "5f6be23a-c05a-4b62-918b-54deaeadbddb",
+    "input_sha256": "37b0f53261e6005ea458a139adabfcf07f08bb1f179a6c49dc9fedef733a719e",
+    "observation": {
+      "assessment": {
+        "analytical_acceptance": "not_accepted",
+        "confirmed_absent_count": 0,
+        "detected_count": 2,
+        "diagnostics": [
+          {
+            "acquisition_duration_min": 7.0,
+            "code": "runtime_preference_not_satisfied",
+            "runtime_preference_min": 5.0
+          },
+          {
+            "analyte_id": "B",
+            "code": "resolution_below_threshold",
+            "resolution": 0.0,
+            "resolution_threshold": 1.5
+          }
+        ],
+        "feasible": true,
+        "per_analyte": [
+          {
+            "acceptance_state": "accepted",
+            "analyte_id": "A",
+            "assignment": "confirmed",
+            "detection": true,
+            "diagnostics": [],
+            "resolution": 2.0,
+            "resolution_satisfied": true,
+            "resolution_status": "observed",
+            "retention_status": "observed",
+            "retention_time_min": 2.0
+          },
+          {
+            "acceptance_state": "not_accepted",
+            "analyte_id": "B",
+            "assignment": "confirmed",
+            "detection": true,
+            "diagnostics": [
+              {
+                "code": "resolution_below_threshold",
+                "resolution": 0.0,
+                "resolution_threshold": 1.5
+              }
+            ],
+            "resolution": 0.0,
+            "resolution_satisfied": false,
+            "resolution_status": "observed",
+            "retention_status": "observed",
+            "retention_time_min": 4.0
+          }
+        ],
+        "profile": "moses-observed-analytical/1",
+        "required_analyte_count": 2,
+        "runtime_preference_satisfied": false,
+        "unknown_count": 0
+      },
+      "attempt": {
+        "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+        "executable_method_link": {
+          "canonical_program_sha256": "5d4c9cd3aa9657fedceb8af9e54b75f9b172347c911bc089faa7ba793e912a31",
+          "input_sha256": "bfdcfa56694224397491ab87d25190f92d77e357eb962c6e870b8326796b28f7",
+          "method_id": "aaae8625-a737-429c-a37d-cf7f5977803f",
+          "schema_version": "1.0"
+        },
+        "experiment_id": "5f6be23a-c05a-4b62-918b-54deaeadbddb",
+        "input_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+        "revision": 1,
+        "spec": {
+          "actual_conditions": [],
+          "ended_at": null,
+          "evaluator_kind": "manual",
+          "evaluator_reference": null,
+          "evaluator_revision": null,
+          "executable_method_id": "aaae8625-a737-429c-a37d-cf7f5977803f",
+          "explanation": "",
+          "external_reference": null,
+          "fidelity": 1.0,
+          "instrument_reference": null,
+          "measurements": [],
+          "method_reference": null,
+          "replicate_group": "synthetic-technical-replicates",
+          "replicate_index": 1,
+          "replicate_kind": "technical",
+          "started_at": null,
+          "status": "completed",
+          "training_snapshot_reference": null
+        }
+      },
+      "contract": {
+        "contract_id": "263d7988-fff9-440e-b566-febf453cb236",
+        "input_sha256": "1eb6313994b968ad4e1b716b00f6327b42e3b1299705749122228e89362abb03",
+        "profile": "moses-observed-analytical/1",
+        "resolution_definition": "caller-declared/1",
+        "utility_input_definition": "finite-resolution-reference/1",
+        "utility_profile": "moses-botier-1.0.0-binary64/1"
+      },
+      "evidence": {
+        "analytes": [
+          {
+            "analyte_id": "A",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label A in the mapped source table.",
+            "resolution_result": {
+              "analyte_reference": "A",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "83d5c3bc24185da80b343a8270202326636b1bf95088280add6838910df08319",
+              "metric": "resolution",
+              "normalized_value": 2.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "A",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "resolution",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 4,
+                    "line_start": 4,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 1,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 3,
+                    "row_sha256": "7b741fd61b2aecbeb894f4c131e5f4ecb289a3dc6e43a300ad70008a7c6d0488",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "1",
+                "upper_bound": null,
+                "value": 2
+              },
+              "raw_unit": "1",
+              "raw_value": 2,
+              "result_id": "64342e35-e4cc-41c4-a66e-34d00b99394f",
+              "status": "observed"
+            },
+            "retention_result": {
+              "analyte_reference": "A",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "8a932878ce330e1193228e82e2664a01e5f718d8a1c392b5c3d7f4a23afb5324",
+              "metric": "retention_time",
+              "normalized_value": 2.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "A",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "retention_time",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 3,
+                    "line_start": 2,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 0,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 2,
+                    "row_sha256": "f030b4ad0eb1377ba7f9c60bae5dc5dc06273cfdff07f5e5ed30cb12bd2c336d",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "min",
+                "upper_bound": null,
+                "value": 2
+              },
+              "raw_unit": "min",
+              "raw_value": 2,
+              "result_id": "fb200875-2790-4b93-854f-6e02272143c8",
+              "status": "observed"
+            }
+          },
+          {
+            "analyte_id": "B",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label B in the mapped source table.",
+            "resolution_result": {
+              "analyte_reference": "B",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "85f49a74e8a2162aedf2596af4718faa33bf9f101b19d5878922dd249fb8b546",
+              "metric": "resolution",
+              "normalized_value": 0.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "B",
+                "explanation": "Synthetic correction reports coelution as zero resolution.",
+                "lower_bound": null,
+                "metric": "resolution",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "fcf1ddd7-1401-49d1-9cd7-d7b4cfc8c178",
+                    "input_sha256": "2b1a39b87aa15c12b629ccbfdc5f37ae69e5f74d2b2af1c420bcdab3816f7002",
+                    "line_end": 2,
+                    "line_start": 2,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 0,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 2,
+                    "row_sha256": "6706c7c115e5279a38698f6f5651746c4e3ad6b1fd1289c6da1c8b3783d61e1b",
+                    "source_sha256": "8f419419a91b84cbcf83bd4efbc5ceb5ed9c402db3954a2ceab1df3fdfe4ed4e"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": "0358b820-c218-4f4c-89cb-a8d34e6fbd62",
+                "unit": "1",
+                "upper_bound": null,
+                "value": 0
+              },
+              "raw_unit": "1",
+              "raw_value": 0,
+              "result_id": "54b8a398-53f8-4a7e-b75c-1c6c61bdffb4",
+              "status": "observed"
+            },
+            "retention_result": {
+              "analyte_reference": "B",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "d5eecb2d382bdc9efcce6d94e2a2aca906107bb569694c2a00742f2759dada3f",
+              "metric": "retention_time",
+              "normalized_value": 4.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "B",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "retention_time",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 5,
+                    "line_start": 5,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 2,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 4,
+                    "row_sha256": "6a516c6b757cbbd186bead2516040890609a9b85a44f916ba3e455671a24e7a5",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "s",
+                "upper_bound": null,
+                "value": 240
+              },
+              "raw_unit": "s",
+              "raw_value": 240,
+              "result_id": "7d1f6113-b5cd-4139-ad8f-909ae95cb429",
+              "status": "observed"
+            }
+          }
+        ],
+        "attempt_evaluator_kind": "manual",
+        "attempt_fidelity_coordinate": 1.0,
+        "fidelity_role": "high",
+        "fidelity_role_check": "matches_attempt_coordinate",
+        "observation_origin": "manual",
+        "required_analytes_without_declared_evidence": []
+      },
+      "executable_method": {
+        "acquisition_duration_min": 7.0,
+        "canonical_program_sha256": "5d4c9cd3aa9657fedceb8af9e54b75f9b172347c911bc089faa7ba793e912a31",
+        "input_sha256": "bfdcfa56694224397491ab87d25190f92d77e357eb962c6e870b8326796b28f7",
+        "method_id": "aaae8625-a737-429c-a37d-cf7f5977803f"
+      },
+      "experiment_id": "5f6be23a-c05a-4b62-918b-54deaeadbddb",
+      "implementation_provenance": {
+        "acceptance_kernel": {
+          "module": "measure_methods.observations",
+          "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+        },
+        "measure_service": {
+          "package": "measure-service",
+          "source_ref": null,
+          "source_revision": null,
+          "version": "0.1.0.dev0"
+        },
+        "utility_definition_module": "measure_methods.moses_objective"
+      },
+      "input_spec": {
+        "analytes": [
+          {
+            "analyte_id": "A",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label A in the mapped source table.",
+            "resolution_result_id": "64342e35-e4cc-41c4-a66e-34d00b99394f",
+            "retention_result_id": "fb200875-2790-4b93-854f-6e02272143c8"
+          },
+          {
+            "analyte_id": "B",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label B in the mapped source table.",
+            "resolution_result_id": "54b8a398-53f8-4a7e-b75c-1c6c61bdffb4",
+            "retention_result_id": "7d1f6113-b5cd-4139-ad8f-909ae95cb429"
+          }
+        ],
+        "fidelity_role": "high",
+        "observation_origin": "manual"
+      },
+      "schema_version": "1.0"
+    },
+    "observation_id": "add31953-2e9a-4c0a-a88d-db2a8dbf5010",
+    "schema_version": "1.0"
+  },
+  "old": {
+    "assessment_sha256": "069bf59854ebc05c0a1448c42bc494f86e1057a48edeb9da9f5f5a247657357f",
+    "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+    "attempt_revision": 1,
+    "contract_id": "263d7988-fff9-440e-b566-febf453cb236",
+    "created_at": "2026-11-08T13:11:20.496899+00:00",
+    "evidence_sha256": "9f8c4fb9bf05f3cd3d49d2bebf1e590f9d06db29f750f80630d3def8708d8d17",
+    "experiment_id": "5f6be23a-c05a-4b62-918b-54deaeadbddb",
+    "input_sha256": "0ca3b24b7f8f98a96108111c11455790eca1b889df62e0390073f0d175f835c4",
+    "observation": {
+      "assessment": {
+        "analytical_acceptance": "accepted",
+        "confirmed_absent_count": 0,
+        "detected_count": 2,
+        "diagnostics": [
+          {
+            "acquisition_duration_min": 7.0,
+            "code": "runtime_preference_not_satisfied",
+            "runtime_preference_min": 5.0
+          }
+        ],
+        "feasible": true,
+        "per_analyte": [
+          {
+            "acceptance_state": "accepted",
+            "analyte_id": "A",
+            "assignment": "confirmed",
+            "detection": true,
+            "diagnostics": [],
+            "resolution": 2.0,
+            "resolution_satisfied": true,
+            "resolution_status": "observed",
+            "retention_status": "observed",
+            "retention_time_min": 2.0
+          },
+          {
+            "acceptance_state": "accepted",
+            "analyte_id": "B",
+            "assignment": "confirmed",
+            "detection": true,
+            "diagnostics": [],
+            "resolution": 1.5,
+            "resolution_satisfied": true,
+            "resolution_status": "observed",
+            "retention_status": "observed",
+            "retention_time_min": 4.0
+          }
+        ],
+        "profile": "moses-observed-analytical/1",
+        "required_analyte_count": 2,
+        "runtime_preference_satisfied": false,
+        "unknown_count": 0
+      },
+      "attempt": {
+        "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+        "executable_method_link": {
+          "canonical_program_sha256": "5d4c9cd3aa9657fedceb8af9e54b75f9b172347c911bc089faa7ba793e912a31",
+          "input_sha256": "bfdcfa56694224397491ab87d25190f92d77e357eb962c6e870b8326796b28f7",
+          "method_id": "aaae8625-a737-429c-a37d-cf7f5977803f",
+          "schema_version": "1.0"
+        },
+        "experiment_id": "5f6be23a-c05a-4b62-918b-54deaeadbddb",
+        "input_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+        "revision": 1,
+        "spec": {
+          "actual_conditions": [],
+          "ended_at": null,
+          "evaluator_kind": "manual",
+          "evaluator_reference": null,
+          "evaluator_revision": null,
+          "executable_method_id": "aaae8625-a737-429c-a37d-cf7f5977803f",
+          "explanation": "",
+          "external_reference": null,
+          "fidelity": 1.0,
+          "instrument_reference": null,
+          "measurements": [],
+          "method_reference": null,
+          "replicate_group": "synthetic-technical-replicates",
+          "replicate_index": 1,
+          "replicate_kind": "technical",
+          "started_at": null,
+          "status": "completed",
+          "training_snapshot_reference": null
+        }
+      },
+      "contract": {
+        "contract_id": "263d7988-fff9-440e-b566-febf453cb236",
+        "input_sha256": "1eb6313994b968ad4e1b716b00f6327b42e3b1299705749122228e89362abb03",
+        "profile": "moses-observed-analytical/1",
+        "resolution_definition": "caller-declared/1",
+        "utility_input_definition": "finite-resolution-reference/1",
+        "utility_profile": "moses-botier-1.0.0-binary64/1"
+      },
+      "evidence": {
+        "analytes": [
+          {
+            "analyte_id": "A",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label A in the mapped source table.",
+            "resolution_result": {
+              "analyte_reference": "A",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "83d5c3bc24185da80b343a8270202326636b1bf95088280add6838910df08319",
+              "metric": "resolution",
+              "normalized_value": 2.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "A",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "resolution",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 4,
+                    "line_start": 4,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 1,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 3,
+                    "row_sha256": "7b741fd61b2aecbeb894f4c131e5f4ecb289a3dc6e43a300ad70008a7c6d0488",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "1",
+                "upper_bound": null,
+                "value": 2
+              },
+              "raw_unit": "1",
+              "raw_value": 2,
+              "result_id": "64342e35-e4cc-41c4-a66e-34d00b99394f",
+              "status": "observed"
+            },
+            "retention_result": {
+              "analyte_reference": "A",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "8a932878ce330e1193228e82e2664a01e5f718d8a1c392b5c3d7f4a23afb5324",
+              "metric": "retention_time",
+              "normalized_value": 2.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "A",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "retention_time",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 3,
+                    "line_start": 2,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 0,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 2,
+                    "row_sha256": "f030b4ad0eb1377ba7f9c60bae5dc5dc06273cfdff07f5e5ed30cb12bd2c336d",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "min",
+                "upper_bound": null,
+                "value": 2
+              },
+              "raw_unit": "min",
+              "raw_value": 2,
+              "result_id": "fb200875-2790-4b93-854f-6e02272143c8",
+              "status": "observed"
+            }
+          },
+          {
+            "analyte_id": "B",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label B in the mapped source table.",
+            "resolution_result": {
+              "analyte_reference": "B",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "f62a951d4ce795b48431f973ed85bb96b8a910f17a7ae066bba00ea6e64d9c32",
+              "metric": "resolution",
+              "normalized_value": 1.5,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "B",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "resolution",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 6,
+                    "line_start": 6,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 3,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 5,
+                    "row_sha256": "ec1dbb0eb4fe4a4457c51ec2ae0249437dc1377780be9d22688224d72c5bc6f2",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "1",
+                "upper_bound": null,
+                "value": 1.5
+              },
+              "raw_unit": "1",
+              "raw_value": 1.5,
+              "result_id": "0358b820-c218-4f4c-89cb-a8d34e6fbd62",
+              "status": "observed"
+            },
+            "retention_result": {
+              "analyte_reference": "B",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "d5eecb2d382bdc9efcce6d94e2a2aca906107bb569694c2a00742f2759dada3f",
+              "metric": "retention_time",
+              "normalized_value": 4.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "B",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "retention_time",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 5,
+                    "line_start": 5,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 2,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 4,
+                    "row_sha256": "6a516c6b757cbbd186bead2516040890609a9b85a44f916ba3e455671a24e7a5",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "s",
+                "upper_bound": null,
+                "value": 240
+              },
+              "raw_unit": "s",
+              "raw_value": 240,
+              "result_id": "7d1f6113-b5cd-4139-ad8f-909ae95cb429",
+              "status": "observed"
+            }
+          }
+        ],
+        "attempt_evaluator_kind": "manual",
+        "attempt_fidelity_coordinate": 1.0,
+        "fidelity_role": "high",
+        "fidelity_role_check": "matches_attempt_coordinate",
+        "observation_origin": "manual",
+        "required_analytes_without_declared_evidence": []
+      },
+      "executable_method": {
+        "acquisition_duration_min": 7.0,
+        "canonical_program_sha256": "5d4c9cd3aa9657fedceb8af9e54b75f9b172347c911bc089faa7ba793e912a31",
+        "input_sha256": "bfdcfa56694224397491ab87d25190f92d77e357eb962c6e870b8326796b28f7",
+        "method_id": "aaae8625-a737-429c-a37d-cf7f5977803f"
+      },
+      "experiment_id": "5f6be23a-c05a-4b62-918b-54deaeadbddb",
+      "implementation_provenance": {
+        "acceptance_kernel": {
+          "module": "measure_methods.observations",
+          "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+        },
+        "measure_service": {
+          "package": "measure-service",
+          "source_ref": null,
+          "source_revision": null,
+          "version": "0.1.0.dev0"
+        },
+        "utility_definition_module": "measure_methods.moses_objective"
+      },
+      "input_spec": {
+        "analytes": [
+          {
+            "analyte_id": "A",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label A in the mapped source table.",
+            "resolution_result_id": "64342e35-e4cc-41c4-a66e-34d00b99394f",
+            "retention_result_id": "fb200875-2790-4b93-854f-6e02272143c8"
+          },
+          {
+            "analyte_id": "B",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label B in the mapped source table.",
+            "resolution_result_id": "0358b820-c218-4f4c-89cb-a8d34e6fbd62",
+            "retention_result_id": "7d1f6113-b5cd-4139-ad8f-909ae95cb429"
+          }
+        ],
+        "fidelity_role": "high",
+        "observation_origin": "manual"
+      },
+      "schema_version": "1.0"
+    },
+    "observation_id": "8d1fb60b-77b5-468b-9d10-6403151cbce6",
+    "schema_version": "1.0"
+  },
+  "old_after_correction": {
+    "assessment_sha256": "069bf59854ebc05c0a1448c42bc494f86e1057a48edeb9da9f5f5a247657357f",
+    "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+    "attempt_revision": 1,
+    "contract_id": "263d7988-fff9-440e-b566-febf453cb236",
+    "created_at": "2026-11-08T13:11:20.496899+00:00",
+    "evidence_sha256": "9f8c4fb9bf05f3cd3d49d2bebf1e590f9d06db29f750f80630d3def8708d8d17",
+    "experiment_id": "5f6be23a-c05a-4b62-918b-54deaeadbddb",
+    "input_sha256": "0ca3b24b7f8f98a96108111c11455790eca1b889df62e0390073f0d175f835c4",
+    "observation": {
+      "assessment": {
+        "analytical_acceptance": "accepted",
+        "confirmed_absent_count": 0,
+        "detected_count": 2,
+        "diagnostics": [
+          {
+            "acquisition_duration_min": 7.0,
+            "code": "runtime_preference_not_satisfied",
+            "runtime_preference_min": 5.0
+          }
+        ],
+        "feasible": true,
+        "per_analyte": [
+          {
+            "acceptance_state": "accepted",
+            "analyte_id": "A",
+            "assignment": "confirmed",
+            "detection": true,
+            "diagnostics": [],
+            "resolution": 2.0,
+            "resolution_satisfied": true,
+            "resolution_status": "observed",
+            "retention_status": "observed",
+            "retention_time_min": 2.0
+          },
+          {
+            "acceptance_state": "accepted",
+            "analyte_id": "B",
+            "assignment": "confirmed",
+            "detection": true,
+            "diagnostics": [],
+            "resolution": 1.5,
+            "resolution_satisfied": true,
+            "resolution_status": "observed",
+            "retention_status": "observed",
+            "retention_time_min": 4.0
+          }
+        ],
+        "profile": "moses-observed-analytical/1",
+        "required_analyte_count": 2,
+        "runtime_preference_satisfied": false,
+        "unknown_count": 0
+      },
+      "attempt": {
+        "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+        "executable_method_link": {
+          "canonical_program_sha256": "5d4c9cd3aa9657fedceb8af9e54b75f9b172347c911bc089faa7ba793e912a31",
+          "input_sha256": "bfdcfa56694224397491ab87d25190f92d77e357eb962c6e870b8326796b28f7",
+          "method_id": "aaae8625-a737-429c-a37d-cf7f5977803f",
+          "schema_version": "1.0"
+        },
+        "experiment_id": "5f6be23a-c05a-4b62-918b-54deaeadbddb",
+        "input_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+        "revision": 1,
+        "spec": {
+          "actual_conditions": [],
+          "ended_at": null,
+          "evaluator_kind": "manual",
+          "evaluator_reference": null,
+          "evaluator_revision": null,
+          "executable_method_id": "aaae8625-a737-429c-a37d-cf7f5977803f",
+          "explanation": "",
+          "external_reference": null,
+          "fidelity": 1.0,
+          "instrument_reference": null,
+          "measurements": [],
+          "method_reference": null,
+          "replicate_group": "synthetic-technical-replicates",
+          "replicate_index": 1,
+          "replicate_kind": "technical",
+          "started_at": null,
+          "status": "completed",
+          "training_snapshot_reference": null
+        }
+      },
+      "contract": {
+        "contract_id": "263d7988-fff9-440e-b566-febf453cb236",
+        "input_sha256": "1eb6313994b968ad4e1b716b00f6327b42e3b1299705749122228e89362abb03",
+        "profile": "moses-observed-analytical/1",
+        "resolution_definition": "caller-declared/1",
+        "utility_input_definition": "finite-resolution-reference/1",
+        "utility_profile": "moses-botier-1.0.0-binary64/1"
+      },
+      "evidence": {
+        "analytes": [
+          {
+            "analyte_id": "A",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label A in the mapped source table.",
+            "resolution_result": {
+              "analyte_reference": "A",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "83d5c3bc24185da80b343a8270202326636b1bf95088280add6838910df08319",
+              "metric": "resolution",
+              "normalized_value": 2.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "A",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "resolution",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 4,
+                    "line_start": 4,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 1,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 3,
+                    "row_sha256": "7b741fd61b2aecbeb894f4c131e5f4ecb289a3dc6e43a300ad70008a7c6d0488",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "1",
+                "upper_bound": null,
+                "value": 2
+              },
+              "raw_unit": "1",
+              "raw_value": 2,
+              "result_id": "64342e35-e4cc-41c4-a66e-34d00b99394f",
+              "status": "observed"
+            },
+            "retention_result": {
+              "analyte_reference": "A",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "8a932878ce330e1193228e82e2664a01e5f718d8a1c392b5c3d7f4a23afb5324",
+              "metric": "retention_time",
+              "normalized_value": 2.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "A",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "retention_time",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 3,
+                    "line_start": 2,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 0,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 2,
+                    "row_sha256": "f030b4ad0eb1377ba7f9c60bae5dc5dc06273cfdff07f5e5ed30cb12bd2c336d",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "min",
+                "upper_bound": null,
+                "value": 2
+              },
+              "raw_unit": "min",
+              "raw_value": 2,
+              "result_id": "fb200875-2790-4b93-854f-6e02272143c8",
+              "status": "observed"
+            }
+          },
+          {
+            "analyte_id": "B",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label B in the mapped source table.",
+            "resolution_result": {
+              "analyte_reference": "B",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "f62a951d4ce795b48431f973ed85bb96b8a910f17a7ae066bba00ea6e64d9c32",
+              "metric": "resolution",
+              "normalized_value": 1.5,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "B",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "resolution",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 6,
+                    "line_start": 6,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 3,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 5,
+                    "row_sha256": "ec1dbb0eb4fe4a4457c51ec2ae0249437dc1377780be9d22688224d72c5bc6f2",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "1",
+                "upper_bound": null,
+                "value": 1.5
+              },
+              "raw_unit": "1",
+              "raw_value": 1.5,
+              "result_id": "0358b820-c218-4f4c-89cb-a8d34e6fbd62",
+              "status": "observed"
+            },
+            "retention_result": {
+              "analyte_reference": "B",
+              "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+              "attempt_revision": 1,
+              "input_sha256": "d5eecb2d382bdc9efcce6d94e2a2aca906107bb569694c2a00742f2759dada3f",
+              "metric": "retention_time",
+              "normalized_value": 4.0,
+              "outcome": {
+                "analysis_id": null,
+                "analyte_reference": "B",
+                "explanation": "",
+                "lower_bound": null,
+                "metric": "retention_time",
+                "provenance": {
+                  "attempt_sha256": "e359f7fb7d72263f7a3c781eba922180759b7b1f14bff1576091831c66addcdc",
+                  "evaluator": {
+                    "evaluator_kind": "manual",
+                    "evaluator_reference": null,
+                    "evaluator_revision": null,
+                    "fidelity": 1.0,
+                    "training_snapshot_reference": null
+                  },
+                  "table_source": {
+                    "import_id": "354a57d4-be6b-4b1e-aa1c-84adac42a394",
+                    "input_sha256": "0eed11acdec3e05a1f41543bc534c923d9e6dc18559a6304891e99168f5c885c",
+                    "line_end": 5,
+                    "line_start": 5,
+                    "mapping_sha256": "f964ea909d2217cd18940798824895bf1c4058624a86cff924c0461781c6cda5",
+                    "ordinal": 2,
+                    "profile": "measure-result-table-row/1",
+                    "record_number": 4,
+                    "row_sha256": "6a516c6b757cbbd186bead2516040890609a9b85a44f916ba3e455671a24e7a5",
+                    "source_sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5"
+                  },
+                  "unit_origin": "caller_declared",
+                  "value_origin": "caller_reported"
+                },
+                "status": "observed",
+                "summary_field": null,
+                "supersedes_result_id": null,
+                "unit": "s",
+                "upper_bound": null,
+                "value": 240
+              },
+              "raw_unit": "s",
+              "raw_value": 240,
+              "result_id": "7d1f6113-b5cd-4139-ad8f-909ae95cb429",
+              "status": "observed"
+            }
+          }
+        ],
+        "attempt_evaluator_kind": "manual",
+        "attempt_fidelity_coordinate": 1.0,
+        "fidelity_role": "high",
+        "fidelity_role_check": "matches_attempt_coordinate",
+        "observation_origin": "manual",
+        "required_analytes_without_declared_evidence": []
+      },
+      "executable_method": {
+        "acquisition_duration_min": 7.0,
+        "canonical_program_sha256": "5d4c9cd3aa9657fedceb8af9e54b75f9b172347c911bc089faa7ba793e912a31",
+        "input_sha256": "bfdcfa56694224397491ab87d25190f92d77e357eb962c6e870b8326796b28f7",
+        "method_id": "aaae8625-a737-429c-a37d-cf7f5977803f"
+      },
+      "experiment_id": "5f6be23a-c05a-4b62-918b-54deaeadbddb",
+      "implementation_provenance": {
+        "acceptance_kernel": {
+          "module": "measure_methods.observations",
+          "source_sha256": "fa721901110b64c21110573409f56a4022a39c9b5a148208926fd3766e20652f"
+        },
+        "measure_service": {
+          "package": "measure-service",
+          "source_ref": null,
+          "source_revision": null,
+          "version": "0.1.0.dev0"
+        },
+        "utility_definition_module": "measure_methods.moses_objective"
+      },
+      "input_spec": {
+        "analytes": [
+          {
+            "analyte_id": "A",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label A in the mapped source table.",
+            "resolution_result_id": "64342e35-e4cc-41c4-a66e-34d00b99394f",
+            "retention_result_id": "fb200875-2790-4b93-854f-6e02272143c8"
+          },
+          {
+            "analyte_id": "B",
+            "assignment": "confirmed",
+            "assignment_evidence": "Caller-declared synthetic label B in the mapped source table.",
+            "resolution_result_id": "0358b820-c218-4f4c-89cb-a8d34e6fbd62",
+            "retention_result_id": "7d1f6113-b5cd-4139-ad8f-909ae95cb429"
+          }
+        ],
+        "fidelity_role": "high",
+        "observation_origin": "manual"
+      },
+      "schema_version": "1.0"
+    },
+    "observation_id": "8d1fb60b-77b5-468b-9d10-6403151cbce6",
+    "schema_version": "1.0"
+  },
+  "snapshot_after_correction": {
+    "contract_id": "263d7988-fff9-440e-b566-febf453cb236",
+    "created_at": "2026-11-08T13:11:20.504552+00:00",
+    "members": [
+      {
+        "assessment_sha256": "069bf59854ebc05c0a1448c42bc494f86e1057a48edeb9da9f5f5a247657357f",
+        "attempt_id": "67d61ee8-9ae4-4464-b9c3-f36b92b63425",
+        "attempt_revision": 1,
+        "evidence_sha256": "9f8c4fb9bf05f3cd3d49d2bebf1e590f9d06db29f750f80630d3def8708d8d17",
+        "input_sha256": "0ca3b24b7f8f98a96108111c11455790eca1b889df62e0390073f0d175f835c4",
+        "observation_id": "8d1fb60b-77b5-468b-9d10-6403151cbce6"
+      }
+    ],
+    "schema_version": "1.0",
+    "sha256": "ed782fb2a69c234f3f85a9ca8420ffe5f9032a3ca1ab87a42c69528999ab2fef",
+    "snapshot_id": "80ea204b-e94e-4088-a3d3-0bf0ec1722cf"
+  }
+}
