@@ -67,6 +67,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Inspect the checked archived-to-fresh results](docs/chromatogram-snapshot-results.md)
 - [Chromatography method declarations](docs/methods.md)
 - [Experiment and result contracts](docs/experiments.md)
+- [Explicit outcome-table format](docs/result-table-format.md)
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)
 - [Ideal retention declarations and predictions](docs/retention-predictions.md)
 - [Generate synthetic Gaussian observation evidence](docs/gaussian-observation-producer.md)
