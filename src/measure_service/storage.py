@@ -52,10 +52,12 @@ def _connect_at(path: Path) -> sqlite3.Connection:
     con.execute("PRAGMA foreign_keys=ON")
     try:
         from .import_origins import validate_import_schema
+        from .result_table_schema import validate_result_table_schema
 
         # Optional imported evidence must fail closed before any unrelated DDL.
         # Validation observes an absent component without creating it.
         validate_import_schema(con)
+        validate_result_table_schema(con)
         batch_schema_exists = validate_batch_schema(con)
     except BaseException:
         con.close()

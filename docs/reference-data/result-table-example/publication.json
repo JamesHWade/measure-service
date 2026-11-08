@@ -1,0 +1,91 @@
+{
+  "counts": {
+    "attempts": 2,
+    "corrected_rows": 1,
+    "initial_rows": 11,
+    "outcome_states": 7,
+    "retained_result_records": 12
+  },
+  "execution_head": "766dcdee9f1fe64104563a2a796dece5f14db1f7",
+  "execution_installed_tests_passed": 1246,
+  "execution_wheel_sha256": "11fdff91719777947788468393fe44f52a97490ee7955aac6ad3666944dea0d8",
+  "files": {
+    "correction-import.json": {
+      "sha256": "7882ba60b37d3836d535e03781654c73b389849e23b9f0a800ba6fcf808742ce",
+      "size_bytes": 5398
+    },
+    "correction.csv": {
+      "sha256": "8f419419a91b84cbcf83bd4efbc5ceb5ed9c402db3954a2ceab1df3fdfe4ed4e",
+      "size_bytes": 428
+    },
+    "execution.json": {
+      "sha256": "c7fe20b1a7d1d5721b8028c88017521f6b0b16c63cd5ad9a52f0d2f42af1ebbe",
+      "size_bytes": 1545
+    },
+    "independent-review.json": {
+      "sha256": "8f43dcfe2ea21f11d006b311d1a022c80ab92190eaffd6b409f1e6251834c60b",
+      "size_bytes": 2761
+    },
+    "index.html": {
+      "sha256": "260746ec88f6a42c04fb093c9e65390d270c5ac746a13b60a4cd9bb71ba8a739",
+      "size_bytes": 11083
+    },
+    "initial-import.json": {
+      "sha256": "9b94d849a61d5324b75626ecd350e9f65db48832da37908e649c154195d70f40",
+      "size_bytes": 21428
+    },
+    "initial.csv": {
+      "sha256": "22354a34c3ebb3cd21a7c2857e9acaae5d73d54543ecdf9082871700e0295ff5",
+      "size_bytes": 1876
+    },
+    "manifest.json": {
+      "sha256": "7927a68cad41553eb9bbbb11ab4fe8342e3dee50c292c32fb43eec5bcfa7f274",
+      "size_bytes": 1824
+    },
+    "observations.json": {
+      "sha256": "fee98148386f6387014a8e43020715c69e58b5c4ac1212b27cce8f66fe52ffc0",
+      "size_bytes": 47579
+    },
+    "outcome-rows.csv": {
+      "sha256": "73348cd7de3365d445c70f5127321c9a5e11dcc48101f49b334c3a38035028d9",
+      "size_bytes": 3812
+    },
+    "rejected.csv": {
+      "sha256": "3e8d61241b7a8ab7519bfa51b33ee11b210f0f9c4ccad182ea31938757756b94",
+      "size_bytes": 481
+    },
+    "report.html": {
+      "sha256": "3fa8eb869e018e7fbe3523e8c0ff7b12f08accf5919dd6d4568c9719320d3ef7",
+      "size_bytes": 11107
+    },
+    "results.json": {
+      "sha256": "f4b1a19fc38f5ad7d183140a00224b1a955e638af55700b82f03bcc50d7cf4a3",
+      "size_bytes": 28171
+    },
+    "snapshot.json": {
+      "sha256": "27eefa471f2f7e1cc17e8069c61e134ad9d204719c3360576cdcc151cc39c6c8",
+      "size_bytes": 788
+    },
+    "workflow_receipt.json": {
+      "sha256": "83797ed63587f30025e64f0a57d449d5ef98997279a344661a911f00fb7f1061",
+      "size_bytes": 36494
+    }
+  },
+  "independent_checks": 522,
+  "original_execution_preserved": true,
+  "presentation": {
+    "inputs": [
+      "workflow_receipt.json",
+      "initial-import.json",
+      "correction-import.json"
+    ],
+    "original_report": "index.html",
+    "renderer": "examples/result_tables.py:_html_document",
+    "renderer_source_sha256": "a60ba5de4554b63fdd1a92d87578b91fc167677f6514b6520e8a26c0c4913047",
+    "report": "report.html",
+    "scope": "Presentation regenerated from retained receipt and normalized rows only. Original execution and report bytes remain unchanged; no service, R, database or analytical computation is run."
+  },
+  "profile": "measure-result-table-publication/1",
+  "schema_version": "1.0",
+  "scope": "Constructed manual scalar outcomes; original observation/snapshot and source-row/result identities preserved through an explicit correction and restart. No instrument, optimizer study, physical qualification or R processing."
+}

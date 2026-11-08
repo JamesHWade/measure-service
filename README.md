@@ -42,6 +42,7 @@ configuration and a numerical analysis example.
 | Comparison | SEC deltas and method/backend/unit comparability flags | No statistical equivalence claim |
 | Method declarations | Isocratic/linear gradients, explicit units, flow/solvent use, declared feasibility and immutable method identities | No optimizer-domain sampling, pressure model or acquisition |
 | Experiment tracking | Intended and actual conditions, attempt revisions, evidence-linked outcomes and explicit corrections | Reported records; no execution or optimizer state machine |
+| Mapped outcome tables | Atomic CSV ingestion across owned attempts, explicit corrections and retained source-row evidence | Caller-declared units/states; separate analytical assessment and optimizer consumption |
 | Analytical acceptance | Predeclared analyte cohorts, evidence-bound three-valued decisions and immutable observation snapshots | Assignments and producer qualifications remain separate |
 | Ideal retention | Explicit linear, quadratic and Neue–Kuss laws, constant-flow inlet programs and immutable predictions | No fitting, gradient-delay inference, widths or physical qualification |
 | Latent Gaussian observations | Predeclared synthetic FWHM widths, prediction-bound generated results and immutable producer evidence | Finite-centroid reference; no traces, physical widths or signal processing |
@@ -67,6 +68,9 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Inspect the checked archived-to-fresh results](docs/chromatogram-snapshot-results.md)
 - [Chromatography method declarations](docs/methods.md)
 - [Experiment and result contracts](docs/experiments.md)
+- [Explicit outcome-table format](docs/result-table-format.md)
+- [Atomic outcome tables over MCP](docs/result-tables.md)
+- [Executed outcome-table correction and replay](docs/result-table-example.md)
 - [Analytical observation evidence and snapshots](docs/observation-evidence.md)
 - [Ideal retention declarations and predictions](docs/retention-predictions.md)
 - [Generate synthetic Gaussian observation evidence](docs/gaussian-observation-producer.md)

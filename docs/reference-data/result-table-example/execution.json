@@ -1,0 +1,35 @@
+{
+  "profile": "measure-result-table-execution/1",
+  "source": {
+    "head": "766dcdee9f1fe64104563a2a796dece5f14db1f7",
+    "tree": "902f6c91a57d3563cec039ae63f304e8b51a1e24"
+  },
+  "wheel_sha256": "11fdff91719777947788468393fe44f52a97490ee7955aac6ad3666944dea0d8",
+  "installed_package_members_verified": 74,
+  "installed_tests_passed": 1246,
+  "optional_BO_tests_deselected_locally": 5,
+  "command": [
+    "/tmp/measure-outcome-tables-example-installed-20261108/bin/python",
+    "/tmp/measure-outcome-tables-example-build-20261108/source/examples/result_tables.py",
+    "--output-dir",
+    "/tmp/measure-outcome-tables-delivery-run-20261108/output",
+    "--data-dir",
+    "/tmp/measure-outcome-tables-delivery-run-20261108/store"
+  ],
+  "started_at": "2026-11-08T13:11:19.554339+00:00",
+  "completed_at": "2026-11-08T13:11:21.460861+00:00",
+  "elapsed_seconds": 1.9064449993893504,
+  "returncode": 0,
+  "runtime": {
+    "python": "3.13.11 (main, Dec  5 2025, 16:06:33) [Clang 17.0.0 (clang-1700.4.4.1)]",
+    "package_path": "/private/tmp/measure-outcome-tables-example-installed-20261108/lib/python3.13/site-packages/measure_service/__init__.py",
+    "versions": {
+      "measure-service": "0.1.0.dev0",
+      "mcp": "1.30.0",
+      "pydantic": "2.14.3"
+    }
+  },
+  "r_backend": "unavailable by design; no numerical R processing requested",
+  "source_revision_environment_fields": "unset; no checkout revision inferred by runtime",
+  "scope": "Constructed manual scalar outcomes; no instrument, optimizer study or physical qualification"
+}

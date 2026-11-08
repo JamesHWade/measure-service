@@ -133,3 +133,13 @@ receipt. Analytical assessment and explicit snapshot membership are separate
 writes. A later caller correction preserves the original producer run and
 snapshots but cannot become generated producer evidence. Omitting the new
 optional field preserves earlier experiment request and payload identities.
+
+## Mapped outcome tables
+
+The [outcome-table importer](result-table-import.md) records up to 50 explicitly
+mapped rows across existing owned attempts in one transaction, with retained
+raw source text and per-row result provenance. Current attempt revisions and
+explicit correction IDs are checked during that transaction. Previewing a
+[mapped source](result-table-format.md) is a pure parse and does not resolve or
+reserve those targets. Registry revision counters require positive integer
+values; booleans, numeric strings and floating-point counters are rejected.
