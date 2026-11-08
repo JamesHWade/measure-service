@@ -464,6 +464,8 @@ def record_attempt(owner: str, experiment_id: str, spec: AttemptSpec, key: str) 
 def revise_attempt(
     owner: str, attempt_id: str, expected_revision: int, spec: AttemptSpec, reason: str, key: str
 ) -> dict[str, Any]:
+    if type(expected_revision) is not int or expected_revision < 1:
+        raise ValueError("Expected attempt revision must be a positive integer")
     if not reason.strip() or len(reason) > 2000:
         raise ValueError("A revision explanation of 1 to 2000 characters is required")
     requested = _requested_spec(spec)
@@ -614,14 +616,19 @@ def _insert_result_records(
     *,
     trusted_provenance: dict[str, Any] | None = None,
     result_ids: list[str] | None = None,
+    table_sources: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     """Insert a result batch inside an existing transaction.
 
     Public caller-reported results and trusted service-generated results share
     the same revision, current-result and supersession checks. Only service
-    adapters call this function with ``trusted_provenance`` or preallocated
-    result IDs; the public ``record_results`` API never accepts provenance.
+    adapters call this function with ``trusted_provenance``, preallocated
+    result IDs or service-built ``table_sources``. The public
+    ``record_results`` API never accepts provenance. Table lineage does not
+    change whether a value was caller-reported or copied from an analysis.
     """
+    if type(expected_attempt_revision) is not int or expected_attempt_revision < 1:
+        raise ValueError("Expected attempt revision must be a positive integer")
     attempt = _attempt(con, owner, attempt_id)
     if attempt["revision"] != expected_attempt_revision:
         raise ValueError(
@@ -629,6 +636,11 @@ def _insert_result_records(
         )
     if result_ids is not None and len(result_ids) != len(specs):
         raise ValueError("The internal result ID batch must match its result specs")
+    if table_sources is not None:
+        if len(table_sources) != len(specs):
+            raise ValueError("The internal table-source batch must match its result specs")
+        if trusted_provenance is not None:
+            raise ValueError("A table source cannot claim generated producer provenance")
     ids = result_ids or [str(uuid.uuid4()) for _ in specs]
     results = []
     for index, spec in enumerate(specs):
@@ -662,6 +674,9 @@ def _insert_result_records(
                 **trusted_provenance,
             }
             bounded(payload)
+        if table_sources is not None:
+            payload["provenance"]["table_source"] = table_sources[index]
+            bounded(payload)
         result_id = ids[index]
         con.execute(
             "INSERT INTO experiment_results VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -685,6 +700,8 @@ def _insert_result_records(
 def record_results(
     owner: str, attempt_id: str, expected_attempt_revision: int, specs: list[ResultSpec], key: str
 ) -> dict[str, Any]:
+    if type(expected_attempt_revision) is not int or expected_attempt_revision < 1:
+        raise ValueError("Expected attempt revision must be a positive integer")
     if not 1 <= len(specs) <= 50:
         raise ValueError("A result batch must contain between 1 and 50 outcomes")
     requested = bounded([v.model_dump(mode="json") for v in specs])

@@ -126,6 +126,11 @@ jobs:
           assert "src/measure_service/result_table_models.py" in members
           assert "src/measure_service/result_table_parser.py" in members
           assert "tests/test_result_table_parser.py" in members
+          assert "docs/result-table-import.md" in members
+          assert "src/measure_service/result_table_schema.py" in members
+          assert "src/measure_service/result_tables.py" in members
+          assert "tests/test_result_table_schema.py" in members
+          assert "tests/test_result_tables.py" in members
           assert "scripts/render_batch_snapshot_publication.py" in members
           assert "tests/test_batch_snapshot_publication.py" in members
           assert "tests/test_batch_snapshot_published_replay.py" in members
