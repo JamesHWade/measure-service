@@ -10,7 +10,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 74 tools.
+The current catalog contains 76 tools.
 
 | Tool | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- |
@@ -39,6 +39,7 @@ The current catalog contains 74 tools.
 | `measurement_get_chromatogram_batch_run` | `run_id` | read | idempotent |
 | `measurement_get_chromatogram_evidence` | `analysis_id` | read | idempotent |
 | `measurement_get_experiment` | `experiment_id` | read | idempotent |
+| `measurement_get_experiment_design_lineage` | `experiment_id` | read | idempotent |
 | `measurement_get_gaussian_observation` | `run_id` | read | idempotent |
 | `measurement_get_gaussian_producer` | `producer_id` | read | idempotent |
 | `measurement_get_method` | `method_id` | read | idempotent |
@@ -87,6 +88,7 @@ The current catalog contains 74 tools.
 | `measurement_revise_attempt` | `attempt_id`, `expected_revision`, `spec`, `reason`, `idempotency_key` | write | idempotent |
 | `measurement_run_chromatogram_batch` | `batch_id`, `idempotency_key`, `expected_revision` | write | idempotent |
 | `measurement_suggest_campaign` | `campaign_id`, `expected_revision`, `idempotency_key` | write | idempotent |
+| `measurement_supersede_experiment` | `experiment_id`, `expected_input_sha256`, `spec`, `reason`, `idempotency_key` | write | idempotent |
 | `measurement_validate_method` | `declaration` | read | idempotent |
 
 ## Tool descriptions
@@ -190,6 +192,10 @@ Capture owned stored chromatogram evidence and return its manifest/digest for bo
 ### `measurement_get_experiment`
 
 Retrieve an experiment's intended conditions and caller-declared origin.
+
+### `measurement_get_experiment_design_lineage`
+
+Read verified ordered design versions and a separate current pointer without moving historical evidence or creating lineage state for a standalone design.
 
 ### `measurement_get_gaussian_observation`
 
@@ -382,6 +388,10 @@ Run at most two pending items with shared bounded R capacity and atomic result r
 ### `measurement_suggest_campaign`
 
 Durably claim and finalize one synthetic suggestion with exact training evidence and failure timing; same-key retries never rerun a claimed computation, and no fallback replaces a failed candidate.
+
+### `measurement_supersede_experiment`
+
+Replace only a current owned design with a complete new immutable experiment and exact expected digest; historical attempts, observations, snapshots and campaign evidence keep their original IDs.
 
 ### `measurement_validate_method`
 

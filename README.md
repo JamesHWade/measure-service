@@ -41,7 +41,7 @@ configuration and a numerical analysis example.
 | Relative SEC | Calibration, molecular-weight averages and distributions | Requires corrected `measure.sec`; results are relative to supplied standards |
 | Comparison | SEC deltas and method/backend/unit comparability flags | No statistical equivalence claim |
 | Method declarations | Isocratic/linear gradients, explicit units, flow/solvent use, declared feasibility and immutable method identities | No optimizer-domain sampling, pressure model or acquisition |
-| Experiment tracking | Intended and actual conditions, attempt revisions, evidence-linked outcomes and explicit corrections | Reported records; no execution or optimizer state machine |
+| Experiment tracking | Immutable design replacements, intended/actual conditions, attempt revisions and evidence-linked corrections | Reported records; no execution or optimizer state machine |
 | Mapped outcome tables | Atomic CSV ingestion across owned attempts, explicit corrections and retained source-row evidence | Caller-declared units/states; separate analytical assessment and optimizer consumption |
 | Analytical acceptance | Predeclared analyte cohorts, evidence-bound three-valued decisions and immutable observation snapshots | Assignments and producer qualifications remain separate |
 | Ideal retention | Explicit linear, quadratic and Neue–Kuss laws, constant-flow inlet programs and immutable predictions | No fitting, gradient-delay inference, widths or physical qualification |

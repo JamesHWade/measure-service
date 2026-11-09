@@ -138,6 +138,11 @@ jobs:
           assert "tests/test_design_lineage_schema.py" in members
           assert "tests/test_design_lineage_boundaries.py" in members
           assert "docs/design-lineage.md" in members
+          assert "src/measure_service/design_lineage_client.py" in members
+          assert "src/measure_service/bounded_json.py" in members
+          assert "tests/test_design_lineage_client.py" in members
+          assert "tests/test_design_lineage_mcp.py" in members
+          assert "tests/test_bounded_json.py" in members
           assert "src/measure_service/result_table_client.py" in members
           assert "tests/test_result_table_client.py" in members
           assert "tests/test_result_table_mcp.py" in members

@@ -11,6 +11,59 @@ owner boundary and retry-key namespace as the existing experiment registry.
 These library calls do not authenticate an HTTP principal; deployment identity
 is supplied by the service boundary.
 
+## Public MCP and verified collection
+
+Use `measurement_supersede_experiment` for the retry-safe write and
+`measurement_get_experiment_design_lineage` for bounded reads. The read tool
+accepts any owned member ID; its `selected_experiment_id` and
+`selected_revision` describe that selection, while `current_experiment_id` and
+`current_revision` describe the discovered tip. Both operations require no R.
+
+The Python client helper collects and verifies the entire bounded history:
+
+```python
+from measure_service.design_lineage_client import collect_experiment_design_lineage
+
+# client is an initialized mcp.ClientSession; root_id is an owned experiment ID.
+history = await collect_experiment_design_lineage(client, root_id)
+current_id = history["current_experiment_id"]
+response = await client.call_tool(
+    "measurement_get_experiment", {"experiment_id": current_id}
+)
+if response.isError or not isinstance(response.structuredContent, dict):
+    raise RuntimeError(response.content)
+current = response.structuredContent
+
+# Explicitly copy every retained requested field before changing the design.
+replacement = {**current["spec"], "description": "Revised scouting design"}
+response = await client.call_tool(
+    "measurement_supersede_experiment",
+    {
+        "experiment_id": current_id,
+        "expected_input_sha256": current["input_sha256"],
+        "spec": replacement,
+        "reason": "Correct the intended scouting description",
+        "idempotency_key": "scouting-design-replacement-1",
+    },
+)
+if response.isError or not isinstance(response.structuredContent, dict):
+    raise RuntimeError(response.content)
+replacement_id = response.structuredContent["entry"]["experiment_id"]
+```
+
+Use a fresh key for a different intended replacement. A no-op or a concurrent
+head change rejects this request; it does not silently select another design.
+The collector verifies every entry digest, predecessor, root, selected/current
+identity and ordered page. If the head or count changes between pages, it fails
+and the caller can start a new collection. Appending after the last returned
+page does not change the verified historical view just collected.
+
+Both public collectors use the shared exact JSON preflight before serialization.
+Escaped control characters, Unicode, punctuation and aggregate values count
+against their canonical byte limits. The lineage collector returns a separate
+assembled envelope with `offset=0`, `limit=count` (up to 50), and
+`next_offset=null`; its 160,000-byte bound is not the 20-entry wire-page bound.
+
 ## Replacement and concurrency
 
 Supply the current experiment ID, its exact `input_sha256`, the complete new
