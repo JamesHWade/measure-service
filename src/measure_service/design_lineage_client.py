@@ -7,24 +7,7 @@ import json
 from datetime import datetime
 from typing import Any
 
-from .bounded_json import (
-    MAX_JSON_DEPTH as MAX_JSON_DEPTH,
-)
-from .bounded_json import (
-    MAX_JSON_INTEGER_BITS as MAX_JSON_INTEGER_BITS,
-)
-from .bounded_json import (
-    MAX_JSON_NODES as MAX_JSON_NODES,
-)
-from .bounded_json import (
-    MAX_JSON_STRING_BYTES as MAX_JSON_STRING_BYTES,
-)
-from .bounded_json import (
-    MAX_JSON_STRING_CHARS as MAX_JSON_STRING_CHARS,
-)
-from .bounded_json import (
-    preflight_json,
-)
+from . import bounded_json
 from .evidence_client import _call
 
 LINEAGE_PROFILE = "measure-experiment-design-lineage/1"
@@ -38,6 +21,11 @@ MAX_AGGREGATE_BYTES = 160_000
 MAX_ID_CHARS = 100
 MAX_REASON_BYTES = 2_000
 MAX_TIMESTAMP_CHARS = 100
+MAX_JSON_DEPTH = bounded_json.MAX_JSON_DEPTH
+MAX_JSON_NODES = bounded_json.MAX_JSON_NODES
+MAX_JSON_STRING_CHARS = bounded_json.MAX_JSON_STRING_CHARS
+MAX_JSON_STRING_BYTES = bounded_json.MAX_JSON_STRING_BYTES
+MAX_JSON_INTEGER_BITS = bounded_json.MAX_JSON_INTEGER_BITS
 _HEX = frozenset("0123456789abcdef")
 _ENTRY_PAYLOAD_FIELDS = frozenset(
     {
@@ -79,7 +67,7 @@ def _fail(message: str) -> ValueError:
 
 
 def _preflight_json(value: Any, label: str, *, max_bytes: int) -> None:
-    preflight_json(value, label, max_bytes=max_bytes, fail=_fail)
+    bounded_json.preflight_json(value, label, max_bytes=max_bytes, fail=_fail)
 
 
 def _canonical(value: Any, label: str, *, max_bytes: int) -> tuple[str, int]:

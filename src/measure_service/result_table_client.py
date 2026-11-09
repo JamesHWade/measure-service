@@ -9,24 +9,7 @@ import json
 from datetime import datetime
 from typing import Any
 
-from .bounded_json import (
-    MAX_JSON_DEPTH as MAX_JSON_DEPTH,
-)
-from .bounded_json import (
-    MAX_JSON_NODES as MAX_JSON_NODES,
-)
-from .bounded_json import (
-    MAX_JSON_NUMBER_CHARS as MAX_JSON_NUMBER_CHARS,
-)
-from .bounded_json import (
-    MAX_JSON_STRING_BYTES as MAX_JSON_STRING_BYTES,
-)
-from .bounded_json import (
-    MAX_JSON_STRING_CHARS as MAX_JSON_STRING_CHARS,
-)
-from .bounded_json import (
-    preflight_json,
-)
+from . import bounded_json
 from .evidence_client import _call
 
 MAX_SOURCE_BYTES = 64_000
@@ -38,6 +21,11 @@ MAX_DOCUMENT_BYTES = 64_000
 MAX_SOURCE_NAME = 200
 MAX_TIMESTAMP_CHARS = 100
 MAX_MAPPING_BYTES = 8_000
+MAX_JSON_DEPTH = bounded_json.MAX_JSON_DEPTH
+MAX_JSON_NODES = bounded_json.MAX_JSON_NODES
+MAX_JSON_STRING_CHARS = bounded_json.MAX_JSON_STRING_CHARS
+MAX_JSON_STRING_BYTES = bounded_json.MAX_JSON_STRING_BYTES
+MAX_JSON_NUMBER_CHARS = bounded_json.MAX_JSON_NUMBER_CHARS
 _HEX_SHA256 = set("0123456789abcdef")
 _KNOWN_OUTCOME_STATUSES = frozenset(
     {
@@ -120,7 +108,7 @@ def _fail(message: str) -> ValueError:
 
 
 def _preflight_json(value: Any, label: str, *, max_bytes: int = MAX_DOCUMENT_BYTES) -> None:
-    preflight_json(value, label, max_bytes=max_bytes, fail=_fail)
+    bounded_json.preflight_json(value, label, max_bytes=max_bytes, fail=_fail)
 
 
 def _canonical(
