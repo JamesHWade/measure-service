@@ -143,6 +143,9 @@ jobs:
           assert "tests/test_design_lineage_client.py" in members
           assert "tests/test_design_lineage_mcp.py" in members
           assert "tests/test_bounded_json.py" in members
+          assert "examples/design_lineage.py" in members
+          assert "tests/test_design_lineage_example.py" in members
+          assert "docs/design-lineage-example.md" in members
           assert "src/measure_service/result_table_client.py" in members
           assert "tests/test_result_table_client.py" in members
           assert "tests/test_result_table_mcp.py" in members

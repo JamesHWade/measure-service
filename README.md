@@ -69,6 +69,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Chromatography method declarations](docs/methods.md)
 - [Experiment and result contracts](docs/experiments.md)
 - [Immutable design replacements and exact historical bindings](docs/design-lineage.md)
+- [Run the design replacement and historical-evidence workflow](docs/design-lineage-example.md)
 - [Explicit outcome-table format](docs/result-table-format.md)
 - [Atomic outcome tables over MCP](docs/result-tables.md)
 - [Executed outcome-table correction and replay](docs/result-table-example.md)
