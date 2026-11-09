@@ -6,10 +6,10 @@ import base64
 import binascii
 import hashlib
 import json
-import math
 from datetime import datetime
 from typing import Any
 
+from . import bounded_json
 from .evidence_client import _call
 
 MAX_SOURCE_BYTES = 64_000
@@ -18,14 +18,14 @@ MAX_SOURCE_PAGE = 12_000
 MAX_ROW_PAGE = 20
 MAX_IMPORT_ID = 100
 MAX_DOCUMENT_BYTES = 64_000
-MAX_JSON_DEPTH = 32
-MAX_JSON_NODES = 10_000
-MAX_JSON_STRING_CHARS = 64_000
-MAX_JSON_STRING_BYTES = 64_000
-MAX_JSON_NUMBER_CHARS = 1_000
 MAX_SOURCE_NAME = 200
 MAX_TIMESTAMP_CHARS = 100
 MAX_MAPPING_BYTES = 8_000
+MAX_JSON_DEPTH = bounded_json.MAX_JSON_DEPTH
+MAX_JSON_NODES = bounded_json.MAX_JSON_NODES
+MAX_JSON_STRING_CHARS = bounded_json.MAX_JSON_STRING_CHARS
+MAX_JSON_STRING_BYTES = bounded_json.MAX_JSON_STRING_BYTES
+MAX_JSON_NUMBER_CHARS = bounded_json.MAX_JSON_NUMBER_CHARS
 _HEX_SHA256 = set("0123456789abcdef")
 _KNOWN_OUTCOME_STATUSES = frozenset(
     {
@@ -107,79 +107,8 @@ def _fail(message: str) -> ValueError:
     return ValueError(f"Result-table import collection failed: {message}")
 
 
-def _check_json_string(value: str, label: str) -> int:
-    if len(value) > MAX_JSON_STRING_CHARS:
-        raise _fail(f"{label} contains a string beyond the JSON string bound")
-    try:
-        encoded_length = len(value.encode("utf-8"))
-    except UnicodeEncodeError as error:
-        raise _fail(f"{label} contains invalid Unicode text") from error
-    if encoded_length > MAX_JSON_STRING_BYTES:
-        raise _fail(f"{label} contains a string beyond the JSON byte bound")
-    # Count the exact ensure_ascii=False JSON representation without first
-    # allocating an escaped string. Ordinary UTF8 bytes are already counted.
-    escaped_extra = 0
-    for character in value:
-        if character in ('"', "\\") or character in "\b\t\n\f\r":
-            escaped_extra += 1
-        elif ord(character) < 0x20:
-            escaped_extra += 5
-    return encoded_length + escaped_extra + 2
-
-
 def _preflight_json(value: Any, label: str, *, max_bytes: int = MAX_DOCUMENT_BYTES) -> None:
-    """Check a JSON tree without recursively walking or serializing it."""
-
-    stack: list[tuple[Any, int]] = [(value, 0)]
-    nodes = 1
-    document_bytes = 0
-
-    def charge(size: int) -> None:
-        nonlocal document_bytes
-        document_bytes += size
-        if document_bytes > max_bytes:
-            raise _fail(f"{label} exceeds the {max_bytes}-byte canonical JSON limit")
-
-    while stack:
-        current, depth = stack.pop()
-        if depth > MAX_JSON_DEPTH:
-            raise _fail(f"{label} exceeds the JSON nesting bound")
-        if type(current) is dict:
-            if nodes + len(current) > MAX_JSON_NODES:
-                raise _fail(f"{label} exceeds the JSON node bound")
-            charge(2 + max(0, len(current) - 1))
-            for key, child in current.items():
-                if type(key) is not str:
-                    raise _fail(f"{label} contains a non-text JSON object key")
-                charge(_check_json_string(key, label) + 1)
-                nodes += 1
-                stack.append((child, depth + 1))
-        elif type(current) is list:
-            if nodes + len(current) > MAX_JSON_NODES:
-                raise _fail(f"{label} exceeds the JSON node bound")
-            charge(2 + max(0, len(current) - 1))
-            for child in reversed(current):
-                nodes += 1
-                stack.append((child, depth + 1))
-        elif type(current) is str:
-            charge(_check_json_string(current, label))
-        elif current is None:
-            charge(4)
-        elif type(current) is bool:
-            charge(4 if current else 5)
-        elif type(current) is int:
-            if current.bit_length() > MAX_JSON_NUMBER_CHARS * 4:
-                raise _fail(f"{label} contains an oversized JSON integer")
-            number_bytes = len(str(current))
-            if number_bytes > MAX_JSON_NUMBER_CHARS:
-                raise _fail(f"{label} contains an oversized JSON integer")
-            charge(number_bytes)
-        elif type(current) is float:
-            if not math.isfinite(current):
-                raise _fail(f"{label} contains a non-finite JSON number")
-            charge(len(repr(current)))
-        else:
-            raise _fail(f"{label} contains a value that is not canonical JSON")
+    bounded_json.preflight_json(value, label, max_bytes=max_bytes, fail=_fail)
 
 
 def _canonical(

@@ -21,7 +21,7 @@ from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import Context, FastMCP
 from mcp.types import ToolAnnotations
-from pydantic import Field, StrictInt, model_validator
+from pydantic import Field, StrictInt, StrictStr, model_validator
 
 from . import (
     analysis_evidence,
@@ -31,6 +31,7 @@ from . import (
     campaign_protocol_registry,
     campaign_suggestion_attempts,
     campaigns,
+    design_lineage,
     gaussian_producer,
     method_registry,
     observations,
@@ -444,6 +445,18 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "qualification": "experimental",
         "storage": "single_node_sqlite",
         "experiment_specs": "immutable",
+        "design_lineage": {
+            "profile": design_lineage.LINEAGE_PROFILE,
+            "replacement": "new_immutable_experiment_with_complete_explicit_specification",
+            "concurrency": "current_tip_and_expected_immutable_input_sha256",
+            "maximum_versions": design_lineage.MAX_VERSIONS,
+            "page_entries": design_lineage.MAX_PAGE,
+            "entry_bytes": design_lineage.MAX_ENTRY_BYTES,
+            "page_bytes": design_lineage.MAX_PAGE_BYTES,
+            "reason_utf8_bytes": design_lineage.MAX_REASON_BYTES,
+            "historical_attempts": "explicit_old_design_ids_remain_valid",
+            "current_pointer": "discovery_only_without_execution_or_evidence_migration",
+        },
         "attempts": "append_only_revisions",
         "results": "immutable_with_explicit_supersession",
         "result_tables": {
@@ -656,6 +669,34 @@ def measurement_create_experiment(
 def measurement_get_experiment(experiment_id: RecordId, ctx: Context) -> dict[str, Any]:
     """Retrieve an experiment's intended conditions and caller-declared origin."""
     return registry.get_experiment(identity(ctx), experiment_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+def measurement_supersede_experiment(
+    experiment_id: RecordId,
+    expected_input_sha256: Annotated[
+        StrictStr, Field(min_length=64, max_length=64, pattern="^[0-9a-f]{64}$")
+    ],
+    spec: ExperimentSpec,
+    reason: Annotated[StrictStr, Field(min_length=1, max_length=2000)],
+    idempotency_key: RequestKey,
+    ctx: Context,
+) -> dict[str, Any]:
+    """Replace only a current owned design with a complete new immutable experiment and exact expected digest; historical attempts, observations, snapshots and campaign evidence keep their original IDs."""
+    return design_lineage.supersede_experiment(
+        identity(ctx), experiment_id, expected_input_sha256, spec, reason, idempotency_key
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_experiment_design_lineage(
+    experiment_id: RecordId,
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=20)] = 10,
+) -> dict[str, Any]:
+    """Read verified ordered design versions and a separate current pointer without moving historical evidence or creating lineage state for a standalone design."""
+    return design_lineage.get_experiment_design_lineage(identity(ctx), experiment_id, offset, limit)
 
 
 @mcp.tool(annotations=READ, structured_output=True)

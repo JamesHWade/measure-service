@@ -1,0 +1,118 @@
+{
+  "records": [
+    {
+      "created_at": "2026-11-09T23:24:13.361306+00:00",
+      "executable_method": {
+        "canonical_program_sha256": "5d4c9cd3aa9657fedceb8af9e54b75f9b172347c911bc089faa7ba793e912a31",
+        "input_sha256": "ebb271da1cb059d590b6e7a6d0876230e572d09dc0c046bf59951a1b46f1e6ba",
+        "method_id": "41ee8dce-19ae-4515-a8d2-0a6ca8d8b199",
+        "schema_version": "1.0"
+      },
+      "experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3",
+      "input_sha256": "37918b35aee2b2e67351f5d02c80f29bf35df76aba6edb3227df5acab186b99a",
+      "observation_contract": {
+        "contract_id": "59db26e6-f58f-4b6e-831f-7ae9b481f284",
+        "input_sha256": "930f55e3e19eb1bb5400f25feae64b928caf6a1014bfaf514694376266ea1592"
+      },
+      "observation_producer": null,
+      "schema_version": "1.0",
+      "spec": {
+        "description": "Caller-declared synthetic design replacement; no instrument execution or optimizer state is implied.",
+        "executable_method_id": "41ee8dce-19ae-4515-a8d2-0a6ca8d8b199",
+        "external_reference": "design-lineage-example-v1",
+        "intended_conditions": [
+          {
+            "name": "flow",
+            "unit": "mL/min",
+            "value": 0.4
+          },
+          {
+            "name": "acquisition_duration",
+            "unit": "min",
+            "value": 7
+          }
+        ],
+        "observation_contract_id": "59db26e6-f58f-4b6e-831f-7ae9b481f284",
+        "proposal_reference": "design-lineage-example",
+        "source": "synthetic public example",
+        "title": "Synthetic immutable design v1"
+      }
+    },
+    {
+      "created_at": "2026-11-09T23:24:13.427396+00:00",
+      "executable_method": {
+        "canonical_program_sha256": "c8bd619b1420587b732a691a82bddd607972d8d8a8863ca04e1d3e57c0d3b701",
+        "input_sha256": "53012d5f79227026a0d21a75dd0d1b56781635c2d95eedb0394f884b8f3105ac",
+        "method_id": "d99b65c1-082e-40c2-ab87-e1641363d3f0",
+        "schema_version": "1.0"
+      },
+      "experiment_id": "fdd77fb7-e12e-46dd-930d-3e53c60eac31",
+      "input_sha256": "72b3af16808ff3d78248cce781eea6738d978ca27ce78be8445ba376a59ddd98",
+      "observation_contract": {
+        "contract_id": "59db26e6-f58f-4b6e-831f-7ae9b481f284",
+        "input_sha256": "930f55e3e19eb1bb5400f25feae64b928caf6a1014bfaf514694376266ea1592"
+      },
+      "observation_producer": null,
+      "schema_version": "1.0",
+      "spec": {
+        "description": "Caller-declared synthetic design replacement; no instrument execution or optimizer state is implied.",
+        "executable_method_id": "d99b65c1-082e-40c2-ab87-e1641363d3f0",
+        "external_reference": "design-lineage-example-v2",
+        "intended_conditions": [
+          {
+            "name": "flow",
+            "unit": "mL/min",
+            "value": 0.45
+          },
+          {
+            "name": "acquisition_duration",
+            "unit": "min",
+            "value": 8
+          }
+        ],
+        "observation_contract_id": "59db26e6-f58f-4b6e-831f-7ae9b481f284",
+        "proposal_reference": "design-lineage-example",
+        "source": "synthetic public example",
+        "title": "Synthetic immutable design v2"
+      }
+    },
+    {
+      "created_at": "2026-11-09T23:24:13.449887+00:00",
+      "executable_method": {
+        "canonical_program_sha256": "9d202a499c9af162712ace272f84f39cf20482a78812d350d3b6ab204a2ae21a",
+        "input_sha256": "d2c01cdcc8754b64f6499790d61801b42e074876fb97f62669983f41e17b7762",
+        "method_id": "49b75d35-5606-494f-9e2d-b08dd57e5335",
+        "schema_version": "1.0"
+      },
+      "experiment_id": "97b9bd5a-f713-47e4-bda2-0102130aa83a",
+      "input_sha256": "6393f21d2ab18782e07d58ba66aca34cd91ebcf4ed920dfc255ec907797e2475",
+      "observation_contract": {
+        "contract_id": "59db26e6-f58f-4b6e-831f-7ae9b481f284",
+        "input_sha256": "930f55e3e19eb1bb5400f25feae64b928caf6a1014bfaf514694376266ea1592"
+      },
+      "observation_producer": null,
+      "schema_version": "1.0",
+      "spec": {
+        "description": "Caller-declared synthetic design replacement; no instrument execution or optimizer state is implied.",
+        "executable_method_id": "49b75d35-5606-494f-9e2d-b08dd57e5335",
+        "external_reference": "design-lineage-example-v3",
+        "intended_conditions": [
+          {
+            "name": "flow",
+            "unit": "mL/min",
+            "value": 0.5
+          },
+          {
+            "name": "acquisition_duration",
+            "unit": "min",
+            "value": 9
+          }
+        ],
+        "observation_contract_id": "59db26e6-f58f-4b6e-831f-7ae9b481f284",
+        "proposal_reference": "design-lineage-example",
+        "source": "synthetic public example",
+        "title": "Synthetic immutable design v3"
+      }
+    }
+  ]
+}

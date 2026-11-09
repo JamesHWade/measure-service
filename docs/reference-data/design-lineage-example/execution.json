@@ -1,0 +1,35 @@
+{
+  "profile": "measure-design-lineage-execution/1",
+  "source": {
+    "head": "02a86c612a730153712da570a9fffd5cae477ce8",
+    "tree": "47c19d20956b70de0a10807023a6bb1f0201cadd"
+  },
+  "wheel_sha256": "b104c1a86e79968a8f91d7179adf47f879cae7619380297f8dd089d7727e64bd",
+  "installed_package_members_verified": 78,
+  "installed_tests_passed": 1344,
+  "optional_BO_tests_deselected_locally": 5,
+  "command": [
+    "/tmp/measure-design-lineage-example-installed-20261109/bin/python",
+    "/tmp/measure-design-lineage-example-build-20261109/source/examples/design_lineage.py",
+    "--output-dir",
+    "/tmp/measure-design-lineage-delivery-run-20261109/output",
+    "--data-dir",
+    "/tmp/measure-design-lineage-delivery-run-20261109/store"
+  ],
+  "started_at": "2026-11-09T23:24:12.441664+00:00",
+  "completed_at": "2026-11-09T23:24:14.479585+00:00",
+  "elapsed_seconds": 2.0378248328343034,
+  "returncode": 0,
+  "runtime": {
+    "python": "3.14.2 (main, Dec  5 2025, 16:49:16) [Clang 17.0.0 (clang-1700.4.4.1)]",
+    "package_path": "/private/tmp/measure-design-lineage-example-installed-20261109/lib/python3.14/site-packages/measure_service/__init__.py",
+    "versions": {
+      "measure-service": "0.1.0.dev0",
+      "mcp": "1.30.0",
+      "pydantic": "2.14.3"
+    }
+  },
+  "r_backend": "unavailable by design; no numerical R processing requested",
+  "source_revision_environment_fields": "unset; no checkout revision inferred by runtime",
+  "scope": "Constructed manual design replacements and analytical evidence history; no instrument, optimizer study or physical qualification"
+}

@@ -1,0 +1,55 @@
+{
+  "count": 3,
+  "current_entry_sha256": "aec278663efefbdec8eba471e741c31bfbd6ca9d59789f69b92ffc9b372707f0",
+  "current_experiment_id": "97b9bd5a-f713-47e4-bda2-0102130aa83a",
+  "current_revision": 3,
+  "entries": [
+    {
+      "created_at": "2026-11-09T23:24:13.361306+00:00",
+      "entry_sha256": "9f6fd6b45cf49c0c0ee98577422f8756add16c4fb4997acde8df864a32e58d31",
+      "experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3",
+      "experiment_input_sha256": "37918b35aee2b2e67351f5d02c80f29bf35df76aba6edb3227df5acab186b99a",
+      "profile": "measure-experiment-design-version/1",
+      "reason": "Initial immutable experiment",
+      "revision": 1,
+      "root_experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3",
+      "schema_version": "1.0",
+      "supersedes_entry_sha256": null,
+      "supersedes_experiment_id": null
+    },
+    {
+      "created_at": "2026-11-09T23:24:13.427396+00:00",
+      "entry_sha256": "327ca91470c8424e439cc483f609dca0f0bdab29816328c3496399e26558e30e",
+      "experiment_id": "fdd77fb7-e12e-46dd-930d-3e53c60eac31",
+      "experiment_input_sha256": "72b3af16808ff3d78248cce781eea6738d978ca27ce78be8445ba376a59ddd98",
+      "profile": "measure-experiment-design-version/1",
+      "reason": "Declared flow and duration replacement for v2.",
+      "revision": 2,
+      "root_experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3",
+      "schema_version": "1.0",
+      "supersedes_entry_sha256": "9f6fd6b45cf49c0c0ee98577422f8756add16c4fb4997acde8df864a32e58d31",
+      "supersedes_experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3"
+    },
+    {
+      "created_at": "2026-11-09T23:24:13.449887+00:00",
+      "entry_sha256": "aec278663efefbdec8eba471e741c31bfbd6ca9d59789f69b92ffc9b372707f0",
+      "experiment_id": "97b9bd5a-f713-47e4-bda2-0102130aa83a",
+      "experiment_input_sha256": "6393f21d2ab18782e07d58ba66aca34cd91ebcf4ed920dfc255ec907797e2475",
+      "profile": "measure-experiment-design-version/1",
+      "reason": "Declared flow and duration replacement for v3.",
+      "revision": 3,
+      "root_experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3",
+      "schema_version": "1.0",
+      "supersedes_entry_sha256": "327ca91470c8424e439cc483f609dca0f0bdab29816328c3496399e26558e30e",
+      "supersedes_experiment_id": "fdd77fb7-e12e-46dd-930d-3e53c60eac31"
+    }
+  ],
+  "limit": 3,
+  "next_offset": null,
+  "offset": 0,
+  "profile": "measure-experiment-design-lineage/1",
+  "root_experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3",
+  "schema_version": "1.0",
+  "selected_experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3",
+  "selected_revision": 1
+}

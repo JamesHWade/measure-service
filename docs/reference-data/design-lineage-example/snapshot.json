@@ -1,0 +1,19 @@
+{
+  "snapshot": {
+    "contract_id": "59db26e6-f58f-4b6e-831f-7ae9b481f284",
+    "created_at": "2026-11-09T23:24:13.418613+00:00",
+    "members": [
+      {
+        "assessment_sha256": "069bf59854ebc05c0a1448c42bc494f86e1057a48edeb9da9f5f5a247657357f",
+        "attempt_id": "f5f8efd0-9a17-43ef-bfc5-70939d29231e",
+        "attempt_revision": 1,
+        "evidence_sha256": "e081b56974147913c6f32dd6ba716761d5482c7ac16ebe7edb2dcb8fefdad26d",
+        "input_sha256": "689d9859fd6d14708966f3e505ce27a7399bc9c7d0311737abd0f7839b00e532",
+        "observation_id": "6453aa8c-4af7-4143-abd8-3df32a273712"
+      }
+    ],
+    "schema_version": "1.0",
+    "sha256": "822fe00022679ca9725d22532c95f940a77c130130abc6aeb75404efe78a730d",
+    "snapshot_id": "744cd1be-7dd1-4176-8466-9eca60ef3cab"
+  }
+}

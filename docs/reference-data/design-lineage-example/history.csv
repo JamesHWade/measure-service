@@ -1,0 +1,17 @@
+record_type,record_id,parent_id,revision,status,metric,analyte,value,unit,reason,input_sha256,digest
+design,986b9d88-980e-4101-b38c-0ff954825ec3,,1,immutable-design,,,,,Initial immutable experiment,37918b35aee2b2e67351f5d02c80f29bf35df76aba6edb3227df5acab186b99a,9f6fd6b45cf49c0c0ee98577422f8756add16c4fb4997acde8df864a32e58d31
+design,fdd77fb7-e12e-46dd-930d-3e53c60eac31,986b9d88-980e-4101-b38c-0ff954825ec3,2,immutable-design,,,,,Declared flow and duration replacement for v2.,72b3af16808ff3d78248cce781eea6738d978ca27ce78be8445ba376a59ddd98,327ca91470c8424e439cc483f609dca0f0bdab29816328c3496399e26558e30e
+design,97b9bd5a-f713-47e4-bda2-0102130aa83a,fdd77fb7-e12e-46dd-930d-3e53c60eac31,3,immutable-design,,,,,Declared flow and duration replacement for v3.,6393f21d2ab18782e07d58ba66aca34cd91ebcf4ed920dfc255ec907797e2475,aec278663efefbdec8eba471e741c31bfbd6ca9d59789f69b92ffc9b372707f0
+attempt,f5f8efd0-9a17-43ef-bfc5-70939d29231e,986b9d88-980e-4101-b38c-0ff954825ec3,1,completed,,,,,Initial record,43f394b788c5134439ca1a4a62d1a37eb95354abd21a73eb06b08fd9cd7102a3,
+attempt,f5f8efd0-9a17-43ef-bfc5-70939d29231e,986b9d88-980e-4101-b38c-0ff954825ec3,2,completed,,,,,Added caller-reported sample temperature metadata.,f0ed6aee1a9694fdaf24036ed75a103af1d58cdfa3a2052710e59e0e8401baea,
+attempt,e5d790d6-fcf9-48ee-942b-658b1a6b7904,fdd77fb7-e12e-46dd-930d-3e53c60eac31,1,planned,,,,,Initial record,d2d52afcd051fa90d5a2cc61dd5f03b4affa984f6505600e0cf098473fab5885,
+attempt,e5d790d6-fcf9-48ee-942b-658b1a6b7904,fdd77fb7-e12e-46dd-930d-3e53c60eac31,2,completed,,,,,Caller completed the planned v2 design at its reported flow.,a48e19fba7a053842c1c0da7b48ef2fbb6ea2db6a443ee50bb6913279d20cd92,
+attempt,b25f204a-db35-4941-8d08-48ed71162c2a,986b9d88-980e-4101-b38c-0ff954825ec3,1,completed,,,,,Initial record,43f394b788c5134439ca1a4a62d1a37eb95354abd21a73eb06b08fd9cd7102a3,
+result,baf3c73a-13bc-4970-baa2-6139e9cd8f03,f5f8efd0-9a17-43ef-bfc5-70939d29231e,1,observed,retention_time,A,2,min,,ade2678078fee6a3219b63c98093b12e1f019bca78392d96e7837ac7f4acad1d,
+result,1c6b9785-2508-45c0-86ab-4f6fcc247460,f5f8efd0-9a17-43ef-bfc5-70939d29231e,1,observed,resolution,A,2,1,,03e2f94e16a48a5980b937b29cfff119719c735f5987c77f000c3323bb3facf9,
+result,2fd0c820-b3b8-41bd-8974-c94ebe0800ae,f5f8efd0-9a17-43ef-bfc5-70939d29231e,1,observed,retention_time,B,4,min,,18214fccc734e7c61b9b046ac2bc1838c80253368e5855075281f006e5dad74a,
+result,3bf5dffa-3315-41fb-b7d7-016c945e193d,f5f8efd0-9a17-43ef-bfc5-70939d29231e,1,observed,resolution,B,1.5,1,,8476fcbee31972a0db22303e4b081f971fbdcdfb4d215d92858159f7bb8fa778,
+result,c8f18f79-c4ad-4a5f-8a45-63b87451aed0,e5d790d6-fcf9-48ee-942b-658b1a6b7904,2,observed,retention_time,A,2,min,,49278a560978373bd5d4d80fd3f133e57efa71e6e10194eefc31557da7cb8089,
+result,d90789e9-93fb-4f85-b13f-0e464501250b,e5d790d6-fcf9-48ee-942b-658b1a6b7904,2,observed,resolution,A,2,1,,812c5fbb8aa03b3009dc77209be41b7799233bf6a4188ca04bf053ff67119947,
+result,c57a6270-8f9e-4ef7-9221-cb5dd3e986f0,e5d790d6-fcf9-48ee-942b-658b1a6b7904,2,observed,retention_time,B,4,min,,238effc334d440fafc762f9ceb55b43dbecbba55f49d5c21fb7a1a84b54fe72a,
+result,2da32ca5-0bfe-42c5-8217-7e3cc4eb7813,e5d790d6-fcf9-48ee-942b-658b1a6b7904,2,observed,resolution,B,0,1,,adad1e70139ff1193b33f3280b8be088f2f299faa36e484a2ced510fdcdc08c4,

@@ -1,0 +1,17 @@
+{
+  "entry": {
+    "created_at": "2026-11-09T23:24:13.427396+00:00",
+    "entry_sha256": "327ca91470c8424e439cc483f609dca0f0bdab29816328c3496399e26558e30e",
+    "experiment_id": "fdd77fb7-e12e-46dd-930d-3e53c60eac31",
+    "experiment_input_sha256": "72b3af16808ff3d78248cce781eea6738d978ca27ce78be8445ba376a59ddd98",
+    "profile": "measure-experiment-design-version/1",
+    "reason": "Declared flow and duration replacement for v2.",
+    "revision": 2,
+    "root_experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3",
+    "schema_version": "1.0",
+    "supersedes_entry_sha256": "9f6fd6b45cf49c0c0ee98577422f8756add16c4fb4997acde8df864a32e58d31",
+    "supersedes_experiment_id": "986b9d88-980e-4101-b38c-0ff954825ec3"
+  },
+  "profile": "measure-experiment-design-supersession/1",
+  "schema_version": "1.0"
+}

@@ -307,37 +307,44 @@ def _requested_spec(spec: ExperimentSpec | AttemptSpec) -> dict:
     return bounded(payload)
 
 
+def _insert_experiment_record(
+    con: sqlite3.Connection, owner: str, payload: dict[str, Any]
+) -> dict[str, Any]:
+    """Resolve immutable links and insert a design within the caller transaction."""
+    retained = dict(payload)
+    if payload.get("executable_method_id") is not None:
+        retained["executable_method"] = method_link(con, owner, payload["executable_method_id"])
+    if payload.get("observation_contract_id") is not None:
+        from .observations import observation_contract_link
+
+        retained["observation_contract"] = observation_contract_link(
+            con, owner, payload["observation_contract_id"]
+        )
+    if payload.get("observation_producer_id") is not None:
+        if payload.get("observation_contract_id") is None:
+            raise ValueError("An observation producer requires a declared observation contract")
+        from .gaussian_producer import gaussian_producer_link
+
+        retained["observation_producer"] = gaussian_producer_link(
+            con,
+            owner,
+            payload["observation_producer_id"],
+            payload["observation_contract_id"],
+        )
+    bounded(retained)
+    record_id = str(uuid.uuid4())
+    con.execute(
+        "INSERT INTO experiments VALUES (?, ?, ?, ?, ?)",
+        (record_id, owner, canonical(retained), sha256(retained), now()),
+    )
+    return _experiment(_owned(con, "experiments", owner, record_id))
+
+
 def create_experiment(owner: str, spec: ExperimentSpec, key: str) -> dict[str, Any]:
     payload = _requested_spec(spec)
 
     def write(con: sqlite3.Connection) -> dict:
-        retained = dict(payload)
-        if payload.get("executable_method_id") is not None:
-            retained["executable_method"] = method_link(con, owner, payload["executable_method_id"])
-        if payload.get("observation_contract_id") is not None:
-            from .observations import observation_contract_link
-
-            retained["observation_contract"] = observation_contract_link(
-                con, owner, payload["observation_contract_id"]
-            )
-        if payload.get("observation_producer_id") is not None:
-            if payload.get("observation_contract_id") is None:
-                raise ValueError("An observation producer requires a declared observation contract")
-            from .gaussian_producer import gaussian_producer_link
-
-            retained["observation_producer"] = gaussian_producer_link(
-                con,
-                owner,
-                payload["observation_producer_id"],
-                payload["observation_contract_id"],
-            )
-        bounded(retained)
-        record_id = str(uuid.uuid4())
-        con.execute(
-            "INSERT INTO experiments VALUES (?, ?, ?, ?, ?)",
-            (record_id, owner, canonical(retained), sha256(retained), now()),
-        )
-        return _experiment(_owned(con, "experiments", owner, record_id))
+        return _insert_experiment_record(con, owner, payload)
 
     return registry_mutation(owner, key, {"operation": "create_experiment", "spec": payload}, write)
 

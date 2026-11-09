@@ -51,6 +51,7 @@ def _connect_at(path: Path) -> sqlite3.Connection:
     con = sqlite3.connect(path, timeout=30)
     con.execute("PRAGMA foreign_keys=ON")
     try:
+        from .design_lineage_schema import validate_design_lineage_schema
         from .import_origins import validate_import_schema
         from .result_table_schema import validate_result_table_schema
 
@@ -58,6 +59,7 @@ def _connect_at(path: Path) -> sqlite3.Connection:
         # Validation observes an absent component without creating it.
         validate_import_schema(con)
         validate_result_table_schema(con)
+        validate_design_lineage_schema(con)
         batch_schema_exists = validate_batch_schema(con)
     except BaseException:
         con.close()
@@ -280,7 +282,12 @@ def registry_connection(write: bool = False) -> Iterator[sqlite3.Connection]:
 
 
 def registry_mutation(
-    owner: str, key: str, request: dict, action: Callable[[sqlite3.Connection], dict]
+    owner: str,
+    key: str,
+    request: dict,
+    action: Callable[[sqlite3.Connection], dict],
+    *,
+    response_validator: Callable[[sqlite3.Connection, Any], None] | None = None,
 ) -> dict[str, Any]:
     """Commit a bounded registry mutation and its retry receipt in one transaction."""
     if not isinstance(key, str) or not 1 <= len(key) <= 100 or not key.strip():
@@ -290,16 +297,39 @@ def registry_mutation(
         raise ValueError("Registry record or result batch exceeds the byte limit")
     digest = sha256(request)
     with registry_connection(write=True) as con:
-        receipt = con.execute(
-            "SELECT digest, response FROM registry_receipts WHERE owner=? AND request_key=?",
-            (owner, key),
-        ).fetchone()
+        if response_validator is None:
+            receipt = con.execute(
+                "SELECT digest, response FROM registry_receipts WHERE owner=? AND request_key=?",
+                (owner, key),
+            ).fetchone()
+        else:
+            # Opt-in components reject oversized stored JSON before SQLite
+            # materializes it in Python; legacy receipt reads stay unchanged.
+            receipt = con.execute(
+                "SELECT CASE WHEN typeof(digest)='text' AND length(CAST(digest AS BLOB))=64 "
+                "THEN digest END AS digest, "
+                "CASE WHEN typeof(response)='text' AND length(CAST(response AS BLOB))<=64000 "
+                "THEN response END AS response FROM registry_receipts WHERE owner=? AND request_key=?",
+                (owner, key),
+            ).fetchone()
         if receipt is not None:
             if receipt["digest"] != digest:
                 raise ValueError(
                     "Idempotency key was already used for a different registry request"
                 )
-            return json.loads(receipt["response"])
+            if response_validator is None:
+                return json.loads(receipt["response"])
+            raw = receipt["response"]
+            try:
+                if type(raw) is not str or len(raw) > 64_000 or len(raw.encode("utf-8")) > 64_000:
+                    raise ValueError("Invalid retry receipt byte limit")
+                response = json.loads(raw)
+                if canonical(response) != raw:
+                    raise ValueError("Retry receipt must retain canonical JSON bytes")
+            except (TypeError, ValueError, RecursionError) as error:
+                raise ValueError("Stored retry receipt is inconsistent") from error
+            response_validator(con, response)
+            return response
         # A durable suggestion claim reserves the same namespace as ordinary
         # receipts, including while its external computation is unresolved.
         claims_exist = con.execute(
@@ -315,6 +345,8 @@ def registry_mutation(
         ):
             raise ValueError("Idempotency key is reserved by a campaign suggestion attempt")
         response = action(con)
+        if response_validator is not None:
+            response_validator(con, response)
         con.execute(
             "INSERT INTO registry_receipts VALUES (?, ?, ?, ?, ?)",
             (owner, key, digest, canonical(response), now()),
