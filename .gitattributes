@@ -7,3 +7,6 @@ docs/reference-data/chromatogram-batch-example/*.csv -text whitespace=cr-at-eol
 
 # Preserve every executed outcome-table reference byte across checkouts.
 docs/reference-data/result-table-example/* -text whitespace=cr-at-eol linguist-generated=true
+
+# Retain the executed design-lineage report and CRLF audit log byte for byte.
+docs/reference-data/design-lineage-example/* -text whitespace=cr-at-eol linguist-generated=true

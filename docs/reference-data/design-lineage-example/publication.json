@@ -1,0 +1,76 @@
+{
+  "counts": {
+    "assessments": 2,
+    "attempt_revisions": 5,
+    "attempts": 3,
+    "designs": 3,
+    "results": 8,
+    "snapshots": 1
+  },
+  "execution_head": "02a86c612a730153712da570a9fffd5cae477ce8",
+  "execution_installed_tests_passed": 1344,
+  "execution_wheel_sha256": "b104c1a86e79968a8f91d7179adf47f879cae7619380297f8dd089d7727e64bd",
+  "files": {
+    "attempts.json": {
+      "sha256": "215630168a73a00ef9eec99b0d4b96a2fffcb806814ef4d8d882471f55f28883",
+      "size_bytes": 19219
+    },
+    "designs.json": {
+      "sha256": "ca1c052134f70f2a534fa47be7341f5c1a10639b34591d4717f4961580b2bfc6",
+      "size_bytes": 4790
+    },
+    "execution.json": {
+      "sha256": "c9603209c116e363baf3d64462eb4afd4d3cdea5480c95ebc41fcf71ca01a070",
+      "size_bytes": 1583
+    },
+    "history.csv": {
+      "sha256": "9c831a6fd116d81b2ca9975903aa7f5a2a9838b4b7afe4e4c1c43697e2034a6e",
+      "size_bytes": 3316
+    },
+    "independent-review.json": {
+      "sha256": "6284972de1baa6c86c1bb774007aa507a2979c51b217254bb6a7b66b66a7eeb9",
+      "size_bytes": 2775
+    },
+    "index.html": {
+      "sha256": "02ed1e34abd1c2ac5c1468533dd0c5f6e8fa5954459be7a6365fab6e23cc5d1b",
+      "size_bytes": 10224
+    },
+    "lineage.json": {
+      "sha256": "62e46422e90b3c509c7583fad1b8e325595447ee9add6613a9585f8d6034f865",
+      "size_bytes": 2614
+    },
+    "manifest.json": {
+      "sha256": "80540f3d61ca6d5a7256ac8a4c0d39690e5a578be48a31bf6cb836bfc460a28c",
+      "size_bytes": 1826
+    },
+    "observations.json": {
+      "sha256": "97b3dbcf27c0f37bc229f0f10d90c2abf0b6aa2b96ea343f624bef5a2f5e531e",
+      "size_bytes": 40155
+    },
+    "replacement-v1-v2.json": {
+      "sha256": "9d8f23e816017e0daf54000d3b012ec47f9a561aa89415e2ee957cd78fdf8713",
+      "size_bytes": 809
+    },
+    "replacement-v2-v3.json": {
+      "sha256": "d902436bcd9d2fd520e2a3f136418358004e45a9fff6690a26d40ff2a93fd5f1",
+      "size_bytes": 809
+    },
+    "results.json": {
+      "sha256": "c85c9901e897aaa354ff6c5ed4b042076544c95644e5856a732d1e168e6127d1",
+      "size_bytes": 9472
+    },
+    "snapshot.json": {
+      "sha256": "a6c54cf153b1e8ef612b260591989f5a9a0237af5c4e3b120523e502ae0e2bc5",
+      "size_bytes": 788
+    },
+    "workflow_receipt.json": {
+      "sha256": "452f333be1099e6cb1bd19f4e187595f3c44cd3d857a1d781ac40e882b5c2920",
+      "size_bytes": 95215
+    }
+  },
+  "independent_checks": 789,
+  "original_execution_preserved": true,
+  "profile": "measure-design-lineage-publication/1",
+  "schema_version": "1.0",
+  "scope": "Constructed manual intended-design replacements and immutable historical evidence. No instrument execution, optimizer study, physical qualification or model training. Current v3 is unattempted; late v1 attempt has no outcomes."
+}

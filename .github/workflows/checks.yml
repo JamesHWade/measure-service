@@ -146,6 +146,9 @@ jobs:
           assert "examples/design_lineage.py" in members
           assert "tests/test_design_lineage_example.py" in members
           assert "docs/design-lineage-example.md" in members
+          assert "tests/test_design_lineage_publication.py" in members
+          for name in ("designs.json", "lineage.json", "replacement-v1-v2.json", "replacement-v2-v3.json", "attempts.json", "results.json", "observations.json", "snapshot.json", "history.csv", "workflow_receipt.json", "index.html", "manifest.json", "execution.json", "independent-review.json", "publication.json"):
+              assert "docs/reference-data/design-lineage-example/" + name in members
           assert "src/measure_service/result_table_client.py" in members
           assert "tests/test_result_table_client.py" in members
           assert "tests/test_result_table_mcp.py" in members

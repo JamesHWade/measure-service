@@ -1,0 +1,42 @@
+{
+  "profile": "measure-design-lineage-independent-artifact-review/1",
+  "decision": "accepted",
+  "findings": [],
+  "independent_artifact_checks": 789,
+  "source_head": "02a86c612a730153712da570a9fffd5cae477ce8",
+  "source_tree": "47c19d20956b70de0a10807023a6bb1f0201cadd",
+  "wheel_sha256": "b104c1a86e79968a8f91d7179adf47f879cae7619380297f8dd089d7727e64bd",
+  "example_source_sha256": "f761ab0a9285f45f290860e7f754aad699b568112db375ba0af27f07871227de",
+  "counts": {
+    "original_files": 16,
+    "output_files": 12,
+    "verified_package_members": 78,
+    "methods": 3,
+    "contracts": 1,
+    "designs": 3,
+    "lineage_versions": 3,
+    "attempts": 3,
+    "attempt_revisions": 5,
+    "results": 8,
+    "analytical_observations": 2,
+    "snapshots": 1,
+    "snapshot_members": 1,
+    "retry_receipts": 17,
+    "csv_rows": 16,
+    "html_local_links": 12,
+    "raw_payloads_verified": 26,
+    "trace_analyses": 0
+  },
+  "checks": [
+    "Original 16 files and preserved copies match the recorded baseline; originals and immutable read-only audit copy remain byte-identical.",
+    "All 78 package members agree across recorded Git source, frozen source, wheel, source archive and installed environment; no unexpected installed members.",
+    "Canonical raw methods, contract, designs, attempt revisions, results, observations and snapshot are bound to complete exported records and recomputed SHA-256 identities.",
+    "The three-entry predecessor chain and stored current-head anchor agree; both replacement receipts and all 17 global retry receipts match independently reconstructed requests and responses.",
+    "Old revision-1 payloads stay immutable while latest_revision advances to 2; v2 completion occurs after v3, the late old attempt remains v1 with no outcomes, and current v3 is unattempted.",
+    "Stale v1 has no successful receipt or fourth design; old result membership and the original revision-1 observation snapshot remain unchanged.",
+    "Original B resolution 1.5 is analytically accepted; v2 B resolution zero is not accepted. The original runtime preference remains unsatisfied, distinct from analytical acceptance.",
+    "All sixteen CSV rows, HTML tables, six numeric cards, method units/durations and local links match retained evidence; original output manifest hashes are exact."
+  ],
+  "audit_method": "Standard-library byte hashing, JSON/CSV/HTML reconstruction and immutable read-only SQLite inspection of a separate audit copy. No service validators, MCP, R or workflow rerun.",
+  "scientific_limits": "Constructed caller-declared method, condition, result and assignment records. No instrument execution, optimizer study, physical/chemical identity or manuscript qualification. The current pointer is discovery, not execution authority."
+}

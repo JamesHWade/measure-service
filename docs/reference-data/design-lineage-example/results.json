@@ -1,0 +1,276 @@
+{
+  "records": [
+    {
+      "attempt_id": "f5f8efd0-9a17-43ef-bfc5-70939d29231e",
+      "attempt_revision": 1,
+      "created_at": "2026-11-09T23:24:13.384209+00:00",
+      "input_sha256": "ade2678078fee6a3219b63c98093b12e1f019bca78392d96e7837ac7f4acad1d",
+      "outcome": {
+        "analysis_id": null,
+        "analyte_reference": "A",
+        "explanation": "",
+        "lower_bound": null,
+        "metric": "retention_time",
+        "provenance": {
+          "attempt_sha256": "43f394b788c5134439ca1a4a62d1a37eb95354abd21a73eb06b08fd9cd7102a3",
+          "evaluator": {
+            "evaluator_kind": "manual",
+            "evaluator_reference": null,
+            "evaluator_revision": null,
+            "fidelity": 1.0,
+            "training_snapshot_reference": null
+          },
+          "unit_origin": "caller_declared",
+          "value_origin": "caller_reported"
+        },
+        "status": "observed",
+        "summary_field": null,
+        "supersedes_result_id": null,
+        "unit": "min",
+        "upper_bound": null,
+        "value": 2
+      },
+      "result_id": "baf3c73a-13bc-4970-baa2-6139e9cd8f03",
+      "schema_version": "1.0",
+      "superseded_by_result_id": null
+    },
+    {
+      "attempt_id": "f5f8efd0-9a17-43ef-bfc5-70939d29231e",
+      "attempt_revision": 1,
+      "created_at": "2026-11-09T23:24:13.384457+00:00",
+      "input_sha256": "03e2f94e16a48a5980b937b29cfff119719c735f5987c77f000c3323bb3facf9",
+      "outcome": {
+        "analysis_id": null,
+        "analyte_reference": "A",
+        "explanation": "",
+        "lower_bound": null,
+        "metric": "resolution",
+        "provenance": {
+          "attempt_sha256": "43f394b788c5134439ca1a4a62d1a37eb95354abd21a73eb06b08fd9cd7102a3",
+          "evaluator": {
+            "evaluator_kind": "manual",
+            "evaluator_reference": null,
+            "evaluator_revision": null,
+            "fidelity": 1.0,
+            "training_snapshot_reference": null
+          },
+          "unit_origin": "caller_declared",
+          "value_origin": "caller_reported"
+        },
+        "status": "observed",
+        "summary_field": null,
+        "supersedes_result_id": null,
+        "unit": "1",
+        "upper_bound": null,
+        "value": 2
+      },
+      "result_id": "1c6b9785-2508-45c0-86ab-4f6fcc247460",
+      "schema_version": "1.0",
+      "superseded_by_result_id": null
+    },
+    {
+      "attempt_id": "f5f8efd0-9a17-43ef-bfc5-70939d29231e",
+      "attempt_revision": 1,
+      "created_at": "2026-11-09T23:24:13.384505+00:00",
+      "input_sha256": "18214fccc734e7c61b9b046ac2bc1838c80253368e5855075281f006e5dad74a",
+      "outcome": {
+        "analysis_id": null,
+        "analyte_reference": "B",
+        "explanation": "",
+        "lower_bound": null,
+        "metric": "retention_time",
+        "provenance": {
+          "attempt_sha256": "43f394b788c5134439ca1a4a62d1a37eb95354abd21a73eb06b08fd9cd7102a3",
+          "evaluator": {
+            "evaluator_kind": "manual",
+            "evaluator_reference": null,
+            "evaluator_revision": null,
+            "fidelity": 1.0,
+            "training_snapshot_reference": null
+          },
+          "unit_origin": "caller_declared",
+          "value_origin": "caller_reported"
+        },
+        "status": "observed",
+        "summary_field": null,
+        "supersedes_result_id": null,
+        "unit": "min",
+        "upper_bound": null,
+        "value": 4
+      },
+      "result_id": "2fd0c820-b3b8-41bd-8974-c94ebe0800ae",
+      "schema_version": "1.0",
+      "superseded_by_result_id": null
+    },
+    {
+      "attempt_id": "f5f8efd0-9a17-43ef-bfc5-70939d29231e",
+      "attempt_revision": 1,
+      "created_at": "2026-11-09T23:24:13.384550+00:00",
+      "input_sha256": "8476fcbee31972a0db22303e4b081f971fbdcdfb4d215d92858159f7bb8fa778",
+      "outcome": {
+        "analysis_id": null,
+        "analyte_reference": "B",
+        "explanation": "",
+        "lower_bound": null,
+        "metric": "resolution",
+        "provenance": {
+          "attempt_sha256": "43f394b788c5134439ca1a4a62d1a37eb95354abd21a73eb06b08fd9cd7102a3",
+          "evaluator": {
+            "evaluator_kind": "manual",
+            "evaluator_reference": null,
+            "evaluator_revision": null,
+            "fidelity": 1.0,
+            "training_snapshot_reference": null
+          },
+          "unit_origin": "caller_declared",
+          "value_origin": "caller_reported"
+        },
+        "status": "observed",
+        "summary_field": null,
+        "supersedes_result_id": null,
+        "unit": "1",
+        "upper_bound": null,
+        "value": 1.5
+      },
+      "result_id": "3bf5dffa-3315-41fb-b7d7-016c945e193d",
+      "schema_version": "1.0",
+      "superseded_by_result_id": null
+    },
+    {
+      "attempt_id": "e5d790d6-fcf9-48ee-942b-658b1a6b7904",
+      "attempt_revision": 2,
+      "created_at": "2026-11-09T23:24:13.546474+00:00",
+      "input_sha256": "49278a560978373bd5d4d80fd3f133e57efa71e6e10194eefc31557da7cb8089",
+      "outcome": {
+        "analysis_id": null,
+        "analyte_reference": "A",
+        "explanation": "",
+        "lower_bound": null,
+        "metric": "retention_time",
+        "provenance": {
+          "attempt_sha256": "a48e19fba7a053842c1c0da7b48ef2fbb6ea2db6a443ee50bb6913279d20cd92",
+          "evaluator": {
+            "evaluator_kind": "manual",
+            "evaluator_reference": null,
+            "evaluator_revision": null,
+            "fidelity": 1.0,
+            "training_snapshot_reference": null
+          },
+          "unit_origin": "caller_declared",
+          "value_origin": "caller_reported"
+        },
+        "status": "observed",
+        "summary_field": null,
+        "supersedes_result_id": null,
+        "unit": "min",
+        "upper_bound": null,
+        "value": 2
+      },
+      "result_id": "c8f18f79-c4ad-4a5f-8a45-63b87451aed0",
+      "schema_version": "1.0",
+      "superseded_by_result_id": null
+    },
+    {
+      "attempt_id": "e5d790d6-fcf9-48ee-942b-658b1a6b7904",
+      "attempt_revision": 2,
+      "created_at": "2026-11-09T23:24:13.548068+00:00",
+      "input_sha256": "812c5fbb8aa03b3009dc77209be41b7799233bf6a4188ca04bf053ff67119947",
+      "outcome": {
+        "analysis_id": null,
+        "analyte_reference": "A",
+        "explanation": "",
+        "lower_bound": null,
+        "metric": "resolution",
+        "provenance": {
+          "attempt_sha256": "a48e19fba7a053842c1c0da7b48ef2fbb6ea2db6a443ee50bb6913279d20cd92",
+          "evaluator": {
+            "evaluator_kind": "manual",
+            "evaluator_reference": null,
+            "evaluator_revision": null,
+            "fidelity": 1.0,
+            "training_snapshot_reference": null
+          },
+          "unit_origin": "caller_declared",
+          "value_origin": "caller_reported"
+        },
+        "status": "observed",
+        "summary_field": null,
+        "supersedes_result_id": null,
+        "unit": "1",
+        "upper_bound": null,
+        "value": 2
+      },
+      "result_id": "d90789e9-93fb-4f85-b13f-0e464501250b",
+      "schema_version": "1.0",
+      "superseded_by_result_id": null
+    },
+    {
+      "attempt_id": "e5d790d6-fcf9-48ee-942b-658b1a6b7904",
+      "attempt_revision": 2,
+      "created_at": "2026-11-09T23:24:13.548157+00:00",
+      "input_sha256": "238effc334d440fafc762f9ceb55b43dbecbba55f49d5c21fb7a1a84b54fe72a",
+      "outcome": {
+        "analysis_id": null,
+        "analyte_reference": "B",
+        "explanation": "",
+        "lower_bound": null,
+        "metric": "retention_time",
+        "provenance": {
+          "attempt_sha256": "a48e19fba7a053842c1c0da7b48ef2fbb6ea2db6a443ee50bb6913279d20cd92",
+          "evaluator": {
+            "evaluator_kind": "manual",
+            "evaluator_reference": null,
+            "evaluator_revision": null,
+            "fidelity": 1.0,
+            "training_snapshot_reference": null
+          },
+          "unit_origin": "caller_declared",
+          "value_origin": "caller_reported"
+        },
+        "status": "observed",
+        "summary_field": null,
+        "supersedes_result_id": null,
+        "unit": "min",
+        "upper_bound": null,
+        "value": 4
+      },
+      "result_id": "c57a6270-8f9e-4ef7-9221-cb5dd3e986f0",
+      "schema_version": "1.0",
+      "superseded_by_result_id": null
+    },
+    {
+      "attempt_id": "e5d790d6-fcf9-48ee-942b-658b1a6b7904",
+      "attempt_revision": 2,
+      "created_at": "2026-11-09T23:24:13.548203+00:00",
+      "input_sha256": "adad1e70139ff1193b33f3280b8be088f2f299faa36e484a2ced510fdcdc08c4",
+      "outcome": {
+        "analysis_id": null,
+        "analyte_reference": "B",
+        "explanation": "",
+        "lower_bound": null,
+        "metric": "resolution",
+        "provenance": {
+          "attempt_sha256": "a48e19fba7a053842c1c0da7b48ef2fbb6ea2db6a443ee50bb6913279d20cd92",
+          "evaluator": {
+            "evaluator_kind": "manual",
+            "evaluator_reference": null,
+            "evaluator_revision": null,
+            "fidelity": 1.0,
+            "training_snapshot_reference": null
+          },
+          "unit_origin": "caller_declared",
+          "value_origin": "caller_reported"
+        },
+        "status": "observed",
+        "summary_field": null,
+        "supersedes_result_id": null,
+        "unit": "1",
+        "upper_bound": null,
+        "value": 0
+      },
+      "result_id": "2da32ca5-0bfe-42c5-8217-7e3cc4eb7813",
+      "schema_version": "1.0",
+      "superseded_by_result_id": null
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "excludes": [
+    "manifest.json",
+    "EXAMPLE_INCOMPLETE"
+  ],
+  "files": [
+    {
+      "bytes": 4790,
+      "path": "designs.json",
+      "sha256": "ca1c052134f70f2a534fa47be7341f5c1a10639b34591d4717f4961580b2bfc6"
+    },
+    {
+      "bytes": 2614,
+      "path": "lineage.json",
+      "sha256": "62e46422e90b3c509c7583fad1b8e325595447ee9add6613a9585f8d6034f865"
+    },
+    {
+      "bytes": 809,
+      "path": "replacement-v1-v2.json",
+      "sha256": "9d8f23e816017e0daf54000d3b012ec47f9a561aa89415e2ee957cd78fdf8713"
+    },
+    {
+      "bytes": 809,
+      "path": "replacement-v2-v3.json",
+      "sha256": "d902436bcd9d2fd520e2a3f136418358004e45a9fff6690a26d40ff2a93fd5f1"
+    },
+    {
+      "bytes": 19219,
+      "path": "attempts.json",
+      "sha256": "215630168a73a00ef9eec99b0d4b96a2fffcb806814ef4d8d882471f55f28883"
+    },
+    {
+      "bytes": 9472,
+      "path": "results.json",
+      "sha256": "c85c9901e897aaa354ff6c5ed4b042076544c95644e5856a732d1e168e6127d1"
+    },
+    {
+      "bytes": 40155,
+      "path": "observations.json",
+      "sha256": "97b3dbcf27c0f37bc229f0f10d90c2abf0b6aa2b96ea343f624bef5a2f5e531e"
+    },
+    {
+      "bytes": 788,
+      "path": "snapshot.json",
+      "sha256": "a6c54cf153b1e8ef612b260591989f5a9a0237af5c4e3b120523e502ae0e2bc5"
+    },
+    {
+      "bytes": 3316,
+      "path": "history.csv",
+      "sha256": "9c831a6fd116d81b2ca9975903aa7f5a2a9838b4b7afe4e4c1c43697e2034a6e"
+    },
+    {
+      "bytes": 95215,
+      "path": "workflow_receipt.json",
+      "sha256": "452f333be1099e6cb1bd19f4e187595f3c44cd3d857a1d781ac40e882b5c2920"
+    },
+    {
+      "bytes": 10224,
+      "path": "index.html",
+      "sha256": "02ed1e34abd1c2ac5c1468533dd0c5f6e8fa5954459be7a6365fab6e23cc5d1b"
+    }
+  ],
+  "profile": "measure-experiment-design-example/1/manifest",
+  "schema_version": "1.0"
+}

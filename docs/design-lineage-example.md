@@ -14,6 +14,13 @@ uses a temporary store. An `EXAMPLE_INCOMPLETE` marker remains if execution fail
 No R backend is used. All service calls pass through two successive stdio MCP
 sessions; the example does not access the registry or SQLite directly.
 
+The [executed report and downloads](reference-data/design-lineage-example/index.html)
+retain the three designs, all history and the original snapshot. The
+[independent audit](reference-data/design-lineage-example/independent-review.json)
+verified 789 source/store/artifact checks without rerunning the workflow or
+using service validators. The [publication manifest](reference-data/design-lineage-example/publication.json)
+binds every retained public file to its original execution source and wheel.
+
 ## The reported sequence
 
 Three owned isocratic method declarations and one A/B observation contract are
