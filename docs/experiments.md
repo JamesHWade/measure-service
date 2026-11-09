@@ -9,8 +9,9 @@ shows the tool sequence over MCP.
 An **experiment** is an immutable intended design. It contains a title,
 caller-declared source, intended conditions and optional external/proposal
 references. A proposal reference is a label, not a validated optimizer campaign.
-Correcting a design currently means creating another experiment; design
-supersession is not implemented.
+The registry supports [explicit design replacements](design-lineage.md) with
+new immutable IDs and a verified lineage. Historical attempt/evidence bindings
+remain attached to their original design IDs.
 
 An **attempt** belongs to one experiment and records actual conditions,
 reported status, measurements, evaluator declarations and optional timestamps,
