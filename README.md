@@ -97,6 +97,8 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Run the installed full-store recovery demonstration](docs/store-recovery-example.md)
 - [HTTP request limits and minimal health checks](docs/http-operations.md)
 - [Invited pilot qualification matrix](docs/pilot-readiness.md)
+- [Run two-account pilot checks and restart verification](docs/pilot-client.md)
+- [Record actual host acceptance](docs/pilot-host-record.md)
 - [Roadmap and acceptance criteria](docs/roadmap.md)
 - [Hierarchical objective scores](docs/hierarchy-scores.md)
 - [MoSeS metric reconciliation](docs/moses-metric-reconciliation.md)

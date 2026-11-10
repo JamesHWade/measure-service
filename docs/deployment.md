@@ -61,7 +61,10 @@ basic core storage and configuration. It does not establish authentication,
 writable storage or R/SEC availability. The service has no browser UI. MCP tool
 errors use the protocol's `isError` field; an HTTP success status does not imply
 a successful tool call. Complete the [pilot matrix](pilot-readiness.md) against
-the intended host, proxy and client.
+the intended host, proxy and client. The installed
+[pilot client](pilot-client.md) provides executable two-account checks and
+private continuity evidence; it does not supply authentication or mark host
+acceptance complete.
 
 ## Persistence and recovery
 
