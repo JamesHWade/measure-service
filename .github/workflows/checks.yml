@@ -149,6 +149,9 @@ jobs:
           assert "tests/test_http_operations_socket.py" in members
           assert "docs/http-operations.md" in members
           assert "docs/pilot-readiness.md" in members
+          assert "docs/store-recovery-example.md" in members
+          assert "examples/store_recovery.py" in members
+          assert "tests/test_store_recovery_example.py" in members
           assert "src/measure_service/design_lineage_client.py" in members
           assert "src/measure_service/bounded_json.py" in members
           assert "tests/test_design_lineage_client.py" in members
@@ -206,6 +209,8 @@ jobs:
         run: |
           /tmp/measure-wheel/bin/python -m pytest -q "$GITHUB_WORKSPACE/tests" -m 'not r_backend and not bo_backend'
           /tmp/measure-wheel/bin/python "$GITHUB_WORKSPACE/examples/registry.py"
+          /tmp/measure-wheel/bin/measure-service-store --help
+          /tmp/measure-wheel/bin/python "$GITHUB_WORKSPACE/examples/store_recovery.py" --output-dir /tmp/measure-wheel-recovery
       - name: Install source archive and run the example
         run: |
           python -m venv /tmp/measure-sdist
@@ -227,6 +232,8 @@ jobs:
           assert method_backend_info()["package"] == "measure-service"
           PY
           /tmp/measure-sdist/bin/python "$GITHUB_WORKSPACE/examples/registry.py"
+          /tmp/measure-sdist/bin/measure-service-store --help
+          /tmp/measure-sdist/bin/python "$GITHUB_WORKSPACE/examples/store_recovery.py" --output-dir /tmp/measure-sdist-recovery
 
   r-integration:
     name: Current R backend heads

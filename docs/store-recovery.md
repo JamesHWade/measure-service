@@ -97,3 +97,5 @@ responsibility. A concurrently hostile process with the same filesystem
 privileges is outside this local operator boundary.
 
 See [deployment](deployment.md) for HTTP and storage limits.
+Run the [installed recovery example](store-recovery-example.md) to retain a
+complete synthetic source, backup, restored store and public-MCP replay proof.
