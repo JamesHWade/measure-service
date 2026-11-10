@@ -1,5 +1,6 @@
 """A synthetic proxy process used only by pilot transport integration tests."""
 
+import json
 import os
 import socket
 import subprocess
@@ -17,7 +18,17 @@ class SimulatedProxy:
     async def __call__(self, scope, receive, send):
         if scope['type'] != 'http':
             return await upstream(scope, receive, send)
+        prefix = os.environ.get('PILOT_TEST_MOUNT_PREFIX', '')
+        if prefix:
+            if not scope['path'].startswith(prefix + '/'):
+                await send({'type':'http.response.start','status':404,'headers':[]})
+                return await send({'type':'http.response.body','body':b''})
+            scope = dict(scope, path=scope['path'][len(prefix):], raw_path=scope['path'][len(prefix):].encode(), root_path=scope.get('root_path','') + prefix)
         headers = [(k,v) for k,v in scope['headers'] if k.lower() != b'rstudio-connect-credentials']
+        public_host = os.environ.get('PILOT_TEST_PUBLIC_HOST')
+        if public_host:
+            headers = [(k,v) for k,v in headers if k.lower() != b'host']
+            headers.append((b'host', public_host.encode('ascii')))
         token = next((v for k,v in headers if k.lower() == b'authorization'), b'')
         users = {
             b'Bearer synthetic-account-a': '113ab98e-05bd-494d-a467-2889a2f27b21',
@@ -40,7 +51,17 @@ def free_port():
 
 
 @contextmanager
-def synthetic_host(directory, port, *, r_backend=False, store=None):
+def synthetic_host(
+    directory,
+    port,
+    *,
+    r_backend=False,
+    store=None,
+    public_host=None,
+    allowed_hosts=None,
+    allowed_origins=None,
+    mount_prefix="",
+):
     environment = dict(
         os.environ,
         MEASURE_MCP_DATA_DIR=str(store if store is not None else directory / "store"),
@@ -55,6 +76,17 @@ def synthetic_host(directory, port, *, r_backend=False, store=None):
         MEASURE_MCP_MEASURE_REVISION="synthetic-private-operator-metadata",
     )
     environment.pop("PYTHONPATH", None)
+    for name, values in (
+        ("MEASURE_MCP_HTTP_ALLOWED_HOSTS", allowed_hosts),
+        ("MEASURE_MCP_HTTP_ALLOWED_ORIGINS", allowed_origins),
+    ):
+        environment.pop(name, None)
+        if values is not None:
+            environment[name] = json.dumps(values)
+    environment.pop("PILOT_TEST_PUBLIC_HOST", None)
+    if public_host is not None:
+        environment["PILOT_TEST_PUBLIC_HOST"] = public_host
+    environment["PILOT_TEST_MOUNT_PREFIX"] = mount_prefix
     process = subprocess.Popen(
         [sys.executable, "-c", PROXY_CODE],
         cwd=directory,
@@ -82,10 +114,14 @@ def synthetic_host(directory, port, *, r_backend=False, store=None):
             process.wait(timeout=5)
 
 
-def client_environment(port):
+def client_environment(port, *, mount_prefix="", origin=None):
+    headers = [{"Authorization": "Bearer synthetic-account-" + account} for account in ("a", "b")]
+    if origin is not None:
+        for value in headers:
+            value["Origin"] = origin
     return dict(
         os.environ,
-        MEASURE_PILOT_URL=f"http://127.0.0.1:{port}/mcp",
-        MEASURE_PILOT_HEADERS_A='{"Authorization":"Bearer synthetic-account-a"}',
-        MEASURE_PILOT_HEADERS_B='{"Authorization":"Bearer synthetic-account-b"}',
+        MEASURE_PILOT_URL=f"http://127.0.0.1:{port}{mount_prefix}/mcp",
+        MEASURE_PILOT_HEADERS_A=json.dumps(headers[0]),
+        MEASURE_PILOT_HEADERS_B=json.dumps(headers[1]),
     )

@@ -6,6 +6,17 @@ its continuity after an operator restart. The command uses the ordinary MCP
 endpoint. It does not configure authentication, start the service, or restart
 it. Keep the actual host acceptance record in [the host worksheet](pilot-host-record.md).
 
+## Configure the service authority first
+
+On the service process, configure [public Host and Origin admission](http-authorities.md)
+for the authority and any Origin preserved by the actual proxy/client. These
+are service startup settings; placing them only in the pilot client environment
+does not configure the deployed service. The client does not override Host or
+trusted identity headers. Keep URL prefix routing at the proxy.
+
+A health response can succeed while MCP admission fails with 421/403. Resolve
+those transport checks before interpreting authentication or numerical results.
+
 ## Configure two actual client accounts
 
 Install the service distribution into your client environment. The service and

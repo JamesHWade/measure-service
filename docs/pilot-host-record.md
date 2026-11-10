@@ -21,6 +21,7 @@ Use [the executable client checks](pilot-client.md) alongside this worksheet.
 | Observation | Status | Private evidence and UTC time |
 | --- | --- | --- |
 | Both accounts sign in using the intended client | pending | |
+| Public Host/Origin admission matches the intended proxy/client and rejects unapproved values | pending | |
 | Missing/expired credentials are rejected at the actual proxy | pending | |
 | Caller-supplied trusted identity headers are stripped and verified GUIDs injected | pending | |
 | Direct upstream access is blocked from unauthorized networks/clients | pending | |

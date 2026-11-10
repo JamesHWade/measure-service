@@ -70,6 +70,7 @@ from .campaign_protocol import (
 )
 from .experiments import AttemptSpec, ExperimentSpec, ResultSpec
 from .gaussian_producer import GaussianProducerSpec
+from .http_authority import http_transport_security, wrap_authority_headers
 from .http_operations import wrap_http
 from .methods import (
     MAX_CONSTRAINTS_BYTES,
@@ -423,7 +424,11 @@ def save_analysis(
 
 
 mcp = FastMCP(
-    "measure-separations", stateless_http=True, json_response=True, streamable_http_path="/mcp"
+    "measure-separations",
+    stateless_http=True,
+    json_response=True,
+    streamable_http_path="/mcp",
+    transport_security=http_transport_security(),
 )
 READ = ToolAnnotations(
     readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False
@@ -1653,7 +1658,7 @@ def measurement_read_analysis_data(
     }
 
 
-app = wrap_http(mcp.streamable_http_app(), readiness_check=storage_ready)
+app = wrap_http(wrap_authority_headers(mcp.streamable_http_app()), readiness_check=storage_ready)
 
 
 def main() -> None:
