@@ -43,6 +43,10 @@ def test_service_distribution_contains_both_import_packages_and_worker():
         "measure_service/batch_exports.py",
         "measure_service/batch_snapshot_client.py",
         "measure_service/batch_restore.py",
+        "measure_service/store_operations.py",
+        "measure_service/store_cli.py",
+        "measure_service/http_operations.py",
+        "measure_service/operational_readiness.py",
     } <= files
     assert {
         "measure_service/benchmarks/reference_data/suggestion_sequences_v1/" + name
@@ -92,6 +96,28 @@ def test_installed_cli_and_worker_outside_checkout(tmp_path):
         check=True,
     )
     assert not completed.stdout, "Stdio startup must not print non-protocol output"
+
+
+def test_installed_store_operator_entrypoint_outside_checkout(tmp_path):
+    distribution = metadata.distribution("measure-service")
+    operator = next(
+        entry for entry in distribution.entry_points if entry.name == "measure-service-store"
+    )
+    assert operator.value == "measure_service.store_cli:main"
+    suffix = ".exe" if os.name == "nt" else ""
+    command = Path(sys.executable).parent / f"measure-service-store{suffix}"
+    completed = subprocess.run(
+        [str(command), "--help"],
+        capture_output=True,
+        text=True,
+        timeout=15,
+        cwd=tmp_path,
+        check=True,
+    )
+    assert {"initialize", "inspect", "backup", "verify", "restore"} <= set(
+        completed.stdout.replace(",", " ").replace("{", " ").replace("}", " ").split()
+    )
+    assert not list(tmp_path.iterdir()), "Operator help must not initialize a store"
 
 
 def test_registry_example_outside_checkout(tmp_path):

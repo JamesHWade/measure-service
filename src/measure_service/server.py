@@ -70,6 +70,7 @@ from .campaign_protocol import (
 )
 from .experiments import AttemptSpec, ExperimentSpec, ResultSpec
 from .gaussian_producer import GaussianProducerSpec
+from .http_operations import wrap_http
 from .methods import (
     MAX_CONSTRAINTS_BYTES,
     MAX_GRADIENT_POINTS,
@@ -80,6 +81,7 @@ from .methods import (
     evaluate_method,
 )
 from .observations import ObservationContractSpec, ObservationEvidenceSpec
+from .operational_readiness import storage_ready
 from .result_table_models import ResultTableSpec
 from .result_table_parser import preview_result_table
 from .retention import RetentionModelSpec
@@ -1651,7 +1653,7 @@ def measurement_read_analysis_data(
     }
 
 
-app = mcp.streamable_http_app()
+app = wrap_http(mcp.streamable_http_app(), readiness_check=storage_ready)
 
 
 def main() -> None:
