@@ -8,9 +8,11 @@ its trust boundary and persistence limits apply unchanged.
 This route was run on one Connect 2026.10.0 server using native execution, with
 R 4.6 and Python 3.12. On that server the bundle built, the health checks
 answered, one account listed tools, and a synthetic chromatogram was analyzed by
-the R worker. Separate owners were checked only against a simulated users API in
-`tests/test_connect_hosting_socket.py`, not with two real accounts. Repository
-CI does not contact a Connect server. Complete the
+the R worker, with the caller identified first by the `username` claim and then
+by the `session-token` claim described below. Separate owners were checked only
+against a simulated Connect API in `tests/test_connect_hosting_socket.py`, not
+with two real accounts. Repository CI does not contact a Connect server.
+Complete the
 [pilot matrix](pilot-readiness.md) on your own server before inviting users.
 
 ## What the bundle contains
@@ -128,8 +130,9 @@ entry module:
 | `MEASURE_MCP_IDENTITY` | `connect` |
 | `MEASURE_MCP_TRUST_CONNECT_HEADERS` | `1` |
 | `MEASURE_MCP_DATA_DIR` | A persistent directory outside the content directory |
-| `MEASURE_MCP_CONNECT_USER_CLAIM` | `guid` (default) or `username`; see below |
-| `MEASURE_MCP_CONNECT_API_KEY` | Only for the `username` claim; see below |
+| `MEASURE_MCP_CONNECT_USER_CLAIM` | `guid` (default), `username` or `session-token`; see below |
+| `MEASURE_MCP_CONNECT_INTEGRATION` | Only for `session-token`, when the content has more than one integration |
+| `MEASURE_MCP_CONNECT_API_KEY` | Optional, for `username` and `session-token`; see below |
 
 Connect replaces the content directory on every deployment, so a store placed
 there is lost. Create the store once with
@@ -144,26 +147,80 @@ access list is the only control over who may call the service.
 
 ## How callers are identified
 
-Connect adds an `RStudio-Connect-Credentials` header whose `user` field names
-the caller. Records are always owned by `connect:<account GUID>`.
+Records are always owned by `connect:<account GUID>`.
+`MEASURE_MCP_CONNECT_USER_CLAIM` selects how the service learns that GUID.
 
-- When your server writes the account GUID in that field, keep
-  `MEASURE_MCP_CONNECT_USER_CLAIM` at `guid`. Nothing else is needed.
-- When your server writes the username, set it to `username`. On every request
-  the service asks Connect's users API for the one unlocked account holding
-  that exact name and uses its GUID. Nothing is cached, because Connect can
-  rename an account and give the old name to another person.
+| Claim | The service reads | Needs |
+| --- | --- | --- |
+| `guid` | The `user` field of `RStudio-Connect-Credentials`, as a GUID | A server configured to write GUIDs there |
+| `session-token` | `Posit-Connect-User-Session-Token`, exchanged with Connect | A Connect API integration associated with the content |
+| `username` | The `user` field of `RStudio-Connect-Credentials`, as a name | An API key that can read `/__api__/v1/users` |
 
-Username lookup needs an API key that can read `/__api__/v1/users`. The service
-uses `MEASURE_MCP_CONNECT_API_KEY`, then `CONNECT_API_KEY`. Some servers inject
-`CONNECT_API_KEY` for the content owner; check whether you want lookups to run
-under that account, and prefer a dedicated key. A failed lookup never selects
-an owner. Tool discovery still answers; a tool that needs an owner returns an
-error stating that the account could not be verified.
+Check which form your server writes in the `user` field before choosing. Keep
+`guid` when it is the account GUID; nothing else is needed. When it is the
+username, prefer `session-token`: Connect validates the token it issued and
+names the account itself, so the service matches no names and needs no key that
+can list users. Use `username` on a server without Connect API integrations.
 
-Check which form your server sends before choosing. A username treated as a
-GUID is rejected. A GUID-shaped value under the `username` claim is looked up
-as a name.
+A username treated as a GUID is rejected. A GUID-shaped value under the
+`username` claim is looked up as a name.
+
+### The `session-token` claim
+
+An administrator creates one integration of the Connect API type. The content
+owner then adds it under the content's integration settings. An integration
+limited to the viewer role is enough, because the service only reads the
+caller's own account.
+
+On every request the service:
+
+1. Posts the session token to
+   `/__api__/v1/oauth/integrations/credentials` on `CONNECT_SERVER`, asking for
+   an API key that acts as the caller.
+2. Reads `/__api__/v1/user` with that key and uses the `guid` it returns. A
+   locked account is refused.
+
+The key is then discarded. `RStudio-Connect-Credentials` is not read in this
+mode. Nothing is cached, so each request costs two calls to Connect.
+
+The exchange itself is authenticated with `MEASURE_MCP_CONNECT_API_KEY`, then
+`CONNECT_API_KEY`. Connect requires that key to belong to an owner of the
+content. Servers that inject `CONNECT_API_KEY` for the content owner need no
+further setting.
+
+When the content has more than one integration, set
+`MEASURE_MCP_CONNECT_INTEGRATION` to the GUID of the Connect API integration.
+Connect refuses an exchange that does not name one. A value that is not a GUID
+stops the import with an error.
+
+Connect deletes the keys it issues when the content process exits. A process
+that never stops accumulates one per request until it is restarted, and Connect
+can answer an exchange with HTTP 429. On the server named above, 30 consecutive
+tool calls from one account were all answered; no higher rate was tried.
+
+Remembering the account for a token would not change this much. On that server
+one account's token differed from one second to the next, so a trial that kept
+each answer for a minute still exchanged once for every second in which a
+request arrived.
+
+### The `username` claim
+
+On every request the service asks Connect's users API for the one unlocked
+account holding that exact name and uses its GUID. Nothing is cached, because
+Connect can rename an account and give the old name to another person.
+
+The lookup uses `MEASURE_MCP_CONNECT_API_KEY`, then `CONNECT_API_KEY`. Some
+servers inject `CONNECT_API_KEY` for the content owner; check whether you want
+lookups to run under that account, and prefer a dedicated key.
+
+### When an account cannot be verified
+
+A failed exchange or lookup never selects an owner. Tool discovery still
+answers; a tool that needs an owner returns an error stating that the account
+could not be verified. The content log has one line per failure, starting
+`Connect identity lookup failed:`, with the HTTP status and Connect's numeric
+error code. It never contains the token or a key. Connect documents code 212
+for content with no integration associated.
 
 ## Connect a client
 
