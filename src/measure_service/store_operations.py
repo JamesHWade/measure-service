@@ -185,7 +185,16 @@ def _check_store_inventory(root: Path, deadline: float) -> dict[str, os.stat_res
                 _check_deadline(deadline)
                 if entry.name not in _SOURCE_FILES:
                     raise StoreOperationError("Store directory contains unsupported files")
-                info = entry.stat(follow_symlinks=False)
+                try:
+                    info = entry.stat(follow_symlinks=False)
+                except FileNotFoundError:
+                    if entry.name != DATABASE_NAME:
+                        # SQLite removes optional journals/sidecars at commit.
+                        # Its own backup/read locking establishes the snapshot.
+                        continue
+                    raise
+                if entry.name != DATABASE_NAME and info.st_nlink == 0:
+                    continue
                 if not stat.S_ISREG(info.st_mode) or entry.is_symlink():
                     raise StoreOperationError("Store directory contains an unsupported file")
                 if info.st_nlink != 1 or info.st_size < 0 or info.st_size > _MAX_DATABASE_BYTES:

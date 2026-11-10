@@ -1,7 +1,9 @@
 """Regression boundaries identified during independent recovery review."""
 
+import os
 import re
 import sqlite3
+from contextlib import contextmanager
 
 import pytest
 
@@ -134,3 +136,60 @@ def test_rollback_journal_rejects_unsafe_entries(tmp_path, kind):
         operations.backup_store(source, tmp_path / "backup")
     assert other.read_bytes() == b"operator-owned sentinel"
     assert not (tmp_path / "backup").exists()
+
+
+@pytest.mark.parametrize("vanishing", ["missing", "unlinked_stat"])
+@pytest.mark.parametrize("main_database", [False, True])
+def test_inventory_tolerates_only_optional_files_disappearing(
+    tmp_path, monkeypatch, vanishing, main_database
+):
+    source = tmp_path / "source"
+    operations.initialize_store(source)
+    selected = operations.DATABASE_NAME
+    if not main_database:
+        selected += "-journal"
+        (source / selected).write_bytes(b"")
+    original_scandir = os.scandir
+    observed = []
+
+    class DisappearingEntry:
+        def __init__(self, entry):
+            self.entry = entry
+            self.name = entry.name
+
+        def stat(self, *, follow_symlinks):
+            info = self.entry.stat(follow_symlinks=follow_symlinks)
+            observed.append(self.name)
+            if not main_database:
+                (source / selected).unlink()
+            if vanishing == "missing":
+                raise FileNotFoundError
+            fields = list(info)
+            fields[3] = 0  # st_nlink can become zero during an unlink race.
+            return os.stat_result(fields)
+
+        def is_symlink(self):
+            return self.entry.is_symlink()
+
+    @contextmanager
+    def inventory(path):
+        with original_scandir(path) as entries:
+            yield (
+                DisappearingEntry(entry)
+                if os.fspath(path) == os.fspath(source) and entry.name == selected
+                else entry
+                for entry in entries
+            )
+
+    monkeypatch.setattr(operations.os, "scandir", inventory)
+    target = tmp_path / "backup"
+    if main_database:
+        before = (source / selected).read_bytes()
+        with pytest.raises(operations.StoreOperationError):
+            operations.backup_store(source, target)
+        assert not target.exists()
+        assert (source / selected).read_bytes() == before
+    else:
+        operations.backup_store(source, target)
+        operations.verify_backup(target)
+    assert observed == [selected]
