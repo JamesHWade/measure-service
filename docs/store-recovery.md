@@ -28,7 +28,7 @@ contracts, including keys, foreign keys, checks and indexes. Unsupported or
 older layouts fail closed; these commands do not silently upgrade them.
 
 This profile supports one `measure.sqlite3` database and its ordinary SQLite
-WAL/SHM sidecars. It rejects unexpected files and incomplete operations. Keep
+rollback-journal, WAL and SHM sidecars. It rejects unexpected files and incomplete operations. Keep
 reports and other files in separate directories.
 
 ## Create and verify a backup
@@ -42,7 +42,8 @@ measure-service-store verify --backup-dir /srv/measure-backups/new-backup
 ```
 
 The online SQLite backup includes committed WAL changes and obtains a coherent
-database snapshot while clients continue using the live store. Uncommitted
+database snapshot while clients continue using the live store, including an
+active write transaction in the default DELETE journal mode. Uncommitted
 transactions are excluded. Inspection and backup issue no application writes,
 schema changes or checkpoints against the source. SQLite may maintain WAL/SHM
 bookkeeping; a read-only connection does not promise unchanged sidecar bytes.
