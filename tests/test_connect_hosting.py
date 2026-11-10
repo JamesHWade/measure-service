@@ -1,4 +1,4 @@
-"""Connect hosting adapters: Host/Origin guard and username-to-GUID identity."""
+"""Connect hosting adapters: derived defaults and account identity resolution."""
 
 from __future__ import annotations
 
@@ -36,13 +36,13 @@ def users_api(users, *, status=200, seen=None):
     return httpx.MockTransport(handler)
 
 
-def run_adapter(headers, transport, extra_scope=None):
+def run_adapter(headers, transport, extra_scope=None, adapter=None):
     captured = {}
 
     async def downstream(scope, receive, send):
         captured.update(scope)
 
-    adapter = connect_hosting.ConnectUsernameIdentity(downstream, transport=transport)
+    adapter = (adapter or connect_hosting.ConnectUsernameIdentity)(downstream, transport=transport)
     scope = {"type": "http", "headers": headers, **(extra_scope or {})}
     asyncio.run(adapter(scope, None, None))
     return captured
@@ -218,5 +218,188 @@ def test_identity_wrapper_requires_explicit_username_claim(monkeypatch, connect_
     monkeypatch.setenv("MEASURE_MCP_CONNECT_USER_CLAIM", "guid")
     assert connect_hosting.wrap_identity(app) is app
     monkeypatch.setenv("MEASURE_MCP_CONNECT_USER_CLAIM", "username")
+    monkeypatch.delenv("MEASURE_MCP_TRUST_CONNECT_HEADERS")
+    assert connect_hosting.wrap_identity(app) is app
+
+
+@pytest.fixture
+def session_env(connect_env, monkeypatch):
+    monkeypatch.setenv("MEASURE_MCP_CONNECT_USER_CLAIM", "session-token")
+    monkeypatch.delenv("MEASURE_MCP_CONNECT_API_KEY")
+    monkeypatch.setenv("CONNECT_API_KEY", "content-key")
+    monkeypatch.delenv("MEASURE_MCP_CONNECT_INTEGRATION", raising=False)
+
+
+def session_token(value=b"token-alice"):
+    return (b"posit-connect-user-session-token", value)
+
+
+def visitor_api(sessions, *, seen=None, exchange=None, account=None):
+    """Stand in for Connect: exchange a session token, then describe the key's account."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if seen is not None:
+            seen.append(request)
+        if request.url.path == "/__api__/v1/oauth/integrations/credentials":
+            if exchange is not None:
+                return exchange
+            form = dict(httpx.QueryParams(request.content.decode()))
+            if form["subject_token"] not in sessions:
+                return httpx.Response(400, json={"code": 215, "error": "Invalid subject_token."})
+            return httpx.Response(
+                200,
+                json={
+                    "access_token": "visitor-key-for-" + form["subject_token"],
+                    "issued_token_type": "urn:posit:connect:api-key",
+                    "token_type": "Key",
+                },
+            )
+        assert request.url.path == "/__api__/v1/user"
+        if account is not None:
+            return account
+        token = request.headers["authorization"].removeprefix("Key visitor-key-for-")
+        return httpx.Response(200, json={"guid": str(sessions[token]), "locked": False})
+
+    return httpx.MockTransport(handler)
+
+
+def run_session(headers, transport, **kwargs):
+    return run_adapter(headers, transport, adapter=connect_hosting.ConnectSessionIdentity, **kwargs)
+
+
+def test_session_token_is_exchanged_for_the_visitors_own_account(session_env):
+    seen = []
+    scope = run_session([session_token()], visitor_api({"token-alice": ALICE}, seen=seen))
+    assert scope[connect_hosting.RESOLVED_GUID_SCOPE_KEY] == str(ALICE)
+    assert connect_hosting.IDENTITY_ERROR_SCOPE_KEY not in scope
+
+    exchange, account = seen
+    assert exchange.method == "POST"
+    assert str(exchange.url) == "https://connect.example/__api__/v1/oauth/integrations/credentials"
+    assert exchange.headers["authorization"] == "Key content-key"
+    assert dict(httpx.QueryParams(exchange.content.decode())) == {
+        "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+        "subject_token_type": "urn:posit:connect:user-session-token",
+        "subject_token": "token-alice",
+        "requested_token_type": "urn:posit:connect:api-key",
+    }
+    # The account is read with the visitor's key, never the content's.
+    assert str(account.url) == "https://connect.example/__api__/v1/user"
+    assert account.headers["authorization"] == "Key visitor-key-for-token-alice"
+
+
+def test_session_tokens_name_separate_accounts_and_ignore_the_credentials_header(session_env):
+    sessions = {"token-alice": ALICE, "token-bob": BOB}
+    scope = run_session(
+        [session_token(b"token-bob"), credentials(str(ALICE))], visitor_api(sessions)
+    )
+    assert scope[connect_hosting.RESOLVED_GUID_SCOPE_KEY] == str(BOB)
+
+
+def test_a_named_integration_is_sent_as_the_audience(session_env, monkeypatch):
+    seen = []
+    integration = "33333333-3333-4333-8333-333333333333"
+    monkeypatch.setenv("MEASURE_MCP_CONNECT_INTEGRATION", integration.upper())
+    run_session([session_token()], visitor_api({"token-alice": ALICE}, seen=seen))
+    assert dict(httpx.QueryParams(seen[0].content.decode()))["audience"] == integration
+
+
+def test_each_session_request_is_exchanged_again(session_env):
+    seen = []
+    transport = visitor_api({"token-alice": ALICE}, seen=seen)
+    run_session([session_token()], transport)
+    run_session([session_token()], transport)
+    assert len(seen) == 4
+
+
+@pytest.mark.parametrize(
+    "exchange",
+    [
+        httpx.Response(400, json={"code": 212, "error": "No OAuth integrations"}),
+        httpx.Response(429, json={"code": 277}),
+        httpx.Response(500, text="unavailable"),
+        httpx.Response(200, json={"issued_token_type": "urn:posit:connect:api-key"}),
+        httpx.Response(200, json={"access_token": ""}),
+        httpx.Response(200, json={"access_token": 7}),
+        httpx.Response(200, text="not json"),
+    ],
+)
+def test_a_refused_or_malformed_exchange_fails_closed(session_env, exchange, caplog):
+    seen = []
+    scope = run_session(
+        [session_token()], visitor_api({"token-alice": ALICE}, seen=seen, exchange=exchange)
+    )
+    assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+    assert "could not be verified" in scope[connect_hosting.IDENTITY_ERROR_SCOPE_KEY]
+    assert len(seen) == 1, "No account is read without a visitor key"
+    assert "token-alice" not in caplog.text and "content-key" not in caplog.text
+
+
+def test_an_unknown_session_token_reports_connects_error_code(session_env, caplog):
+    scope = run_session([session_token(b"forged")], visitor_api({"token-alice": ALICE}))
+    assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+    assert "HTTP 400, Connect error code 215" in caplog.text
+    assert "forged" not in caplog.text and "Invalid subject_token" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    "account",
+    [
+        httpx.Response(401, json={"code": 30}),
+        httpx.Response(200, json={"guid": str(ALICE), "locked": True}),
+        httpx.Response(200, json={"guid": "not-a-guid"}),
+        httpx.Response(200, json={"username": "alice"}),
+        httpx.Response(200, json=[str(ALICE)]),
+        httpx.Response(200, text="not json"),
+    ],
+)
+def test_a_refused_locked_or_malformed_account_fails_closed(session_env, account):
+    scope = run_session([session_token()], visitor_api({"token-alice": ALICE}, account=account))
+    assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+    assert "could not be verified" in scope[connect_hosting.IDENTITY_ERROR_SCOPE_KEY]
+
+
+def test_a_missing_content_key_fails_closed(session_env, monkeypatch):
+    seen = []
+    monkeypatch.delenv("CONNECT_API_KEY")
+    scope = run_session([session_token()], visitor_api({"token-alice": ALICE}, seen=seen))
+    assert seen == []
+    assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+
+
+@pytest.mark.parametrize(
+    "headers",
+    [
+        [],
+        [credentials(str(ALICE))],
+        [session_token(), session_token(b"token-bob")],
+        [session_token(b"")],
+        [session_token(b"x" * 16_385)],
+        [session_token("t\u00f8ken".encode())],
+    ],
+)
+def test_a_missing_or_ambiguous_session_token_never_reaches_connect(session_env, headers):
+    seen = []
+    scope = run_session(headers, visitor_api({"token-alice": ALICE}, seen=seen))
+    assert seen == []
+    assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+    assert "missing or ambiguous" in scope[connect_hosting.IDENTITY_ERROR_SCOPE_KEY]
+
+
+def test_session_caller_cannot_preseed_a_resolved_identity(session_env):
+    scope = run_session(
+        [], visitor_api({}), extra_scope={connect_hosting.RESOLVED_GUID_SCOPE_KEY: str(BOB)}
+    )
+    assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+
+
+def test_identity_wrapper_selects_the_session_adapter(session_env, monkeypatch):
+    async def app(scope, receive, send):
+        return None
+
+    assert isinstance(connect_hosting.wrap_identity(app), connect_hosting.ConnectSessionIdentity)
+    monkeypatch.setenv("MEASURE_MCP_CONNECT_INTEGRATION", "not-a-guid")
+    with pytest.raises(ValueError, match="MEASURE_MCP_CONNECT_INTEGRATION"):
+        connect_hosting.wrap_identity(app)
     monkeypatch.delenv("MEASURE_MCP_TRUST_CONNECT_HEADERS")
     assert connect_hosting.wrap_identity(app) is app

@@ -7,12 +7,17 @@ adapters only interpret what a trusted Connect proxy delivers:
   Connect gives every content process into service settings an operator has
   not set: the public host Connect forwards, and the R installation whose
   packages Connect restored.
+* ``ConnectSessionIdentity`` asks Connect who the visitor is. It exchanges the
+  ``Posit-Connect-User-Session-Token`` Connect attaches to a request for a
+  visitor API key, through a Connect API integration associated with the
+  content, and reads the account GUID with that key.
 * ``ConnectUsernameIdentity`` serves servers whose
-  ``RStudio-Connect-Credentials.user`` is a username. It resolves the username
-  to the account's immutable GUID through Connect's users API on every
-  request. Owners are always keyed on the GUID, never on the mutable name.
+  ``RStudio-Connect-Credentials.user`` is a username and that have no such
+  integration. It resolves the username to the account's GUID through
+  Connect's users API.
 
-Both are inert unless their environment variables are set.
+Owners are always keyed on the immutable account GUID, never on a mutable
+name. All three are inert unless their environment variables are set.
 """
 
 from __future__ import annotations
@@ -34,7 +39,16 @@ IDENTITY_ERROR_SCOPE_KEY = "measure_service.connect_identity_error"
 LOOKUP_TIMEOUT_SECONDS = 5.0
 _MAX_CREDENTIAL_BYTES = 16_384
 _MAX_USERNAME_LENGTH = 256
-_USER_CLAIMS = ("guid", "username")
+_MAX_TOKEN_BYTES = 16_384
+_USER_CLAIMS = ("guid", "username", "session-token")
+_UNVERIFIED = (
+    "Your Connect account could not be verified; retry, and contact the "
+    "service operator if this continues"
+)
+# RFC 8693 token exchange, as Connect's OAuth integrations define it.
+_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:token-exchange"
+_SESSION_TOKEN_TYPE = "urn:posit:connect:user-session-token"
+_API_KEY_TOKEN_TYPE = "urn:posit:connect:api-key"
 
 
 def apply_connect_defaults() -> dict[str, str]:
@@ -63,11 +77,27 @@ def apply_connect_defaults() -> dict[str, str]:
 
 
 def user_claim() -> str:
-    """Return how this deployment's Connect writes the credential ``user`` field."""
+    """Return which value Connect attaches to a request names the caller."""
     claim = os.environ.get("MEASURE_MCP_CONNECT_USER_CLAIM", "guid")
     if claim not in _USER_CLAIMS:
-        raise ValueError("MEASURE_MCP_CONNECT_USER_CLAIM must be 'guid' or 'username'")
+        raise ValueError(
+            "MEASURE_MCP_CONNECT_USER_CLAIM must be 'guid', 'username' or 'session-token'"
+        )
     return claim
+
+
+def integration_audience() -> str | None:
+    """Return the integration GUID to request a visitor key from, if one is named.
+
+    Connect needs it only when the content has more than one integration.
+    """
+    raw = os.environ.get("MEASURE_MCP_CONNECT_INTEGRATION")
+    if not raw:
+        return None
+    try:
+        return str(uuid.UUID(raw))
+    except ValueError:
+        raise ValueError("MEASURE_MCP_CONNECT_INTEGRATION must be an integration GUID") from None
 
 
 def connect_origin() -> tuple[str, str] | None:
@@ -96,8 +126,97 @@ def connect_origin() -> tuple[str, str] | None:
     return f"{parsed.scheme}://{netloc}", netloc
 
 
-class UsernameLookupError(Exception):
+class ConnectLookupError(Exception):
+    """Connect did not confirm which account a request belongs to."""
+
+
+class UsernameLookupError(ConnectLookupError):
     """A username could not be resolved to exactly one unlocked account."""
+
+
+def _lookup_target(purpose: str) -> tuple[str, str]:
+    """Return ``(Connect origin, API key)`` for a lookup, or explain what is missing."""
+    key = os.environ.get("MEASURE_MCP_CONNECT_API_KEY") or os.environ.get("CONNECT_API_KEY")
+    if not key:
+        raise ConnectLookupError(f"no Connect API key is configured for {purpose}")
+    try:
+        origin = connect_origin()
+    except ValueError as exc:
+        raise ConnectLookupError(str(exc)) from None
+    if origin is None:
+        raise ConnectLookupError("CONNECT_SERVER is not set")
+    return origin[0], key
+
+
+def _connect_error_code(response: httpx.Response) -> str:
+    """Describe a refusal by status and Connect's numeric error code, never its text."""
+    try:
+        code = response.json()["code"]
+    except (ValueError, KeyError, TypeError):
+        code = None
+    suffix = f", Connect error code {code}" if isinstance(code, int) else ""
+    return f"HTTP {response.status_code}{suffix}"
+
+
+async def resolve_session_token(
+    token: str, *, transport: httpx.AsyncBaseTransport | None = None
+) -> uuid.UUID:
+    """Return the GUID of the account Connect issued ``token`` to.
+
+    Connect validates the token and returns an API key that acts as that
+    visitor; the key is used once, to read the visitor's own account, and is
+    then discarded. Nothing is cached.
+    """
+    origin, key = _lookup_target("the visitor key exchange")
+    form = {
+        "grant_type": _GRANT_TYPE,
+        "subject_token_type": _SESSION_TOKEN_TYPE,
+        "subject_token": token,
+        "requested_token_type": _API_KEY_TOKEN_TYPE,
+    }
+    try:
+        audience = integration_audience()
+    except ValueError as exc:
+        raise ConnectLookupError(str(exc)) from None
+    if audience is not None:
+        form["audience"] = audience
+    try:
+        async with httpx.AsyncClient(
+            transport=transport, timeout=LOOKUP_TIMEOUT_SECONDS, follow_redirects=False
+        ) as client:
+            exchange = await client.post(
+                origin + "/__api__/v1/oauth/integrations/credentials",
+                data=form,
+                headers={"Authorization": "Key " + key},
+            )
+            if exchange.status_code != 200:
+                raise ConnectLookupError(
+                    "Connect refused the visitor key exchange ("
+                    + _connect_error_code(exchange)
+                    + ")"
+                )
+            try:
+                visitor_key = exchange.json()["access_token"]
+            except (ValueError, KeyError, TypeError):
+                visitor_key = None
+            if not isinstance(visitor_key, str) or not visitor_key or len(visitor_key) > 4096:
+                raise ConnectLookupError("Connect returned no visitor key")
+            account = await client.get(
+                origin + "/__api__/v1/user", headers={"Authorization": "Key " + visitor_key}
+            )
+    except httpx.HTTPError as exc:
+        raise ConnectLookupError(f"Connect request failed ({type(exc).__name__})") from None
+    if account.status_code != 200:
+        raise ConnectLookupError(
+            "Connect refused the visitor key (" + _connect_error_code(account) + ")"
+        )
+    try:
+        body = account.json()
+        if body.get("locked", False) is not False:
+            raise ConnectLookupError("the visitor's Connect account is locked")
+        return uuid.UUID(body["guid"])
+    except (ValueError, KeyError, TypeError, AttributeError):
+        raise ConnectLookupError("Connect returned a malformed account") from None
 
 
 async def resolve_username(
@@ -109,21 +228,13 @@ async def resolve_username(
     someone else; a remembered mapping would hand the new holder the previous
     holder's records.
     """
-    key = os.environ.get("MEASURE_MCP_CONNECT_API_KEY") or os.environ.get("CONNECT_API_KEY")
-    if not key:
-        raise UsernameLookupError("no Connect API key is configured for username lookup")
-    try:
-        origin = connect_origin()
-    except ValueError as exc:
-        raise UsernameLookupError(str(exc)) from None
-    if origin is None:
-        raise UsernameLookupError("CONNECT_SERVER is not set")
+    origin, key = _lookup_target("username lookup")
     try:
         async with httpx.AsyncClient(
             transport=transport, timeout=LOOKUP_TIMEOUT_SECONDS, follow_redirects=False
         ) as client:
             response = await client.get(
-                origin[0] + "/__api__/v1/users",
+                origin + "/__api__/v1/users",
                 params={"prefix": username, "page_size": 500},
                 headers={"Authorization": "Key " + key},
             )
@@ -159,15 +270,25 @@ def _credential_username(scope: dict[str, Any]) -> str:
     return user
 
 
-class ConnectUsernameIdentity:
-    """Resolve the proxy's username claim to a GUID before dispatch.
+def _session_token(scope: dict[str, Any]) -> str:
+    values = [
+        v for k, v in scope.get("headers", []) if k.lower() == b"posit-connect-user-session-token"
+    ]
+    if len(values) != 1 or not values[0] or len(values[0]) > _MAX_TOKEN_BYTES:
+        raise ValueError("Connect session token is missing or ambiguous")
+    return values[0].decode("ascii")
+
+
+class _ResolvedIdentity:
+    """Resolve what the proxy attached to a request to an account GUID before dispatch.
 
     The result, or a caller-safe failure reason, is attached to the ASGI scope.
     Requests are never rejected here: protocol discovery needs no principal,
     and a tool that does need one reports the failure as an MCP tool error
-    that the caller can read. A value spelled like a GUID is still looked up
-    as a username, so a name equal to another account's GUID cannot become it.
+    that the caller can read.
     """
+
+    missing: str
 
     def __init__(
         self,
@@ -176,6 +297,12 @@ class ConnectUsernameIdentity:
         transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self.app, self.transport = app, transport
+
+    def _claim(self, scope: dict[str, Any]) -> str:
+        raise NotImplementedError
+
+    async def _resolve(self, claim: str) -> uuid.UUID:
+        raise NotImplementedError
 
     async def __call__(self, scope: dict[str, Any], receive: Any, send: Any) -> None:
         if scope.get("type") != "http":
@@ -186,28 +313,60 @@ class ConnectUsernameIdentity:
         scope.pop(RESOLVED_GUID_SCOPE_KEY, None)
         scope.pop(IDENTITY_ERROR_SCOPE_KEY, None)
         try:
-            username = _credential_username(scope)
+            claim = self._claim(scope)
         except (ValueError, KeyError, TypeError, UnicodeDecodeError):
-            scope[IDENTITY_ERROR_SCOPE_KEY] = "Connect credentials are missing or ambiguous"
+            scope[IDENTITY_ERROR_SCOPE_KEY] = self.missing
         else:
             try:
-                guid = await resolve_username(username, transport=self.transport)
-                scope[RESOLVED_GUID_SCOPE_KEY] = str(guid)
-            except UsernameLookupError as exc:
-                logger.warning("Connect username lookup failed: %s", exc)
-                scope[IDENTITY_ERROR_SCOPE_KEY] = (
-                    "Your Connect account could not be verified; retry, and contact the "
-                    "service operator if this continues"
-                )
+                scope[RESOLVED_GUID_SCOPE_KEY] = str(await self._resolve(claim))
+            except ConnectLookupError as exc:
+                logger.warning("Connect identity lookup failed: %s", exc)
+                scope[IDENTITY_ERROR_SCOPE_KEY] = _UNVERIFIED
         await self.app(scope, receive, send)
 
 
+class ConnectUsernameIdentity(_ResolvedIdentity):
+    """Resolve the proxy's username claim through Connect's users API.
+
+    A value spelled like a GUID is still looked up as a username, so a name
+    equal to another account's GUID cannot become it.
+    """
+
+    missing = "Connect credentials are missing or ambiguous"
+
+    def _claim(self, scope: dict[str, Any]) -> str:
+        return _credential_username(scope)
+
+    async def _resolve(self, claim: str) -> uuid.UUID:
+        return await resolve_username(claim, transport=self.transport)
+
+
+class ConnectSessionIdentity(_ResolvedIdentity):
+    """Resolve the proxy's user session token through a Connect API integration.
+
+    ``RStudio-Connect-Credentials`` is not read in this mode.
+    """
+
+    missing = "Connect session token is missing or ambiguous"
+
+    def _claim(self, scope: dict[str, Any]) -> str:
+        return _session_token(scope)
+
+    async def _resolve(self, claim: str) -> uuid.UUID:
+        return await resolve_session_token(claim, transport=self.transport)
+
+
 def wrap_identity(app: Callable[..., Any]) -> Callable[..., Any]:
-    """Add username resolution only when this deployment declares that claim."""
+    """Add identity resolution only when this deployment declares a claim that needs it."""
     if (
-        os.environ.get("MEASURE_MCP_IDENTITY", "local") == "connect"
-        and os.environ.get("MEASURE_MCP_TRUST_CONNECT_HEADERS") == "1"
-        and user_claim() == "username"
+        os.environ.get("MEASURE_MCP_IDENTITY", "local") != "connect"
+        or os.environ.get("MEASURE_MCP_TRUST_CONNECT_HEADERS") != "1"
     ):
+        return app
+    claim = user_claim()
+    if claim == "username":
         return ConnectUsernameIdentity(app)
+    if claim == "session-token":
+        integration_audience()
+        return ConnectSessionIdentity(app)
     return app

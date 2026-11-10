@@ -187,14 +187,15 @@ def identity(ctx: Context) -> str:
         raise ValueError("A trusted identity mode must be configured")
     if request is None:
         raise ValueError("Connect identity requires an authenticated HTTP request")
-    if connect_hosting.user_claim() == "username":
-        # The hosting adapter resolved the proxy's username to a GUID before
-        # dispatch. The raw header is never read as a GUID in this mode.
+    if connect_hosting.user_claim() != "guid":
+        # The hosting adapter resolved the proxy's username or session token
+        # to a GUID before dispatch. The credentials header is never read as a
+        # GUID in these modes.
         resolved = request.scope.get(connect_hosting.RESOLVED_GUID_SCOPE_KEY)
         if not isinstance(resolved, str):
             raise ValueError(
                 request.scope.get(connect_hosting.IDENTITY_ERROR_SCOPE_KEY)
-                or "Connect username identity is not available for this request"
+                or "Connect identity is not available for this request"
             )
         return "connect:" + str(uuid.UUID(resolved))
     headers = request.headers.getlist("rstudio-connect-credentials")
