@@ -145,6 +145,12 @@ jobs:
           assert "tests/test_pilot_checks.py" in members
           assert "tests/pilot_host_support.py" in members
           assert "docs/pilot-checks.md" in members
+          for name in ("pilot_evidence", "pilot_transport", "pilot_cli", "pilot_entrypoint"):
+              if name != "pilot_entrypoint":
+                  assert "src/measure_service/" + name + ".py" in members
+              assert "tests/test_" + name + ".py" in members
+          assert "docs/pilot-client.md" in members
+          assert "docs/pilot-host-record.md" in members
           assert "docs/store-recovery.md" in members
           for name in ("store_operations", "store_cli"):
               assert "src/measure_service/" + name + ".py" in members
@@ -217,6 +223,7 @@ jobs:
           /tmp/measure-wheel/bin/python -m pytest -q "$GITHUB_WORKSPACE/tests" -m 'not r_backend and not bo_backend'
           /tmp/measure-wheel/bin/python "$GITHUB_WORKSPACE/examples/registry.py"
           /tmp/measure-wheel/bin/measure-service-store --help
+          /tmp/measure-wheel/bin/measure-service-pilot --help
           /tmp/measure-wheel/bin/python "$GITHUB_WORKSPACE/examples/store_recovery.py" --output-dir /tmp/measure-wheel-recovery
       - name: Install source archive and run the example
         run: |
@@ -240,6 +247,7 @@ jobs:
           PY
           /tmp/measure-sdist/bin/python "$GITHUB_WORKSPACE/examples/registry.py"
           /tmp/measure-sdist/bin/measure-service-store --help
+          /tmp/measure-sdist/bin/measure-service-pilot --help
           /tmp/measure-sdist/bin/python "$GITHUB_WORKSPACE/examples/store_recovery.py" --output-dir /tmp/measure-sdist-recovery
 
   r-integration:

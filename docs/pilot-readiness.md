@@ -6,6 +6,15 @@ limits before accepting measurements. Synthetic optimization remains a
 separately qualified research workflow; an analytical-service pilot does not
 establish full MoSeS reproduction or instrument control.
 
+## Run the available client checks
+
+Use the installed [pilot CLI](pilot-client.md) with two real account credential
+maps to create synthetic records, check ownership and independent numerical
+references, then verify the same records and original retry receipts after a
+restart. Keep its private checkpoint and operation journal protected. The
+aggregate report deliberately leaves actual host gates pending. Record those
+observations in the [host worksheet](pilot-host-record.md).
+
 ## Required deployment evidence
 
 Record these results for the actual host, authentication proxy and MCP client:
