@@ -215,6 +215,11 @@ jobs:
           assert "docs/figures/chromatogram-evidence-example.png" in members
           for name in ("report.html", "chromatogram.svg", "evidence.json", "trace.csv", "peaks.csv", "publication.json"):
               assert "docs/reference-data/chromatogram-example/" + name in members
+          assert "docs/connect-hosting.md" in members
+          assert "scripts/build_connect_bundle.py" in members
+          assert "src/measure_service/connect_hosting.py" in members
+          for name in ("test_connect_bundle", "test_connect_hosting", "test_connect_hosting_socket"):
+              assert "tests/" + name + ".py" in members
           PY
       - name: Check upgrade from the standalone method distribution
         run: python scripts/check_distribution_upgrade.py dist/*.whl

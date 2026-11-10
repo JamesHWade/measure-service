@@ -31,6 +31,7 @@ from . import (
     campaign_protocol_registry,
     campaign_suggestion_attempts,
     campaigns,
+    connect_hosting,
     design_lineage,
     gaussian_producer,
     method_registry,
@@ -186,6 +187,16 @@ def identity(ctx: Context) -> str:
         raise ValueError("A trusted identity mode must be configured")
     if request is None:
         raise ValueError("Connect identity requires an authenticated HTTP request")
+    if connect_hosting.user_claim() == "username":
+        # The hosting adapter resolved the proxy's username to a GUID before
+        # dispatch. The raw header is never read as a GUID in this mode.
+        resolved = request.scope.get(connect_hosting.RESOLVED_GUID_SCOPE_KEY)
+        if not isinstance(resolved, str):
+            raise ValueError(
+                request.scope.get(connect_hosting.IDENTITY_ERROR_SCOPE_KEY)
+                or "Connect username identity is not available for this request"
+            )
+        return "connect:" + str(uuid.UUID(resolved))
     headers = request.headers.getlist("rstudio-connect-credentials")
     if len(headers) != 1:
         raise ValueError("Connect credentials are missing or ambiguous")
@@ -423,8 +434,20 @@ def save_analysis(
     return analysis_runtime.compact_analysis(record)
 
 
+INSTRUCTIONS = (
+    "Analytical trace processing and experiment-result tracking. Every dataset, method, "
+    "experiment, result and analysis belongs to the account that created it. Records are "
+    "not shared between accounts: another signed-in person cannot list, read or link "
+    "yours, and you cannot see theirs. There is no sharing, project or delete operation, "
+    "so do not store data you could not keep here. Start with "
+    "measurement_registry_capabilities; numerical analysis additionally needs the R "
+    "backend reported by measurement_capabilities. A tool failure is reported in the "
+    "result's isError field, not as an HTTP error."
+)
+
 mcp = FastMCP(
     "measure-separations",
+    instructions=INSTRUCTIONS,
     stateless_http=True,
     json_response=True,
     streamable_http_path="/mcp",
@@ -1658,7 +1681,10 @@ def measurement_read_analysis_data(
     }
 
 
-app = wrap_http(wrap_authority_headers(mcp.streamable_http_app()), readiness_check=storage_ready)
+app = wrap_http(
+    wrap_authority_headers(connect_hosting.wrap_identity(mcp.streamable_http_app())),
+    readiness_check=storage_ready,
+)
 
 
 def main() -> None:

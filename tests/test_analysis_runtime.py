@@ -205,3 +205,22 @@ def test_record_binds_executed_worker_even_if_installed_source_changes_later(tmp
     assert record["provenance"]["worker_sha256"] == observed
     assert observed != hashlib.sha256(worker.read_bytes()).hexdigest()
     assert json.loads(runtime.canonical(record["result"])) == {"peak_count": 0, "warnings": []}
+
+
+def test_an_inherited_r_home_cannot_corrupt_the_worker_response(tmp_path, monkeypatch):
+    # R's launcher announces an R_HOME it will not use on stdout; this stand-in
+    # reproduces that one behavior so the check runs without an R installation.
+    launcher = tmp_path / "R"
+    launcher.write_text(
+        "#!/bin/sh\n"
+        'if test -n "${R_HOME}"; then echo "WARNING: ignoring environment value of R_HOME"; fi\n'
+        "cat > /dev/null\n"
+        'echo \'{"ok": true, "result": {"marker": 1}}\'\n'
+    )
+    launcher.chmod(0o700)
+    monkeypatch.setenv("MEASURE_MCP_R", str(launcher))
+    monkeypatch.setenv("R_HOME", "/another/installation/lib/R")
+    monkeypatch.setenv("R_LIBS", "/kept/library")
+
+    assert runtime._execute_worker({"operation": "capabilities"})["marker"] == 1
+    assert runtime._worker_environment()["R_LIBS"] == "/kept/library"
