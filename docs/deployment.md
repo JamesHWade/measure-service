@@ -12,6 +12,8 @@ verified by this repository's tests.
 | `MEASURE_MCP_R` | `R` | R executable for numerical calls; not `Rscript` |
 | `MEASURE_MCP_IDENTITY` | `local` | `local` for stdio or `connect` for the proxy header adapter |
 | `MEASURE_MCP_TRUST_CONNECT_HEADERS` | unset | Must be `1` to enable the Connect header adapter |
+| `MEASURE_MCP_HTTP_ALLOWED_HOSTS` | unset | JSON array of explicit public authorities preserved by the trusted proxy |
+| `MEASURE_MCP_HTTP_ALLOWED_ORIGINS` | unset | JSON array of explicit HTTPS origins sent by approved clients |
 | `MEASURE_MCP_MEASURE_REVISION` | unset | Operator-declared source revision in analysis provenance |
 | `MEASURE_MCP_SEC_REVISION` | unset | Operator-declared SEC source revision in analysis provenance |
 
@@ -65,6 +67,11 @@ the intended host, proxy and client. The installed
 [pilot client](pilot-client.md) provides executable two-account checks and
 private continuity evidence; it does not supply authentication or mark host
 acceptance complete.
+
+The MCP transport keeps Host/Origin validation enabled. Configure the
+[approved public authorities](http-authorities.md) when a proxy preserves the
+public Host or Origin; loopback defaults alone do not admit them. These checks
+do not authenticate callers or enable browser CORS.
 
 ## Persistence and recovery
 

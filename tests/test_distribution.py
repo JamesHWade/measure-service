@@ -51,6 +51,7 @@ def test_service_distribution_contains_both_import_packages_and_worker():
         "measure_service/store_operations.py",
         "measure_service/store_cli.py",
         "measure_service/http_operations.py",
+        "measure_service/http_authority.py",
         "measure_service/operational_readiness.py",
     } <= files
     assert {

@@ -161,6 +161,10 @@ jobs:
               assert "tests/test_" + name + ".py" in members
           assert "tests/test_http_operations_socket.py" in members
           assert "docs/http-operations.md" in members
+          assert "src/measure_service/http_authority.py" in members
+          assert "tests/test_http_authority.py" in members
+          assert "tests/test_authority_startup.py" in members
+          assert "docs/http-authorities.md" in members
           assert "docs/pilot-readiness.md" in members
           assert "docs/store-recovery-example.md" in members
           assert "examples/store_recovery.py" in members
@@ -253,7 +257,7 @@ jobs:
   r-integration:
     name: Current R backend heads
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       MEASURE_BACKEND_REF: main

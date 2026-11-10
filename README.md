@@ -93,6 +93,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [MCP tool reference](docs/tools.md)
 - [Architecture and package boundaries](docs/architecture.md)
 - [HTTP deployment, identity and storage](docs/deployment.md)
+- [Configure public Host and Origin admission](docs/http-authorities.md)
 - [Operator store backup, verification and exact restore](docs/store-recovery.md)
 - [Run the installed full-store recovery demonstration](docs/store-recovery-example.md)
 - [HTTP request limits and minimal health checks](docs/http-operations.md)
