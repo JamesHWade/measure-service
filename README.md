@@ -94,6 +94,8 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Architecture and package boundaries](docs/architecture.md)
 - [HTTP deployment, identity and storage](docs/deployment.md)
 - [Operator store backup, verification and exact restore](docs/store-recovery.md)
+- [HTTP request limits and minimal health checks](docs/http-operations.md)
+- [Invited pilot qualification matrix](docs/pilot-readiness.md)
 - [Roadmap and acceptance criteria](docs/roadmap.md)
 - [Hierarchical objective scores](docs/hierarchy-scores.md)
 - [MoSeS metric reconciliation](docs/moses-metric-reconciliation.md)

@@ -142,6 +142,13 @@ jobs:
           for name in ("store_operations", "store_cli"):
               assert "src/measure_service/" + name + ".py" in members
               assert "tests/test_" + name + ".py" in members
+          assert "tests/test_store_operations_boundaries.py" in members
+          for name in ("http_operations", "operational_readiness"):
+              assert "src/measure_service/" + name + ".py" in members
+              assert "tests/test_" + name + ".py" in members
+          assert "tests/test_http_operations_socket.py" in members
+          assert "docs/http-operations.md" in members
+          assert "docs/pilot-readiness.md" in members
           assert "src/measure_service/design_lineage_client.py" in members
           assert "src/measure_service/bounded_json.py" in members
           assert "tests/test_design_lineage_client.py" in members

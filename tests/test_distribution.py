@@ -45,6 +45,8 @@ def test_service_distribution_contains_both_import_packages_and_worker():
         "measure_service/batch_restore.py",
         "measure_service/store_operations.py",
         "measure_service/store_cli.py",
+        "measure_service/http_operations.py",
+        "measure_service/operational_readiness.py",
     } <= files
     assert {
         "measure_service/benchmarks/reference_data/suggestion_sequences_v1/" + name

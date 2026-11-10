@@ -54,9 +54,14 @@ MEASURE_MCP_IDENTITY=connect MEASURE_MCP_TRUST_CONNECT_HEADERS=1 \
   --host 127.0.0.1 --port 8000
 ```
 
-This command alone does not create a secure deployment. The service has no
-public health endpoint or browser UI. MCP tool errors use the protocol's
-`isError` field; an HTTP success status does not imply a successful tool call.
+This command alone does not create a secure deployment. The service exposes
+minimal `/health/live` and `/health/ready` checks and a bounded HTTP request
+envelope; see [HTTP operations](http-operations.md). Readiness observes only
+basic core storage and configuration. It does not establish authentication,
+writable storage or R/SEC availability. The service has no browser UI. MCP tool
+errors use the protocol's `isError` field; an HTTP success status does not imply
+a successful tool call. Complete the [pilot matrix](pilot-readiness.md) against
+the intended host, proxy and client.
 
 ## Persistence and recovery
 
@@ -82,8 +87,11 @@ retention/deletion API remain operator work. Never run two independent copies
 and expect their IDs, revisions or retry receipts to synchronize. Shared network
 filesystems and multi-node service replicas are not supported by this design.
 
-Application payload limits bound accepted traces and registry records. They do
-not replace an upstream HTTP body limit, rate limit or storage quota. Quotas,
+Application payload limits bound accepted traces and registry records. The HTTP
+envelope independently measures complete bodies before dispatch, enforces a
+30-second receive deadline and admits at most 16 in-flight requests per process.
+Upstream connection, header, body and rate limits and a storage quota remain
+necessary for the actual deployment. Quotas,
 host-wide resource scheduling, audit-log export, authenticated asset ingestion
 and multi-node persistence remain deployment work. Numerical calls run inline
 with at most two R workers per service process. Analytical batches retain
