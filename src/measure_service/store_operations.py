@@ -44,6 +44,7 @@ _SOURCE_FILES = {
     DATABASE_NAME,
     f"{DATABASE_NAME}-wal",
     f"{DATABASE_NAME}-shm",
+    f"{DATABASE_NAME}-journal",
 }
 
 _OPTIONAL_SUGGESTION_TABLES = {

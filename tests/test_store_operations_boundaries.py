@@ -5,6 +5,7 @@ import sqlite3
 
 import pytest
 
+from measure_service import experiments
 from measure_service import store_operations as operations
 
 
@@ -76,3 +77,60 @@ def test_unsupported_operator_host_fails_before_path_changes(tmp_path, monkeypat
         with pytest.raises(operations.StoreOperationError, match="POSIX"):
             operations.initialize_store(target)
     assert not target.exists()
+
+
+def test_default_rollback_journal_excludes_uncommitted_rows(tmp_path, monkeypatch):
+    source = tmp_path / "source"
+    operations.initialize_store(source)
+    monkeypatch.setenv("MEASURE_MCP_DATA_DIR", str(source))
+    committed = experiments.create_experiment(
+        "owner", experiments.ExperimentSpec(title="Committed design", source="manual"), "committed"
+    )
+    path = source / operations.DATABASE_NAME
+    writer = sqlite3.connect(path)
+    try:
+        assert writer.execute("PRAGMA journal_mode").fetchone() == ("delete",)
+        writer.execute("BEGIN IMMEDIATE")
+        writer.execute(
+            "INSERT INTO experiments VALUES ('uncommitted', 'owner', '{}', 'digest', 'now')"
+        )
+        journal = source / f"{operations.DATABASE_NAME}-journal"
+        assert journal.is_file()
+        source_bytes, journal_bytes = path.read_bytes(), journal.read_bytes()
+        backup = tmp_path / "backup"
+        receipt = operations.backup_store(source, backup)
+        assert receipt["table_counts"]["experiments"] == 1
+        with sqlite3.connect(backup / operations.DATABASE_NAME) as snapshot:
+            assert snapshot.execute("SELECT id FROM experiments").fetchall() == [
+                (committed["experiment_id"],)
+            ]
+        assert writer.execute("SELECT COUNT(*) FROM experiments").fetchone() == (2,)
+        assert path.read_bytes() == source_bytes
+        assert journal.read_bytes() == journal_bytes
+        assert {p.name for p in backup.iterdir()} == {
+            operations.DATABASE_NAME,
+            operations.MANIFEST_NAME,
+        }
+        operations.verify_backup(backup)
+    finally:
+        writer.rollback()
+        writer.close()
+
+
+@pytest.mark.parametrize("kind", ["symlink", "hardlink", "directory"])
+def test_rollback_journal_rejects_unsafe_entries(tmp_path, kind):
+    source = tmp_path / "source"
+    operations.initialize_store(source)
+    journal = source / f"{operations.DATABASE_NAME}-journal"
+    other = tmp_path / "preserve"
+    other.write_bytes(b"operator-owned sentinel")
+    if kind == "symlink":
+        journal.symlink_to(other)
+    elif kind == "hardlink":
+        journal.hardlink_to(other)
+    else:
+        journal.mkdir()
+    with pytest.raises(operations.StoreOperationError):
+        operations.backup_store(source, tmp_path / "backup")
+    assert other.read_bytes() == b"operator-owned sentinel"
+    assert not (tmp_path / "backup").exists()
