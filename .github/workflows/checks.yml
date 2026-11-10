@@ -164,6 +164,7 @@ jobs:
           assert "src/measure_service/http_authority.py" in members
           assert "tests/test_http_authority.py" in members
           assert "tests/test_authority_startup.py" in members
+          assert "tests/test_public_proxy_pilot.py" in members
           assert "docs/http-authorities.md" in members
           assert "docs/pilot-readiness.md" in members
           assert "docs/store-recovery-example.md" in members

@@ -76,3 +76,19 @@ request contract, not the real host's sign-in or network isolation.
 After configuring the boundary, run [the two-account pilot checks](pilot-client.md)
 and record [actual host acceptance](pilot-host-record.md). Keep service issue
 #83 open until that evidence is complete.
+
+## Executable local proxy qualification
+
+`tests/test_public_proxy_pilot.py` runs the actual installed service and MCP
+client behind a synthetic two-account proxy. The proxy preserves a public Host,
+forwards the declared client Origin and mounts the upstream `/mcp` endpoint at
+`/service/mcp`. Tests check the expected 421/403 failures before admission is
+configured, Host/Origin independence, case/default-port normalization, exact
+nondefault ports, forwarded-header exclusion and continued identity rejection.
+The installed pilot command prepares both accounts and verifies the same
+checkpoint after the process is stopped and restarted.
+
+This test proxy and its fixed tokens are fixtures, not a deployment recipe.
+The connection is local HTTP, not actual public TLS or hosted authentication.
+The aggregate pilot report retains its simulation label and pending host gates.
+Run the actual host worksheet with the intended authenticated clients.
