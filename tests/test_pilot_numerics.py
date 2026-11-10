@@ -9,7 +9,6 @@ import json
 import math
 import os
 import sys
-from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -448,14 +447,9 @@ def test_invalid_capability_call_fails_safely_before_mutation(corruption, messag
 
 @pytest.mark.r_backend
 def test_qualify_numerics_over_real_stdio(tmp_path):
-    r_path = Path("/opt/homebrew/opt/r/bin/R")
-    r_library = Path("/tmp/measure-design-lineage-r-library-20261109")
-    if not r_path.exists():
-        pytest.skip("the assigned R runtime is unavailable")
     env = dict(
         os.environ,
-        MEASURE_MCP_R=str(r_path),
-        R_LIBS_USER=str(r_library),
+        MEASURE_MCP_R=os.environ.get("MEASURE_MCP_TEST_R", "R"),
         MEASURE_MCP_DATA_DIR=str(tmp_path),
         MEASURE_MCP_IDENTITY="local",
     )
