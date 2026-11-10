@@ -198,6 +198,11 @@ that never stops accumulates one per request until it is restarted, and Connect
 can answer an exchange with HTTP 429. On the server named above, 30 consecutive
 tool calls from one account were all answered; no higher rate was tried.
 
+Remembering the account for a token would not change this much. On that server
+one account's token differed from one second to the next, so a trial that kept
+each answer for a minute still exchanged once for every second in which a
+request arrived.
+
 ### The `username` claim
 
 On every request the service asks Connect's users API for the one unlocked
