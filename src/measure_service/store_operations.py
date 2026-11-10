@@ -69,7 +69,7 @@ def _expected_store_schema() -> dict[str, Any]:
                 continue
             tables[name] = (
                 batch_schema._table_xinfo(reference, physical),
-                batch_schema._normalized_sql(sql),
+                _normalized_table_sql(sql, name),
                 batch_schema._index_signature(reference, physical),
                 batch_schema._foreign_key_signature(reference, physical),
             )
@@ -274,6 +274,20 @@ def _quote_identifier(name: str) -> str:
     return '"' + name.replace('"', '""') + '"'
 
 
+def _normalized_table_sql(sql: str | None, table: str) -> str | None:
+    normalized = batch_schema._normalized_sql(sql)
+    if normalized is None:
+        return None
+    # SQLite's built-in rename records a quoted table identifier. Canonicalize
+    # only this known CREATE TABLE name; constraints and literals stay intact.
+    return re.sub(
+        r'\Acreate table (?:"' + re.escape(table) + r'"|' + re.escape(table) + r")\s*\(",
+        "create table " + table + " (",
+        normalized,
+        count=1,
+    )
+
+
 def _known_table_signature(
     con: sqlite3.Connection,
     objects: dict[tuple[str, str], tuple[str, str | None, str | None]],
@@ -282,7 +296,7 @@ def _known_table_signature(
     physical, _table_name, sql = objects[("table", table)]
     return (
         batch_schema._table_xinfo(con, physical),
-        batch_schema._normalized_sql(sql),
+        _normalized_table_sql(sql, table),
         batch_schema._index_signature(con, physical),
         batch_schema._foreign_key_signature(con, physical),
     )

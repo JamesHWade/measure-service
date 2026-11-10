@@ -7,7 +7,7 @@ from contextlib import contextmanager
 
 import pytest
 
-from measure_service import experiments
+from measure_service import campaign_schema, experiments, storage
 from measure_service import store_operations as operations
 
 
@@ -193,3 +193,58 @@ def test_inventory_tolerates_only_optional_files_disappearing(
         operations.backup_store(source, target)
         operations.verify_backup(target)
     assert observed == [selected]
+
+
+@pytest.mark.parametrize("mutation", [None, "nullable_owner", "changed_pending_literal"])
+def test_builtin_proposal_migration_preserves_compatible_schema(tmp_path, mutation):
+    source = tmp_path / "source"
+    operations.initialize_store(source)
+    path = source / operations.DATABASE_NAME
+    con = sqlite3.connect(path)
+    try:
+        con.execute("DROP TABLE campaign_proposals")
+        con.execute(campaign_schema._LEGACY_DDL)
+        con.execute(campaign_schema._PENDING_INDEX_SQL)
+        con.commit()
+    finally:
+        con.close()
+    # Exercise the same startup migration as a deployed older service store.
+    storage._connect_at(path).close()
+    con = sqlite3.connect(path)
+    try:
+        sql = con.execute(
+            "SELECT sql FROM sqlite_master WHERE name='campaign_proposals'"
+        ).fetchone()[0]
+        assert sql.startswith('CREATE TABLE "campaign_proposals"')
+        if mutation == "nullable_owner":
+            con.execute("PRAGMA writable_schema=ON")
+            con.execute(
+                "UPDATE sqlite_master SET sql=? WHERE name='campaign_proposals'",
+                (sql.replace("owner TEXT NOT NULL", "owner TEXT"),),
+            )
+            version = con.execute("PRAGMA schema_version").fetchone()[0]
+            con.execute(f"PRAGMA schema_version={version + 1}")
+        elif mutation == "changed_pending_literal":
+            con.execute("DROP INDEX campaign_one_pending")
+            con.execute(campaign_schema._PENDING_INDEX_SQL.replace("'pending'", "'PENDING'"))
+        con.commit()
+    finally:
+        con.close()
+    before = path.read_bytes()
+    if mutation is None:
+        operations.inspect_store(source)
+        backup = tmp_path / "backup"
+        operations.backup_store(source, backup)
+        operations.verify_backup(backup)
+        restored = tmp_path / "restored"
+        operations.restore_store(backup, restored)
+        assert (restored / operations.DATABASE_NAME).read_bytes() == (
+            backup / operations.DATABASE_NAME
+        ).read_bytes()
+    else:
+        with pytest.raises(operations.StoreOperationError):
+            operations.inspect_store(source)
+        with pytest.raises(operations.StoreOperationError):
+            operations.backup_store(source, tmp_path / "backup")
+        assert not (tmp_path / "backup").exists()
+    assert path.read_bytes() == before
