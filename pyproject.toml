@@ -26,6 +26,7 @@ dev = [
 
 [project.scripts]
 measure-service = "measure_service.server:main"
+measure-service-store = "measure_service.store_cli:main"
 
 [project.urls]
 Repository = "https://github.com/JamesHWade/measure-service"

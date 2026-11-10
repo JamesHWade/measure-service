@@ -72,12 +72,15 @@ directory/file permissions or encrypt the database. Raw source text, numeric
 arrays, sample IDs and declared conditions may all be stored there. Do not use
 a shared temporary directory for real measurements.
 
-For a simple consistent backup, stop clients and the server, copy the data
-directory, then restore a copy into a separate directory and verify records
-before resuming. No automated backup, restore drill or retention/deletion API
-is implemented. Never run two independent copies and expect their IDs,
-revisions or retry receipts to synchronize. Shared network filesystems and
-multi-node service replicas are not supported by the current design.
+Use the local [operator commands](store-recovery.md) to initialize a new store,
+inspect existing storage, create a consistent online backup, verify its digest
+manifest and restore exact database bytes into a new separate directory.
+Backups contain all owners' data and retry receipts. Stop clients and the old
+service before cutover; retained running or unknown claims still require their
+explicit recovery procedure. Backup scheduling, off-host protection and a
+retention/deletion API remain operator work. Never run two independent copies
+and expect their IDs, revisions or retry receipts to synchronize. Shared network
+filesystems and multi-node service replicas are not supported by this design.
 
 Application payload limits bound accepted traces and registry records. They do
 not replace an upstream HTTP body limit, rate limit or storage quota. Quotas,

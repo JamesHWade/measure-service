@@ -138,6 +138,10 @@ jobs:
           assert "tests/test_design_lineage_schema.py" in members
           assert "tests/test_design_lineage_boundaries.py" in members
           assert "docs/design-lineage.md" in members
+          assert "docs/store-recovery.md" in members
+          for name in ("store_operations", "store_cli"):
+              assert "src/measure_service/" + name + ".py" in members
+              assert "tests/test_" + name + ".py" in members
           assert "src/measure_service/design_lineage_client.py" in members
           assert "src/measure_service/bounded_json.py" in members
           assert "tests/test_design_lineage_client.py" in members

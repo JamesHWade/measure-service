@@ -93,6 +93,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [MCP tool reference](docs/tools.md)
 - [Architecture and package boundaries](docs/architecture.md)
 - [HTTP deployment, identity and storage](docs/deployment.md)
+- [Operator store backup, verification and exact restore](docs/store-recovery.md)
 - [Roadmap and acceptance criteria](docs/roadmap.md)
 - [Hierarchical objective scores](docs/hierarchy-scores.md)
 - [MoSeS metric reconciliation](docs/moses-metric-reconciliation.md)
