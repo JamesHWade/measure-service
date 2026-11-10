@@ -246,7 +246,7 @@ def test_timeout_preserves_requested_operation_without_fabricated_response(monke
 
     async def exercise():
         recorded = transport._RecordedClient(Interrupted(), "a", Journal())
-        with pytest.raises(TimeoutError):
+        with pytest.raises(asyncio.TimeoutError):
             await recorded.call_tool("measurement_create_experiment", {"synthetic": True})
 
     asyncio.run(exercise())
