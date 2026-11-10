@@ -14,8 +14,9 @@ verified by this repository's tests.
 | `MEASURE_MCP_TRUST_CONNECT_HEADERS` | unset | Must be `1` to enable the Connect header adapter |
 | `MEASURE_MCP_HTTP_ALLOWED_HOSTS` | unset | JSON array of explicit public authorities preserved by the trusted proxy |
 | `MEASURE_MCP_HTTP_ALLOWED_ORIGINS` | unset | JSON array of explicit HTTPS origins sent by approved clients |
-| `MEASURE_MCP_CONNECT_USER_CLAIM` | `guid` | `guid` or `username`: what the proxy writes in the credential `user` field |
-| `MEASURE_MCP_CONNECT_API_KEY` | `CONNECT_API_KEY` | Key for the users API; read only under the `username` claim |
+| `MEASURE_MCP_CONNECT_USER_CLAIM` | `guid` | `guid`, `username` or `session-token`: how the Connect adapter learns the caller's account |
+| `MEASURE_MCP_CONNECT_INTEGRATION` | unset | Integration GUID for the `session-token` claim when the content has several |
+| `MEASURE_MCP_CONNECT_API_KEY` | `CONNECT_API_KEY` | Key for Connect API calls; read only under the `username` and `session-token` claims |
 | `MEASURE_MCP_MEASURE_REVISION` | unset | Operator-declared source revision in analysis provenance |
 | `MEASURE_MCP_SEC_REVISION` | unset | Operator-declared SEC source revision in analysis provenance |
 
@@ -45,16 +46,18 @@ that boundary allows identity spoofing.
 An operator evaluating Posit Connect must verify GUID delivery
 (`Authorization.ContentCredentialsUseGUID`) and the actual request shape.
 A server that delivers usernames instead needs
-`MEASURE_MCP_CONNECT_USER_CLAIM=username`, which resolves each request's
-username to the account GUID through Connect's users API. See
-[hosting on Posit Connect](connect-hosting.md) for that adapter and for
+`MEASURE_MCP_CONNECT_USER_CLAIM=session-token`, which exchanges the session
+token Connect attaches to each request for the caller's account GUID, or
+`username`, which resolves each request's username through Connect's users API.
+See [hosting on Posit Connect](connect-hosting.md) for both adapters and for
 building a bundle.
 See the official documentation for
 [user metadata](https://docs.posit.co/connect/user/fastapi/#user-meta-data) and
 [GUID configuration](https://docs.posit.co/connect/admin/appendix/advanced-user-group/#uniqueness-and-leverage-the-connect-server-api-using-posit-connect-guids).
 The automated test injects two UUIDs and checks missing/malformed identities
-and record ownership. It does not test Connect configuration, token exchange,
-TLS or proxy bypass.
+and record ownership. Other tests run both adapters against a simulated Connect
+API. None of them tests a real server's configuration or token exchange, TLS or
+proxy bypass.
 
 For an already configured, verified proxy on the same host, the upstream
 process can be started on loopback:
