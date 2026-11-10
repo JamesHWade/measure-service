@@ -45,7 +45,12 @@ __all__ = ["app"]
 # Wheel archives record file timestamps. A fixed default keeps an unchanged
 # tree at an unchanged wheel digest, and therefore at a reusable environment.
 DEFAULT_SOURCE_DATE_EPOCH = "315532800"
-_PIN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*(\[[A-Za-z0-9,._-]+\])?==[^\s;]+(\s*;.+)?$")
+# One concrete version: a wildcard (``==1.2.*``), a second clause (``==1.2,<2``)
+# or ``===`` would let the installer choose, so none of them is a pin.
+_PIN = re.compile(
+    r"^[A-Za-z0-9][A-Za-z0-9._-]*(\[[A-Za-z0-9,._-]+\])?"
+    r"==(\d+!)?\d+(\.\d+)*[A-Za-z0-9.]*(\+[A-Za-z0-9.]+)?(\s*;.+)?$"
+)
 _VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 _CONSTRAINT = re.compile(r"^(>=|<=|==|~=|>|<)\d+(\.\d+){1,2}$")
 

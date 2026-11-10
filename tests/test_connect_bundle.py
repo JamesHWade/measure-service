@@ -73,7 +73,17 @@ def test_changed_service_code_changes_the_requirements_text(tmp_path, wheel):
 
 @pytest.mark.parametrize(
     "line",
-    ["mcp>=1.30", "mcp", "-r other.txt", "measure-service==0.1.0", "measure_service==0.1.0"],
+    [
+        "mcp>=1.30",
+        "mcp",
+        "-r other.txt",
+        "measure-service==0.1.0",
+        "measure_service==0.1.0",
+        "mcp==1.30.*",
+        "mcp==1.30.0,<2",
+        "mcp===1.30.0",
+        "mcp==*",
+    ],
 )
 def test_only_exact_third_party_pins_are_accepted(tmp_path, line):
     pins = tmp_path / "pins.txt"
@@ -84,10 +94,15 @@ def test_only_exact_third_party_pins_are_accepted(tmp_path, line):
 
 def test_pins_keep_markers_and_drop_comments(tmp_path):
     pins = tmp_path / "pins.txt"
-    pins.write_text('\nhttpx==0.28.1  # via mcp\ncolorama==0.4.6 ; sys_platform == "win32"\n')
+    pins.write_text(
+        "\nhttpx==0.28.1  # via mcp\n"
+        'colorama==0.4.6 ; sys_platform == "win32"\n'
+        "example-package[extra]==1!2.0rc1.post3+local.1\n"
+    )
     assert builder.read_pins(pins) == [
         "httpx==0.28.1",
         'colorama==0.4.6 ; sys_platform == "win32"',
+        "example-package[extra]==1!2.0rc1.post3+local.1",
     ]
 
 
