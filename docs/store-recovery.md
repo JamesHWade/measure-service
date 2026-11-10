@@ -30,6 +30,8 @@ older layouts fail closed; these commands do not silently upgrade them.
 This profile supports one `measure.sqlite3` database and its ordinary SQLite
 rollback-journal, WAL and SHM sidecars. It rejects unexpected files and incomplete operations. Keep
 reports and other files in separate directories.
+Optional sidecars can disappear while a live writer commits; inventory tolerates
+those vanished entries. The main database must remain present and regular.
 
 ## Create and verify a backup
 
