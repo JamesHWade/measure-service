@@ -14,10 +14,14 @@ verified by this repository's tests.
 | `MEASURE_MCP_TRUST_CONNECT_HEADERS` | unset | Must be `1` to enable the Connect header adapter |
 | `MEASURE_MCP_HTTP_ALLOWED_HOSTS` | unset | JSON array of explicit public authorities preserved by the trusted proxy |
 | `MEASURE_MCP_HTTP_ALLOWED_ORIGINS` | unset | JSON array of explicit HTTPS origins sent by approved clients |
+| `MEASURE_MCP_CONNECT_USER_CLAIM` | `guid` | `guid` or `username`: what the proxy writes in the credential `user` field |
+| `MEASURE_MCP_CONNECT_API_KEY` | `CONNECT_API_KEY` | Key for the users API; read only under the `username` claim |
 | `MEASURE_MCP_MEASURE_REVISION` | unset | Operator-declared source revision in analysis provenance |
 | `MEASURE_MCP_SEC_REVISION` | unset | Operator-declared SEC source revision in analysis provenance |
 
 Standard R library variables such as `R_LIBS_USER` are inherited by the worker.
+`R_HOME` is not: R's launcher ignores an inherited value and announces that on
+standard output, where the worker's response is read.
 The repository rename preserves these variable names, tool names and default
 storage path for compatibility. There is no automatic data relocation.
 
@@ -40,6 +44,11 @@ that boundary allows identity spoofing.
 
 An operator evaluating Posit Connect must verify GUID delivery
 (`Authorization.ContentCredentialsUseGUID`) and the actual request shape.
+A server that delivers usernames instead needs
+`MEASURE_MCP_CONNECT_USER_CLAIM=username`, which resolves each request's
+username to the account GUID through Connect's users API. See
+[hosting on Posit Connect](connect-hosting.md) for that adapter and for
+building a bundle.
 See the official documentation for
 [user metadata](https://docs.posit.co/connect/user/fastapi/#user-meta-data) and
 [GUID configuration](https://docs.posit.co/connect/admin/appendix/advanced-user-group/#uniqueness-and-leverage-the-connect-server-api-using-posit-connect-guids).

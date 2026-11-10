@@ -13,6 +13,7 @@ license-files = ["LICENSE", "src/measure_service/benchmarks/reference_data/READM
 authors = [{name = "James Wade"}]
 dependencies = [
   "mcp==1.30.0",
+  "httpx>=0.27,<1",
 ]
 
 [project.optional-dependencies]

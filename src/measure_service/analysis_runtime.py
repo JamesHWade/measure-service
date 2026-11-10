@@ -95,6 +95,16 @@ def run_worker(payload: dict, *, worker_path: Path | None = None) -> dict[str, A
         slots[0].release()
 
 
+def _worker_environment() -> dict[str, str]:
+    """Return the worker's environment without an inherited ``R_HOME``.
+
+    R's launcher always uses its own installation. When an inherited value
+    names that installation by another path, or names a different one, the
+    launcher prints a notice on stdout, where the worker's JSON is expected.
+    """
+    return {name: value for name, value in os.environ.items() if name != "R_HOME"}
+
+
 def _execute_worker(payload: dict, *, worker_path: Path | None = None) -> dict[str, Any]:
     command = os.environ.get("MEASURE_MCP_R", "R")
     path = ROOT / "worker.R" if worker_path is None else worker_path
@@ -109,6 +119,7 @@ def _execute_worker(payload: dict, *, worker_path: Path | None = None) -> dict[s
             snapshot.chmod(0o400)
             process = subprocess.run(
                 [command, "--vanilla", "--slave", "-f", str(snapshot)],
+                env=_worker_environment(),
                 input=canonical(payload),
                 text=True,
                 capture_output=True,
