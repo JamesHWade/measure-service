@@ -141,6 +141,10 @@ jobs:
           assert "src/measure_service/pilot_numerics.py" in members
           assert "tests/test_pilot_numerics.py" in members
           assert "docs/pilot-numerics.md" in members
+          assert "src/measure_service/pilot_checks.py" in members
+          assert "tests/test_pilot_checks.py" in members
+          assert "tests/pilot_host_support.py" in members
+          assert "docs/pilot-checks.md" in members
           assert "docs/store-recovery.md" in members
           for name in ("store_operations", "store_cli"):
               assert "src/measure_service/" + name + ".py" in members
