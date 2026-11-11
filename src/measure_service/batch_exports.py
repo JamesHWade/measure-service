@@ -20,7 +20,7 @@ _CACHE_BYTES = 0
 
 
 def _store_identity() -> tuple:
-    path = db_path().resolve()
+    path = db_path(create=False).resolve()
     try:
         info = path.stat()
     except OSError as exc:

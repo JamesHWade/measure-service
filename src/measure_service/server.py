@@ -87,7 +87,7 @@ from .operational_readiness import storage_ready
 from .result_table_models import ResultTableSpec
 from .result_table_parser import preview_result_table
 from .retention import RetentionModelSpec
-from .storage import canonical, connect, db_path, now, sha256
+from .storage import canonical, connect, db_path, now, registry_connection, sha256
 
 ROOT = Path(__file__).resolve().parent
 MAX_PAYLOAD_BYTES = 4_000_000
@@ -210,7 +210,7 @@ def identity(ctx: Context) -> str:
 
 
 def dataset_for(owner: str, dataset_id: str) -> tuple[dict, str]:
-    with connect() as con:
+    with registry_connection() as con:
         row = con.execute(
             "SELECT payload, digest FROM datasets WHERE id=? AND owner=?", (dataset_id, owner)
         ).fetchone()
@@ -220,7 +220,7 @@ def dataset_for(owner: str, dataset_id: str) -> tuple[dict, str]:
 
 
 def source_for(owner: str, dataset_id: str) -> dict[str, Any] | None:
-    with connect() as con:
+    with registry_connection() as con:
         row = con.execute(
             """SELECT s.kind, s.digest, s.content, s.mapping FROM dataset_sources s
             JOIN datasets d ON s.dataset_id=d.id WHERE d.id=? AND d.owner=?""",
@@ -393,7 +393,7 @@ def trace_for(dataset: dict, trace_id: str) -> dict[str, Any]:
 
 
 def analysis_for(owner: str, analysis_id: str) -> dict[str, Any]:
-    with connect() as con:
+    with registry_connection() as con:
         row = con.execute(
             "SELECT dataset_id, trace_id, kind, method, result, provenance, created_at FROM analyses WHERE id=? AND owner=?",
             (analysis_id, owner),
@@ -1482,7 +1482,7 @@ def _owned_chromatogram_evidence(owner: str, analysis_id: str) -> dict[str, Any]
 
 
 def _evidence_store_identity() -> tuple:
-    path = db_path().resolve()
+    path = db_path(create=False).resolve()
     try:
         stat = path.stat()
     except OSError as error:
