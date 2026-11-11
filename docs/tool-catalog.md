@@ -54,6 +54,11 @@ nonnegative, and fraction bounds are checked both by the declared schema and
 by Pydantic validation. Runtime validators also enforce relational conditions
 such as solvent fractions summing to one.
 
+The catalog serializes numeric `gt`, `ge`, `lt`, and `le` metadata as the
+standard JSON Schema bounds `exclusiveMinimum`, `minimum`, `exclusiveMaximum`,
+and `maximum`. This changes the advertised schema copy; it does not change
+runtime validators or the frozen campaign protocol source.
+
 The `scripts/check_tool_schemas.py` check verifies Draft 2020-12 validity and
 exact registry coverage for the complete catalog. It rejects the nonstandard
 numeric keywords `gt`, `ge`, `lt`, and `le`. It reports canonical `oneOf`,

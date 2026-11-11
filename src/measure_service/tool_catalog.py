@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import copy
 import json
+import math
 import os
 from collections.abc import Iterable, Mapping
 from types import MappingProxyType
@@ -264,6 +265,93 @@ class UnsupportedSchemaProfileError(ValueError):
     """The opt-in function-host projection encountered an unreviewed construct."""
 
 
+class SchemaStandardizationError(ValueError):
+    """A Pydantic schema contains a numeric-bound alias that cannot be normalized safely."""
+
+
+_NUMERIC_BOUND_ALIASES = {
+    "gt": "exclusiveMinimum",
+    "ge": "minimum",
+    "lt": "exclusiveMaximum",
+    "le": "maximum",
+}
+_SCHEMA_MAP_KEYS = (
+    "$defs",
+    "definitions",
+    "properties",
+    "patternProperties",
+    "dependentSchemas",
+    "dependencies",
+)
+_SCHEMA_CHILD_KEYS = (
+    "additionalProperties",
+    "items",
+    "contains",
+    "not",
+    "if",
+    "then",
+    "else",
+    "propertyNames",
+    "unevaluatedProperties",
+    "unevaluatedItems",
+    "contentSchema",
+)
+_SCHEMA_ARRAY_KEYS = ("allOf", "anyOf", "oneOf", "prefixItems")
+
+
+def _finite_bound(value: Any) -> bool:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(float(value))
+    except (OverflowError, ValueError):
+        return False
+
+
+def _standardize_numeric_bounds(node: Any, path: str = "$") -> None:
+    """Normalize custom bounds only in actual numeric schema nodes.
+
+    Traverse only JSON Schema positions. User data under ``default``, ``enum``,
+    ``examples`` or discriminator mappings is left as data and is never scanned
+    as though it were a schema.
+    """
+    if not isinstance(node, dict):
+        return
+
+    aliases = [
+        (alias, standard) for alias, standard in _NUMERIC_BOUND_ALIASES.items() if alias in node
+    ]
+    if aliases:
+        if node.get("type") != "number":
+            raise SchemaStandardizationError(
+                f"Nonstandard numeric bound outside a number schema at {path}"
+            )
+        for alias, standard in aliases:
+            if not _finite_bound(node[alias]):
+                raise SchemaStandardizationError(
+                    f"Non-finite or nonnumeric bound at {path}.{alias}"
+                )
+            if standard in node:
+                raise SchemaStandardizationError(
+                    f"Conflicting standard and aliased numeric bounds at {path}"
+                )
+        for alias, standard in aliases:
+            node[standard] = node.pop(alias)
+
+    for keyword in _SCHEMA_MAP_KEYS:
+        children = node.get(keyword)
+        if isinstance(children, Mapping):
+            for name, child in children.items():
+                _standardize_numeric_bounds(child, f"{path}.{keyword}.{name}")
+    for keyword in _SCHEMA_CHILD_KEYS:
+        _standardize_numeric_bounds(node.get(keyword), f"{path}.{keyword}")
+    for keyword in _SCHEMA_ARRAY_KEYS:
+        children = node.get(keyword)
+        if isinstance(children, list):
+            for index, child in enumerate(children):
+                _standardize_numeric_bounds(child, f"{path}.{keyword}[{index}]")
+
+
 def _resolve_definition(schema: Mapping[str, Any], ref: Any) -> Mapping[str, Any] | None:
     if not isinstance(ref, str) or not ref.startswith("#/$defs/"):
         return None
@@ -397,6 +485,7 @@ def schema_for_profile(schema: Mapping[str, Any], profile: str | None = None) ->
     if selected_profile not in (CANONICAL_SCHEMA_PROFILE, FUNCTION_HOST_SCHEMA_PROFILE):
         raise ValueError("Unknown MCP tool schema profile")
     result = copy.deepcopy(dict(schema))
+    _standardize_numeric_bounds(result)
     if selected_profile == CANONICAL_SCHEMA_PROFILE:
         return result
     _walk_and_project(result, result)
@@ -412,6 +501,7 @@ __all__ = [
     "TOOL_GROUP_BY_NAME",
     "TOOL_GROUP_META_KEY",
     "TOOL_SCHEMA_PROFILE_ENV",
+    "SchemaStandardizationError",
     "UnsupportedSchemaProfileError",
     "configured_groups",
     "decorate_tool",

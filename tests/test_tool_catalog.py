@@ -1,6 +1,7 @@
 """Versioned tool-group and bounded schema-profile contracts."""
 
 import ast
+import asyncio
 import copy
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from pydantic import ValidationError
 from measure_service.analysis_models import Trace
 from measure_service.methods import MethodDeclaration
 from measure_service.tool_catalog import (
+    CANONICAL_SCHEMA_PROFILE,
     FUNCTION_HOST_SCHEMA_PROFILE,
     TOOL_CATALOG_VERSION,
     TOOL_GROUP_BY_NAME,
@@ -19,6 +21,7 @@ from measure_service.tool_catalog import (
     TOOL_GROUPS,
     TOOL_GROUPS_ENV,
     TOOL_SCHEMA_PROFILE_ENV,
+    SchemaStandardizationError,
     UnsupportedSchemaProfileError,
     configured_groups,
     decorate_tool,
@@ -29,6 +32,7 @@ from measure_service.tool_catalog import (
     tool_group,
     validate_tool_registry,
 )
+from scripts.check_tool_schemas import _nonstandard_numeric_keywords
 
 
 def registered_tool_names() -> list[str]:
@@ -123,6 +127,102 @@ def test_schema_profile_defaults_to_canonical_and_rejects_unknown_values(monkeyp
     with pytest.raises(ValueError) as error:
         schema_profile()
     assert "private-profile-value" not in str(error.value)
+
+
+@pytest.mark.parametrize(
+    ("alias", "standard"),
+    [
+        ("gt", "exclusiveMinimum"),
+        ("ge", "minimum"),
+        ("lt", "exclusiveMaximum"),
+        ("le", "maximum"),
+    ],
+)
+@pytest.mark.parametrize("profile", [CANONICAL_SCHEMA_PROFILE, FUNCTION_HOST_SCHEMA_PROFILE])
+def test_numeric_schema_aliases_standardize_in_both_profiles(alias, standard, profile):
+    source = {"type": "number", alias: 2.5}
+    original = copy.deepcopy(source)
+
+    projected = schema_for_profile(source, profile)
+
+    assert projected == {"type": "number", standard: 2.5}
+    assert source == original
+    Draft202012Validator.check_schema(projected)
+
+
+@pytest.mark.parametrize(
+    ("alias", "standard"),
+    [
+        ("gt", "exclusiveMinimum"),
+        ("ge", "minimum"),
+        ("lt", "exclusiveMaximum"),
+        ("le", "maximum"),
+    ],
+)
+def test_numeric_schema_alias_collisions_fail_closed(alias, standard):
+    schema = {"type": "number", alias: 2, standard: 1}
+
+    with pytest.raises(SchemaStandardizationError, match="Conflicting standard"):
+        schema_for_profile(schema, CANONICAL_SCHEMA_PROFILE)
+
+
+@pytest.mark.parametrize("value", [True, "1", float("nan"), float("inf"), -float("inf")])
+def test_numeric_schema_alias_requires_a_finite_json_number(value):
+    with pytest.raises(SchemaStandardizationError, match="Non-finite or nonnumeric"):
+        schema_for_profile({"type": "number", "gt": value}, CANONICAL_SCHEMA_PROFILE)
+
+
+def test_numeric_schema_alias_requires_a_number_schema_node():
+    with pytest.raises(SchemaStandardizationError, match="outside a number schema"):
+        schema_for_profile({"type": "string", "ge": 1}, CANONICAL_SCHEMA_PROFILE)
+
+
+def test_schema_standardization_does_not_treat_property_names_or_examples_as_schemas():
+    schema = {
+        "type": "object",
+        "properties": {
+            "gt": {
+                "type": "string",
+                "default": {"gt": 1, "ge": 2},
+                "enum": [{"lt": 3}],
+                "examples": [{"le": 4}],
+            }
+        },
+        "default": {"gt": 5, "ge": 6},
+        "enum": [{"lt": 7}],
+        "examples": [{"le": 8}],
+        "discriminator": {"propertyName": "kind", "mapping": {"gt": "#/$defs/Kind"}},
+    }
+    original = copy.deepcopy(schema)
+
+    assert schema_for_profile(schema, CANONICAL_SCHEMA_PROFILE) == original
+    assert schema == original
+
+
+def test_actual_registered_catalog_is_standard_under_both_profiles(monkeypatch):
+    from measure_service.server import mcp
+
+    monkeypatch.setattr(mcp, "_selected_groups", frozenset(TOOL_GROUPS))
+    tools = asyncio.run(mcp.registered_tools())
+    assert len(tools) == 76
+    validate_tool_registry(tool.name for tool in tools)
+    for profile in (CANONICAL_SCHEMA_PROFILE, FUNCTION_HOST_SCHEMA_PROFILE):
+        for tool in tools:
+            for schema in (tool.inputSchema, tool.outputSchema):
+                if schema is not None:
+                    projected = schema_for_profile(schema, profile)
+                    Draft202012Validator.check_schema(projected)
+                    assert _nonstandard_numeric_keywords(projected) == []
+
+        monkeypatch.setattr(mcp, "_schema_profile", profile)
+        advertised = asyncio.run(mcp.list_tools())
+        assert len(advertised) == 76
+        for tool in advertised:
+            assert tool.meta[TOOL_GROUP_META_KEY] in TOOL_GROUPS
+            for schema in (tool.inputSchema, tool.outputSchema):
+                if schema is not None:
+                    Draft202012Validator.check_schema(schema)
+                    assert _nonstandard_numeric_keywords(schema) == []
 
 
 def test_decorate_tool_copies_mapping_and_mcp_model_metadata():

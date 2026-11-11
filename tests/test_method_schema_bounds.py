@@ -7,6 +7,7 @@ from jsonschema import Draft202012Validator
 from pydantic import TypeAdapter, ValidationError
 
 from measure_service import methods
+from measure_service.tool_catalog import CANONICAL_SCHEMA_PROFILE, schema_for_profile
 
 
 def nested_method_input() -> dict:
@@ -57,18 +58,26 @@ def all_keyword_paths(schema, path="$", keywords=("gt", "ge", "lt", "le")):
 
 
 @pytest.mark.parametrize(
-    ("alias", "valid", "invalid", "expected_keywords"),
+    ("alias", "valid", "invalid", "expected_keywords", "pydantic_keyword"),
     [
-        (methods.PositiveNumber, [1, 0.25], [0, -0.25], {"exclusiveMinimum": 0}),
-        (methods.NonnegativeNumber, [0, 0.25], [-0.25], {"minimum": 0}),
-        (methods.Fraction, [0, 0.25, 1], [-0.25, 1.25], {"minimum": 0, "maximum": 1}),
+        (methods.PositiveNumber, [1, 0.25], [0, -0.25], {"exclusiveMinimum": 0}, "gt"),
+        (methods.NonnegativeNumber, [0, 0.25], [-0.25], {"minimum": 0}, "ge"),
+        (
+            methods.Fraction,
+            [0, 0.25, 1],
+            [-0.25, 1.25],
+            {"minimum": 0, "maximum": 1},
+            "ge",
+        ),
     ],
 )
 def test_numeric_aliases_use_standard_schema_keywords_and_match_runtime(
-    alias, valid, invalid, expected_keywords
+    alias, valid, invalid, expected_keywords, pydantic_keyword
 ):
     adapter = TypeAdapter(alias)
-    schema = adapter.json_schema()
+    raw_schema = adapter.json_schema()
+    assert pydantic_keyword in raw_schema
+    schema = schema_for_profile(raw_schema, CANONICAL_SCHEMA_PROFILE)
     Draft202012Validator.check_schema(schema)
     assert {key: schema[key] for key in expected_keywords} == expected_keywords
     validator = Draft202012Validator(schema)
@@ -92,7 +101,9 @@ def test_numeric_aliases_reject_non_json_numbers_at_runtime(value):
 
 
 def test_real_nested_method_schemas_are_draft_2020_12_and_match_pydantic_field_bounds():
-    schema = methods._MethodEvaluationInput.model_json_schema()
+    raw_schema = methods._MethodEvaluationInput.model_json_schema()
+    assert all_keyword_paths(raw_schema)
+    schema = schema_for_profile(raw_schema, CANONICAL_SCHEMA_PROFILE)
     Draft202012Validator.check_schema(schema)
     assert all_keyword_paths(schema) == []
     validator = Draft202012Validator(schema)
@@ -142,7 +153,9 @@ def test_real_nested_method_schemas_are_draft_2020_12_and_match_pydantic_field_b
 def test_campaign_coordinate_bounds_also_emit_standard_numeric_keywords():
     from measure_service.campaign_protocol import CandidateCoordinates
 
-    schema = CandidateCoordinates.model_json_schema()
+    raw_schema = CandidateCoordinates.model_json_schema()
+    assert all_keyword_paths(raw_schema)
+    schema = schema_for_profile(raw_schema, CANONICAL_SCHEMA_PROFILE)
     Draft202012Validator.check_schema(schema)
     assert all_keyword_paths(schema) == []
     validator = Draft202012Validator(schema)
@@ -162,3 +175,20 @@ def test_campaign_coordinate_bounds_also_emit_standard_numeric_keywords():
         except ValidationError:
             pydantic_accepts = False
         assert validator.is_valid(candidate) == pydantic_accepts
+
+
+def test_direct_method_and_campaign_models_project_standard_numeric_bounds():
+    from measure_service.campaign_protocol import CampaignProtocolSpec, CandidateCoordinates
+
+    models = (
+        methods.MethodDeclaration,
+        methods.MethodConstraints,
+        methods._MethodEvaluationInput,
+        methods.MethodEvaluation,
+        CampaignProtocolSpec,
+        CandidateCoordinates,
+    )
+    for model in models:
+        projected = schema_for_profile(model.model_json_schema(), CANONICAL_SCHEMA_PROFILE)
+        Draft202012Validator.check_schema(projected)
+        assert all_keyword_paths(projected) == []
