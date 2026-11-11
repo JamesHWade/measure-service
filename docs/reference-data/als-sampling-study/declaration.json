@@ -1,0 +1,160 @@
+{
+  "profile": "measure-als-sampling-study/1",
+  "title": "Fixed ALS sample-grid and noise sensitivity study",
+  "status": "declared-before-fit",
+  "purpose": "Describe how a fixed ALS lambda grid behaves across selected synthetic sampling densities and noise levels. Do not select or recommend a lambda.",
+  "scope": {
+    "data": "Synthetic signal with known baseline and Gaussian peaks; no instrument, sample matrix, or analytical method is represented.",
+    "allowed_conclusion": "The reported metrics characterize this declared numerical grid and installed implementation only.",
+    "excluded_conclusions": [
+      "universal ALS settings",
+      "instrument qualification",
+      "method validation",
+      "peak-area or concentration qualification",
+      "a statistically selected or optimized lambda"
+    ]
+  },
+  "implementation": {
+    "api": "measure::step_measure_baseline_als",
+    "r_recipe_max_iter": 20,
+    "asymmetry_p": 0.01,
+    "service_lambda_default": 1000000,
+    "fit_grid_reuses_each_input_for_every_lambda": true,
+    "fit_count": 315,
+    "unique_input_count": 45,
+    "qualified_runtime": {
+      "r_version": "4.5.2",
+      "measure_version": "0.0.1.9003",
+      "measure_r_code_database_md5": "2d4c2bf3693c8918dde6fcc0ac8e9a5b",
+      "recipes_version": "1.3.1",
+      "measure_source_head": "56abb0f71e6052d2c4810011bc0f8b60363021ac",
+      "measure_peak_operations_source_sha256": "c07bc473b6daa30f4428dc8a0000fed0d861bf1759fa44734b7e5f5dda479c86",
+      "measure_baseline_als_source_sha256": "089b9115abaa9c5b8089016902c1d52649486d4cccfc574c42e824952a0f6c61"
+    },
+    "qualified_runtime_role": "Reference provenance for one captured study run only. Reproducers record their actual installed R packages and do not reject other versions or build fingerprints."
+  },
+  "signal": {
+    "axis_unit": "synthetic axis units",
+    "signal_unit": "synthetic signal units",
+    "axis_range": [
+      0,
+      10
+    ],
+    "sample_counts": [
+      101,
+      401,
+      1601
+    ],
+    "nested_grid_rule": "For each grid, take every stride-th sample from the 1601-point linspace, with strides 16, 4, and 1 for sample counts 101, 401, and 1601 respectively.",
+    "baseline": "0.2 + 0.02*x + 0.015*sin(2*pi*x/10)",
+    "gaussian_peaks": [
+      {
+        "amplitude": 1.0,
+        "center": 2.0,
+        "sigma": 0.18
+      },
+      {
+        "amplitude": 0.7,
+        "center": 5.2,
+        "sigma": 0.4
+      },
+      {
+        "amplitude": 0.85,
+        "center": 8.2,
+        "sigma": 0.24
+      }
+    ],
+    "noise": {
+      "distribution": "standard normal values on the finest grid, scaled by noise_sd; values are reused as nested density subsamples and across noise levels for each seed",
+      "noise_sd_values": [
+        0.01,
+        0.03,
+        0.06
+      ],
+      "seed_values": [
+        101,
+        202,
+        303,
+        404,
+        505
+      ],
+      "generation": "For each seed, use Python random.Random(seed) and generate 801 Box-Muller pairs. For each pair u1=1-random() and u2=random(), set r=sqrt(-2*ln(u1)), z_even=r*cos(2*pi*u2), and z_odd=r*sin(2*pi*u2); retain the first 1601 values and discard the one excess value. Reuse nested-grid positions across densities and scale the same realization by each noise_sd.",
+      "pairing_limit": "All densities use nested positions from the same 1601-point seed-specific realization, and all noise levels scale that same realization. Density and noise comparisons are paired descriptive summaries, not independent-density inference."
+    },
+    "observed_signal": "true baseline + all three Gaussian peaks + scaled noise"
+  },
+  "settings": {
+    "lambda_values": [
+      1000,
+      10000,
+      100000,
+      1000000,
+      10000000,
+      100000000,
+      1000000000
+    ],
+    "p": 0.01,
+    "max_iter": 20,
+    "preprocessing": "ALS only; no Gaussian smoothing, peak detection, or integration"
+  },
+  "metrics": {
+    "estimated_baseline": "observed signal minus the ALS-corrected signal returned by the fitted recipe",
+    "overall_baseline_rmse": "sqrt(mean((estimated_baseline - true_baseline)^2)) over every sample",
+    "low_peak_windows": [
+      [
+        0.5,
+        1.2
+      ],
+      [
+        3.2,
+        3.8
+      ],
+      [
+        6.8,
+        7.4
+      ],
+      [
+        9.0,
+        9.5
+      ]
+    ],
+    "baseline_rmse_peak_free": "CSV metric name retained as an identifier; sqrt(mean squared baseline error over the union of the declared low-peak windows). The windows avoid nominal peak centers, but Gaussian tails remain, so this is not an RMSE over peak-free signal.",
+    "endpoint_windows": {
+      "left": "axis x <= 1.0 (first 10% of the declared axis)",
+      "right": "axis x >= 9.0 (last 10% of the declared axis)"
+    },
+    "endpoint_cut": 1.0,
+    "endpoint_outputs": [
+      "true and estimated baseline means in each endpoint window",
+      "signed mean baseline error in each endpoint window",
+      "baseline RMSE in each endpoint window"
+    ],
+    "aggregation": "Summary rows group by sample count, noise_sd, and lambda and report the median, minimum, maximum, arithmetic mean, and sample standard deviation across the five declared seeds. The SVG figure plots medians. No ranking or recommendation is calculated."
+  },
+  "figure": {
+    "file": "lambda-sampling-sensitivity.svg",
+    "implementation": "Base R SVG device and graphics",
+    "panels": "One panel per noise_sd value",
+    "x_axis": "lambda on a logarithmic scale",
+    "y_axis": "overall baseline RMSE in synthetic signal units",
+    "series": "One line per sample count",
+    "aggregation": "Median across the five declared seeds",
+    "purpose": "Show the declared grid without selecting a best lambda or implying a universal setting."
+  },
+  "reproducibility": {
+    "input_hash": "SHA-256 of each canonical JSON input record, including input_id, seed, sample_count, noise_sd, axis, true baseline, peak signal, scaled noise vector, and observed signal",
+    "required_run_provenance": [
+      "R version",
+      "measure package version",
+      "installed measure R code database MD5",
+      "R library paths",
+      "study declaration SHA-256",
+      "Python driver SHA-256",
+      "R fitting script SHA-256",
+      "R plotting script SHA-256"
+    ],
+    "optional_source_provenance": "When a measure source directory is supplied, record available source-file SHA-256 values and its Git HEAD or a supplied source-head file. Source provenance is not required for fitting.",
+    "runtime_policy": "Record actual installed runtime fingerprints on every run. Do not reject a run because they differ from qualified_runtime; compare its numeric outputs as a separate run.",
+    "determinism": "A rerun with the same source, declaration, runtime, package build, and input hashes is expected to reproduce numeric fit and summary fields. Run timestamps may differ. Different runtime fingerprints can yield different results and remain separately identified."
+  }
+}

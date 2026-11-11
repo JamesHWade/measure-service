@@ -1,0 +1,46 @@
+{
+  "artifacts_sha256": {
+    "declaration.json": "865bc385d8df1d3facf7bf447a25e0c8e3ac6ff434f84b8899940ae26ae5586a",
+    "fits.csv": "80c999d203c2ee9dcffd98a8941d608b6e07f0e747274c230960c7b700366bc1",
+    "input_manifest.csv": "e29d11ab95fe9d98b512225daa65b713a544e8ba67de0dc1f433e958c84ab736",
+    "inputs.csv": "ffc8353cf8d1fe87a0bda4ed1499aaf3de551f3ff08374db155af296595b48ee",
+    "lambda-sampling-sensitivity.svg": "70772716ba4d58c5d93f6131235c149edc81877d066863f79a84dda33d2d059c",
+    "summary.csv": "05c71917d4cef9490294eafb500bd485b8cc9d30940b7fd7b670e24857d8514f"
+  },
+  "completed_at_utc": "2026-11-11T12:01:54.337229+00:00",
+  "fit_count": 315,
+  "fit_warning_rows": 0,
+  "input_sample_rows": 31545,
+  "measure_source_provenance": {
+    "baseline_als.R_sha256": "089b9115abaa9c5b8089016902c1d52649486d4cccfc574c42e824952a0f6c61",
+    "git_head": "56abb0f71e6052d2c4810011bc0f8b60363021ac",
+    "head_source": "git",
+    "peak_operations.R_sha256": "c07bc473b6daa30f4428dc8a0000fed0d861bf1759fa44734b7e5f5dda479c86",
+    "status": "supplied"
+  },
+  "no_parameter_selection_performed": true,
+  "profile": "measure-als-sampling-study-run/1",
+  "python_driver_sha256": "0e90d1bdcac246367b7924bfcd034152d42493959b9ce96889429d1e70290275",
+  "r_binary": "/opt/homebrew/Cellar/r/4.5.2_1/bin/R",
+  "r_fitting_script_sha256": "7509e2748fb9742ffbffc0b8959cd7fa61d2baa22c68c07443430857b19b207f",
+  "r_library_paths": [
+    "/private/tmp/measure-recovery-20261111/study-r-library",
+    "/opt/homebrew/lib/R/4.5/site-library",
+    "/opt/homebrew/Cellar/r/4.5.2_1/lib/R/library"
+  ],
+  "r_plotting_script_sha256": "59bf2f05c19e625705d2cd21a89c050bdccbe208d932248944f437f3f4c125f6",
+  "runtime": {
+    "library_paths": [
+      "/private/tmp/measure-recovery-20261111/study-r-library",
+      "/opt/homebrew/lib/R/4.5/site-library",
+      "/opt/homebrew/Cellar/r/4.5.2_1/lib/R/library"
+    ],
+    "measure_r_code_database_md5": "b09dc6a68cf47e69f0570ed3646023ab",
+    "measure_version": "0.0.1.9003",
+    "r_version": "4.5.2",
+    "recipes_version": "1.3.1"
+  },
+  "status": "completed-fixed-grid",
+  "study_declaration_sha256": "865bc385d8df1d3facf7bf447a25e0c8e3ac6ff434f84b8899940ae26ae5586a",
+  "unique_input_count": 45
+}

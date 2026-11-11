@@ -103,23 +103,78 @@ class Dataset(StrictModel):
 
 
 class ChromatogramMethod(StrictModel):
-    baseline: Literal["none", "als"] = "none"
-    baseline_lambda: float = Field(
-        default=1e6, gt=0, le=1e12, description="ALS baseline smoothness on the sample-index grid."
+    baseline: Literal["none", "als"] = Field(
+        default="none",
+        description=(
+            "Preprocess the signal with no ALS correction or asymmetric least squares. "
+            "`none` leaves acquired background in the signal; this is separate from "
+            "`integration_baseline`, which controls area calculation."
+        ),
     )
-    baseline_p: float = Field(default=0.01, gt=0, lt=1, description="ALS asymmetry parameter.")
-    smoothing: Literal["none", "gaussian"] = "none"
+    baseline_lambda: float = Field(
+        default=1e6,
+        gt=0,
+        le=1e12,
+        description=(
+            "Positive ALS penalty on second differences of the sample-index signal; larger values "
+            "generally produce smoother baselines. Its effect depends on the sampling grid and "
+            "signal, peak, and noise pattern, so the default 1e6 is not a universal setting."
+        ),
+    )
+    baseline_p: float = Field(
+        default=0.01,
+        gt=0,
+        lt=1,
+        description=(
+            "Unitless ALS weight for residuals above the fitted baseline; residuals below it "
+            "receive weight 1 - p. Smaller values downweight above-baseline peaks more strongly. "
+            "The default 0.01 is not an instrument-independent recommendation."
+        ),
+    )
+    smoothing: Literal["none", "gaussian"] = Field(
+        default="none",
+        description=(
+            "Leave the signal unsmoothed or apply Gaussian smoothing on the sample-index grid. "
+            "The width is set by smoothing_sigma in sample points, not axis units."
+        ),
+    )
     smoothing_sigma: float = Field(
         default=1,
         gt=0,
         le=100,
         description="Gaussian kernel standard deviation in sample points, not axis units.",
     )
-    min_height: float = Field(default=0, ge=0, description="Minimum peak height in signal units.")
+    min_height: float = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Minimum detected apex value after preprocessing, in signal_unit. Zero disables "
+            "height filtering; with baseline='none', the value still includes acquired background."
+        ),
+    )
     min_prominence: float = Field(
-        default=0, ge=0, description="Minimum peak prominence in signal units."
+        default=0,
+        ge=0,
+        description=(
+            "Minimum peak prominence for prominence detection, in signal_unit. Zero disables "
+            "prominence filtering; prominence describes contrast to surrounding signal and is "
+            "distinct from integration area."
+        ),
     )
     min_distance: float = Field(
-        default=0, ge=0, description="Minimum separation between peaks in axis units."
+        default=0,
+        ge=0,
+        description=(
+            "Minimum separation between retained peak locations in axis_unit. Zero disables "
+            "distance filtering; when positive, the prominence detector keeps stronger nearby "
+            "candidates first."
+        ),
     )
-    integration_baseline: Literal["local", "none", "global"] = "local"
+    integration_baseline: Literal["local", "none", "global"] = Field(
+        default="local",
+        description=(
+            "Observed-signal area baseline: local subtracts a line between the integration bounds; "
+            "none integrates to zero and includes background; global subtracts the minimum in the "
+            "peak range. Negative corrected integrand values are clipped to zero."
+        ),
+    )
