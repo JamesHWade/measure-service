@@ -63,8 +63,18 @@ The probe runs outside the event loop, with at most one blocking checker per
 wrapper. Concurrent requests share that work, with a one-second response
 deadline; timing out a response does not start another checker while the old
 one is still running. The SQLite probe also uses a short busy timeout and a
-cooperative query deadline. Filesystem calls are subject to the host's I/O
-behavior.
+cooperative 0.75-second probe budget, including connection and query time.
+This leaves room for a cold read inside the one-second HTTP deadline. A read
+that exceeds the budget still reports `not_ready`. Filesystem calls are
+subject to the host's I/O behavior; the HTTP deadline does not interrupt an
+operating-system call already in progress.
+
+A single `not_ready` can reflect a cold read or brief storage contention, as
+well as an unavailable store. Start with three consecutive failed probes
+before removing an instance from service, and investigate repeated failures
+using the operator inspection command. Keep the probe interval and recovery
+policy explicit in the actual supervisor configuration. Repeated failures are
+not evidence that the store should be recreated or migrated automatically.
 
 `ready` does not establish complete schema integrity, write capacity, free disk
 space, R/SEC availability, a functioning authentication proxy or a working

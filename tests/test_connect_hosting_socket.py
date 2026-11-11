@@ -29,7 +29,10 @@ REPLACEMENT = "33333333-3333-4333-8333-333333333333"
 
 @pytest.fixture
 def users_api():
-    accounts = {"analyst-a": ANALYST_A, "analyst-b": ANALYST_B}
+    class Accounts(dict):
+        locked = set()
+
+    accounts = Accounts({"analyst-a": ANALYST_A, "analyst-b": ANALYST_B})
     # Session tokens the stand-in issued, and the visitor keys it exchanged them for.
     sessions = {"session-a": ANALYST_A, "session-b": ANALYST_B}
     visitor_keys = {}
@@ -62,7 +65,7 @@ def users_api():
                 200,
                 {
                     "results": [
-                        {"username": name, "guid": guid, "locked": False}
+                        {"username": name, "guid": guid, "locked": name in accounts.locked}
                         for name, guid in accounts.items()
                         if name.startswith(prefix)
                     ]
@@ -193,6 +196,21 @@ def call(port, user, name, arguments, *, host=None, token=None):
     )
 
 
+def protocol_request(port, message, *, headers=()):
+    request_headers = [
+        ("Content-Type", "application/json"),
+        ("Accept", "application/json, text/event-stream"),
+        *headers,
+    ]
+    return httpx.post(
+        f"http://127.0.0.1:{port}/mcp",
+        headers=request_headers,
+        content=json.dumps(message),
+        timeout=10,
+        trust_env=False,
+    )
+
+
 def create(port, user, key, **kwargs):
     response = call(
         port,
@@ -244,6 +262,20 @@ def test_a_reassigned_username_does_not_inherit_records(running_service, users_a
     assert read(port, "analyst-a-renamed", experiment_id)["isError"] is False
 
 
+def test_each_request_revalidates_a_locked_username(running_service, users_api):
+    port = running_service
+    _, accounts, requests = users_api
+    created = create(port, "analyst-a", "a-1")
+    experiment_id = created["structuredContent"]["experiment_id"]
+    assert read(port, "analyst-a", experiment_id)["isError"] is False
+    assert len(requests) == 2
+
+    accounts.locked.add("analyst-a")
+    revoked = read(port, "analyst-a", experiment_id)
+    assert revoked["isError"] is True
+    assert len(requests) == 3, "An existing owner must be revalidated on every HTTP request"
+
+
 def test_unresolved_accounts_get_a_readable_tool_error(running_service, users_api):
     port = running_service
     _, accounts, _ = users_api
@@ -280,6 +312,92 @@ def test_discovery_needs_no_account_and_foreign_hosts_are_refused(running_servic
 
     refused = call(port, "analyst-a", "measurement_registry_capabilities", {}, host="other.example")
     assert refused.status_code == 421
+
+
+def test_health_discovery_and_protocol_setup_do_not_query_connect(running_service, users_api):
+    port = running_service
+    _, _, requests = users_api
+
+    assert (
+        httpx.get(f"http://127.0.0.1:{port}/health/live", timeout=10, trust_env=False).status_code
+        == 200
+    )
+    assert (
+        httpx.get(f"http://127.0.0.1:{port}/health/ready", timeout=10, trust_env=False).status_code
+        == 503
+    )
+
+    messages = [
+        {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2025-03-26",
+                "capabilities": {},
+                "clientInfo": {"name": "identity-cost-test", "version": "1"},
+            },
+        },
+        {"jsonrpc": "2.0", "id": 2, "method": "ping", "params": {}},
+        {"jsonrpc": "2.0", "id": 3, "method": "tools/list", "params": {}},
+        {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}},
+    ]
+    for message in messages:
+        protocol_request(port, message)
+    assert requests == []
+
+
+def test_unknown_tool_and_malformed_protocol_do_not_query_connect(running_service, users_api):
+    port = running_service
+    _, _, requests = users_api
+    unknown = protocol_request(
+        port,
+        {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "tools/call",
+            "params": {"name": "not_a_registered_tool", "arguments": {}},
+        },
+        headers=(("RStudio-Connect-Credentials", json.dumps({"user": "analyst-a"})),),
+    )
+    assert unknown.status_code == 200
+    assert unknown.json()["result"]["isError"] is True
+
+    malformed = httpx.post(
+        f"http://127.0.0.1:{port}/mcp",
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json, text/event-stream",
+            "RStudio-Connect-Credentials": json.dumps({"user": "analyst-a"}),
+        },
+        content=b'{"jsonrpc":"2.0","id":1,"method":"tools/call",',
+        timeout=10,
+        trust_env=False,
+    )
+    assert malformed.status_code >= 400
+    assert requests == []
+
+
+def test_ambiguous_identity_headers_do_not_query_connect(running_service, users_api):
+    port = running_service
+    _, _, requests = users_api
+    response = protocol_request(
+        port,
+        {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "tools/call",
+            "params": {"name": "measurement_registry_capabilities", "arguments": {}},
+        },
+        headers=(
+            ("RStudio-Connect-Credentials", json.dumps({"user": "analyst-a"})),
+            ("RStudio-Connect-Credentials", json.dumps({"user": "analyst-b"})),
+        ),
+    )
+    assert response.status_code == 200
+    assert response.json()["result"]["isError"] is True
+    assert "missing or ambiguous" in error_text(response.json()["result"])
+    assert requests == []
 
 
 def test_session_tokens_resolve_to_separate_owners(session_service, users_api):

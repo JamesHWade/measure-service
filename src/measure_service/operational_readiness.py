@@ -8,6 +8,9 @@ import time
 from contextlib import closing
 from pathlib import Path
 
+_PROBE_BUDGET_SECONDS = 0.75
+_BUSY_TIMEOUT_SECONDS = 0.1
+
 
 def storage_ready() -> bool:
     """Observe an initialized readable store without creating or migrating it.
@@ -26,6 +29,7 @@ def storage_ready() -> bool:
         )
     )
     path = root / "measure.sqlite3"
+    deadline = time.monotonic() + _PROBE_BUDGET_SECONDS
     try:
         if (
             root.is_symlink()
@@ -33,13 +37,15 @@ def storage_ready() -> bool:
             or os.path.lexists(root / "INCOMPLETE")
             or path.is_symlink()
             or not path.is_file()
+            or time.monotonic() >= deadline
         ):
             return False
         # mode=ro observes committed WAL data; immutable=1 would ignore it.
         with closing(
-            sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True, timeout=0.1)
+            sqlite3.connect(
+                path.resolve().as_uri() + "?mode=ro", uri=True, timeout=_BUSY_TIMEOUT_SECONDS
+            )
         ) as con:
-            deadline = time.monotonic() + 0.2
             con.set_progress_handler(lambda: int(time.monotonic() >= deadline), 100)
             try:
                 for table, columns in (
@@ -64,6 +70,8 @@ def storage_ready() -> bool:
                         ("owner", "request_key", "digest", "response", "created_at"),
                     ),
                 ):
+                    if time.monotonic() >= deadline:
+                        return False
                     kind = con.execute(
                         "SELECT type FROM sqlite_master WHERE name=? LIMIT 1", (table,)
                     ).fetchone()
@@ -73,7 +81,7 @@ def storage_ready() -> bool:
                     # prepares the required columns without reading any records.
                     selected = ",".join(f'"{table}"."{column}"' for column in columns)
                     con.execute(f'SELECT {selected} FROM "{table}" LIMIT 0')
-                return True
+                return time.monotonic() < deadline
             finally:
                 con.set_progress_handler(None, 0)
     except (OSError, sqlite3.Error, ValueError):

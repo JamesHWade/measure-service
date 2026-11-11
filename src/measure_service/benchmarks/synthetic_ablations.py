@@ -2005,6 +2005,8 @@ def run_synthetic_ablations(output_dir: str | Path, *, data_dir: str | Path) -> 
 
     with staged_bundle(target, input_dirs=(DEFAULT_DOCUMENT.parent, data_path)) as stage:
         with shared._scoped_data_dir(data_path):
+            with registry_connection(write=True):
+                pass
             _validate_existing_plan(document, study_sha256)
             registration_failure = None
             try:

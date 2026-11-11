@@ -1,8 +1,9 @@
 # MCP tool reference
 
 Generated from the registered tools by `python scripts/render_reference.py --write`.
-Do not edit the tables by hand. MCP `tools/list` supplies complete JSON schemas,
-including nested record models, defaults and validation limits. For a local JSON
+Do not edit the tables by hand. By default, MCP `tools/list` supplies canonical JSON schemas,
+including nested record models, defaults and validation limits. Optional schema profiles
+are described in [the catalog guide](tool-catalog.md). For a local JSON
 export, run `python scripts/render_reference.py --json`.
 
 All tools return structured JSON. Check `isError` before reading
@@ -12,84 +13,84 @@ a new record each time. No tool executes an instrument command.
 
 The current catalog contains 76 tools.
 
-| Tool | Required arguments | Effect | Retry behavior |
-| --- | --- | --- | --- |
-| `measurement_abandon_campaign_suggestion_attempt` | `suggestion_attempt_id`, `expected_start_sha256`, `reason`, `idempotency_key` | write | idempotent |
-| `measurement_analyze_chromatogram` | `dataset_id`, `trace_id`, `method` | write | creates new record |
-| `measurement_analyze_sec` | `dataset_id`, `trace_id`, `method` | write | creates new record |
-| `measurement_cancel_chromatogram_batch` | `batch_id`, `idempotency_key`, `expected_revision` | write | idempotent |
-| `measurement_capabilities` | — | read | idempotent |
-| `measurement_compare_sec` | `analysis_ids` | read | idempotent |
-| `measurement_consume_campaign_snapshot` | `campaign_id`, `proposal_id`, `snapshot_id`, `expected_revision`, `idempotency_key` | write | idempotent |
-| `measurement_create_campaign` | `protocol_id`, `task_id`, `seed`, `policy`, `idempotency_key` | write | idempotent |
-| `measurement_create_chromatogram_batch` | `batch`, `idempotency_key` | write | idempotent |
-| `measurement_create_experiment` | `spec`, `idempotency_key` | write | idempotent |
-| `measurement_create_observation_snapshot` | `contract_id`, `observation_ids`, `idempotency_key` | write | idempotent |
-| `measurement_evaluate_observation` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
-| `measurement_export_chromatogram_batch` | `batch_id`, `expected_revision`, `mode` | read | returns a new capture |
-| `measurement_get_analysis` | `analysis_id` | read | idempotent |
-| `measurement_get_analytical_import` | `import_id` | read | idempotent |
-| `measurement_get_attempt` | `attempt_id` | read | idempotent |
-| `measurement_get_campaign` | `campaign_id` | read | idempotent |
-| `measurement_get_campaign_consumption` | `consumption_id` | read | idempotent |
-| `measurement_get_campaign_proposal` | `proposal_id` | read | idempotent |
-| `measurement_get_campaign_protocol` | `protocol_id` | read | idempotent |
-| `measurement_get_campaign_suggestion_attempt` | `suggestion_attempt_id` | read | idempotent |
-| `measurement_get_chromatogram_batch` | `batch_id` | read | idempotent |
-| `measurement_get_chromatogram_batch_run` | `run_id` | read | idempotent |
-| `measurement_get_chromatogram_evidence` | `analysis_id` | read | idempotent |
-| `measurement_get_experiment` | `experiment_id` | read | idempotent |
-| `measurement_get_experiment_design_lineage` | `experiment_id` | read | idempotent |
-| `measurement_get_gaussian_observation` | `run_id` | read | idempotent |
-| `measurement_get_gaussian_producer` | `producer_id` | read | idempotent |
-| `measurement_get_method` | `method_id` | read | idempotent |
-| `measurement_get_observation` | `observation_id` | read | idempotent |
-| `measurement_get_observation_contract` | `contract_id` | read | idempotent |
-| `measurement_get_observation_snapshot` | `snapshot_id` | read | idempotent |
-| `measurement_get_result` | `result_id` | read | idempotent |
-| `measurement_get_result_table_import` | `import_id` | read | idempotent |
-| `measurement_get_retention_model` | `model_id` | read | idempotent |
-| `measurement_get_retention_prediction` | `prediction_id` | read | idempotent |
-| `measurement_import_result_table` | `spec`, `idempotency_key` | write | idempotent |
-| `measurement_inspect_dataset` | `dataset_id` | read | idempotent |
-| `measurement_list_attempts` | `experiment_id` | read | idempotent |
-| `measurement_list_campaign_suggestion_attempts` | `campaign_id` | read | idempotent |
-| `measurement_list_experiments` | — | read | idempotent |
-| `measurement_list_methods` | — | read | idempotent |
-| `measurement_list_results` | `attempt_id` | read | idempotent |
-| `measurement_method_capabilities` | — | read | idempotent |
-| `measurement_predict_retention` | `model_id`, `method_id`, `idempotency_key` | write | idempotent |
-| `measurement_preview_result_table` | `spec` | read | idempotent |
-| `measurement_quantify_peak` | `analysis_id`, `peak_id`, `method` | write | creates new record |
-| `measurement_read_analysis_data` | `analysis_id`, `kind` | read | idempotent |
-| `measurement_read_chromatogram_batch_attempts` | `batch_id`, `ordinal` | read | idempotent |
-| `measurement_read_chromatogram_batch_control_events` | `batch_id` | read | idempotent |
-| `measurement_read_chromatogram_batch_export` | `snapshot_sha256` | read | idempotent |
-| `measurement_read_chromatogram_batch_items` | `batch_id` | read | idempotent |
-| `measurement_read_chromatogram_evidence` | `analysis_id`, `kind`, `evidence_sha256` | read | idempotent |
-| `measurement_read_result_table_rows` | `import_id` | read | idempotent |
-| `measurement_read_result_table_source` | `import_id` | read | idempotent |
-| `measurement_read_source` | `dataset_id` | read | idempotent |
-| `measurement_record_attempt` | `experiment_id`, `spec`, `idempotency_key` | write | idempotent |
-| `measurement_record_gaussian_observation` | `producer_id`, `prediction_id`, `attempt_id`, `expected_attempt_revision`, `idempotency_key` | write | idempotent |
-| `measurement_record_results` | `attempt_id`, `expected_attempt_revision`, `results`, `idempotency_key` | write | idempotent |
-| `measurement_recover_chromatogram_batch` | `batch_id`, `idempotency_key`, `expected_revision` | write | idempotent |
-| `measurement_register_campaign_protocol` | `title`, `spec`, `idempotency_key` | write | idempotent |
-| `measurement_register_csv` | `title`, `csv_text`, `axis_column`, `signal_column`, `metadata` | write | creates new record |
-| `measurement_register_dataset` | `dataset` | write | creates new record |
-| `measurement_register_gaussian_producer` | `title`, `retention_model_id`, `spec`, `idempotency_key` | write | idempotent |
-| `measurement_register_long_csv` | `title`, `csv_text`, `axis_column`, `signal_column`, `group_columns`, `groups` | write | creates new record |
-| `measurement_register_method` | `title`, `declaration`, `idempotency_key` | write | idempotent |
-| `measurement_register_observation_contract` | `title`, `spec`, `idempotency_key` | write | idempotent |
-| `measurement_register_retention_model` | `title`, `spec`, `idempotency_key` | write | idempotent |
-| `measurement_register_wide_csv` | `title`, `csv_text`, `axis_column`, `channels` | write | creates new record |
-| `measurement_registry_capabilities` | — | read | idempotent |
-| `measurement_retry_chromatogram_batch_items` | `batch_id`, `ordinals`, `idempotency_key`, `expected_revision` | write | idempotent |
-| `measurement_revise_attempt` | `attempt_id`, `expected_revision`, `spec`, `reason`, `idempotency_key` | write | idempotent |
-| `measurement_run_chromatogram_batch` | `batch_id`, `idempotency_key`, `expected_revision` | write | idempotent |
-| `measurement_suggest_campaign` | `campaign_id`, `expected_revision`, `idempotency_key` | write | idempotent |
-| `measurement_supersede_experiment` | `experiment_id`, `expected_input_sha256`, `spec`, `reason`, `idempotency_key` | write | idempotent |
-| `measurement_validate_method` | `declaration` | read | idempotent |
+| Tool | Group | Required arguments | Effect | Retry behavior |
+| --- | --- | --- | --- | --- |
+| `measurement_abandon_campaign_suggestion_attempt` | `campaigns` | `suggestion_attempt_id`, `expected_start_sha256`, `reason`, `idempotency_key` | write | idempotent |
+| `measurement_analyze_chromatogram` | `traces` | `dataset_id`, `trace_id`, `method` | write | creates new record |
+| `measurement_analyze_sec` | `sec` | `dataset_id`, `trace_id`, `method` | write | creates new record |
+| `measurement_cancel_chromatogram_batch` | `batches` | `batch_id`, `idempotency_key`, `expected_revision` | write | idempotent |
+| `measurement_capabilities` | `discovery` | — | read | idempotent |
+| `measurement_compare_sec` | `sec` | `analysis_ids` | read | idempotent |
+| `measurement_consume_campaign_snapshot` | `campaigns` | `campaign_id`, `proposal_id`, `snapshot_id`, `expected_revision`, `idempotency_key` | write | idempotent |
+| `measurement_create_campaign` | `campaigns` | `protocol_id`, `task_id`, `seed`, `policy`, `idempotency_key` | write | idempotent |
+| `measurement_create_chromatogram_batch` | `batches` | `batch`, `idempotency_key` | write | idempotent |
+| `measurement_create_experiment` | `experiments` | `spec`, `idempotency_key` | write | idempotent |
+| `measurement_create_observation_snapshot` | `observations` | `contract_id`, `observation_ids`, `idempotency_key` | write | idempotent |
+| `measurement_evaluate_observation` | `observations` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
+| `measurement_export_chromatogram_batch` | `batches` | `batch_id`, `expected_revision`, `mode` | read | returns a new capture |
+| `measurement_get_analysis` | `traces` | `analysis_id` | read | idempotent |
+| `measurement_get_analytical_import` | `batches` | `import_id` | read | idempotent |
+| `measurement_get_attempt` | `experiments` | `attempt_id` | read | idempotent |
+| `measurement_get_campaign` | `campaigns` | `campaign_id` | read | idempotent |
+| `measurement_get_campaign_consumption` | `campaigns` | `consumption_id` | read | idempotent |
+| `measurement_get_campaign_proposal` | `campaigns` | `proposal_id` | read | idempotent |
+| `measurement_get_campaign_protocol` | `campaigns` | `protocol_id` | read | idempotent |
+| `measurement_get_campaign_suggestion_attempt` | `campaigns` | `suggestion_attempt_id` | read | idempotent |
+| `measurement_get_chromatogram_batch` | `batches` | `batch_id` | read | idempotent |
+| `measurement_get_chromatogram_batch_run` | `batches` | `run_id` | read | idempotent |
+| `measurement_get_chromatogram_evidence` | `evidence` | `analysis_id` | read | idempotent |
+| `measurement_get_experiment` | `experiments` | `experiment_id` | read | idempotent |
+| `measurement_get_experiment_design_lineage` | `experiments` | `experiment_id` | read | idempotent |
+| `measurement_get_gaussian_observation` | `observations` | `run_id` | read | idempotent |
+| `measurement_get_gaussian_producer` | `observations` | `producer_id` | read | idempotent |
+| `measurement_get_method` | `methods` | `method_id` | read | idempotent |
+| `measurement_get_observation` | `observations` | `observation_id` | read | idempotent |
+| `measurement_get_observation_contract` | `observations` | `contract_id` | read | idempotent |
+| `measurement_get_observation_snapshot` | `observations` | `snapshot_id` | read | idempotent |
+| `measurement_get_result` | `experiments` | `result_id` | read | idempotent |
+| `measurement_get_result_table_import` | `experiments` | `import_id` | read | idempotent |
+| `measurement_get_retention_model` | `retention` | `model_id` | read | idempotent |
+| `measurement_get_retention_prediction` | `retention` | `prediction_id` | read | idempotent |
+| `measurement_import_result_table` | `experiments` | `spec`, `idempotency_key` | write | idempotent |
+| `measurement_inspect_dataset` | `traces` | `dataset_id` | read | idempotent |
+| `measurement_list_attempts` | `experiments` | `experiment_id` | read | idempotent |
+| `measurement_list_campaign_suggestion_attempts` | `campaigns` | `campaign_id` | read | idempotent |
+| `measurement_list_experiments` | `experiments` | — | read | idempotent |
+| `measurement_list_methods` | `methods` | — | read | idempotent |
+| `measurement_list_results` | `experiments` | `attempt_id` | read | idempotent |
+| `measurement_method_capabilities` | `discovery` | — | read | idempotent |
+| `measurement_predict_retention` | `retention` | `model_id`, `method_id`, `idempotency_key` | write | idempotent |
+| `measurement_preview_result_table` | `experiments` | `spec` | read | idempotent |
+| `measurement_quantify_peak` | `traces` | `analysis_id`, `peak_id`, `method` | write | creates new record |
+| `measurement_read_analysis_data` | `evidence` | `analysis_id`, `kind` | read | idempotent |
+| `measurement_read_chromatogram_batch_attempts` | `batches` | `batch_id`, `ordinal` | read | idempotent |
+| `measurement_read_chromatogram_batch_control_events` | `batches` | `batch_id` | read | idempotent |
+| `measurement_read_chromatogram_batch_export` | `batches` | `snapshot_sha256` | read | idempotent |
+| `measurement_read_chromatogram_batch_items` | `batches` | `batch_id` | read | idempotent |
+| `measurement_read_chromatogram_evidence` | `evidence` | `analysis_id`, `kind`, `evidence_sha256` | read | idempotent |
+| `measurement_read_result_table_rows` | `evidence` | `import_id` | read | idempotent |
+| `measurement_read_result_table_source` | `evidence` | `import_id` | read | idempotent |
+| `measurement_read_source` | `evidence` | `dataset_id` | read | idempotent |
+| `measurement_record_attempt` | `experiments` | `experiment_id`, `spec`, `idempotency_key` | write | idempotent |
+| `measurement_record_gaussian_observation` | `observations` | `producer_id`, `prediction_id`, `attempt_id`, `expected_attempt_revision`, `idempotency_key` | write | idempotent |
+| `measurement_record_results` | `experiments` | `attempt_id`, `expected_attempt_revision`, `results`, `idempotency_key` | write | idempotent |
+| `measurement_recover_chromatogram_batch` | `batches` | `batch_id`, `idempotency_key`, `expected_revision` | write | idempotent |
+| `measurement_register_campaign_protocol` | `campaigns` | `title`, `spec`, `idempotency_key` | write | idempotent |
+| `measurement_register_csv` | `traces` | `title`, `csv_text`, `axis_column`, `signal_column`, `metadata` | write | creates new record |
+| `measurement_register_dataset` | `traces` | `dataset` | write | creates new record |
+| `measurement_register_gaussian_producer` | `observations` | `title`, `retention_model_id`, `spec`, `idempotency_key` | write | idempotent |
+| `measurement_register_long_csv` | `traces` | `title`, `csv_text`, `axis_column`, `signal_column`, `group_columns`, `groups` | write | creates new record |
+| `measurement_register_method` | `methods` | `title`, `declaration`, `idempotency_key` | write | idempotent |
+| `measurement_register_observation_contract` | `observations` | `title`, `spec`, `idempotency_key` | write | idempotent |
+| `measurement_register_retention_model` | `retention` | `title`, `spec`, `idempotency_key` | write | idempotent |
+| `measurement_register_wide_csv` | `traces` | `title`, `csv_text`, `axis_column`, `channels` | write | creates new record |
+| `measurement_registry_capabilities` | `discovery` | — | read | idempotent |
+| `measurement_retry_chromatogram_batch_items` | `batches` | `batch_id`, `ordinals`, `idempotency_key`, `expected_revision` | write | idempotent |
+| `measurement_revise_attempt` | `experiments` | `attempt_id`, `expected_revision`, `spec`, `reason`, `idempotency_key` | write | idempotent |
+| `measurement_run_chromatogram_batch` | `batches` | `batch_id`, `idempotency_key`, `expected_revision` | write | idempotent |
+| `measurement_suggest_campaign` | `campaigns` | `campaign_id`, `expected_revision`, `idempotency_key` | write | idempotent |
+| `measurement_supersede_experiment` | `experiments` | `experiment_id`, `expected_input_sha256`, `spec`, `reason`, `idempotency_key` | write | idempotent |
+| `measurement_validate_method` | `methods` | `declaration` | read | idempotent |
 
 ## Tool descriptions
 
@@ -283,7 +284,7 @@ Quantify an explicitly assigned chromatogram peak with supplied linear response 
 
 ### `measurement_read_analysis_data`
 
-Read a bounded page of peaks, processed trace points, or SEC distribution points.
+Read up to 1,000 rows and 48,000 compact UTF-8 JSON bytes of stored analysis data; continue from the returned next_offset.
 
 ### `measurement_read_chromatogram_batch_attempts`
 
@@ -403,3 +404,4 @@ Normalize a declared LC method, calculate time and solvent use, and report feasi
 - [Numerical methods](analysis.md)
 - [Registry semantics](experiments.md)
 - [HTTP identity and storage](deployment.md)
+- [Tool groups and schema profiles](tool-catalog.md)

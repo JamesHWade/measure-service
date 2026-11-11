@@ -13,18 +13,17 @@ import hashlib
 import io
 import json
 import os
-import threading
 import uuid
-from collections import OrderedDict
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from mcp.server.fastmcp import Context, FastMCP
+from mcp.server.fastmcp import Context
 from mcp.types import ToolAnnotations
 from pydantic import Field, StrictInt, StrictStr, model_validator
 
 from . import (
     analysis_evidence,
+    analysis_pages,
     analysis_runtime,
     batch_exports,
     batches,
@@ -38,6 +37,7 @@ from . import (
     observations,
     result_tables,
     retention,
+    tool_catalog,
 )
 from . import experiments as registry
 from .analysis_models import (
@@ -69,6 +69,12 @@ from .campaign_protocol import (
     SUPPORTED_SURROGATE_NOISE_PRIORS,
     ProtocolSpec,
 )
+from .capture_cache import (
+    CAPTURE_IDLE_SECONDS,
+    MAX_CAPTURE_COUNT,
+    MAX_CAPTURES_PER_OWNER,
+    CaptureCache,
+)
 from .experiments import AttemptSpec, ExperimentSpec, ResultSpec
 from .gaussian_producer import GaussianProducerSpec
 from .http_authority import http_transport_security, wrap_authority_headers
@@ -87,16 +93,20 @@ from .operational_readiness import storage_ready
 from .result_table_models import ResultTableSpec
 from .result_table_parser import preview_result_table
 from .retention import RetentionModelSpec
-from .storage import canonical, connect, db_path, now, sha256
+from .storage import canonical, connect, db_path, now, registry_connection, sha256
+from .tool_server import ServiceMCP
 
 ROOT = Path(__file__).resolve().parent
 MAX_PAYLOAD_BYTES = 4_000_000
 MAX_PAGE = 1000
-MAX_EVIDENCE_SNAPSHOTS = 4
+MAX_EVIDENCE_SNAPSHOTS = MAX_CAPTURE_COUNT
 MAX_EVIDENCE_CACHE_BYTES = 64 * 1024 * 1024
-_EVIDENCE_SNAPSHOTS: OrderedDict[tuple, Any] = OrderedDict()
-_EVIDENCE_SNAPSHOT_BYTES = 0
-_EVIDENCE_SNAPSHOT_LOCK = threading.Lock()
+_EVIDENCE_CAPTURE_CACHE = CaptureCache(
+    max_per_owner=MAX_CAPTURES_PER_OWNER,
+    max_entries=MAX_EVIDENCE_SNAPSHOTS,
+    max_bytes=MAX_EVIDENCE_CACHE_BYTES,
+    idle_seconds=CAPTURE_IDLE_SECONDS,
+)
 
 
 class Standard(StrictModel):
@@ -210,7 +220,7 @@ def identity(ctx: Context) -> str:
 
 
 def dataset_for(owner: str, dataset_id: str) -> tuple[dict, str]:
-    with connect() as con:
+    with registry_connection() as con:
         row = con.execute(
             "SELECT payload, digest FROM datasets WHERE id=? AND owner=?", (dataset_id, owner)
         ).fetchone()
@@ -220,7 +230,7 @@ def dataset_for(owner: str, dataset_id: str) -> tuple[dict, str]:
 
 
 def source_for(owner: str, dataset_id: str) -> dict[str, Any] | None:
-    with connect() as con:
+    with registry_connection() as con:
         row = con.execute(
             """SELECT s.kind, s.digest, s.content, s.mapping FROM dataset_sources s
             JOIN datasets d ON s.dataset_id=d.id WHERE d.id=? AND d.owner=?""",
@@ -393,7 +403,7 @@ def trace_for(dataset: dict, trace_id: str) -> dict[str, Any]:
 
 
 def analysis_for(owner: str, analysis_id: str) -> dict[str, Any]:
-    with connect() as con:
+    with registry_connection() as con:
         row = con.execute(
             "SELECT dataset_id, trace_id, kind, method, result, provenance, created_at FROM analyses WHERE id=? AND owner=?",
             (analysis_id, owner),
@@ -440,19 +450,21 @@ INSTRUCTIONS = (
     "experiment, result and analysis belongs to the account that created it. Records are "
     "not shared between accounts: another signed-in person cannot list, read or link "
     "yours, and you cannot see theirs. There is no sharing, project or delete operation, "
-    "so do not store data you could not keep here. Start with "
-    "measurement_registry_capabilities; numerical analysis additionally needs the R "
+    "so do not store data you could not keep here. Use the tools listed by this deployment. "
+    "When listed, start with measurement_registry_capabilities; numerical analysis needs the R "
     "backend reported by measurement_capabilities. A tool failure is reported in the "
     "result's isError field, not as an HTTP error."
 )
 
-mcp = FastMCP(
+mcp = ServiceMCP(
     "measure-separations",
     instructions=INSTRUCTIONS,
     stateless_http=True,
     json_response=True,
     streamable_http_path="/mcp",
     transport_security=http_transport_security(),
+    selected_groups=tool_catalog.configured_groups(),
+    schema_profile=tool_catalog.schema_profile(),
 )
 READ = ToolAnnotations(
     readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False
@@ -479,6 +491,7 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "schema_version": registry.SCHEMA_VERSION,
         "qualification": "experimental",
         "storage": "single_node_sqlite",
+        "tool_catalog": mcp.catalog_configuration(),
         "experiment_specs": "immutable",
         "design_lineage": {
             "profile": design_lineage.LINEAGE_PROFILE,
@@ -543,6 +556,12 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
             "historical_execution_authority_restore": False,
             "instrument_actuation": False,
         },
+        "analysis_data_pages": {
+            "rows": analysis_pages.MAX_PAGE,
+            "compact_utf8_bytes": analysis_pages.MAX_RESPONSE_BYTES,
+            "backend_warning_messages": analysis_pages.MAX_BACKEND_WARNINGS,
+            "backend_warning_utf8_bytes": analysis_pages.MAX_WARNING_UTF8_BYTES,
+        },
         "chromatogram_evidence": {
             "profile": analysis_evidence.PROFILE,
             "retrieval": "owned_stored_results_without_reanalysis",
@@ -554,6 +573,9 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
             "document_bytes": analysis_evidence.MAX_BUNDLE_BYTES,
             "paging": "process_local_immutable_capture_by_owner_store_analysis_and_digest",
             "capture_limit": MAX_EVIDENCE_SNAPSHOTS,
+            "captures_per_owner": MAX_CAPTURES_PER_OWNER,
+            "capture_idle_seconds": CAPTURE_IDLE_SECONDS,
+            "capacity_pressure": "reject_new_capture_without_evicting_another_owner",
             "capture_serialized_bytes": MAX_EVIDENCE_CACHE_BYTES,
             "managed_artifact_upload": False,
         },
@@ -565,7 +587,10 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
             "control_events": 1024,
             "export_page_bytes": batch_exports.MAX_EXPORT_PAGE,
             "process_cache_bytes": batch_exports.MAX_EXPORT_BYTES,
-            "process_capture_count": batch_exports.MAX_EXPORTS,
+            "process_capture_count": batch_exports.MAX_EXPORTS_TOTAL,
+            "captures_per_owner": MAX_CAPTURES_PER_OWNER,
+            "capture_idle_seconds": CAPTURE_IDLE_SECONDS,
+            "capacity_pressure": "reject_new_capture_without_evicting_another_owner",
             "capture": "owned_coherent_revision_without_running_claims",
             "restoration": "local_operator_new_store_import_and_fresh_pending_batch",
             "historical_execution_authority": "not_portable",
@@ -1482,7 +1507,7 @@ def _owned_chromatogram_evidence(owner: str, analysis_id: str) -> dict[str, Any]
 
 
 def _evidence_store_identity() -> tuple:
-    path = db_path().resolve()
+    path = db_path(create=False).resolve()
     try:
         stat = path.stat()
     except OSError as error:
@@ -1495,7 +1520,6 @@ def _evidence_store_identity() -> tuple:
 def _cache_evidence_snapshot(
     owner: str, analysis_id: str, digest: str, snapshot: Any, store_identity: tuple
 ) -> None:
-    global _EVIDENCE_SNAPSHOT_BYTES
     size = snapshot.serialized_size_bytes
     if size > MAX_EVIDENCE_CACHE_BYTES:
         raise ValueError("Evidence capture exceeds the process-local cache limit")
@@ -1503,30 +1527,21 @@ def _cache_evidence_snapshot(
         raise ValueError(
             "Database identity changed during evidence capture; request a new manifest"
         )
-    key = (*store_identity, owner, analysis_id, digest)
-    with _EVIDENCE_SNAPSHOT_LOCK:
-        previous = _EVIDENCE_SNAPSHOTS.pop(key, None)
-        if previous is not None:
-            _EVIDENCE_SNAPSHOT_BYTES -= previous.serialized_size_bytes
-        while _EVIDENCE_SNAPSHOTS and (
-            len(_EVIDENCE_SNAPSHOTS) >= MAX_EVIDENCE_SNAPSHOTS
-            or _EVIDENCE_SNAPSHOT_BYTES + size > MAX_EVIDENCE_CACHE_BYTES
-        ):
-            _, evicted = _EVIDENCE_SNAPSHOTS.popitem(last=False)
-            _EVIDENCE_SNAPSHOT_BYTES -= evicted.serialized_size_bytes
-        _EVIDENCE_SNAPSHOTS[key] = snapshot
-        _EVIDENCE_SNAPSHOT_BYTES += size
+    if not _EVIDENCE_CAPTURE_CACHE.put(
+        (store_identity, owner), (analysis_id, digest), snapshot, size
+    ):
+        raise ValueError(
+            "Evidence capture capacity is busy; retry after idle captures expire "
+            "and request a new manifest"
+        )
 
 
 def _cached_evidence_snapshot(owner: str, analysis_id: str, digest: str) -> Any:
-    key = (*_evidence_store_identity(), owner, analysis_id, digest)
-    with _EVIDENCE_SNAPSHOT_LOCK:
-        snapshot = _EVIDENCE_SNAPSHOTS.get(key)
-        if snapshot is None:
-            raise ValueError(
-                "Evidence snapshot was not found or is not accessible; request a manifest"
-            )
-        _EVIDENCE_SNAPSHOTS.move_to_end(key)
+    snapshot = _EVIDENCE_CAPTURE_CACHE.get(
+        (_evidence_store_identity(), owner), (analysis_id, digest)
+    )
+    if snapshot is None:
+        raise ValueError("Evidence snapshot was not found or is not accessible; request a manifest")
     return snapshot
 
 
@@ -1655,36 +1670,15 @@ def measurement_read_analysis_data(
     analysis_id: str,
     kind: Literal["peaks", "processed_trace", "distribution"],
     ctx: Context,
-    offset: int = 0,
-    limit: Annotated[int, Field(ge=1, le=MAX_PAGE)] = 100,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=MAX_PAGE)] = 100,
 ) -> dict[str, Any]:
-    """Read a bounded page of peaks, processed trace points, or SEC distribution points."""
-    if offset < 0:
-        raise ValueError("offset must be nonnegative")
+    """Read up to 1,000 rows and 48,000 compact UTF-8 JSON bytes of stored analysis data; continue from the returned next_offset."""
     record = analysis_for(identity(ctx), analysis_id)
-    result = record["result"]
-    if kind not in result:
-        raise ValueError("This analysis does not contain the requested data")
-    data = result[kind]
-    if isinstance(data, list):
-        count, page = len(data), data[offset : offset + limit]
-    elif isinstance(data, dict):
-        lengths = {len(v) for v in data.values() if isinstance(v, list)}
-        if len(lengths) != 1:
-            raise ValueError("Stored analysis data have inconsistent lengths")
-        count = next(iter(lengths))
-        page = {k: v[offset : offset + limit] for k, v in data.items()}
-    else:
-        raise ValueError("Stored analysis data have an unsupported shape")
-    return {
-        "analysis_id": analysis_id,
-        "kind": kind,
-        "offset": offset,
-        "count": count,
-        "next_offset": offset + limit if offset + limit < count else None,
-        "data": page,
-    }
+    return analysis_pages.page_analysis_data(analysis_id, kind, record["result"], offset, limit)
 
+
+mcp.validate_tool_catalog()
 
 app = wrap_http(
     wrap_authority_headers(connect_hosting.wrap_identity(mcp.streamable_http_app())),

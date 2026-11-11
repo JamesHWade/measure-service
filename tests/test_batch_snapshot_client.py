@@ -3,7 +3,6 @@
 import asyncio
 import copy
 import sqlite3
-from collections import OrderedDict
 from types import SimpleNamespace
 
 import pytest
@@ -12,13 +11,15 @@ from snapshot_store_support import make_snapshot_store
 from measure_service import batch_exports, storage
 from measure_service.batch_snapshot import decode_snapshot
 from measure_service.batch_snapshot_client import collect_batch_snapshot
+from measure_service.capture_cache import CaptureCache
 
 
 @pytest.fixture
 def declared(tmp_path, monkeypatch):
     monkeypatch.setenv("MEASURE_MCP_DATA_DIR", str(tmp_path))
-    monkeypatch.setattr(batch_exports, "_CACHE", OrderedDict())
-    monkeypatch.setattr(batch_exports, "_CACHE_BYTES", 0)
+    monkeypatch.setattr(
+        batch_exports, "_CAPTURE_CACHE", CaptureCache(max_bytes=batch_exports.MAX_EXPORT_BYTES)
+    )
     return make_snapshot_store()
 
 
@@ -126,7 +127,11 @@ def test_bad_pages_never_return_a_partial_snapshot(declared, field, value):
 
 
 def test_owner_store_identity_and_eviction_fence_cached_pages(declared, tmp_path, monkeypatch):
-    monkeypatch.setattr(batch_exports, "MAX_EXPORTS", 1)
+    monkeypatch.setattr(
+        batch_exports,
+        "_CAPTURE_CACHE",
+        CaptureCache(max_per_owner=1, max_bytes=batch_exports.MAX_EXPORT_BYTES),
+    )
     first = batch_exports.export_batch(
         "owner", declared["batch_id"], declared["batch"]["revision"], "self_contained"
     )
@@ -144,3 +149,17 @@ def test_owner_store_identity_and_eviction_fence_cached_pages(declared, tmp_path
     replacement.replace(storage.db_path())
     with pytest.raises(ValueError, match="not found"):
         batch_exports.read_export("owner", second["snapshot_sha256"])
+
+
+def test_another_owners_exports_do_not_evict_active_pages(declared):
+    first = batch_exports.export_batch(
+        "owner", declared["batch_id"], declared["batch"]["revision"], "self_contained"
+    )
+    original_page = batch_exports.read_export("owner", first["snapshot_sha256"], 0, 10)
+    other = make_snapshot_store(owner="second")
+    for _ in range(6):
+        batch_exports.export_batch(
+            "second", other["batch_id"], other["batch"]["revision"], "self_contained"
+        )
+    assert batch_exports.read_export("owner", first["snapshot_sha256"], 0, 10) == original_page
+    assert batch_exports._CAPTURE_CACHE.capture_count == 5

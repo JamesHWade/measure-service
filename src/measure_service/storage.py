@@ -29,13 +29,15 @@ def now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def db_path() -> Path:
+def db_path(*, create: bool = True) -> Path:
+    """Return the configured database path, optionally without creating its directory."""
     root = Path(
         os.environ.get(
             "MEASURE_MCP_DATA_DIR", str(Path.home() / ".local" / "share" / "measure-mcp")
         )
     )
-    root.mkdir(mode=0o700, parents=True, exist_ok=True)
+    if create:
+        root.mkdir(mode=0o700, parents=True, exist_ok=True)
     return root / "measure.sqlite3"
 
 
@@ -265,13 +267,80 @@ def _connect_at(path: Path) -> sqlite3.Connection:
     return con
 
 
+def _connect_readonly_at(path: Path) -> sqlite3.Connection:
+    """Open an existing store without creating, migrating, or repairing it."""
+    root = path.parent
+    if root.is_symlink():
+        raise ValueError("Store data directory must not be a symlink")
+    if not root.is_dir():
+        raise _missing_store_error()
+    if os.path.lexists(root / "INCOMPLETE"):
+        raise ValueError("Store contains an INCOMPLETE marker; inspect or recover it before use")
+    if path.is_symlink():
+        raise ValueError("Store database must not be a symlink")
+    if not path.is_file():
+        raise _missing_store_error()
+
+    try:
+        con = sqlite3.connect(path.resolve(strict=True).as_uri() + "?mode=ro", uri=True, timeout=30)
+    except (OSError, sqlite3.Error):
+        raise ValueError("Store database could not be opened read-only") from None
+
+    try:
+        con.execute("PRAGMA foreign_keys=ON")
+        con.execute("PRAGMA query_only=ON")
+        con.execute("BEGIN")
+        from .design_lineage_schema import validate_design_lineage_schema
+        from .import_origins import validate_import_schema
+        from .result_table_schema import validate_result_table_schema
+
+        # Keep optional component checks fail-closed while preserving the
+        # read-only contract. These validators only inspect the opened schema.
+        validate_import_schema(con)
+        validate_result_table_schema(con)
+        validate_design_lineage_schema(con)
+        validate_batch_schema(con)
+
+        # Reads must not trigger the proposal migration hidden in connect().
+        # Reuse that component's validator and report its supported remedy.
+        from .campaign_schema import _candidate_index_ready, _schema_state
+
+        try:
+            proposal_state = _schema_state(con)
+            candidate_index_ready = _candidate_index_ready(con)
+        except ValueError as error:
+            raise ValueError(f"{_proposal_migration_error()}: {error}") from error
+        if proposal_state != "current" or not candidate_index_ready:
+            raise ValueError(_proposal_migration_error())
+    except BaseException:
+        con.close()
+        raise
+    return con
+
+
+def _missing_store_error() -> ValueError:
+    return ValueError(
+        "Store is not initialized; create a new store with measure-service-store initialize "
+        "--data-dir /path/to/new-store, then set MEASURE_MCP_DATA_DIR to that directory"
+    )
+
+
+def _proposal_migration_error() -> str:
+    return (
+        "The store's campaign proposal schema needs a writable migration before read-only "
+        "access; run MEASURE_MCP_DATA_DIR=/path/to/store python -c "
+        "'from measure_service.storage import connect; connect().close()' and retry"
+    )
+
+
 @contextmanager
 def registry_connection(write: bool = False) -> Iterator[sqlite3.Connection]:
-    """Serialize registry mutations, atomically committing records and retry receipts."""
-    con = connect()
+    """Open a read-only transaction or an explicit serialized registry write."""
+    con = connect() if write else _connect_readonly_at(db_path(create=False))
     con.row_factory = sqlite3.Row
     try:
-        con.execute("BEGIN IMMEDIATE" if write else "BEGIN")
+        if write:
+            con.execute("BEGIN IMMEDIATE")
         yield con
         con.commit()
     except BaseException:

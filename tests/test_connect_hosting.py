@@ -9,6 +9,7 @@ import uuid
 
 import httpx
 import pytest
+from starlette.requests import Request
 
 from measure_service import connect_hosting, http_authority
 
@@ -36,16 +37,19 @@ def users_api(users, *, status=200, seen=None):
     return httpx.MockTransport(handler)
 
 
-def run_adapter(headers, transport, extra_scope=None, adapter=None):
+def run_adapter(headers, transport, extra_scope=None, adapter=None, *, resolve=True):
+    """Run one HTTP scope, optionally requesting identity as a protected tool does."""
     captured = {}
 
     async def downstream(scope, receive, send):
-        captured.update(scope)
+        if resolve:
+            await connect_hosting.resolve_request_identity(Request(scope))
+        captured["scope"] = scope
 
     adapter = (adapter or connect_hosting.ConnectUsernameIdentity)(downstream, transport=transport)
     scope = {"type": "http", "headers": headers, **(extra_scope or {})}
     asyncio.run(adapter(scope, None, None))
-    return captured
+    return captured["scope"]
 
 
 def credentials(user):
@@ -149,6 +153,74 @@ def test_each_request_is_looked_up_again(connect_env):
     assert len(seen) == 2
 
 
+def test_http_middleware_installs_a_lazy_resolver_without_connect_traffic(connect_env):
+    seen = []
+    scope = run_adapter(
+        [credentials("alice")],
+        users_api([{"username": "alice", "guid": str(ALICE)}], seen=seen),
+        resolve=False,
+    )
+
+    assert seen == []
+    assert connect_hosting.REQUEST_IDENTITY_SCOPE_KEY in scope
+    assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+    assert connect_hosting.IDENTITY_ERROR_SCOPE_KEY not in scope
+
+    asyncio.run(connect_hosting.resolve_request_identity(Request(scope)))
+    assert scope[connect_hosting.RESOLVED_GUID_SCOPE_KEY] == str(ALICE)
+    assert len(seen) == 1
+
+
+def test_concurrent_tool_calls_share_one_request_local_success(connect_env):
+    seen = []
+    scope = run_adapter(
+        [credentials("alice")],
+        users_api([{"username": "alice", "guid": str(ALICE)}], seen=seen),
+        resolve=False,
+    )
+
+    async def resolve_twice():
+        request = Request(scope)
+        await asyncio.gather(
+            connect_hosting.resolve_request_identity(request),
+            connect_hosting.resolve_request_identity(request),
+        )
+
+    asyncio.run(resolve_twice())
+    assert scope[connect_hosting.RESOLVED_GUID_SCOPE_KEY] == str(ALICE)
+    assert len(seen) == 1
+
+
+def test_duplicate_failed_resolution_is_cached_only_for_that_request(connect_env):
+    seen = []
+    scope = run_adapter(
+        [credentials("alice")],
+        users_api([], seen=seen),
+        resolve=False,
+    )
+
+    async def resolve_twice():
+        request = Request(scope)
+        await asyncio.gather(
+            connect_hosting.resolve_request_identity(request),
+            connect_hosting.resolve_request_identity(request),
+        )
+
+    asyncio.run(resolve_twice())
+    assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+    assert "could not be verified" in scope[connect_hosting.IDENTITY_ERROR_SCOPE_KEY]
+    assert len(seen) == 1
+
+    # A new scope gets a new resolver and revalidates the mutable username.
+    second = run_adapter(
+        [credentials("alice")],
+        users_api([{"username": "alice", "guid": str(BOB)}]),
+        resolve=False,
+    )
+    asyncio.run(connect_hosting.resolve_request_identity(Request(second)))
+    assert second[connect_hosting.RESOLVED_GUID_SCOPE_KEY] == str(BOB)
+
+
 def test_guid_spelled_username_is_still_looked_up(connect_env):
     users = [{"username": str(BOB), "guid": str(ALICE)}]
     scope = run_adapter([credentials(str(BOB))], users_api(users))
@@ -204,10 +276,22 @@ def test_missing_or_ambiguous_credentials_never_reach_the_api(connect_env, heade
 
 
 def test_caller_cannot_preseed_a_resolved_identity(connect_env):
+    forged_resolver = object()
     scope = run_adapter(
-        [], users_api([]), extra_scope={connect_hosting.RESOLVED_GUID_SCOPE_KEY: str(BOB)}
+        [],
+        users_api([]),
+        extra_scope={
+            connect_hosting.RESOLVED_GUID_SCOPE_KEY: str(BOB),
+            connect_hosting.IDENTITY_ERROR_SCOPE_KEY: "forged failure",
+            connect_hosting.REQUEST_IDENTITY_SCOPE_KEY: forged_resolver,
+        },
     )
     assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+    assert (
+        scope[connect_hosting.IDENTITY_ERROR_SCOPE_KEY]
+        == connect_hosting.ConnectUsernameIdentity.missing
+    )
+    assert scope[connect_hosting.REQUEST_IDENTITY_SCOPE_KEY] is not forged_resolver
 
 
 def test_identity_wrapper_requires_explicit_username_claim(monkeypatch, connect_env):
@@ -387,10 +471,22 @@ def test_a_missing_or_ambiguous_session_token_never_reaches_connect(session_env,
 
 
 def test_session_caller_cannot_preseed_a_resolved_identity(session_env):
+    forged_resolver = object()
     scope = run_session(
-        [], visitor_api({}), extra_scope={connect_hosting.RESOLVED_GUID_SCOPE_KEY: str(BOB)}
+        [],
+        visitor_api({}),
+        extra_scope={
+            connect_hosting.RESOLVED_GUID_SCOPE_KEY: str(BOB),
+            connect_hosting.IDENTITY_ERROR_SCOPE_KEY: "forged failure",
+            connect_hosting.REQUEST_IDENTITY_SCOPE_KEY: forged_resolver,
+        },
     )
     assert connect_hosting.RESOLVED_GUID_SCOPE_KEY not in scope
+    assert (
+        scope[connect_hosting.IDENTITY_ERROR_SCOPE_KEY]
+        == connect_hosting.ConnectSessionIdentity.missing
+    )
+    assert scope[connect_hosting.REQUEST_IDENTITY_SCOPE_KEY] is not forged_resolver
 
 
 def test_identity_wrapper_selects_the_session_adapter(session_env, monkeypatch):

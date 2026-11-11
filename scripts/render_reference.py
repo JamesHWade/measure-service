@@ -6,15 +6,18 @@ import json
 from pathlib import Path
 
 from measure_service.server import mcp
+from measure_service.tool_catalog import tool_group, validate_tool_registry
 
 
 def format_reference(tools) -> str:
+    validate_tool_registry(tool.name for tool in tools)
     lines = [
         "# MCP tool reference",
         "",
         "Generated from the registered tools by `python scripts/render_reference.py --write`.",
-        "Do not edit the tables by hand. MCP `tools/list` supplies complete JSON schemas,",
-        "including nested record models, defaults and validation limits. For a local JSON",
+        "Do not edit the tables by hand. By default, MCP `tools/list` supplies canonical JSON schemas,",
+        "including nested record models, defaults and validation limits. Optional schema profiles",
+        "are described in [the catalog guide](tool-catalog.md). For a local JSON",
         "export, run `python scripts/render_reference.py --json`.",
         "",
         "All tools return structured JSON. Check `isError` before reading",
@@ -24,8 +27,8 @@ def format_reference(tools) -> str:
         "",
         f"The current catalog contains {len(tools)} tools.",
         "",
-        "| Tool | Required arguments | Effect | Retry behavior |",
-        "| --- | --- | --- | --- |",
+        "| Tool | Group | Required arguments | Effect | Retry behavior |",
+        "| --- | --- | --- | --- | --- |",
     ]
     for tool in sorted(tools, key=lambda item: item.name):
         required = ", ".join(f"`{name}`" for name in tool.inputSchema.get("required", [])) or "—"
@@ -36,7 +39,9 @@ def format_reference(tools) -> str:
             retry = "returns a new capture"
         else:
             retry = "creates new record"
-        lines.append(f"| `{tool.name}` | {required} | {effect} | {retry} |")
+        lines.append(
+            f"| `{tool.name}` | `{tool_group(tool.name)}` | {required} | {effect} | {retry} |"
+        )
     lines.extend(["", "## Tool descriptions", ""])
     for tool in sorted(tools, key=lambda item: item.name):
         lines.extend([f"### `{tool.name}`", "", tool.description.strip(), ""])
@@ -48,6 +53,7 @@ def format_reference(tools) -> str:
             "- [Numerical methods](analysis.md)",
             "- [Registry semantics](experiments.md)",
             "- [HTTP identity and storage](deployment.md)",
+            "- [Tool groups and schema profiles](tool-catalog.md)",
             "",
         ]
     )
@@ -61,9 +67,9 @@ def main() -> None:
     mode.add_argument("--check", action="store_true", help="Fail if docs/tools.md is stale")
     mode.add_argument("--json", action="store_true", help="Print complete registered schemas")
     args = parser.parse_args()
-    tools = asyncio.run(mcp.list_tools())
+    tools = asyncio.run(mcp.list_tools() if args.json else mcp.registered_tools())
     if args.json:
-        print(json.dumps([tool.model_dump(mode="json") for tool in tools], indent=2))
+        print(json.dumps([tool.model_dump(mode="json", by_alias=True) for tool in tools], indent=2))
         return
     rendered = format_reference(tools)
     target = Path(__file__).resolve().parents[1] / "docs" / "tools.md"

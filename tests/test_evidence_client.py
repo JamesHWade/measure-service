@@ -8,7 +8,6 @@ import math
 import os
 import sqlite3
 import sys
-from collections import OrderedDict
 from types import SimpleNamespace
 
 import pytest
@@ -17,17 +16,19 @@ from mcp.client.stdio import stdio_client
 
 from measure_service import analysis_evidence as evidence
 from measure_service import server
+from measure_service.capture_cache import CaptureCache
 from measure_service.evidence_client import collect_chromatogram_evidence
 from measure_service.evidence_report import write_report
 
 
 @pytest.fixture(autouse=True)
 def isolated_capture_cache(monkeypatch):
-    monkeypatch.setattr(server, "_EVIDENCE_SNAPSHOTS", OrderedDict())
-    monkeypatch.setattr(server, "_EVIDENCE_SNAPSHOT_BYTES", 0)
+    monkeypatch.setattr(
+        server, "_EVIDENCE_CAPTURE_CACHE", CaptureCache(max_bytes=server.MAX_EVIDENCE_CACHE_BYTES)
+    )
 
 
-def stored_bundle(tmp_path, monkeypatch):
+def stored_bundle(tmp_path, monkeypatch, owner="owner"):
     monkeypatch.setenv("MEASURE_MCP_DATA_DIR", str(tmp_path))
     trace = {
         "trace_id": "uv",
@@ -42,9 +43,9 @@ def stored_bundle(tmp_path, monkeypatch):
         "signal": [-1.0, 2.0, 5.0, 2.0, -1.0],
     }
     registered = server.register_dataset(
-        "owner", server.Dataset.model_validate({"title": "Evidence specimen", "traces": [trace]})
+        owner, server.Dataset.model_validate({"title": "Evidence specimen", "traces": [trace]})
     )
-    dataset, digest = server.dataset_for("owner", registered["dataset_id"])
+    dataset, digest = server.dataset_for(owner, registered["dataset_id"])
     result = {
         "kind": "chromatogram",
         "peak_count": 1,
@@ -64,7 +65,7 @@ def stored_bundle(tmp_path, monkeypatch):
         "notes": [],
     }
     record = server.save_analysis(
-        "owner",
+        owner,
         registered["dataset_id"],
         "uv",
         "chromatogram",
@@ -73,7 +74,7 @@ def stored_bundle(tmp_path, monkeypatch):
         digest,
     )
     return evidence.build_evidence(
-        server.analysis_for("owner", record["analysis_id"]), dataset, digest
+        server.analysis_for(owner, record["analysis_id"]), dataset, digest
     )
 
 
@@ -222,7 +223,11 @@ def test_captured_pages_do_not_reread_or_revalidate_source(tmp_path, monkeypatch
 
 def test_capture_eviction_requires_an_explicit_new_manifest(tmp_path, monkeypatch):
     monkeypatch.setattr(server, "identity", lambda ctx: ctx)
-    monkeypatch.setattr(server, "MAX_EVIDENCE_SNAPSHOTS", 2)
+    monkeypatch.setattr(
+        server,
+        "_EVIDENCE_CAPTURE_CACHE",
+        CaptureCache(max_per_owner=2, max_bytes=server.MAX_EVIDENCE_CACHE_BYTES),
+    )
     captures = []
     for _ in range(3):
         bundle = stored_bundle(tmp_path, monkeypatch)
@@ -234,8 +239,8 @@ def test_capture_eviction_requires_an_explicit_new_manifest(tmp_path, monkeypatc
         server.measurement_read_chromatogram_evidence(
             first_id, "trace", "owner", first_manifest["evidence_sha256"]
         )
-    assert len(server._EVIDENCE_SNAPSHOTS) <= 2
-    assert server._EVIDENCE_SNAPSHOT_BYTES <= server.MAX_EVIDENCE_CACHE_BYTES
+    assert server._EVIDENCE_CAPTURE_CACHE.capture_count <= 2
+    assert server._EVIDENCE_CAPTURE_CACHE.serialized_bytes <= server.MAX_EVIDENCE_CACHE_BYTES
     restored = server.measurement_get_chromatogram_evidence(first_id, "owner")
     assert restored == first_manifest
     page = server.measurement_read_chromatogram_evidence(
@@ -284,7 +289,7 @@ def test_database_replacement_during_capture_is_not_bound_to_new_store(tmp_path,
     monkeypatch.setattr(evidence, "capture_evidence", replace_during_capture)
     with pytest.raises(ValueError, match="Database identity changed"):
         server.measurement_get_chromatogram_evidence(identifier, "owner")
-    assert len(server._EVIDENCE_SNAPSHOTS) == 0
+    assert server._EVIDENCE_CAPTURE_CACHE.capture_count == 0
 
 
 @pytest.mark.r_backend
@@ -414,3 +419,22 @@ def test_real_installed_stdio_evidence_report_survives_restart(tmp_path):
     assert bundle["evidence_sha256"] in html
     assert "trace.csv" in html and "peaks.csv" in html and "evidence.json" in html
     assert (tmp_path / "report/chromatogram.svg").is_file()
+
+
+def test_one_owners_captures_leave_another_owners_pages_readable(tmp_path, monkeypatch):
+    monkeypatch.setattr(server, "identity", lambda ctx: ctx)
+    original = stored_bundle(tmp_path, monkeypatch, owner="first")
+    analysis_id = original["analysis"]["analysis_id"]
+    manifest = server.measurement_get_chromatogram_evidence(analysis_id, "first")
+    for _ in range(6):
+        other = stored_bundle(tmp_path, monkeypatch, owner="second")
+        server.measurement_get_chromatogram_evidence(other["analysis"]["analysis_id"], "second")
+    page = server.measurement_read_chromatogram_evidence(
+        analysis_id, "trace", "first", manifest["evidence_sha256"], limit=1
+    )
+    assert page["data"] == original["points"][:1]
+    assert server._EVIDENCE_CAPTURE_CACHE.capture_count == 5
+    with pytest.raises(ValueError, match="not found or is not accessible"):
+        server.measurement_read_chromatogram_evidence(
+            analysis_id, "trace", "second", manifest["evidence_sha256"], limit=1
+        )

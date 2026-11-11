@@ -48,10 +48,13 @@ one content identity; clients must not combine pages with different digests.
 
 Manifest retrieval validates and captures the document once. Page requests
 decode only the requested rows from that immutable capture. Captures are
-scoped to the resolved owner, database identity, analysis and digest. The
-process retains at most four captures and 64 MiB of serialized capture data.
-Cache eviction, database replacement or server restart requires an explicit
-new manifest request. A failed partial collection writes no report; start a
+scoped to the resolved owner, database identity, analysis and digest. Each owner can retain four captures, with at most 64 captures and 64 MiB of
+serialized data across the process. Reading a capture renews its five-minute
+idle lifetime. A new capture can evict only that owner's least-recently-read
+capture; it cannot evict another owner's unexpired capture. Global capacity
+pressure rejects the new capture with retry guidance. See [capture retention](capture-retention.md).
+Owner-local eviction, expiry, database replacement or server restart requires
+an explicit new manifest request. A failed partial collection writes no report; start a
 new collection rather than appending pages to the old one. Captures are
 temporary paging state, not a durable backup or general dataset snapshot.
 HTTP paging requests must reach the same process; replicated routing is not

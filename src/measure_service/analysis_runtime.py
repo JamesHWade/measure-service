@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .analysis_models import ChromatogramMethod, Trace
+from .analysis_pages import bound_backend_warnings
 from .storage import canonical, now, sha256
 
 ROOT = Path(__file__).resolve().parent
@@ -138,9 +139,7 @@ def _execute_worker(payload: dict, *, worker_path: Path | None = None) -> dict[s
         raise ValueError("The R analysis worker returned an invalid response") from exc
     if not output.get("ok"):
         raise ValueError("Analysis failed: " + str(output.get("error", "unknown worker error")))
-    warnings = output.get("warnings", [])
-    if isinstance(warnings, str):
-        warnings = [warnings]
+    warnings = bound_backend_warnings(output.get("warnings", []))
     result = output["result"]
     result["warnings"] = warnings
     return _WorkerResult(result, worker_digest)
@@ -157,12 +156,14 @@ def process_chromatogram(
     spec = ChromatogramMethod.model_validate(method).model_dump(mode="json")
     execute = run_worker if worker is None else worker
     result = execute({"operation": "chromatogram", "trace": data, "method": spec})
+    warnings = bound_backend_warnings(result.get("warnings", []))
     if spec["baseline"] == "als" or spec["smoothing"] == "gaussian":
         steps = [b - a for a, b in zip(data["axis"], data["axis"][1:])]
         if max(steps) - min(steps) > 1e-6 * max(steps):
-            result["warnings"].append(
+            warnings.append(
                 "ALS baseline and Gaussian smoothing use sample indices; spacing is irregular, so their physical width varies along the axis."
             )
+    result["warnings"] = warnings
     return result
 
 
