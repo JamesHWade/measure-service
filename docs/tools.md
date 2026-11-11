@@ -283,7 +283,7 @@ Quantify an explicitly assigned chromatogram peak with supplied linear response 
 
 ### `measurement_read_analysis_data`
 
-Read a bounded page of peaks, processed trace points, or SEC distribution points.
+Read up to 1,000 rows and 48,000 compact UTF-8 JSON bytes of stored analysis data; continue from the returned next_offset.
 
 ### `measurement_read_chromatogram_batch_attempts`
 

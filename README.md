@@ -97,6 +97,8 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Build a bundle and host on Posit Connect](docs/connect-hosting.md)
 - [Operator store backup, verification and exact restore](docs/store-recovery.md)
 - [Read existing records without creating or migrating a store](docs/read-only-store.md)
+- [Analysis page and backend warning limits](docs/analysis-response-limits.md)
+- [Owner-isolated temporary capture retention](docs/capture-retention.md)
 - [Run the installed full-store recovery demonstration](docs/store-recovery-example.md)
 - [HTTP request limits and minimal health checks](docs/http-operations.md)
 - [Invited pilot qualification matrix](docs/pilot-readiness.md)

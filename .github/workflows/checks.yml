@@ -162,6 +162,12 @@ jobs:
           assert "tests/test_http_operations_socket.py" in members
           assert "docs/http-operations.md" in members
           assert "docs/read-only-store.md" in members
+          for name in ("analysis_pages", "capture_cache"):
+              assert "src/measure_service/" + name + ".py" in members
+              assert "tests/test_" + name + ".py" in members
+          assert "tests/test_backend_warning_bounds.py" in members
+          assert "docs/analysis-response-limits.md" in members
+          assert "docs/capture-retention.md" in members
           for name in ("storage_readonly", "observational_reads", "readiness_budget"):
               assert "tests/test_" + name + ".py" in members
           assert "src/measure_service/http_authority.py" in members

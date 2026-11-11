@@ -32,6 +32,8 @@ def test_service_distribution_contains_both_import_packages_and_worker():
         "measure_service/evidence_report.py",
         "measure_service/analysis_models.py",
         "measure_service/analysis_runtime.py",
+        "measure_service/analysis_pages.py",
+        "measure_service/capture_cache.py",
         "measure_service/batch_models.py",
         "measure_service/batch_schema.py",
         "measure_service/batches.py",

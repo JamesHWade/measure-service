@@ -8,7 +8,6 @@ is replaced by a constructed response; no numerical analysis runs here.
 from __future__ import annotations
 
 import asyncio
-from collections import OrderedDict
 from typing import Any
 
 import pytest
@@ -16,6 +15,7 @@ from mcp.shared.memory import create_connected_server_and_client_session
 from mcp.types import TextContent
 
 from measure_service import batch_exports, server
+from measure_service.capture_cache import CaptureCache
 
 
 @pytest.fixture(autouse=True)
@@ -23,8 +23,9 @@ def isolated_service(tmp_path, monkeypatch):
     monkeypatch.setenv("MEASURE_MCP_DATA_DIR", str(tmp_path / "store"))
     monkeypatch.setenv("MEASURE_MCP_R", str(tmp_path / "unavailable-R"))
     monkeypatch.setenv("MEASURE_MCP_IDENTITY", "local")
-    monkeypatch.setattr(batch_exports, "_CACHE", OrderedDict())
-    monkeypatch.setattr(batch_exports, "_CACHE_BYTES", 0)
+    monkeypatch.setattr(
+        batch_exports, "_CAPTURE_CACHE", CaptureCache(max_bytes=batch_exports.MAX_EXPORT_BYTES)
+    )
 
 
 def _trace() -> dict[str, Any]:

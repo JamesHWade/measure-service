@@ -53,7 +53,7 @@ Originally structured JSON inputs have no retained CSV/TSV source asset. Export
 records that absence; it does not fabricate text or fetch external assets.
 
 Captured bytes live in an owner- and store-bound process cache: at most four
-captures and 128 MiB. One capture runs at a time. Export does not block the MCP
+captures per owner, 64 across the process, and 128 MiB of serialized data. One capture runs at a time. Export does not block the MCP
 event loop while constructing the document. Byte pages contain at most 48,000
 decoded bytes. Restart, eviction or store replacement invalidates cached bytes;
 the caller must explicitly capture again. An interrupted collector never
@@ -130,3 +130,12 @@ snapshot's availability fields.
 Run the [complete synthetic example](batch-snapshot-example.md) to retain a
 partially completed source batch, import its evidence, and compare explicit
 fresh computations with the two original successes.
+
+## Capture retention
+
+Exports reserve up to four live captures per owner. The process holds at most
+64 captures and 128 MiB of serialized exports. Page reads renew a five-minute
+idle lifetime. New exports can replace only that owner's least-recently-read
+capture; global pressure rejects admission without evicting another owner.
+After expiry, owner-local eviction or process restart, request a new export
+and restart collection from its new digest. See [capture retention](capture-retention.md).
