@@ -22,7 +22,9 @@ fit with the response envelope, the tool reports a bounded error so the caller
 can identify the result as unreadable through this page interface.
 
 The 48,000-byte limit applies to that compact JSON response representation.
-MCP may return both rendered text and structured content, so this limit does
+The analysis-data tool uses that same compact JSON for its sole SDK text
+rendering when it agrees exactly with the structured result. Other tool text
+is unchanged. MCP returns both text and structured content, so this limit does
 not bound the total transport response size.
 
 Backend warning metadata is capped at 32 messages and 2,000 UTF-8 bytes per

@@ -22,6 +22,7 @@ name. All three are inert unless their environment variables are set.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -36,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 RESOLVED_GUID_SCOPE_KEY = "measure_service.connect_guid"
 IDENTITY_ERROR_SCOPE_KEY = "measure_service.connect_identity_error"
+REQUEST_IDENTITY_SCOPE_KEY = "measure_service.connect_identity_resolver"
 LOOKUP_TIMEOUT_SECONDS = 5.0
 _MAX_CREDENTIAL_BYTES = 16_384
 _MAX_USERNAME_LENGTH = 256
@@ -280,12 +282,12 @@ def _session_token(scope: dict[str, Any]) -> str:
 
 
 class _ResolvedIdentity:
-    """Resolve what the proxy attached to a request to an account GUID before dispatch.
+    """Install a request-local resolver for a proxy claim.
 
-    The result, or a caller-safe failure reason, is attached to the ASGI scope.
-    Requests are never rejected here: protocol discovery needs no principal,
-    and a tool that does need one reports the failure as an MCP tool error
-    that the caller can read.
+    Resolution is triggered by an enabled tool call. The result, or a
+    caller-safe failure reason, is attached to the ASGI scope. Requests are
+    never rejected here: protocol discovery needs no principal, and a tool
+    that does need one reports the failure as an MCP tool error.
     """
 
     missing: str
@@ -312,17 +314,48 @@ class _ResolvedIdentity:
         # Only this adapter may populate the keys the identity check trusts.
         scope.pop(RESOLVED_GUID_SCOPE_KEY, None)
         scope.pop(IDENTITY_ERROR_SCOPE_KEY, None)
-        try:
-            claim = self._claim(scope)
-        except (ValueError, KeyError, TypeError, UnicodeDecodeError):
-            scope[IDENTITY_ERROR_SCOPE_KEY] = self.missing
-        else:
-            try:
-                scope[RESOLVED_GUID_SCOPE_KEY] = str(await self._resolve(claim))
-            except ConnectLookupError as exc:
-                logger.warning("Connect identity lookup failed: %s", exc)
-                scope[IDENTITY_ERROR_SCOPE_KEY] = _UNVERIFIED
+        scope.pop(REQUEST_IDENTITY_SCOPE_KEY, None)
+        scope[REQUEST_IDENTITY_SCOPE_KEY] = _RequestIdentityResolver(self, scope)
         await self.app(scope, receive, send)
+
+
+class _RequestIdentityResolver:
+    """Cache one identity result, including failure, inside one HTTP request."""
+
+    def __init__(self, adapter: _ResolvedIdentity, scope: dict[str, Any]) -> None:
+        self.adapter, self.scope = adapter, scope
+        self.lock = asyncio.Lock()
+        self.complete = False
+
+    async def resolve(self) -> None:
+        async with self.lock:
+            if self.complete:
+                return
+            try:
+                claim = self.adapter._claim(self.scope)
+            except (ValueError, KeyError, TypeError, UnicodeDecodeError):
+                self.scope[IDENTITY_ERROR_SCOPE_KEY] = self.adapter.missing
+            else:
+                try:
+                    guid = await self.adapter._resolve(claim)
+                except ConnectLookupError as exc:
+                    logger.warning("Connect identity lookup failed: %s", exc)
+                    self.scope[IDENTITY_ERROR_SCOPE_KEY] = _UNVERIFIED
+                except Exception as exc:
+                    # An unexpected adapter/transport error must fail closed
+                    # without echoing request credentials or response bodies.
+                    logger.warning("Connect identity lookup failed (%s)", type(exc).__name__)
+                    self.scope[IDENTITY_ERROR_SCOPE_KEY] = _UNVERIFIED
+                else:
+                    self.scope[RESOLVED_GUID_SCOPE_KEY] = str(guid)
+            self.complete = True
+
+
+async def resolve_request_identity(request: Any) -> None:
+    """Resolve the current HTTP identity if a Connect adapter installed state."""
+    resolver = request.scope.get(REQUEST_IDENTITY_SCOPE_KEY)
+    if isinstance(resolver, _RequestIdentityResolver):
+        await resolver.resolve()
 
 
 class ConnectUsernameIdentity(_ResolvedIdentity):

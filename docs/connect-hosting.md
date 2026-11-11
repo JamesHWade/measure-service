@@ -120,6 +120,31 @@ ignores an inherited value and reports that on standard output. Call
 `measurement_capabilities` after each deployment; it reports the R version and
 backend package versions the worker actually loaded.
 
+### A browser client on the same Connect server
+
+A browser-based client hosted on this Connect server sends the server's
+origin, for example `Origin: https://connect.example.org`. If that origin is
+not admitted, MCP requests receive HTTP 403 and the content log reports
+`Invalid Origin header`. A working Host setting does not admit an Origin.
+
+An operator can explicitly set:
+
+```sh
+MEASURE_MCP_HTTP_ALLOWED_ORIGINS='["https://connect.example.org"]'
+```
+
+All content on that server shares this origin. Admitting it allows requests
+from pages under other content items on the same origin, subject to the
+service's Connect access controls, as the account viewing the page. The
+allowlist cannot distinguish content publishers or URL paths. Choose this
+setting only when that shared-origin trust is appropriate; an independently
+isolated origin or a non-browser client has a different boundary.
+
+`apply_connect_defaults()` deliberately does not derive an allowed Origin
+from `CONNECT_SERVER`. The existing explicit allowlist records the operator's
+choice without another deployment setting. Origin admission does not add
+browser CORS support or authenticate a caller.
+
 ## Settings on the content item
 
 Set these environment variables on the content, or as defaults in a custom
@@ -234,3 +259,14 @@ claude mcp add --transport http measure "https://<connect host>/content/<content
 
 Use the [pilot client](pilot-client.md) with two accounts to check that owners
 stay separate on your server.
+
+## Discovery and identity lookup cost
+
+Initialization, tool discovery, notifications, ping and health requests do not
+resolve a caller through the Connect API. Each enabled owner-tool request
+revalidates the account; `session-token` performs one visitor-key exchange and
+one account read. See [identity lookup cost](connect-identity-cost.md) for
+request counts, failure behavior and the issued-key lifetime boundary.
+
+Use [tool groups and schema profiles](tool-catalog.md) to select the workflows
+offered by a deployment and inspect compatibility with its intended client.

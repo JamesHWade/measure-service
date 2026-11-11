@@ -32,6 +32,8 @@ jobs:
       - run: air format --check .
       - run: jarl check .
       - run: python scripts/render_reference.py --check
+      - run: python scripts/check_tool_schemas.py
+      - run: python scripts/check_tool_schemas.py --profile function-host/1
       - run: python scripts/check_docs.py
       - run: python -m pytest -q -m 'not r_backend and not bo_backend'
 
@@ -168,6 +170,13 @@ jobs:
           assert "tests/test_backend_warning_bounds.py" in members
           assert "docs/analysis-response-limits.md" in members
           assert "docs/capture-retention.md" in members
+          for name in ("tool_server", "tool_catalog"):
+              assert "src/measure_service/" + name + ".py" in members
+          for name in ("tool_catalog", "method_schema_bounds", "tool_identity_dispatch", "tool_deployment"):
+              assert "tests/test_" + name + ".py" in members
+          assert "scripts/check_tool_schemas.py" in members
+          assert "docs/tool-catalog.md" in members
+          assert "docs/connect-identity-cost.md" in members
           for name in ("storage_readonly", "observational_reads", "readiness_budget"):
               assert "tests/test_" + name + ".py" in members
           assert "src/measure_service/http_authority.py" in members

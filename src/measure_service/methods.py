@@ -50,9 +50,9 @@ def _number(value: Any) -> float:
 
 
 FiniteNumber: TypeAlias = Annotated[float, BeforeValidator(_number)]
-NonnegativeNumber: TypeAlias = Annotated[FiniteNumber, Field(ge=0)]
-PositiveNumber: TypeAlias = Annotated[FiniteNumber, Field(gt=0)]
-Fraction: TypeAlias = Annotated[FiniteNumber, Field(ge=0, le=1)]
+NonnegativeNumber: TypeAlias = Annotated[float, Field(ge=0), BeforeValidator(_number)]
+PositiveNumber: TypeAlias = Annotated[float, Field(gt=0), BeforeValidator(_number)]
+Fraction: TypeAlias = Annotated[float, Field(ge=0, le=1), BeforeValidator(_number)]
 Identifier: TypeAlias = Annotated[str, StringConstraints(min_length=1, max_length=100)]
 SolventIdentifier: TypeAlias = Annotated[str, StringConstraints(min_length=1, max_length=32)]
 TimeUnit = Literal["s", "min"]

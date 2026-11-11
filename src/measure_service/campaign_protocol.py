@@ -12,7 +12,7 @@ import hashlib
 import math
 from typing import Annotated, Any, Literal
 
-from pydantic import Field, StrictBool, StrictInt, field_validator, model_validator
+from pydantic import BeforeValidator, Field, StrictBool, StrictInt, field_validator, model_validator
 
 from measure_methods.design import latin_hypercube_design, uniform_random_point
 
@@ -22,6 +22,7 @@ from .methods import (
     MethodConstraints,
     MethodDeclaration,
     StrictModel,
+    _number,
     evaluate_method,
 )
 from .storage import canonical, sha256
@@ -49,7 +50,7 @@ _MAX_TASKS = 10
 _MAX_EVALUATION_BUDGET = 50
 _MAX_SEED_VALUE = 2**31 - 1
 
-PositiveNumber = Annotated[FiniteNumber, Field(gt=0)]
+PositiveNumber = Annotated[float, Field(gt=0), BeforeValidator(_number)]
 PolicyId = Literal["random", "bo_mcp_gp_logei"]
 SeedValue = Annotated[StrictInt, Field(ge=0, le=_MAX_SEED_VALUE)]
 _SeedList = Annotated[list[SeedValue], Field(min_length=1, max_length=_MAX_SEEDS)]
@@ -195,8 +196,8 @@ ProtocolSpec = ReplicationProtocolSpec | AblationProtocolSpec | CampaignProtocol
 class CandidateCoordinates(StrictModel):
     """One candidate with exactly the two declared decision coordinates."""
 
-    strong_solvent_fraction: Annotated[FiniteNumber, Field(ge=0, le=1)]
-    acquisition_duration_min: Annotated[FiniteNumber, Field(ge=1)]
+    strong_solvent_fraction: Annotated[float, Field(ge=0, le=1), BeforeValidator(_number)]
+    acquisition_duration_min: Annotated[float, Field(ge=1), BeforeValidator(_number)]
 
 
 def parse_campaign_protocol(spec: ProtocolSpec | dict[str, Any]) -> ProtocolSpec:

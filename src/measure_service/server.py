@@ -17,7 +17,7 @@ import uuid
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from mcp.server.fastmcp import Context, FastMCP
+from mcp.server.fastmcp import Context
 from mcp.types import ToolAnnotations
 from pydantic import Field, StrictInt, StrictStr, model_validator
 
@@ -37,6 +37,7 @@ from . import (
     observations,
     result_tables,
     retention,
+    tool_catalog,
 )
 from . import experiments as registry
 from .analysis_models import (
@@ -93,6 +94,7 @@ from .result_table_models import ResultTableSpec
 from .result_table_parser import preview_result_table
 from .retention import RetentionModelSpec
 from .storage import canonical, connect, db_path, now, registry_connection, sha256
+from .tool_server import ServiceMCP
 
 ROOT = Path(__file__).resolve().parent
 MAX_PAYLOAD_BYTES = 4_000_000
@@ -448,19 +450,21 @@ INSTRUCTIONS = (
     "experiment, result and analysis belongs to the account that created it. Records are "
     "not shared between accounts: another signed-in person cannot list, read or link "
     "yours, and you cannot see theirs. There is no sharing, project or delete operation, "
-    "so do not store data you could not keep here. Start with "
-    "measurement_registry_capabilities; numerical analysis additionally needs the R "
+    "so do not store data you could not keep here. Use the tools listed by this deployment. "
+    "When listed, start with measurement_registry_capabilities; numerical analysis needs the R "
     "backend reported by measurement_capabilities. A tool failure is reported in the "
     "result's isError field, not as an HTTP error."
 )
 
-mcp = FastMCP(
+mcp = ServiceMCP(
     "measure-separations",
     instructions=INSTRUCTIONS,
     stateless_http=True,
     json_response=True,
     streamable_http_path="/mcp",
     transport_security=http_transport_security(),
+    selected_groups=tool_catalog.configured_groups(),
+    schema_profile=tool_catalog.schema_profile(),
 )
 READ = ToolAnnotations(
     readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False
@@ -487,6 +491,7 @@ def measurement_registry_capabilities(ctx: Context) -> dict[str, Any]:
         "schema_version": registry.SCHEMA_VERSION,
         "qualification": "experimental",
         "storage": "single_node_sqlite",
+        "tool_catalog": mcp.catalog_configuration(),
         "experiment_specs": "immutable",
         "design_lineage": {
             "profile": design_lineage.LINEAGE_PROFILE,
@@ -1672,6 +1677,8 @@ def measurement_read_analysis_data(
     record = analysis_for(identity(ctx), analysis_id)
     return analysis_pages.page_analysis_data(analysis_id, kind, record["result"], offset, limit)
 
+
+mcp.validate_tool_catalog()
 
 app = wrap_http(
     wrap_authority_headers(connect_hosting.wrap_identity(mcp.streamable_http_app())),
