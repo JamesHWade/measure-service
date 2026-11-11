@@ -72,9 +72,15 @@ conditions, and deltas do not establish statistical significance.
 
 Each saved analysis records SHA-256 digests of normalized input, method and
 worker code, plus the original text digest when available. Backend metadata
-include R/package versions and MD5 fingerprints of the installed `measure`
-and `measure.sec` R code databases. Optional operator-declared source
-revisions are recorded separately.
+include the R version, selected package versions (`measure`, `measure.sec`,
+`recipes` and `Matrix`), and MD5 fingerprints of the installed `measure` and
+`measure.sec` R code databases. Matrix supplies the
+sparse ALS solve; fresh capability responses and analyses record its installed
+version when available. An unavailable package
+is recorded as `null`; this metadata does not require a particular version or
+make Matrix an additional service admission check for older backends.
+Historical records retain their original metadata, including absent Matrix
+entries. Optional operator-declared source revisions are recorded separately.
 
 These fingerprints help distinguish builds; they are not a complete dependency
 lock, software bill of materials, authentication proof or validation record.

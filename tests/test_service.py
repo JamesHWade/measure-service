@@ -92,6 +92,23 @@ def test_stdio_end_to_end(tmp_path):
         MEASURE_MCP_DATA_DIR=str(tmp_path),
         MEASURE_MCP_IDENTITY="local",
     )
+    matrix_probe = subprocess.run(
+        [
+            r,
+            "--vanilla",
+            "--slave",
+            "-e",
+            "cat(jsonlite::toJSON(if (requireNamespace('Matrix', quietly = TRUE)) "
+            "as.character(utils::packageVersion('Matrix')) else NULL, "
+            "auto_unbox = TRUE, null = 'null'))",
+        ],
+        env={name: value for name, value in env.items() if name != "R_HOME"},
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=True,
+    )
+    expected_matrix_version = json.loads(matrix_probe.stdout)
     params = StdioServerParameters(command=sys.executable, args=["-m", "measure_service"], env=env)
 
     async def exercise():
@@ -102,6 +119,7 @@ def test_stdio_end_to_end(tmp_path):
                 assert tools["measurement_register_dataset"].annotations.readOnlyHint is False
                 assert tools["measurement_get_analysis"].annotations.readOnlyHint is True
                 caps = result(await client.call_tool("measurement_capabilities", {}))
+                assert caps["backend"]["packages"]["Matrix"] == expected_matrix_version
                 assert caps["techniques"]["generic_1d_trace"]
                 assert {"structured_traces", "delimited_wide", "delimited_long"}.issubset(
                     caps["input_formats"]
@@ -135,6 +153,13 @@ def test_stdio_end_to_end(tmp_path):
                 )
                 assert chrom["artifact"] is True and chrom["summary"]["peak_count"] == 1
                 assert chrom["provenance"]["input_sha256"] == ds["input_sha256"]
+                assert chrom["provenance"]["packages"]["Matrix"] == expected_matrix_version
+                saved_chrom = result(
+                    await client.call_tool(
+                        "measurement_get_analysis", {"analysis_id": chrom["analysis_id"]}
+                    )
+                )
+                assert saved_chrom["provenance"] == chrom["provenance"]
                 peaks = result(
                     await client.call_tool(
                         "measurement_read_analysis_data",
@@ -167,6 +192,7 @@ def test_stdio_end_to_end(tmp_path):
                 assert quant["summary"]["concentration"] == pytest.approx(
                     (peaks["data"][0]["area"] - 0.01) / 0.4
                 )
+                assert quant["provenance"]["packages"]["Matrix"] == expected_matrix_version
                 assert not quant["summary"]["outside_standard_range"]
                 assert quant["diagnostics"]["residual_degrees_of_freedom"] == 2
                 outside_method = quant_method | {
@@ -283,6 +309,7 @@ def test_stdio_end_to_end(tmp_path):
                 assert sec["summary"]["mn_g_mol"] == pytest.approx(expected_mn, rel=1e-8)
                 assert sec["diagnostics"]["residual_degrees_of_freedom"] == 2
                 assert sec["provenance"]["installed_r_code_md5"]["measure.sec"]
+                assert sec["provenance"]["packages"]["Matrix"] == expected_matrix_version
                 dist = result(
                     await client.call_tool(
                         "measurement_read_analysis_data",
