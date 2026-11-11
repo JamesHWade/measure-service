@@ -3,6 +3,7 @@
 import ast
 import asyncio
 import copy
+import runpy
 from pathlib import Path
 
 import pytest
@@ -32,7 +33,11 @@ from measure_service.tool_catalog import (
     tool_group,
     validate_tool_registry,
 )
-from scripts.check_tool_schemas import _nonstandard_numeric_keywords
+
+_schema_checker = runpy.run_path(
+    str(Path(__file__).resolve().parents[1] / "scripts" / "check_tool_schemas.py")
+)
+_nonstandard_numeric_keywords = _schema_checker["_nonstandard_numeric_keywords"]
 
 
 def registered_tool_names() -> list[str]:
