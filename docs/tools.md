@@ -26,7 +26,7 @@ The current catalog contains 76 tools.
 | `measurement_create_experiment` | `spec`, `idempotency_key` | write | idempotent |
 | `measurement_create_observation_snapshot` | `contract_id`, `observation_ids`, `idempotency_key` | write | idempotent |
 | `measurement_evaluate_observation` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
-| `measurement_export_chromatogram_batch` | `batch_id`, `expected_revision`, `mode` | read | idempotent |
+| `measurement_export_chromatogram_batch` | `batch_id`, `expected_revision`, `mode` | read | returns a new capture |
 | `measurement_get_analysis` | `analysis_id` | read | idempotent |
 | `measurement_get_analytical_import` | `import_id` | read | idempotent |
 | `measurement_get_attempt` | `attempt_id` | read | idempotent |

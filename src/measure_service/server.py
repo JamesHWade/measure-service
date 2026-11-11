@@ -463,6 +463,10 @@ WRITE = ToolAnnotations(
 RETRY_WRITE = ToolAnnotations(
     readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False
 )
+# Writes no durable record, but every call returns a newly identified result.
+READ_CAPTURE = ToolAnnotations(
+    readOnlyHint=True, destructiveHint=False, idempotentHint=False, openWorldHint=False
+)
 RequestKey = Annotated[str, Field(min_length=1, max_length=100)]
 RecordId = Annotated[str, Field(min_length=1, max_length=100)]
 
@@ -1270,7 +1274,7 @@ def measurement_get_chromatogram_batch(batch_id: RecordId, ctx: Context) -> dict
     return batches.get_batch(identity(ctx), batch_id)
 
 
-@mcp.tool(annotations=READ, structured_output=True)
+@mcp.tool(annotations=READ_CAPTURE, structured_output=True)
 async def measurement_export_chromatogram_batch(
     batch_id: RecordId,
     expected_revision: Annotated[StrictInt, Field(ge=1)],

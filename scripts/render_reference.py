@@ -30,7 +30,12 @@ def format_reference(tools) -> str:
     for tool in sorted(tools, key=lambda item: item.name):
         required = ", ".join(f"`{name}`" for name in tool.inputSchema.get("required", [])) or "—"
         effect = "read" if tool.annotations.readOnlyHint else "write"
-        retry = "idempotent" if tool.annotations.idempotentHint else "creates new record"
+        if tool.annotations.idempotentHint:
+            retry = "idempotent"
+        elif tool.annotations.readOnlyHint:
+            retry = "returns a new capture"
+        else:
+            retry = "creates new record"
         lines.append(f"| `{tool.name}` | {required} | {effect} | {retry} |")
     lines.extend(["", "## Tool descriptions", ""])
     for tool in sorted(tools, key=lambda item: item.name):
