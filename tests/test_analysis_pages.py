@@ -178,3 +178,22 @@ def test_page_bounds_require_plain_integers(offset, limit):
 def test_unsupported_kind_fails_as_a_bounded_value_error():
     with pytest.raises(ValueError, match="kind must be"):
         page_analysis_data("analysis-9", [], {"peaks": []}, 0, 1)
+
+
+def test_thousand_row_pages_use_a_bounded_number_of_serializations(monkeypatch):
+    from measure_service import analysis_pages
+
+    original = analysis_pages._compact_json_bytes
+    page_serializations = 0
+
+    def measured(value, description):
+        nonlocal page_serializations
+        if isinstance(value, dict) and "analysis_id" in value:
+            page_serializations += 1
+        return original(value, description)
+
+    monkeypatch.setattr(analysis_pages, "_compact_json_bytes", measured)
+    result = {"processed_trace": {"axis": list(range(50_000)), "signal": [0.123456789] * 50_000}}
+    page = analysis_pages.page_analysis_data("analysis", "processed_trace", result, 0, 1000)
+    assert page["next_offset"] == 1000
+    assert page_serializations <= 12

@@ -97,3 +97,30 @@ def test_analysis_stores_a_warning_list_with_explicit_truncation(monkeypatch):
         "dataset-1", "t1", "chromatogram", {}, result, "a" * 64, None
     )
     assert record["result"]["warnings"] == result["warnings"]
+
+
+@pytest.mark.parametrize("already_bounded", [False, True])
+def test_processing_warning_preserves_backend_omission_count(already_bounded):
+    trace = {
+        "trace_id": "t",
+        "sample_id": "s",
+        "injection_id": "i",
+        "channel": "uv",
+        "separation": "LC",
+        "detector": "UV",
+        "axis_unit": "min",
+        "signal_unit": "mAU",
+        "axis": [0.0, 1.0, 3.0],
+        "signal": [0.0, 1.0, 0.0],
+    }
+    backend = [f"backend {index}" for index in range(40)]
+    messages = bound_backend_warnings(backend) if already_bounded else backend
+    result = analysis_runtime.process_chromatogram(
+        trace,
+        {"smoothing": "gaussian"},
+        worker=lambda payload: {"warnings": messages, "peak_count": 0, "peaks": []},
+    )
+    assert result["warnings"][:31] == backend[:31]
+    assert result["warnings"][31] == "9 additional warning messages omitted"
+    assert "spacing is irregular" in result["warnings"][32]
+    assert len(result["warnings"]) == MAX_BACKEND_WARNINGS + 1

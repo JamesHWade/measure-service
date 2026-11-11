@@ -125,18 +125,22 @@ def page_analysis_data(
     if row_limit == 0:
         return empty_response
 
+    candidate = build_response(row_limit)
+    if len(_compact_json_bytes(candidate, "Analysis page")) <= MAX_RESPONSE_BYTES:
+        return candidate
+
+    lower, upper = 1, row_limit - 1
     selected: dict[str, Any] | None = None
-    for included in range(1, row_limit + 1):
+    while lower <= upper:
+        included = (lower + upper) // 2
         candidate = build_response(included)
-        if len(_compact_json_bytes(candidate, "Analysis page")) > MAX_RESPONSE_BYTES:
-            if selected is None:
-                raise ValueError(
-                    "A single analysis row exceeds the 48000-byte compact response limit"
-                )
-            break
-        selected = candidate
+        if len(_compact_json_bytes(candidate, "Analysis page")) <= MAX_RESPONSE_BYTES:
+            selected = candidate
+            lower = included + 1
+        else:
+            upper = included - 1
     if selected is None:
-        raise ValueError("No analysis rows fit within the compact response limit")
+        raise ValueError("A single analysis row exceeds the 48000-byte compact response limit")
     return selected
 
 

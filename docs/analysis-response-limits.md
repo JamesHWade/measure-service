@@ -29,5 +29,8 @@ Backend warning metadata is capped at 32 messages and 2,000 UTF-8 bytes per
 message. Longer messages end with `[warning text truncated]`; excess messages
 are summarized with an explicit omission marker. A single warning string is
 normalized to a one-element list, and null warnings become an empty list.
+Chromatogram processing can append one additional bounded spacing warning.
+It preserves the backend's original omission count and the processing warning,
+so the combined list contains at most 33 messages.
 These limits affect warning metadata only; reported numerical results,
 methods and provenance fields are unchanged.

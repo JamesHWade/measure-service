@@ -163,7 +163,7 @@ def process_chromatogram(
             warnings.append(
                 "ALS baseline and Gaussian smoothing use sample indices; spacing is irregular, so their physical width varies along the axis."
             )
-    result["warnings"] = bound_backend_warnings(warnings)
+    result["warnings"] = warnings
     return result
 
 
