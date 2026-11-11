@@ -39,6 +39,11 @@ through the ordinary batch API. Capture does not cancel, recover or rerun work.
 All traces in each selected dataset are retained, including unselected traces,
 so the original dataset digest remains meaningful.
 
+Each capture records its own `captured_at` time. Repeating an export with the
+same arguments therefore returns a different `snapshot_sha256`, and the tool is
+declared read-only but not idempotent. Read pages with the digest returned by
+the capture being collected; a retried export starts a new snapshot.
+
 | Mode | Raw datasets and retained source text | Stored result arrays | Local import |
 | --- | --- | --- | --- |
 | `references` | Identities and metadata only | Digests and provenance only | Rejected |
