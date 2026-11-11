@@ -5,6 +5,7 @@ import json
 import os
 import subprocess
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -214,3 +215,24 @@ def test_host_projection_does_not_overwrite_an_existing_union_constraint():
     }
     with pytest.raises(tool_catalog.UnsupportedSchemaProfileError, match="oneOf"):
         tool_catalog.schema_for_profile(schema, tool_catalog.FUNCTION_HOST_SCHEMA_PROFILE)
+
+
+def test_json_catalog_export_uses_wire_metadata_alias_and_selection(tmp_path):
+    environment = dict(
+        os.environ, MEASURE_MCP_IDENTITY="local", MEASURE_MCP_TOOL_GROUPS='["traces"]'
+    )
+    environment.pop("PYTHONPATH", None)
+    script = Path(__file__).resolve().parents[1] / "scripts" / "render_reference.py"
+    result = subprocess.run(
+        [sys.executable, str(script), "--json"],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=15,
+    )
+    tools = json.loads(result.stdout)
+    assert len(tools) == 8
+    assert all(tool["_meta"][tool_catalog.TOOL_GROUP_META_KEY] == "traces" for tool in tools)
+    assert all("meta" not in tool for tool in tools)

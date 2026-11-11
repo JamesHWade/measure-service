@@ -69,7 +69,7 @@ def main() -> None:
     args = parser.parse_args()
     tools = asyncio.run(mcp.list_tools() if args.json else mcp.registered_tools())
     if args.json:
-        print(json.dumps([tool.model_dump(mode="json") for tool in tools], indent=2))
+        print(json.dumps([tool.model_dump(mode="json", by_alias=True) for tool in tools], indent=2))
         return
     rendered = format_reference(tools)
     target = Path(__file__).resolve().parents[1] / "docs" / "tools.md"
