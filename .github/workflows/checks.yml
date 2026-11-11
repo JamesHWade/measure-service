@@ -170,6 +170,8 @@ jobs:
           assert "tests/test_backend_warning_bounds.py" in members
           assert "docs/analysis-response-limits.md" in members
           assert "docs/capture-retention.md" in members
+          assert "docs/peak-boundaries.md" in members
+          assert "tests/test_peak_boundary_bridge.py" in members
           for name in ("tool_server", "tool_catalog"):
               assert "src/measure_service/" + name + ".py" in members
           for name in ("tool_catalog", "method_schema_bounds", "tool_identity_dispatch", "tool_deployment"):

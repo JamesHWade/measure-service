@@ -41,6 +41,9 @@ produces an error. Evidence must have a matching source/method identity,
 equal trace lengths and independently finite ordered axes, consistent peak boundaries and complete rows.
 Unsupported analysis kinds are rejected rather than relabeled chromatograms.
 
+[Peak-boundary diagnostics](peak-boundaries.md) explain the separate HTML warning for
+interior overlap. It preserves stored rows, warnings and evidence digests.
+
 The complete document is bounded to 50,000 points, 25,000 peaks and 16 MiB.
 Each response page is bounded to 256 KiB. Smaller requested pages are useful
 for clients with lower transport limits. The manifest and every page share

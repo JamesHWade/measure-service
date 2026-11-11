@@ -61,6 +61,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Local setup and examples](docs/quickstart.md)
 - [Input formats and limits](docs/inputs.md)
 - [Scientific methods and interpretation](docs/analysis.md)
+- [Peak boundaries, backend compatibility and historical overlap warnings](docs/peak-boundaries.md)
 - [Inspect linked chromatogram evidence and export a local report](docs/chromatogram-evidence.md)
 - [Run and resume declared chromatogram batches](docs/chromatogram-batches.md)
 - [Export batch evidence and import into a new local store](docs/batch-snapshots.md)

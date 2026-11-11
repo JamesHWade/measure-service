@@ -7,6 +7,7 @@ import hashlib
 import html
 import io
 import json
+import math
 import os
 from decimal import ROUND_CEILING, ROUND_FLOOR, Decimal, localcontext
 from pathlib import Path
@@ -435,6 +436,28 @@ def _peak_heading(field: str, axis_unit: Any, signal_unit: Any) -> str:
     return headings[field]
 
 
+def _has_interior_peak_overlap(peaks: list[dict[str, Any]]) -> bool:
+    """Check whether stored finite integration intervals share an interior."""
+    ranges = [
+        (peak["left_base"], peak["right_base"])
+        for peak in peaks
+        if peak["left_base"] is not None
+        and peak["right_base"] is not None
+        and math.isfinite(peak["left_base"])
+        and math.isfinite(peak["right_base"])
+        and peak["right_base"] > peak["left_base"]
+    ]
+    ranges.sort()
+    if len(ranges) < 2:
+        return False
+    furthest_right = ranges[0][1]
+    for left, right in ranges[1:]:
+        if left < furthest_right:
+            return True
+        furthest_right = max(furthest_right, right)
+    return False
+
+
 def _html(bundle: dict[str, Any], svg: bytes) -> bytes:
     identifiers, digests = _metadata(bundle)
     availability = bundle["availability"]
@@ -480,6 +503,14 @@ def _html(bundle: dict[str, Any], svg: bytes) -> bytes:
         else "The raw and processed curves share the same recorded axis grid."
     )
     embed_svg = svg.decode("utf-8")
+    overlap_notice = (
+        '<p class="derived-notice" role="status"><strong>Derived view diagnostic.</strong> '
+        "The stored finite peak-integration ranges overlap in their interiors. Stored boundaries "
+        "and peak areas are unchanged; shared signal may contribute to more than one area. This "
+        "report does not recalculate areas or deconvolve peaks.</p>"
+        if _has_interior_peak_overlap(bundle["peaks"])
+        else ""
+    )
     artifacts = " | ".join(
         f'<a href="{name}">{name}</a>' for name in _FILENAMES if name != "report.html"
     )
@@ -506,12 +537,14 @@ th {{ background: #f1f5f6; }} figure {{ margin: 1.5rem 0; }} figure svg {{ width
 .scroll-hint {{ margin: .45rem .75rem; color: #4b5a62; font-size: .9rem; }}
 .provenance-json {{ max-width: 100%; box-sizing: border-box; margin: 1rem 0 2rem; padding: .8rem; border: 1px solid #d4dbdf; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; }}
 .notice {{ padding: .8rem 1rem; background: #fff6df; border-left: 4px solid #b77a15; }}
+.derived-notice {{ padding: .8rem 1rem; background: #fff6df; border-left: 4px solid #b77a15; }}
 </style>
 </head>
 <body>
 <header><h1>Chromatogram evidence report</h1>
 <p>Validated stored evidence; this report renders the supplied samples and peak rows without recalculating them.</p>
 <p>{point_count} {point_noun}; {bundle["peak_count"]} peak rows.</p></header>
+{overlap_notice}
 <figure>{embed_svg}<figcaption>All supplied points are plotted in sample order. The vertical scale is shared between raw and processed signal. Shaded bands mark recorded peak-boundary intervals. {grid_caption}</figcaption></figure>
 <h2>Stored peak rows</h2><p>Peak IDs identify stored rows; they are not analyte assignments. Null measurements are shown as “Unavailable” in HTML and blank in CSV. An unavailable area_basis means the source record did not state a basis; none is inferred. Numeric values are shown as stored.</p>
 <div class="table-scroll peak-table-region" role="region" aria-label="Stored peak rows" aria-describedby="peak-table-scroll-hint" tabindex="0">
