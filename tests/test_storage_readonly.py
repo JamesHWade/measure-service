@@ -2,11 +2,47 @@ from __future__ import annotations
 
 import hashlib
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 import pytest
 
 from measure_service import storage
+
+
+def test_schema_validation_and_read_share_one_wal_snapshot(tmp_path, monkeypatch):
+    from measure_service import campaign_schema
+
+    monkeypatch.setenv("MEASURE_MCP_DATA_DIR", str(tmp_path))
+    path = storage.db_path()
+    with closing(storage.connect()) as con:
+        con.execute("PRAGMA journal_mode=WAL")
+    original_state = campaign_schema._schema_state
+    changed = False
+
+    def change_after_first_validation(con):
+        nonlocal changed
+        state = original_state(con)
+        if not changed:
+            changed = True
+            with closing(sqlite3.connect(path)) as writer, writer:
+                writer.execute("DROP INDEX campaign_proposals_candidate")
+        return state
+
+    monkeypatch.setattr(campaign_schema, "_schema_state", change_after_first_validation)
+    with storage.registry_connection() as con:
+        assert con.execute("SELECT count(*) FROM experiments").fetchone()[0] == 0
+    assert changed
+    with sqlite3.connect(path) as con:
+        assert (
+            con.execute(
+                "SELECT name FROM sqlite_master WHERE name='campaign_proposals_candidate'"
+            ).fetchone()
+            is None
+        )
+    with pytest.raises(ValueError, match="writable migration"):
+        with storage.registry_connection():
+            pass
 
 
 def _initialize(root: Path, monkeypatch: pytest.MonkeyPatch) -> Path:

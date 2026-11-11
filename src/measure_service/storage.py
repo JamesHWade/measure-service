@@ -289,6 +289,7 @@ def _connect_readonly_at(path: Path) -> sqlite3.Connection:
     try:
         con.execute("PRAGMA foreign_keys=ON")
         con.execute("PRAGMA query_only=ON")
+        con.execute("BEGIN")
         from .design_lineage_schema import validate_design_lineage_schema
         from .import_origins import validate_import_schema
         from .result_table_schema import validate_result_table_schema
@@ -338,7 +339,8 @@ def registry_connection(write: bool = False) -> Iterator[sqlite3.Connection]:
     con = connect() if write else _connect_readonly_at(db_path(create=False))
     con.row_factory = sqlite3.Row
     try:
-        con.execute("BEGIN IMMEDIATE" if write else "BEGIN")
+        if write:
+            con.execute("BEGIN IMMEDIATE")
         yield con
         con.commit()
     except BaseException:
