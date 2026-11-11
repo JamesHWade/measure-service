@@ -10,7 +10,7 @@ warning_state <- new.env(parent = emptyenv())
 warning_state$seen <- character()
 
 package_versions <- function() {
-  names <- c("measure", "measure.sec", "recipes")
+  names <- c("measure", "measure.sec", "recipes", "Matrix")
   stats::setNames(
     lapply(names, function(name) {
       if (requireNamespace(name, quietly = TRUE)) {
