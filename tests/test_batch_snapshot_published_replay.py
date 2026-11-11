@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import json
+import math
 import os
 import sys
 from pathlib import Path
@@ -16,26 +17,117 @@ from measure_service.batch_bundle import read_bundle
 from measure_service.batch_restore import restore_bundle
 from measure_service.batch_snapshot import decode_snapshot
 from measure_service.evidence_client import collect_chromatogram_evidence
-from measure_service.storage import canonical
 
 REFERENCE = Path(__file__).parents[1] / "docs/reference-data/chromatogram-snapshot-example"
 RUNTIME_FIELDS = {"packages", "installed_r_code_md5", "r_version"}
+CURRENT_BACKEND_REPLAY_POLICY = "current-backend-replay/2"
+PROCESSED_SIGNAL_ABS_TOLERANCE = 1e-9
+REPLAY_METRIC_ABS_TOLERANCE = 1e-10
+REPLAY_METRIC_REL_TOLERANCE = 1e-8
 
 
-def _scientific_value(expected, observed):
+def _assert_exact(expected, observed):
+    """Compare JSON structure and scalar types without numeric coercion."""
+    assert type(expected) is type(observed)
     if isinstance(expected, dict):
-        assert isinstance(observed, dict) and expected.keys() == observed.keys()
+        assert expected.keys() == observed.keys()
         for key in expected:
-            _scientific_value(expected[key], observed[key])
+            _assert_exact(expected[key], observed[key])
     elif isinstance(expected, list):
-        assert isinstance(observed, list) and len(expected) == len(observed)
+        assert len(expected) == len(observed)
         for left, right in zip(expected, observed):
-            _scientific_value(left, right)
-    elif type(expected) in (int, float):
-        assert type(observed) in (int, float)
-        assert observed == pytest.approx(expected, abs=1e-10, rel=1e-8)
+            _assert_exact(left, right)
     else:
-        assert type(expected) is type(observed) and expected == observed
+        assert expected == observed
+
+
+def _assert_numeric_close(expected, observed, *, abs_tolerance, rel_tolerance):
+    if expected is None or observed is None:
+        _assert_exact(expected, observed)
+        return
+    assert type(expected) is type(observed) and type(expected) in (int, float)
+    assert math.isfinite(expected) and math.isfinite(observed)
+    assert observed == pytest.approx(expected, abs=abs_tolerance, rel=rel_tolerance)
+
+
+def _assert_point_compatible(expected, observed):
+    assert type(expected) is dict and type(observed) is dict
+    assert expected.keys() == observed.keys()
+    for field in ("sample_index", "axis", "processed_axis", "raw_signal"):
+        _assert_exact(expected[field], observed[field])
+    _assert_numeric_close(
+        expected["processed_signal"],
+        observed["processed_signal"],
+        abs_tolerance=PROCESSED_SIGNAL_ABS_TOLERANCE,
+        rel_tolerance=REPLAY_METRIC_REL_TOLERANCE,
+    )
+
+
+def _assert_peak_compatible(expected, observed):
+    assert type(expected) is dict and type(observed) is dict
+    assert expected.keys() == observed.keys()
+    metric_fields = {"height", "area", "prominence"}
+    for field in expected:
+        if field in metric_fields:
+            _assert_numeric_close(
+                expected[field],
+                observed[field],
+                abs_tolerance=REPLAY_METRIC_ABS_TOLERANCE,
+                rel_tolerance=REPLAY_METRIC_REL_TOLERANCE,
+            )
+        else:
+            _assert_exact(expected[field], observed[field])
+
+
+def _without_local_analysis_identity(evidence):
+    normalized = {key: value for key, value in evidence.items() if key != "evidence_sha256"}
+    normalized["analysis"] = {
+        key: value
+        for key, value in evidence["analysis"].items()
+        if key not in {"analysis_id", "dataset_id"}
+    }
+    return normalized
+
+
+def test_current_backend_replay_policy_changes_only_processed_signal_budget():
+    assert CURRENT_BACKEND_REPLAY_POLICY == "current-backend-replay/2"
+    point = {
+        "sample_index": 0,
+        "axis": 0.0,
+        "processed_axis": 0.0,
+        "raw_signal": 0.0,
+        "processed_signal": 0.0,
+    }
+    _assert_point_compatible(point, {**point, "processed_signal": 2e-10})
+    with pytest.raises(AssertionError):
+        _assert_point_compatible(point, {**point, "processed_signal": 2e-9})
+    for field in ("axis", "processed_axis", "raw_signal"):
+        with pytest.raises(AssertionError):
+            _assert_point_compatible(point, {**point, field: 2e-10})
+    with pytest.raises(AssertionError):
+        _assert_point_compatible(point, {**point, "sample_index": 0.0})
+    with pytest.raises(AssertionError):
+        _assert_point_compatible(point, {**point, "extra": "field"})
+
+    peak = {
+        "peak_id": 1,
+        "location": 1.0,
+        "height": 0.02,
+        "left_base": 0.9,
+        "right_base": 1.1,
+        "area": 0.03,
+        "prominence": 0.02,
+        "area_basis": "observed_signal",
+    }
+    for field in ("location", "left_base", "right_base"):
+        with pytest.raises(AssertionError):
+            _assert_peak_compatible(peak, {**peak, field: peak[field] + 2e-10})
+    with pytest.raises(AssertionError):
+        _assert_peak_compatible(peak, {**peak, "peak_id": 1.0})
+    for field in ("height", "area", "prominence"):
+        _assert_peak_compatible(peak, {**peak, field: peak[field] + 1.5e-10})
+        with pytest.raises(AssertionError):
+            _assert_peak_compatible({**peak, field: 0.0}, {**peak, field: 2e-10})
 
 
 @pytest.mark.r_backend
@@ -115,9 +207,11 @@ def test_fixed_archive_reproduces_two_original_successes_with_current_r(tmp_path
                     )
                     identifier = fresh[original["trace_id"]]["analysis_id"]
                     observed = await collect_chromatogram_evidence(client, identifier)
-                    assert canonical(expected["trace"]) == canonical(observed["trace"])
-                    assert canonical(expected["analysis"]["method"]) == canonical(
-                        observed["analysis"]["method"]
+                    _assert_exact(expected["trace"], observed["trace"])
+                    _assert_exact(expected["analysis"]["method"], observed["analysis"]["method"])
+                    _assert_exact(expected["analysis"]["kind"], observed["analysis"]["kind"])
+                    _assert_exact(
+                        expected["analysis"]["trace_id"], observed["analysis"]["trace_id"]
                     )
                     expected_meta = {
                         k: v for k, v in expected["result"].items() if k not in RUNTIME_FIELDS
@@ -125,39 +219,40 @@ def test_fixed_archive_reproduces_two_original_successes_with_current_r(tmp_path
                     observed_meta = {
                         k: v for k, v in observed["result"].items() if k not in RUNTIME_FIELDS
                     }
-                    _scientific_value(expected_meta, observed_meta)
+                    _assert_exact(expected_meta, observed_meta)
+                    _assert_exact(expected["point_count"], observed["point_count"])
+                    _assert_exact(expected["peak_count"], observed["peak_count"])
                     assert len(expected["points"]) == len(observed["points"]) == 501
                     for left, right in zip(expected["points"], observed["points"]):
-                        assert (
-                            type(right["sample_index"]) is int
-                            and left["sample_index"] == right["sample_index"]
-                        )
-                        for field in ("axis", "processed_axis", "raw_signal", "processed_signal"):
-                            _scientific_value(left[field], right[field])
+                        _assert_point_compatible(left, right)
                     assert len(expected["peaks"]) == len(observed["peaks"])
                     for left, right in zip(expected["peaks"], observed["peaks"]):
-                        for field in ("peak_id", "area_basis"):
-                            assert (
-                                type(left[field]) is type(right[field])
-                                and left[field] == right[field]
-                            )
-                        for field in (
-                            "location",
-                            "height",
-                            "left_base",
-                            "right_base",
-                            "area",
-                            "prominence",
-                        ):
-                            _scientific_value(left.get(field), right.get(field))
+                        _assert_peak_compatible(left, right)
                     compact = await call("measurement_get_analysis", {"analysis_id": identifier})
                     assert "import_origin" not in compact and "input_import_origin" in compact
                     retained = await call(
                         "measurement_get_analysis",
                         {"analysis_id": imported["analysis_map"][original["analysis_id"]]},
                     )
-                    assert retained["provenance"] == original["provenance"]
+                    local_analysis_id = imported["analysis_map"][original["analysis_id"]]
+                    local_dataset_id = imported["dataset_map"][original["dataset_id"]]
+                    retained_evidence = await collect_chromatogram_evidence(
+                        client, local_analysis_id
+                    )
+                    assert retained_evidence["analysis"]["analysis_id"] == local_analysis_id
+                    assert retained_evidence["analysis"]["dataset_id"] == local_dataset_id
+                    _assert_exact(
+                        _without_local_analysis_identity(expected),
+                        _without_local_analysis_identity(retained_evidence),
+                    )
+                    _assert_exact(retained["provenance"], original["provenance"])
+                    _assert_exact(retained["method"], original["method"])
                     assert retained["import_origin"]["source_record_id"] == original["analysis_id"]
+                    assert retained["import_origin"]["local_record_id"] == local_analysis_id
+                    assert (
+                        retained["input_import_origin"]["source_record_id"]
+                        == original["dataset_id"]
+                    )
                     compared.append(original["trace_id"])
                 assert set(compared) == {analysis["trace_id"] for analysis in document["analyses"]}
                 assert (

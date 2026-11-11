@@ -10,3 +10,4 @@ docs/reference-data/result-table-example/* -text whitespace=cr-at-eol linguist-g
 
 # Retain the executed design-lineage report and CRLF audit log byte for byte.
 docs/reference-data/design-lineage-example/* -text whitespace=cr-at-eol linguist-generated=true
+docs/reference-data/als-sampling-study/inputs.csv linguist-generated=true

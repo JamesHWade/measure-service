@@ -179,6 +179,13 @@ jobs:
           assert "scripts/check_tool_schemas.py" in members
           assert "docs/tool-catalog.md" in members
           assert "docs/connect-identity-cost.md" in members
+          assert "docs/peak-settings.md" in members
+          assert "docs/project-sharing-design.md" in members
+          assert "tests/test_als_sampling_study.py" in members
+          for name in ("qualify_als_sampling_study.py", "fit_als_sampling_study.R", "plot_als_sampling_study.R"):
+              assert "scripts/" + name in members
+          for name in ("declaration.json", "input_manifest.csv", "inputs.csv", "fits.csv", "summary.csv", "lambda-sampling-sensitivity.svg", "run.json"):
+              assert "docs/reference-data/als-sampling-study/" + name in members
           for name in ("storage_readonly", "observational_reads", "readiness_budget"):
               assert "tests/test_" + name + ".py" in members
           assert "src/measure_service/http_authority.py" in members

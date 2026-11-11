@@ -25,6 +25,9 @@ Record these results for the actual host, authentication proxy and MCP client:
 | Identity boundary | Caller-supplied identity headers are stripped; verified identity is injected; direct upstream access is blocked |
 | Ownership | Two invited accounts cannot retrieve or link each other's datasets, results or evidence |
 | Client input | A representative authorized trace reaches the service with exact units, metadata and retained source identity |
+| Tool admission | The intended client lists the selected groups and schema profile; disabled tools fail on direct calls, and discovery makes no Connect account lookup |
+| Browser and proxy | Public Host and Origin admission match the actual client, including an explicit shared-origin trust decision where needed |
+| Response continuity | Large pages stay bounded and the client follows actual next_offset values; one account cannot evict another account's unexpired captures |
 | Backend discovery | Required R/SEC APIs and an independently checked numerical example pass in the installed host environment |
 | Request limits | Oversized and interrupted uploads do not create records; a saturated service returns bounded errors and remains observable |
 | Persistence | Host restart preserves records and retry receipts on the configured private volume |
@@ -38,7 +41,7 @@ states the current identity and transport boundaries.
 
 ## Before inviting researchers
 
-1. Install the selected service distribution and compatible numerical backends.
+1. Install the selected service distribution and compatible R 4.5+ numerical backends.
    Record resolved versions and source identities as evidence; do not infer
    compatibility from an unchanged development version string.
 2. Initialize a new private persistent store with the operator command in
@@ -47,13 +50,17 @@ states the current identity and transport boundaries.
 3. Configure the trusted proxy and loopback-only upstream. Apply upstream
    header, rate and connection limits in addition to the service's body and
    in-flight request limits. Configure process supervision and host resources.
-4. Run the matrix above through the intended client. Retain outcomes, warnings,
+4. Select the needed [tool groups and schema profile](tool-catalog.md). The
+   installed pilot CLI needs discovery, traces, sec, evidence and experiments.
+   Verify the actual client's discovery and response handling; a schema
+   projection does not establish compatibility with a vendor endpoint.
+5. Run the matrix above through the intended client. Retain outcomes, warnings,
    actual runtime identities and failures. A health response or HTTP 200 alone
    is insufficient: inspect the MCP result's `isError` field too.
-5. Demonstrate a restore using synthetic pilot data before accepting real data.
+6. Demonstrate a restore using synthetic pilot data before accepting real data.
    Schedule protected backups and verify that an operator can access them after
    host failure. Do not publish full-store backups from researcher datasets.
-6. Agree a small pilot cohort, supported workflow and feedback route. Keep
+7. Agree a small pilot cohort, supported workflow and feedback route. Keep
    unsupported vendor formats, compound identification, physical retention
    fitting and instrument execution explicit in onboarding.
 
@@ -62,3 +69,18 @@ HTTP and R capacity limits. Storage quotas, host-wide resource scheduling,
 detached execution, automated backup scheduling, deletion/retention APIs and
 multi-node persistence remain separate work. Do not imply these capabilities
 from a working local example.
+
+Before interpreting peak areas, inspect recorded [boundary warnings](peak-boundaries.md)
+and [peak/ALS settings](peak-settings.md). A warning-free synthetic example does
+not establish baseline, coelution or physical method performance.
+
+Use [Connect identity cost](connect-identity-cost.md), [Host and Origin admission](http-authorities.md)
+and [Connect hosting](connect-hosting.md) to plan actual proxy/client checks.
+Read-only calls [do not initialize or migrate stores](read-only-store.md).
+[Temporary captures](capture-retention.md) have owner-local retention and can
+reject admission under global pressure. [Response limits](analysis-response-limits.md)
+apply to compact page JSON rather than the entire MCP wire envelope.
+
+The [sharing and deletion proposal](project-sharing-design.md) records future
+policy choices and acceptance tests. It adds no project membership or deletion
+API; this pilot still uses principal-isolated records.
