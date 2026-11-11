@@ -48,6 +48,50 @@ package_code_fingerprints <- function() {
 
 as_num <- function(x) as.numeric(unlist(x, use.names = FALSE))
 
+project_peak_rows <- function(value) {
+  required <- c(
+    "peak_id",
+    "location",
+    "height",
+    "left_base",
+    "right_base",
+    "area"
+  )
+  optional <- c("area_basis", "prominence")
+  peaks <- as.data.frame(value)
+  if (nrow(peaks) == 0L) {
+    return(list())
+  }
+  missing <- setdiff(required, names(peaks))
+  if (length(missing) > 0L) {
+    stop("The peak backend returned a malformed nonempty peak table.")
+  }
+  peaks[, c(required, intersect(optional, names(peaks))), drop = FALSE]
+}
+
+peak_ranges_overlap <- function(peaks) {
+  if (!is.data.frame(peaks) || nrow(peaks) < 2L) {
+    return(FALSE)
+  }
+  left <- suppressWarnings(as_num(peaks$left_base))
+  right <- suppressWarnings(as_num(peaks$right_base))
+  finite <- is.finite(left) & is.finite(right) & right > left
+  if (sum(finite) < 2L) {
+    return(FALSE)
+  }
+  order_index <- order(left[finite], right[finite])
+  left <- left[finite][order_index]
+  right <- right[finite][order_index]
+  furthest_right <- right[[1]]
+  for (index in seq.int(2L, length(left))) {
+    if (left[[index]] < furthest_right) {
+      return(TRUE)
+    }
+    furthest_right <- max(furthest_right, right[[index]])
+  }
+  FALSE
+}
+
 analyze <- function(input) {
   if (identical(input$operation, "capabilities")) {
     return(list(
@@ -160,6 +204,17 @@ analyze <- function(input) {
 
   if (identical(input$operation, "chromatogram")) {
     method <- input$method
+    if (
+      isTRUE(
+        method$min_height == 0 &&
+          method$min_prominence == 0 &&
+          method$min_distance == 0
+      )
+    ) {
+      warning(
+        "Peak detection with all thresholds set to zero can retain noise; inspect the signal range and sampling before choosing thresholds."
+      )
+    }
     if (identical(method$baseline, "als")) {
       rec <- measure::step_measure_baseline_als(
         rec,
@@ -190,10 +245,15 @@ analyze <- function(input) {
       baseline = method$integration_baseline
     )
     out <- recipes::bake(recipes::prep(rec), new_data = NULL)
-    peaks <- as.data.frame(out$.peaks[[1]])
+    peaks <- project_peak_rows(out$.peaks[[1]])
+    if (peak_ranges_overlap(peaks)) {
+      warning(
+        "Peak integration ranges overlap in their interiors; stored peak areas are unchanged and shared signal may contribute to more than one area."
+      )
+    }
     return(list(
       kind = "chromatogram",
-      peak_count = nrow(peaks),
+      peak_count = if (is.data.frame(peaks)) nrow(peaks) else 0L,
       peaks = peaks,
       processed_trace = list(
         axis = out$signal[[1]]$location,
