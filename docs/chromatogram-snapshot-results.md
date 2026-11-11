@@ -36,6 +36,27 @@ The reference and blank provide the two supported numerical comparisons. Their
 order, peak identities and categorical interpretation remain exact. Package
 versions and code fingerprints are recorded separately from numerical equality.
 
+The published comparison above reports its original run unchanged: it observed
+zero numeric error under those tolerances. The current-backend replay test uses
+the named `current-backend-replay/2` policy for a separate rerun. In that test,
+only `processed_signal` has an absolute tolerance of `1e-9` and relative
+tolerance of `1e-8`; the absolute tolerance is in mAU for this fixed reference,
+whose signal unit is mAU, and is not a general guarantee for signals with other
+scales or units. Peak height, area and prominence retain the historical
+`1e-10` absolute and `1e-8` relative tolerances. Raw and processed axes, raw
+signal, sample and peak identifiers, peak locations and bounds, counts,
+methods, and categorical fields must match exactly. This replay policy does not
+change the published comparison or its zero-error result.
+
+The processed-signal allowance reflects a measured sparse-ALS replay: revision
+`8ce4a3b` differed from the archive by at most `1.816e-10` mAU. Two of
+1,002 samples exceeded the historical comparison budget. A fresh execution
+with legacy revision `71894a6` matched the archive exactly. An independent QR
+calculation agreed with the sparse solver within `2.204e-13` mAU after smoothing,
+using the same seven ALS iterations and weights; the blank trace was unchanged. These implementation revisions and
+runtime details are provenance for the recorded comparison, not backend pins or
+general numerical guarantees.
+
 Import retained original source text, mappings, methods, results, timestamps and
 scientific provenance with new local dataset/analysis IDs and separate import
 origins. Archived runs, attempts, controls and retry keys did not become active
