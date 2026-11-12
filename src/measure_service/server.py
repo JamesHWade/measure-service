@@ -1139,10 +1139,10 @@ def measurement_get_campaign_consumption(consumption_id: RecordId, ctx: Context)
 
 
 @mcp.tool(annotations=READ, structured_output=True)
-def measurement_capabilities(ctx: Context) -> dict[str, Any]:
+async def measurement_capabilities(ctx: Context) -> dict[str, Any]:
     """Report installed R backends and the experimental operations available."""
     identity(ctx)
-    result = run_worker({"operation": "capabilities"})
+    result = await asyncio.to_thread(run_worker, {"operation": "capabilities"})
     packages = result.get("packages", {})
     return {
         "service": "measure-separations",
@@ -1432,7 +1432,7 @@ def measurement_retry_chromatogram_batch_items(
 
 
 @mcp.tool(annotations=WRITE, structured_output=True)
-def measurement_analyze_chromatogram(
+async def measurement_analyze_chromatogram(
     dataset_id: str, trace_id: str, method: ChromatogramMethod, ctx: Context
 ) -> dict[str, Any]:
     """Process one trace and detect/integrate peaks using measure; peak areas are not compound identities or concentrations."""
@@ -1440,12 +1440,14 @@ def measurement_analyze_chromatogram(
     dataset, digest = dataset_for(owner, dataset_id)
     trace = trace_for(dataset, trace_id)
     spec = method.model_dump(mode="json")
-    result = analysis_runtime.process_chromatogram(trace, spec, worker=run_worker)
+    result = await asyncio.to_thread(
+        analysis_runtime.process_chromatogram, trace, spec, worker=run_worker
+    )
     return save_analysis(owner, dataset_id, trace_id, "chromatogram", spec, result, digest)
 
 
 @mcp.tool(annotations=WRITE, structured_output=True)
-def measurement_analyze_sec(
+async def measurement_analyze_sec(
     dataset_id: str, trace_id: str, method: SECMethod, ctx: Context
 ) -> dict[str, Any]:
     """Calculate relative SEC molecular-weight moments from a baseline-corrected concentration trace and explicit standards."""
@@ -1455,12 +1457,14 @@ def measurement_analyze_sec(
     if trace["separation"] != "SEC" or trace["axis_unit"] not in ("min", "mL"):
         raise ValueError("SEC analysis requires an SEC trace with an axis in min or mL")
     spec = method.model_dump(mode="json")
-    result = run_worker({"operation": "sec", "trace": trace, "method": spec})
+    result = await asyncio.to_thread(
+        run_worker, {"operation": "sec", "trace": trace, "method": spec}
+    )
     return save_analysis(owner, dataset_id, trace_id, "sec", spec, result, digest)
 
 
 @mcp.tool(annotations=WRITE, structured_output=True)
-def measurement_quantify_peak(
+async def measurement_quantify_peak(
     analysis_id: str, peak_id: int, method: PeakQuantitationMethod, ctx: Context
 ) -> dict[str, Any]:
     """Quantify an explicitly assigned chromatogram peak with supplied linear response standards; does not establish peak identity."""
@@ -1479,8 +1483,9 @@ def measurement_quantify_peak(
         "peak_id": peak_id,
         "response_unit": f"{trace['signal_unit']} * {trace['axis_unit']}",
     }
-    result = run_worker(
-        {"operation": "quantitation", "method": spec, "response": matches[0]["area"]}
+    result = await asyncio.to_thread(
+        run_worker,
+        {"operation": "quantitation", "method": spec, "response": matches[0]["area"]},
     )
     return save_analysis(
         owner, source["dataset_id"], source["trace_id"], "peak_quantitation", spec, result, digest
