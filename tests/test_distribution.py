@@ -53,6 +53,7 @@ def test_service_distribution_contains_both_import_packages_and_worker():
         "measure_service/pilot_evidence.py",
         "measure_service/pilot_transport.py",
         "measure_service/pilot_cli.py",
+        "measure_service/client_cli.py",
         "measure_service/store_operations.py",
         "measure_service/store_cli.py",
         "measure_service/http_operations.py",
@@ -107,6 +108,28 @@ def test_installed_cli_and_worker_outside_checkout(tmp_path):
         check=True,
     )
     assert not completed.stdout, "Stdio startup must not print non-protocol output"
+
+
+def test_installed_client_configuration_entrypoint_outside_checkout(tmp_path):
+    distribution = metadata.distribution("measure-service")
+    entry = next(
+        item for item in distribution.entry_points if item.name == "measure-service-client"
+    )
+    assert entry.value == "measure_service.client_cli:main"
+    suffix = ".exe" if os.name == "nt" else ""
+    command = Path(sys.executable).parent / f"measure-service-client{suffix}"
+    completed = subprocess.run(
+        [str(command), "config", "claude", "--data-dir", str(tmp_path / "private-store")],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=15,
+        check=True,
+    )
+    configuration = json.loads(completed.stdout)["mcpServers"]["measure-service"]
+    assert configuration["command"] == sys.executable
+    assert configuration["args"] == ["-m", "measure_service"]
+    assert not list(tmp_path.iterdir())
 
 
 def test_installed_store_operator_entrypoint_outside_checkout(tmp_path):

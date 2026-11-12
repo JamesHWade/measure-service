@@ -64,7 +64,8 @@ these rows. See [store recovery](store-recovery.md) and
 - Access, encryption where required, backup retention/deletion, support and incident ownership agreed:
 - Invitation decision, operator and UTC time:
 
-Keep service issue #83 open until actual hosted evidence is recorded. Broader
+Track remaining actual-host acceptance in [service issue #116](https://github.com/JamesHWade/measure-service/issues/116)
+until actual hosted evidence is recorded. Broader
 scientific, instrument and optimization qualification stays separate. The
 service remains single-node; a pilot does not establish multi-node durability,
 provider-independent OAuth, general vendor ingestion or physical execution.

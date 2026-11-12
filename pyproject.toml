@@ -29,6 +29,7 @@ dev = [
 measure-service = "measure_service.server:main"
 measure-service-store = "measure_service.store_cli:main"
 measure-service-pilot = "measure_service.pilot_cli:main"
+measure-service-client = "measure_service.client_cli:main"
 
 [project.urls]
 Repository = "https://github.com/JamesHWade/measure-service"
