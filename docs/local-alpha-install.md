@@ -105,13 +105,16 @@ The generated manifest records the service source commit, service wheel
 version and SHA-256, all dependency wheel names, versions and hashes, the
 resolved Python lock hash, and the two explicit R commits. It does not move a
 branch or tag. Keep the bundle directory intact; copying a wheel or changing a
-lock file invalidates its manifest checks.
+lock file invalidates its manifest checks. Generated install requirements
+contain the SHA-256 of every staged wheel, including the service wheel. Rebuild
+older bundles created before these install hashes were added.
 
 ## Install Python wheels offline
 
 Use a fresh environment with the exact Python version and platform recorded in
 the manifest. The installer verifies all bundle hashes before it runs pip,
-installs only from the staged wheelhouse, checks dependency consistency, then
+uses `--require-hashes` and only the staged wheelhouse, ignores inherited
+`PIP_*` redirects and configuration, checks dependency consistency, then
 checks installed distribution versions and verifies that the installed
 `measure_service/` and `measure_methods/` files match the service wheel.
 

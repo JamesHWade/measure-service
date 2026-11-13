@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 import subprocess
 import venv
 import zipfile
@@ -161,7 +162,18 @@ def staged_bundle(tmp_path):
 
 
 def test_manifest_rejects_changed_artifacts_and_semantic_lock_drift(staged_bundle):
-    builder.verify_bundle(staged_bundle)
+    document = builder.verify_bundle(staged_bundle)
+    dependency_entry = document["python"]["dependencies"][0]
+    service_entry = document["service"]["wheel"]
+    requirement_lines = [
+        line
+        for line in (staged_bundle / "requirements.txt").read_text().splitlines()
+        if line and not line.startswith("#")
+    ]
+    assert requirement_lines == [
+        f"demo-dep==1.0 --hash=sha256:{dependency_entry['sha256']}",
+        f"measure-service==0.1.0.dev0 --hash=sha256:{service_entry['sha256']}",
+    ]
     dependency = next((staged_bundle / "wheels").glob("demo_dep-*.whl"))
     dependency.write_bytes(dependency.read_bytes() + b"changed")
     with pytest.raises(ValueError, match="SHA-256 mismatch"):
@@ -174,6 +186,25 @@ def test_manifest_rejects_changed_artifacts_and_semantic_lock_drift(staged_bundl
     manifest["python"]["lock_sha256"] = builder.sha256_file(requirements)
     (staged_bundle / "manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="lock does not match manifest dependency pins"):
+        builder.verify_bundle(staged_bundle)
+
+
+@pytest.mark.parametrize("mutation", ["remove", "change"])
+def test_manifest_rejects_install_hash_drift_even_if_file_digest_is_updated(
+    staged_bundle, mutation
+):
+    document = builder.verify_bundle(staged_bundle)
+    requirements = staged_bundle / "requirements.txt"
+    contents = requirements.read_text()
+    dependency_hash = document["python"]["dependencies"][0]["sha256"]
+    original = f" --hash=sha256:{dependency_hash}"
+    replacement = "" if mutation == "remove" else " --hash=sha256:" + "0" * 64
+    requirements.write_text(contents.replace(original, replacement, 1))
+    document["python"]["install_requirements_sha256"] = builder.sha256_file(requirements)
+    (staged_bundle / "manifest.json").write_text(json.dumps(document))
+    with pytest.raises(
+        ValueError, match="requirements.txt does not match the manifest package pins"
+    ):
         builder.verify_bundle(staged_bundle)
 
 
@@ -218,6 +249,18 @@ def test_r_verifier_forces_the_selected_library_ahead_of_inherited_libraries(tmp
     assert report == ["measure 1.0"]
 
 
+def test_pip_environment_drops_inherited_redirects_and_uses_no_config(monkeypatch):
+    monkeypatch.setenv("PIP_FIND_LINKS", "/external/wheels")
+    monkeypatch.setenv("PIP_TARGET", "/external/target")
+    monkeypatch.setenv("PIP_PREFIX", "/external/prefix")
+    monkeypatch.setenv("PIP_CONFIG_FILE", "/external/pip.conf")
+    environment = builder._isolated_pip_environment()
+    assert environment["PIP_CONFIG_FILE"] == os.devnull
+    assert "PIP_FIND_LINKS" not in environment
+    assert "PIP_TARGET" not in environment
+    assert "PIP_PREFIX" not in environment
+
+
 def _venv_python(path: Path) -> Path:
     venv.EnvBuilder(with_pip=True).create(path)
     return path / "bin" / "python"
@@ -233,6 +276,7 @@ def test_offline_bundle_installs_exact_wheels_and_checks_package_bytes(tmp_path,
         source_wheelhouse / "demo_dep-1.0-py3-none-any.whl",
         "demo-dep",
         "1.0",
+        files={"demo_dep/__init__.py": b"ORIGIN = 'staged'\n"},
     )
     download_python = _venv_python(tmp_path / "download-python")
     monkeypatch.setattr(builder.sys, "executable", str(download_python))
@@ -261,15 +305,38 @@ def test_offline_bundle_installs_exact_wheels_and_checks_package_bytes(tmp_path,
         assert archive.read("measure_service/source-marker.txt") == b"committed service source\n"
     assert len(list((bundle / "wheels").glob("*.whl"))) == 2
 
+    external_wheelhouse = tmp_path / "external-wheelhouse"
+    make_wheel(
+        external_wheelhouse / "demo_dep-1.0-1-py3-none-any.whl",
+        "demo-dep",
+        "1.0",
+        files={"demo_dep/__init__.py": b"ORIGIN = 'external'\n"},
+    )
+    pip_config = tmp_path / "external-pip.conf"
+    pip_config.write_text(f"[global]\nfind-links = {external_wheelhouse}\n")
+
     install_python = _venv_python(tmp_path / "install-python")
+    environment = dict(os.environ)
+    environment["PIP_FIND_LINKS"] = str(external_wheelhouse)
+    environment["PIP_CONFIG_FILE"] = str(pip_config)
     install = subprocess.run(
         [str(install_python), str(SCRIPT), "install", "--bundle", str(bundle)],
+        env=environment,
         capture_output=True,
         text=True,
         check=False,
     )
     assert install.returncode == 0, install.stdout + install.stderr
     assert "measure_service/ and measure_methods/ files match" in install.stdout
+    dependency_path = subprocess.check_output(
+        [str(install_python), "-c", "import demo_dep; print(demo_dep.__file__)"], text=True
+    ).strip()
+    assert Path(dependency_path).read_bytes() == b"ORIGIN = 'staged'\n"
+    assert all(
+        "--hash=sha256:" in line
+        for line in (bundle / "requirements.txt").read_text().splitlines()
+        if line and not line.startswith("#")
+    )
 
     package_path = subprocess.check_output(
         [str(install_python), "-c", "import measure_service; print(measure_service.__file__)"],
