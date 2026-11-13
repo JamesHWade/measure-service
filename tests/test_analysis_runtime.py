@@ -1,5 +1,6 @@
 """Shared preview/batch execution and process-wide resource boundaries."""
 
+import asyncio
 import hashlib
 import json
 import subprocess
@@ -43,7 +44,9 @@ def test_preview_uses_shared_processing_and_records_original_inputs(tmp_path, mo
         "owner", server.Dataset(title="declared input", traces=[server.Trace(**trace())])
     )
     method = server.ChromatogramMethod(smoothing="gaussian")
-    response = server.measurement_analyze_chromatogram(dataset["dataset_id"], "uv", method, None)
+    response = asyncio.run(
+        server.measurement_analyze_chromatogram(dataset["dataset_id"], "uv", method, None)
+    )
     stored = server.analysis_for("owner", response["analysis_id"])
     assert calls == [
         {

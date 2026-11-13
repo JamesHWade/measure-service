@@ -261,6 +261,8 @@ jobs:
           /tmp/measure-wheel/bin/python "$GITHUB_WORKSPACE/examples/registry.py"
           /tmp/measure-wheel/bin/measure-service-store --help
           /tmp/measure-wheel/bin/measure-service-pilot --help
+          /tmp/measure-wheel/bin/measure-service-client --help
+          /tmp/measure-wheel/bin/measure-service-client check
           /tmp/measure-wheel/bin/python "$GITHUB_WORKSPACE/examples/store_recovery.py" --output-dir /tmp/measure-wheel-recovery
       - name: Install source archive and run the example
         run: |
@@ -285,7 +287,24 @@ jobs:
           /tmp/measure-sdist/bin/python "$GITHUB_WORKSPACE/examples/registry.py"
           /tmp/measure-sdist/bin/measure-service-store --help
           /tmp/measure-sdist/bin/measure-service-pilot --help
+          /tmp/measure-sdist/bin/measure-service-client --help
+          /tmp/measure-sdist/bin/measure-service-client check
           /tmp/measure-sdist/bin/python "$GITHUB_WORKSPACE/examples/store_recovery.py" --output-dir /tmp/measure-sdist-recovery
+      - name: Build and install a complete offline Python alpha bundle
+        run: |
+          python -m pip install pip==25.3 setuptools==80.9.0 wheel==0.45.1
+          /tmp/measure-sdist/bin/python -m pip freeze --exclude measure-service > /tmp/measure-alpha-python.lock
+          # These explicit source identities are declarations for this Python-only
+          # bundle check. The R integration job qualifies installed numerical code.
+          python scripts/build_alpha_bundle.py build \
+            --requirements /tmp/measure-alpha-python.lock \
+            --measure-commit 392a1e3767dcf6eb26f6a54bca7eddb477f9ec5d \
+            --measure-sec-commit 09c1fd59f7ca7b947a581d51280a0ea3e4cc53f6 \
+            --output /tmp/measure-alpha-bundle
+          python -m venv /tmp/measure-alpha-installed
+          /tmp/measure-alpha-installed/bin/python scripts/build_alpha_bundle.py install --bundle /tmp/measure-alpha-bundle
+          cd /tmp
+          /tmp/measure-alpha-installed/bin/measure-service-client check
 
   r-integration:
     name: Current R backend heads
@@ -402,6 +421,8 @@ jobs:
           PY
       - name: Run complete service, HTTP, R and SEC contracts
         run: python -m pytest -q -m 'not bo_backend'
+      - name: Check the installed local numerical client workflow
+        run: measure-service-client check --include-sec --numerical --r "$MEASURE_MCP_R" --r-library "$R_LIBS_USER"
 
   bo-integration:
     name: Public BO-MCP runtime and recovery

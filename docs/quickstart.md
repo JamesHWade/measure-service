@@ -1,5 +1,11 @@
 # Local setup
 
+For a retained wheel, hashed Python dependencies and exact R backend source
+revisions, use the [local alpha bundle](local-alpha-install.md). To generate
+client-specific settings and run the installed SDK check, use the
+[MCP client guide](mcp-clients.md). The source installation below is useful
+for development; its moving R branch references do not freeze an installation.
+
 Run commands from the repository root. Python 3.10+ is required; Git is only
 needed when installing the R backends from their source repositories. The
 Python distribution has no R installation step or dependency on the R packages

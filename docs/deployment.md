@@ -121,3 +121,8 @@ durable item/run attempts with explicit recovery and pending-item cancellation;
 there is no detached execution queue or physical execution control. See
 [batch execution limits](chromatogram-batches.md). Additional processes and
 orphaned children after a crash are outside that process-local bound.
+
+Single numerical calls leave the MCP dispatcher available while R runs.
+Cancellation retains a running worker's capacity until it finishes; see
+[numerical concurrency and cancellation](numerical-runtime.md) for the exact
+storage and retry boundaries.

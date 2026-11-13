@@ -30,6 +30,11 @@ For an MCP client, use the installed `measure-service` command or
 `python -m measure_service`. See [local setup](docs/quickstart.md) for a client
 configuration and a numerical analysis example.
 
+For a repeatable installation, build a [local alpha bundle](docs/local-alpha-install.md).
+The [client guide](docs/mcp-clients.md) generates Claude Code and Codex settings
+without changing their configuration, and checks an installed server in a
+temporary store before you connect real measurements.
+
 ## Current scope
 
 | Workflow | Available behavior | Main limit |
@@ -59,6 +64,8 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 ## Documentation
 
 - [Local setup and examples](docs/quickstart.md)
+- [Reproducible local alpha installation](docs/local-alpha-install.md)
+- [MCP client setup and installed checks](docs/mcp-clients.md)
 - [Input formats and limits](docs/inputs.md)
 - [Scientific methods and interpretation](docs/analysis.md)
 - [Choose peak thresholds and inspect ALS sampling sensitivity](docs/peak-settings.md)
