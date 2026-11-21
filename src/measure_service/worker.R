@@ -88,6 +88,9 @@ native_bundle_max_bytes <- 4000000L
 native_bundle_max_file_bytes <- native_bundle_max_bytes
 native_trace_max_rows <- 50000L
 native_trace_max_points <- 100000L
+native_dad_max_points <- 4096L
+native_array_identity_max_items <- 128L
+native_array_identity_max_bytes <- 48L * 1024L
 
 as_native_text <- function(x, field, max_bytes = NULL) {
   if (
@@ -221,6 +224,30 @@ native_stream_rows <- function(acquisition) {
   })
 }
 
+native_array_identity_rows <- function(acquisition) {
+  arrays <- acquisition$arrays
+  count <- nrow(arrays)
+  if (count == 0L) {
+    return(list())
+  }
+  limit <- min(count, native_array_identity_max_items)
+  rows <- list()
+  for (i in seq_len(limit)) {
+    candidate <- list(
+      array_id = arrays$array_id[[i]],
+      stream_id = arrays$stream_id[[i]],
+      point_count = as.integer(nrow(arrays$.measures[[i]]))
+    )
+    trial <- c(rows, list(candidate))
+    serialized <- jsonlite::toJSON(trial, auto_unbox = TRUE, null = "null")
+    if (length(charToRaw(serialized)) > native_array_identity_max_bytes) {
+      break
+    }
+    rows <- trial
+  }
+  rows
+}
+
 native_status_counts <- function(values) {
   counts <- table(values, useNA = "no")
   as.list(stats::setNames(as.integer(counts), names(counts)))
@@ -238,17 +265,21 @@ native_inspection <- function(acquisition, bundle) {
       array_points = array_points
     )
   )
+  inspection_summary <- list(
+    counts = counts,
+    scan_status_counts = native_status_counts(acquisition$scans$scan_status),
+    streams = native_stream_rows(acquisition),
+    samples = context$samples,
+    injections = context$injections,
+    channels = context$channels,
+    sources = context$sources
+  )
+  if (nrow(acquisition$arrays) > 0L) {
+    inspection_summary$arrays <- native_array_identity_rows(acquisition)
+  }
   list(
     profile = "measure-acquisition-inspection/1",
-    summary = list(
-      counts = counts,
-      scan_status_counts = native_status_counts(acquisition$scans$scan_status),
-      streams = native_stream_rows(acquisition),
-      samples = context$samples,
-      injections = context$injections,
-      channels = context$channels,
-      sources = context$sources
-    ),
+    summary = inspection_summary,
     provenance = list(
       operation = "inspect_acquisition",
       backend = "measure",
@@ -260,6 +291,115 @@ native_inspection <- function(acquisition, bundle) {
       installed_r_code_md5 = package_code_fingerprints(),
       r_version = as.character(getRversion())
     )
+  )
+}
+
+native_dad_selection <- function(input) {
+  array_id <- as_native_text(input$array_id, "array_id")
+  time_axis <- input$time_axis
+  if (
+    is.logical(time_axis) ||
+      !is.numeric(time_axis) ||
+      length(time_axis) != 1L ||
+      !is.finite(time_axis) ||
+      time_axis != floor(time_axis) ||
+      !time_axis %in% c(1, 2)
+  ) {
+    stop("time_axis must be exactly 1 or 2.")
+  }
+  list(array_id = array_id, time_axis = as.integer(time_axis))
+}
+
+native_dad_unit <- function(units, index, field) {
+  if (
+    is.null(units) ||
+      length(units) != 2L ||
+      is.na(units[[index]]) ||
+      !nzchar(trimws(units[[index]], whitespace = "[\\h\\v]"))
+  ) {
+    stop(field, " must be a known nonblank unit for both array axes.")
+  }
+  unname(units[[index]])
+}
+
+native_dad_plane <- function(acquisition, selection) {
+  arrays <- acquisition$arrays
+  array_position <- match(selection$array_id, arrays$array_id)
+  if (is.na(array_position)) {
+    stop("The requested array_id was not found in the acquisition.")
+  }
+  stream_id <- arrays$stream_id[[array_position]]
+  stream_position <- match(stream_id, acquisition$streams$stream_id)
+  if (is.na(stream_position)) {
+    stop("The selected array refers to an unknown stream.")
+  }
+
+  measure <- arrays$.measures[[array_position]]
+  point_count <- nrow(measure)
+  if (point_count > native_dad_max_points) {
+    stop("The selected DAD array exceeds the 4096 observed-point limit.")
+  }
+  source_rows <- arrays$.source_rows[[array_position]]
+  saturated <- arrays$.saturated[[array_position]]
+  if (
+    length(source_rows) != point_count ||
+      length(saturated) != point_count
+  ) {
+    stop("The selected array lineage and saturation masks do not align.")
+  }
+
+  time_axis <- selection$time_axis
+  wavelength_axis <- 3L - time_axis
+  dim_units <- attr(measure, "dim_units", exact = TRUE)
+  time_unit <- native_dad_unit(dim_units, time_axis, "time_unit")
+  wavelength_unit <- native_dad_unit(
+    dim_units,
+    wavelength_axis,
+    "wavelength_unit"
+  )
+  time <- as.numeric(measure[[paste0("location_", time_axis)]])
+  wavelength <- as.numeric(
+    measure[[paste0("location_", wavelength_axis)]]
+  )
+  if (!all(is.finite(time)) || !all(is.finite(wavelength))) {
+    stop("DAD time and wavelength coordinates must be finite.")
+  }
+  if (any(wavelength <= 0)) {
+    stop("DAD wavelengths must be positive.")
+  }
+  if (anyDuplicated(data.frame(time = time, wavelength = wavelength))) {
+    stop("DAD time and wavelength coordinate pairs must be unique.")
+  }
+
+  value <- as.numeric(measure$value)
+  if (any(is.nan(value)) || any(!is.na(value) & !is.finite(value))) {
+    stop("DAD values must be finite or NA.")
+  }
+  points <- lapply(seq_len(point_count), function(i) {
+    list(
+      point_index = as.integer(i),
+      time = time[[i]],
+      wavelength = wavelength[[i]],
+      value = native_nullable(value[i]),
+      source_row = native_nullable(source_rows[i]),
+      saturated = native_nullable(saturated[i])
+    )
+  })
+
+  stream <- acquisition$streams[stream_position, , drop = FALSE]
+  list(
+    array_id = selection$array_id,
+    stream_id = stream$stream_id[[1L]],
+    injection_id = stream$injection_id[[1L]],
+    channel_id = stream$channel_id[[1L]],
+    source_id = native_nullable(stream$source_id[1L]),
+    time_unit = time_unit,
+    wavelength_unit = wavelength_unit,
+    value_unit = native_nullable(stream$value_unit[1L]),
+    points = points,
+    packages = package_versions(),
+    installed_r_code_md5 = package_code_fingerprints(),
+    r_version = as.character(getRversion())
   )
 }
 
@@ -499,6 +639,18 @@ analyze <- function(input) {
         input,
         function(acquisition, ...) {
           native_trace_extraction(acquisition, selection)
+        }
+      )
+    )
+  }
+
+  if (identical(input$operation, "read_dad_plane")) {
+    selection <- native_dad_selection(input)
+    return(
+      with_native_acquisition(
+        input,
+        function(acquisition, ...) {
+          native_dad_plane(acquisition, selection)
         }
       )
     )

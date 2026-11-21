@@ -1,9 +1,11 @@
 include AGENTS.md CONTRIBUTING.md
 recursive-include docs *.md *.csv *.json *.html *.png *.svg
 recursive-include docs/reference-data/chromatogram-snapshot-example *.zip
-recursive-include examples *.py
+recursive-include examples *.py *.R
 recursive-include scripts *.py *.R
 recursive-include tests *.py *.json
+include tests/fixtures/generate_native_dad_fixture.R
+recursive-include tests/fixtures/native_dad_v1 *.dcf *.csv
 include tests/fixtures/generate_native_xic_fixture.R
 recursive-include tests/fixtures/native_acquisition_xic_v1 *.dcf *.csv
 recursive-include src/measure_service *.R

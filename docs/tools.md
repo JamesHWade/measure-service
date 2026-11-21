@@ -11,7 +11,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 81 tools.
+The current catalog contains 82 tools.
 
 | Tool | Group | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- | --- |
@@ -71,6 +71,7 @@ The current catalog contains 81 tools.
 | `measurement_read_chromatogram_batch_export` | `batches` | `snapshot_sha256` | read | idempotent |
 | `measurement_read_chromatogram_batch_items` | `batches` | `batch_id` | read | idempotent |
 | `measurement_read_chromatogram_evidence` | `evidence` | `analysis_id`, `kind`, `evidence_sha256` | read | idempotent |
+| `measurement_read_dad_plane` | `dad` | `acquisition_id`, `array_id`, `time_axis` | read | idempotent |
 | `measurement_read_ms_trace` | `ms` | `trace_id`, `kind`, `evidence_sha256` | read | idempotent |
 | `measurement_read_result_table_rows` | `evidence` | `import_id` | read | idempotent |
 | `measurement_read_result_table_source` | `evidence` | `import_id` | read | idempotent |
@@ -322,6 +323,10 @@ Read bounded owned batch-item metadata, states and retained analysis links; does
 ### `measurement_read_chromatogram_evidence`
 
 Read a bounded page from an owned immutable capture selected by its manifest digest; request a new manifest after cache eviction or server restart.
+
+### `measurement_read_dad_plane`
+
+Read the observed time–wavelength cells of one owned native array. Declare which of its two axes holds time. Includes detector values, units, saturation flags and source rows.
 
 ### `measurement_read_ms_trace`
 

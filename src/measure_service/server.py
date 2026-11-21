@@ -32,6 +32,7 @@ from . import (
     campaign_suggestion_attempts,
     campaigns,
     connect_hosting,
+    dad_plane,
     design_lineage,
     gaussian_producer,
     method_registry,
@@ -42,6 +43,7 @@ from . import (
     tool_catalog,
 )
 from . import experiments as registry
+from .acquisition_models import MAX_MEMBER_BYTES
 from .analysis_models import (
     MAX_DATASET_POINTS,
     MAX_POINTS,
@@ -1192,6 +1194,19 @@ async def measurement_register_acquisition(
 def measurement_get_acquisition(acquisition_id: RecordId, ctx: Context) -> dict[str, Any]:
     """Read the retained acquisition summary and source digest for this owner."""
     return acquisition_store.get_acquisition(identity(ctx), acquisition_id)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+async def measurement_read_dad_plane(
+    acquisition_id: RecordId,
+    array_id: Annotated[StrictStr, Field(min_length=1, max_length=MAX_MEMBER_BYTES)],
+    time_axis: Annotated[StrictInt, Field(ge=1, le=2)],
+    ctx: Context,
+) -> dict[str, Any]:
+    """Read the observed time–wavelength cells of one owned native array. Declare which of its two axes holds time. Includes detector values, units, saturation flags and source rows."""
+    return await asyncio.to_thread(
+        dad_plane.read_dad_plane, identity(ctx), acquisition_id, array_id, time_axis
+    )
 
 
 @mcp.tool(annotations=RETRY_WRITE, structured_output=True)
