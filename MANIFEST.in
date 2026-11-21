@@ -1,7 +1,7 @@
 include AGENTS.md CONTRIBUTING.md
 recursive-include docs *.md *.csv *.json *.html *.png *.svg
 recursive-include docs/reference-data/chromatogram-snapshot-example *.zip
-recursive-include examples *.py
+recursive-include examples *.py *.R
 recursive-include scripts *.py *.R
 recursive-include tests *.py *.json
 include tests/fixtures/generate_native_dad_fixture.R
