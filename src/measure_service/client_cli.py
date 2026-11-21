@@ -17,7 +17,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.types import TextContent
 
-from . import pilot_numerics, tool_catalog
+from . import ms_trace_cli, pilot_numerics, tool_catalog
 
 DEFAULT_GROUPS = ("discovery", "traces", "evidence")
 CHECK_TIMEOUT_SECONDS = 120
@@ -550,6 +550,8 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="measure-service-client")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
+    ms_trace_cli.add_commands(subparsers)
+
     config = subparsers.add_parser(
         "config", help="print a client configuration fragment without editing settings"
     )
@@ -586,6 +588,8 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
+    if args.command in ("xic", "xic-report"):
+        return ms_trace_cli.run(args, parser)
     if args.command == "config":
         paths = _runtime_paths(args, parser)
         groups = _groups(args.include_sec)
