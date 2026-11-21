@@ -36,6 +36,28 @@ array's declared units. An axis can occupy either native dimension. Set
 `--time-axis 2` when the second dimension carries time. Values are displayed
 as supplied. A chromatogram uses one exact wavelength, with no band averaging.
 
+## Check the slices in R
+
+The native array and exported evidence can be read independently. For the
+two-response example, these checks compare every coordinate and signal value
+in the two selected slices.
+
+```r
+array <- measure::read_measure_acquisition("two-responses")$arrays$.measures[[1]]
+points <- jsonlite::fromJSON("detector-report/evidence.json")$points
+chrom <- subset(points, wavelength == 251)
+spectrum <- subset(points, time == 2)
+direct_chrom <- measure::measure_slice(array, wavelength = 251)
+direct_spectrum <- measure::measure_slice(array, time = 2)
+
+stopifnot(
+  identical(chrom$time, direct_chrom$location),
+  identical(chrom$value, direct_chrom$value),
+  all(spectrum$wavelength == direct_spectrum$location),
+  identical(spectrum$value, direct_spectrum$value)
+)
+```
+
 ## Read a sparse acquisition
 
 The small test acquisition includes an absent coordinate, a missing response
