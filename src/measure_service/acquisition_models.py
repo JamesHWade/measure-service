@@ -121,6 +121,12 @@ def validate_summary(summary: Any) -> dict[str, Any]:
     except UnicodeError as error:
         raise ValueError("The acquisition worker returned a non-UTF-8 summary") from error
     if len(encoded) > MAX_SUMMARY_BYTES:
+        # Array discovery is an optional preview. An input that fit the original
+        # summary limit must still register after adding the preview.
+        metadata = summary.get("summary")
+        if isinstance(metadata, dict) and "arrays" in metadata:
+            trimmed = {key: value for key, value in metadata.items() if key != "arrays"}
+            return validate_summary({**summary, "summary": trimmed})
         raise ValueError("The acquisition summary exceeds the byte limit")
     # A bounded object should also have bounded top-level fan-out even when its
     # values are compact.  The worker remains responsible for semantic checks.

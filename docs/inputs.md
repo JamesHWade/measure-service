@@ -47,6 +47,25 @@ one-based `point_index` identifies a centroid within its scan. `source_row`
 retains the original row number when the acquisition declared one. Fetching
 the same extraction again returns the original retained result.
 
+### Reading a diode-array detector plane
+
+Use `measurement_read_dad_plane` with an owned acquisition ID, an array ID
+and `time_axis` (1 or 2). The other native dimension supplies wavelength.
+Acquisition inspections include a bounded preview of array IDs when space
+permits. The array count covers the entire acquisition. The native arrays
+table supplies every ID, including those absent from an older inspection.
+
+The response contains each supplied coordinate once, in native row order,
+with its detector value, one-based point index, optional source row and
+saturation flag. A missing coordinate contributes no row. A null detector
+value belongs to an observed coordinate. The declared units accompany each
+view. The service accepts up to 4,096 observed cells and a 2 MB evidence
+document. Reading the array uses the current R worker and leaves the original
+acquisition intact. Its evidence digest covers the view and worker provenance.
+
+For a restricted deployment, `dad` enables the plane reader. Registration and
+inspection use the existing `ms` tool group.
+
 ## Trace metadata
 
 Every trace declares `trace_id`, `sample_id`, `injection_id`, `channel`,

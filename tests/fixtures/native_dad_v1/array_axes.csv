@@ -1,0 +1,3 @@
+"array_id","axis_index","storage_type","axis_name","axis_unit"
+"dad-1","1","double","time","min"
+"dad-1","2","double","wavelength","nm"

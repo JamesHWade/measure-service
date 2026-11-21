@@ -74,8 +74,8 @@ def test_versioned_catalog_covers_each_registered_tool_exactly_once():
     names = registered_tool_names()
 
     assert TOOL_CATALOG_VERSION == "1.0"
-    assert len(names) == 81
-    assert len(TOOL_GROUP_BY_NAME) == 81
+    assert len(names) == 82
+    assert len(TOOL_GROUP_BY_NAME) == 82
     validate_tool_registry(names)
     assert set(TOOL_GROUP_BY_NAME.values()) == set(TOOL_GROUPS)
     assert all(tool_group(name) in TOOL_GROUPS for name in names)
@@ -209,7 +209,7 @@ def test_actual_registered_catalog_is_standard_under_both_profiles(monkeypatch):
 
     monkeypatch.setattr(mcp, "_selected_groups", frozenset(TOOL_GROUPS))
     tools = asyncio.run(mcp.registered_tools())
-    assert len(tools) == 81
+    assert len(tools) == 82
     validate_tool_registry(tool.name for tool in tools)
     for profile in (CANONICAL_SCHEMA_PROFILE, FUNCTION_HOST_SCHEMA_PROFILE):
         for tool in tools:
@@ -221,7 +221,7 @@ def test_actual_registered_catalog_is_standard_under_both_profiles(monkeypatch):
 
         monkeypatch.setattr(mcp, "_schema_profile", profile)
         advertised = asyncio.run(mcp.list_tools())
-        assert len(advertised) == 81
+        assert len(advertised) == 82
         for tool in advertised:
             assert tool.meta[TOOL_GROUP_META_KEY] in TOOL_GROUPS
             for schema in (tool.inputSchema, tool.outputSchema):
