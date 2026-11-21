@@ -71,6 +71,7 @@ def test_reader_scopes_native_files_before_dispatch_and_hashes_the_returned_view
 def test_dad_tool_requires_explicit_native_axes_and_uses_authenticated_owner(monkeypatch):
     monkeypatch.setattr(server.mcp, "_selected_groups", frozenset({"dad"}))
     monkeypatch.setenv("MEASURE_MCP_IDENTITY", "local")
+    array_id = "detector-" + "a" * 128
     calls = []
 
     def reader(owner, acquisition_id, array_id, time_axis):
@@ -84,14 +85,14 @@ def test_dad_tool_requires_explicit_native_axes_and_uses_authenticated_owner(mon
             tools = (await client.list_tools()).tools
             assert [tool.name for tool in tools] == ["measurement_read_dad_plane"]
             assert tools[0].annotations.readOnlyHint
-            arguments = {"acquisition_id": "owned", "array_id": "dad-1"}
+            arguments = {"acquisition_id": "owned", "array_id": array_id}
             assert (await client.call_tool(tools[0].name, arguments)).isError
             assert (await client.call_tool(tools[0].name, {**arguments, "time_axis": 3})).isError
             result = await client.call_tool(tools[0].name, {**arguments, "time_axis": 2})
-            assert not result.isError and result.structuredContent == {"array_id": "dad-1"}
+            assert not result.isError and result.structuredContent == {"array_id": array_id}
 
     asyncio.run(exercise())
-    assert calls == [("local", "owned", "dad-1", 2)]
+    assert calls == [("local", "owned", array_id, 2)]
 
 
 def test_array_preview_cannot_make_a_previously_valid_registration_too_large(monkeypatch):
