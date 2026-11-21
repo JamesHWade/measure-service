@@ -34,6 +34,19 @@ Keep the returned `acquisition_id` to inspect the same input later with
 returns that acquisition again. Sample, source and unit fields retain the
 declarations in the bundle.
 
+For a centroid XIC, pass the acquisition ID, stream ID, polarity, integer MS
+level and inclusive `mz_min` and `mz_max` to `measurement_extract_ms_trace`.
+The installed `measure::measure_ms_trace()` calculates one value per selected
+scan in scan-index order. A missing scan and a saturated selection both have
+a null intensity and retain their distinct statuses. An acquired empty scan
+has a measured sum of zero. The result records the R package and worker used.
+
+Use the returned trace ID and evidence digest to page through `points` or
+`source_rows` with `measurement_read_ms_trace`. Join by `scan_id`. The
+one-based `point_index` identifies a centroid within its scan. `source_row`
+retains the original row number when the acquisition declared one. Fetching
+the same extraction again returns the original retained result.
+
 ## Trace metadata
 
 Every trace declares `trace_id`, `sample_id`, `injection_id`, `channel`,

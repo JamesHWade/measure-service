@@ -86,6 +86,16 @@ def _connect_at(path: Path) -> sqlite3.Connection:
     );
     CREATE INDEX IF NOT EXISTS acquisition_files_owner_lookup
       ON acquisition_files(owner, acquisition_id, name);
+    CREATE TABLE IF NOT EXISTS ms_traces (
+      id TEXT PRIMARY KEY, owner TEXT NOT NULL, acquisition_id TEXT NOT NULL REFERENCES acquisitions(id),
+      request_sha256 TEXT NOT NULL, manifest TEXT NOT NULL, manifest_sha256 TEXT NOT NULL,
+      UNIQUE(owner, request_sha256)
+    );
+    CREATE TABLE IF NOT EXISTS ms_trace_rows (
+      trace_id TEXT NOT NULL REFERENCES ms_traces(id),
+      kind TEXT NOT NULL CHECK(kind IN ('points', 'source_rows')), ordinal INTEGER NOT NULL,
+      payload TEXT NOT NULL, row_sha256 TEXT NOT NULL, PRIMARY KEY(trace_id, kind, ordinal)
+    );
     CREATE TABLE IF NOT EXISTS analyses (
       id TEXT PRIMARY KEY, owner TEXT NOT NULL, dataset_id TEXT NOT NULL,
       trace_id TEXT NOT NULL, kind TEXT NOT NULL, method TEXT NOT NULL,

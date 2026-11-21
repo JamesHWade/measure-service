@@ -55,7 +55,7 @@ PLANNED_CAMPAIGN_COUNT = 12
 PLANNED_EVALUATION_COUNT = 120
 _STORE_MARKER_TABLE = "measure_synthetic_campaign_store"
 _STORE_MARKER_SCHEMA_VERSION = 1
-_NATIVE_ACQUISITION_TABLES = {"acquisitions", "acquisition_files"}
+_NATIVE_ACQUISITION_TABLES = {"acquisitions", "acquisition_files", "ms_traces", "ms_trace_rows"}
 _NATIVE_ACQUISITION_INDEXES = {
     "acquisitions_owner_order",
     "acquisition_files_owner_lookup",
@@ -116,6 +116,8 @@ _SERVICE_TABLES = {
     "analysis_batch_control_events",
     "acquisitions",
     "acquisition_files",
+    "ms_traces",
+    "ms_trace_rows",
 }
 _SERVICE_INDEXES = {
     "analytical_observations_contract_attempt",
@@ -151,6 +153,7 @@ _SERVICE_OWNER_TABLES = _SERVICE_TABLES - {
     "attempt_revisions",
     "dataset_sources",
     "measure_batch_schema",
+    "ms_trace_rows",
 }
 _EVALUATION_CSV_FIELDS = (
     "campaign_id",

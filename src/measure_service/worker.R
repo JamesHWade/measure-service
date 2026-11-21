@@ -178,18 +178,6 @@ native_nullable <- function(x) {
   }
 }
 
-native_source_rows <- function(x) {
-  lapply(x, function(value) {
-    if (is.na(value)) NULL else as.integer(value)
-  })
-}
-
-native_mask_values <- function(x) {
-  lapply(x, function(value) {
-    if (is.na(value)) NULL else as.logical(value)
-  })
-}
-
 native_context_rows <- function(acquisition) {
   record <- acquisition$record
   list(
@@ -275,6 +263,150 @@ native_inspection <- function(acquisition, bundle) {
   )
 }
 
+native_trace_scalar <- function(x, field, minimum = -Inf) {
+  values <- suppressWarnings(as_num(x))
+  if (
+    length(values) != 1L ||
+      !is.finite(values[[1L]]) ||
+      values[[1L]] < minimum ||
+      values[[1L]] != floor(values[[1L]])
+  ) {
+    stop(field, " must be one finite whole-number scalar.")
+  }
+  as.integer(values[[1L]])
+}
+
+native_trace_selection <- function(input) {
+  stream_id <- as_native_text(input$stream_id, "stream_id")
+  polarity <- as_native_text(input$polarity, "polarity")
+  if (!polarity %in% c("positive", "negative")) {
+    stop("polarity must be exactly 'positive' or 'negative'.")
+  }
+  ms_level <- native_trace_scalar(input$ms_level, "ms_level", minimum = 1)
+  mz_min <- input$mz_min
+  mz_max <- input$mz_max
+  if (is.null(mz_min) && is.null(mz_max)) {
+    mz_range <- NULL
+  } else {
+    if (is.null(mz_min) || is.null(mz_max)) {
+      stop("mz_min and mz_max must both be supplied for an XIC.")
+    }
+    mz_min <- suppressWarnings(as_num(mz_min))
+    mz_max <- suppressWarnings(as_num(mz_max))
+    if (
+      length(mz_min) != 1L ||
+        length(mz_max) != 1L ||
+        !is.finite(mz_min) ||
+        !is.finite(mz_max) ||
+        mz_min <= 0 ||
+        mz_max <= 0 ||
+        mz_min > mz_max
+    ) {
+      stop(
+        "mz_min and mz_max must be finite positive scalars with mz_min <= mz_max."
+      )
+    }
+    mz_range <- c(as.numeric(mz_min), as.numeric(mz_max))
+  }
+  list(
+    stream_id = stream_id,
+    polarity = polarity,
+    ms_level = ms_level,
+    mz_range = mz_range
+  )
+}
+
+native_trace_rows <- function(acquisition, trace) {
+  scans <- acquisition$scans
+  points <- vector("list", nrow(trace))
+  source_rows <- vector("list", sum(trace$selected_points))
+  next_source <- 0L
+  scan_positions <- match(trace$scan_id, scans$scan_id)
+  for (i in seq_len(nrow(trace))) {
+    row <- trace[i, , drop = FALSE]
+    scan_id <- row$scan_id[[1L]]
+    scan_position <- scan_positions[[i]]
+    if (is.na(scan_position)) {
+      stop("The trace returned a scan that is absent from the acquisition.")
+    }
+    measures <- scans$.measures[[scan_position]]
+    raw_source_rows <- scans$.source_rows[[scan_position]]
+    raw_saturated <- scans$.saturated[[scan_position]]
+    point_indices <- row$.point_indices[[1L]]
+    if (is.null(point_indices)) {
+      point_indices <- integer()
+    } else {
+      point_indices <- as.integer(point_indices)
+    }
+    if (length(point_indices) > 0L) {
+      for (j in seq_along(point_indices)) {
+        point_index <- point_indices[[j]]
+        if (
+          point_index < 1L ||
+            point_index > nrow(measures) ||
+            length(raw_source_rows) != nrow(measures) ||
+            length(raw_saturated) != nrow(measures)
+        ) {
+          stop("The trace returned a point index outside its source scan.")
+        }
+        next_source <- next_source + 1L
+        source_rows[[next_source]] <- list(
+          scan_id = scan_id,
+          point_index = point_index,
+          source_row = native_nullable(raw_source_rows[point_index]),
+          mz = as.numeric(measures$location[[point_index]]),
+          intensity = native_nullable(measures$value[point_index]),
+          saturated = native_nullable(raw_saturated[point_index])
+        )
+      }
+    }
+    points[[i]] <- list(
+      scan_id = scan_id,
+      scan_index = as.integer(row$scan_index[[1L]]),
+      source_scan_id = native_nullable(row$source_scan_id[1L]),
+      retention_time = as.numeric(row$retention_time[[1L]]),
+      value = native_nullable(row$value[1L]),
+      status = row$status[[1L]],
+      selected_points = as.integer(row$selected_points[[1L]]),
+      saturation_unknown = as.logical(row$saturation_unknown[[1L]])
+    )
+  }
+  list(points = points, source_rows = source_rows)
+}
+
+native_trace_extraction <- function(acquisition, selection) {
+  trace <- measure::measure_ms_trace(
+    acquisition,
+    stream_id = selection$stream_id,
+    polarity = selection$polarity,
+    ms_level = selection$ms_level,
+    mz_range = selection$mz_range
+  )
+  if (nrow(trace) > native_trace_max_rows) {
+    stop("The extracted trace exceeds the scan-row limit.")
+  }
+  selected_count <- sum(as_num(trace$selected_points))
+  if (!is.finite(selected_count) || selected_count > native_trace_max_points) {
+    stop("The extracted trace exceeds the selected-point limit.")
+  }
+  rows <- native_trace_rows(acquisition, trace)
+  if (length(rows$source_rows) > native_trace_max_points) {
+    stop("The extracted trace exceeds the source-row limit.")
+  }
+  processing <- attr(trace, "processing")
+  if (!is.list(processing)) {
+    stop("The measure backend returned no processing metadata.")
+  }
+  list(
+    points = rows$points,
+    source_rows = rows$source_rows,
+    processing = processing,
+    packages = package_versions(),
+    installed_r_code_md5 = package_code_fingerprints(),
+    r_version = as.character(getRversion())
+  )
+}
+
 project_peak_rows <- function(value) {
   required <- c(
     "peak_id",
@@ -344,7 +476,9 @@ analyze <- function(input) {
         all(
           c("read_measure_acquisition", "measure_acquisition") %in%
             getNamespaceExports("measure")
-        )
+        ),
+      centroid_xic_support = requireNamespace("measure", quietly = TRUE) &&
+        "measure_ms_trace" %in% getNamespaceExports("measure")
     ))
   }
   if (
@@ -356,6 +490,18 @@ analyze <- function(input) {
 
   if (identical(input$operation, "inspect_acquisition")) {
     return(with_native_acquisition(input, native_inspection))
+  }
+
+  if (identical(input$operation, "extract_ms_trace")) {
+    selection <- native_trace_selection(input)
+    return(
+      with_native_acquisition(
+        input,
+        function(acquisition, ...) {
+          native_trace_extraction(acquisition, selection)
+        }
+      )
+    )
   }
 
   if (identical(input$operation, "quantitation")) {

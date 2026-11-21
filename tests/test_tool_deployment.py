@@ -90,7 +90,7 @@ def test_production_mcp_filters_tools_and_enforces_runtime_trace_limit(tmp_path,
             )
             assert rejected.isError
             assert "50000" in rejected.content[0].text or "50,000" in rejected.content[0].text
-            assert len(await server.mcp.registered_tools()) == 78
+            assert len(await server.mcp.registered_tools()) == 81
 
     asyncio.run(run())
     assert not (tmp_path / "absent").exists()

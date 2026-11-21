@@ -11,7 +11,7 @@ assigns each registered tool to exactly one stable group. MCP
 | --- | --- |
 | `discovery` | Registry, method and numerical capabilities |
 | `traces` | Scalar trace import, inspection, analysis and peak quantitation |
-| `ms` | Native acquisition registration and inspection |
+| `ms` | Native acquisitions, centroid XIC extraction and retained scan evidence |
 | `sec` | Relative SEC analysis and comparison |
 | `batches` | Declared analytical batches, execution, recovery and snapshots |
 | `evidence` | Exact source, result-table and analysis evidence pages |

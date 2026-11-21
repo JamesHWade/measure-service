@@ -11,7 +11,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 78 tools.
+The current catalog contains 81 tools.
 
 | Tool | Group | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- | --- |
@@ -28,6 +28,7 @@ The current catalog contains 78 tools.
 | `measurement_create_observation_snapshot` | `observations` | `contract_id`, `observation_ids`, `idempotency_key` | write | idempotent |
 | `measurement_evaluate_observation` | `observations` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_export_chromatogram_batch` | `batches` | `batch_id`, `expected_revision`, `mode` | read | returns a new capture |
+| `measurement_extract_ms_trace` | `ms` | `acquisition_id`, `stream_id`, `polarity`, `ms_level`, `mz_min`, `mz_max` | write | idempotent |
 | `measurement_get_acquisition` | `ms` | `acquisition_id` | read | idempotent |
 | `measurement_get_analysis` | `traces` | `analysis_id` | read | idempotent |
 | `measurement_get_analytical_import` | `batches` | `import_id` | read | idempotent |
@@ -45,6 +46,7 @@ The current catalog contains 78 tools.
 | `measurement_get_gaussian_observation` | `observations` | `run_id` | read | idempotent |
 | `measurement_get_gaussian_producer` | `observations` | `producer_id` | read | idempotent |
 | `measurement_get_method` | `methods` | `method_id` | read | idempotent |
+| `measurement_get_ms_trace` | `ms` | `trace_id` | read | idempotent |
 | `measurement_get_observation` | `observations` | `observation_id` | read | idempotent |
 | `measurement_get_observation_contract` | `observations` | `contract_id` | read | idempotent |
 | `measurement_get_observation_snapshot` | `observations` | `snapshot_id` | read | idempotent |
@@ -69,6 +71,7 @@ The current catalog contains 78 tools.
 | `measurement_read_chromatogram_batch_export` | `batches` | `snapshot_sha256` | read | idempotent |
 | `measurement_read_chromatogram_batch_items` | `batches` | `batch_id` | read | idempotent |
 | `measurement_read_chromatogram_evidence` | `evidence` | `analysis_id`, `kind`, `evidence_sha256` | read | idempotent |
+| `measurement_read_ms_trace` | `ms` | `trace_id`, `kind`, `evidence_sha256` | read | idempotent |
 | `measurement_read_result_table_rows` | `evidence` | `import_id` | read | idempotent |
 | `measurement_read_result_table_source` | `evidence` | `import_id` | read | idempotent |
 | `measurement_read_source` | `evidence` | `dataset_id` | read | idempotent |
@@ -148,6 +151,10 @@ Assess exact owned retention/resolution result records under the experiment's pr
 
 Capture owned quiescent batch evidence at a revision without R; explicitly choose metadata references or self-contained source assets, then read immutable byte pages.
 
+### `measurement_extract_ms_trace`
+
+Sum centroid intensities in an inclusive m/z interval for one stream, polarity and MS level. Retain the scan results and contributing source rows.
+
 ### `measurement_get_acquisition`
 
 Read the retained acquisition summary and source digest for this owner.
@@ -215,6 +222,10 @@ Retrieve the owned immutable latent-producer declaration, assumed FWHM widths an
 ### `measurement_get_method`
 
 Retrieve an owned immutable executable method and its declared limits.
+
+### `measurement_get_ms_trace`
+
+Read a retained XIC's selectors, units, row counts and provenance.
 
 ### `measurement_get_observation`
 
@@ -311,6 +322,10 @@ Read bounded owned batch-item metadata, states and retained analysis links; does
 ### `measurement_read_chromatogram_evidence`
 
 Read a bounded page from an owned immutable capture selected by its manifest digest; request a new manifest after cache eviction or server restart.
+
+### `measurement_read_ms_trace`
+
+Read a page of retained scan results or their contributing centroid rows.
 
 ### `measurement_read_result_table_rows`
 
