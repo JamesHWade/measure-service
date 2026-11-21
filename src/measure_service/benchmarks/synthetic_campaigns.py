@@ -55,6 +55,11 @@ PLANNED_CAMPAIGN_COUNT = 12
 PLANNED_EVALUATION_COUNT = 120
 _STORE_MARKER_TABLE = "measure_synthetic_campaign_store"
 _STORE_MARKER_SCHEMA_VERSION = 1
+_NATIVE_ACQUISITION_TABLES = {"acquisitions", "acquisition_files"}
+_NATIVE_ACQUISITION_INDEXES = {
+    "acquisitions_owner_order",
+    "acquisition_files_owner_lookup",
+}
 _BACKEND_IDENTITY_FIELDS = (
     "backend_id",
     "adapter_profile",
@@ -109,6 +114,8 @@ _SERVICE_TABLES = {
     "analysis_batch_run_items",
     "analysis_batch_attempts",
     "analysis_batch_control_events",
+    "acquisitions",
+    "acquisition_files",
 }
 _SERVICE_INDEXES = {
     "analytical_observations_contract_attempt",
@@ -137,6 +144,8 @@ _SERVICE_INDEXES = {
     "analysis_batch_attempts_owner_batch_order",
     "analysis_batch_attempts_owner_run_order",
     "analysis_batch_events_owner_order",
+    "acquisitions_owner_order",
+    "acquisition_files_owner_lookup",
 }
 _SERVICE_OWNER_TABLES = _SERVICE_TABLES - {
     "attempt_revisions",
@@ -494,6 +503,9 @@ def _check_owned_store(
     for table in sorted(name for name in table_names if name.startswith("analysis_batch")):
         if con.execute(f'SELECT 1 FROM "{table}" LIMIT 1').fetchone() is not None:
             raise ValueError("isolated synthetic runner store must not contain analytical batches")
+    for table in sorted(_NATIVE_ACQUISITION_TABLES & table_names):
+        if con.execute(f'SELECT 1 FROM "{table}" LIMIT 1').fetchone() is not None:
+            raise ValueError("isolated synthetic runner store must not contain native acquisitions")
     for table in sorted(_SERVICE_OWNER_TABLES):
         if table not in table_names:
             continue

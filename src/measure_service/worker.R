@@ -48,6 +48,233 @@ package_code_fingerprints <- function() {
 
 as_num <- function(x) as.numeric(unlist(x, use.names = FALSE))
 
+# Native acquisition inputs are passed as exact UTF-8 members rather than
+# paths. The R package reader remains the authority for the bundle format;
+# this adapter only bounds the transport and writes the already-validated
+# member bytes to a private temporary directory.
+native_bundle_files <- list(
+  csv = c(
+    "manifest.dcf",
+    "samples.csv",
+    "injections.csv",
+    "channels.csv",
+    "sources.csv",
+    "curves.csv",
+    "points.csv",
+    "streams.csv",
+    "scans.csv",
+    "scan_points.csv",
+    "arrays.csv",
+    "array_axes.csv",
+    "array_points.csv"
+  ),
+  tsv = c(
+    "manifest.dcf",
+    "samples.tsv",
+    "injections.tsv",
+    "channels.tsv",
+    "sources.tsv",
+    "curves.tsv",
+    "points.tsv",
+    "streams.tsv",
+    "scans.tsv",
+    "scan_points.tsv",
+    "arrays.tsv",
+    "array_axes.tsv",
+    "array_points.tsv"
+  )
+)
+native_bundle_max_bytes <- 4000000L
+native_bundle_max_file_bytes <- native_bundle_max_bytes
+native_trace_max_rows <- 50000L
+native_trace_max_points <- 100000L
+
+as_native_text <- function(x, field, max_bytes = NULL) {
+  if (
+    !is.character(x) ||
+      length(x) != 1L ||
+      is.na(x) ||
+      Encoding(x) == "bytes" ||
+      !validUTF8(x)
+  ) {
+    stop(field, " must be one nonmissing UTF-8 string.")
+  }
+  bytes <- charToRaw(x)
+  if (any(as.integer(bytes) == 0L)) {
+    stop(field, " must not contain NUL bytes.")
+  }
+  if (!is.null(max_bytes) && length(bytes) > max_bytes) {
+    stop(field, " exceeds the per-file byte limit.")
+  }
+  x
+}
+
+native_bundle_input <- function(input) {
+  files <- input$files
+  if (
+    !is.list(files) ||
+      is.data.frame(files) ||
+      is.null(names(files)) ||
+      anyNA(names(files)) ||
+      anyDuplicated(names(files))
+  ) {
+    stop("files must be a named object of bundle members.")
+  }
+  matching <- Filter(
+    function(nameset) setequal(names(files), nameset),
+    native_bundle_files
+  )
+  if (length(matching) != 1L) {
+    stop(
+      "files must contain exactly the fixed CSV or TSV bundle members."
+    )
+  }
+  ordered_names <- matching[[1L]]
+  sizes <- vapply(
+    ordered_names,
+    function(name) {
+      value <- as_native_text(files[[name]], paste0("files.", name))
+      length(charToRaw(value))
+    },
+    integer(1)
+  )
+  if (any(sizes > native_bundle_max_file_bytes)) {
+    stop("A native acquisition bundle member exceeds the per-file byte limit.")
+  }
+  total <- sum(sizes)
+  if (!is.finite(total) || total > native_bundle_max_bytes) {
+    stop("The native acquisition bundle exceeds the cumulative byte limit.")
+  }
+  list(
+    files = files,
+    names = ordered_names,
+    bytes = sizes,
+    total_bytes = total
+  )
+}
+
+with_native_acquisition <- function(input, callback) {
+  bundle <- native_bundle_input(input)
+  directory <- tempfile("measure-native-acquisition-")
+  dir.create(directory, mode = "0700")
+  on.exit(unlink(directory, recursive = TRUE, force = TRUE), add = TRUE)
+  for (name in bundle$names) {
+    connection <- file(file.path(directory, name), open = "wb")
+    writeBin(charToRaw(bundle$files[[name]]), connection)
+    close(connection)
+  }
+  acquisition <- measure::read_measure_acquisition(
+    directory,
+    max_bytes = native_bundle_max_bytes
+  )
+  callback(acquisition, bundle)
+}
+
+native_nullable <- function(x) {
+  if (length(x) == 0L || is.na(x[[1L]])) {
+    NULL
+  } else {
+    unname(x[[1L]])
+  }
+}
+
+native_source_rows <- function(x) {
+  lapply(x, function(value) {
+    if (is.na(value)) NULL else as.integer(value)
+  })
+}
+
+native_mask_values <- function(x) {
+  lapply(x, function(value) {
+    if (is.na(value)) NULL else as.logical(value)
+  })
+}
+
+native_context_rows <- function(acquisition) {
+  record <- acquisition$record
+  list(
+    samples = lapply(record$samples$sample_id, identity),
+    injections = lapply(seq_len(nrow(record$injections)), function(i) {
+      list(
+        injection_id = record$injections$injection_id[[i]],
+        sample_id = record$injections$sample_id[[i]]
+      )
+    }),
+    channels = lapply(seq_len(nrow(record$channels)), function(i) {
+      list(
+        channel_id = record$channels$channel_id[[i]],
+        channel_name = native_nullable(record$channels$channel_name[i])
+      )
+    }),
+    sources = lapply(seq_len(nrow(record$sources)), function(i) {
+      list(
+        source_id = record$sources$source_id[[i]],
+        source_name = native_nullable(record$sources$source_name[i]),
+        source_sha256 = native_nullable(record$sources$source_sha256[i])
+      )
+    })
+  )
+}
+
+native_stream_rows <- function(acquisition) {
+  streams <- acquisition$streams
+  lapply(seq_len(nrow(streams)), function(i) {
+    list(
+      stream_id = streams$stream_id[[i]],
+      injection_id = streams$injection_id[[i]],
+      channel_id = streams$channel_id[[i]],
+      kind = streams$kind[[i]],
+      source_id = native_nullable(streams$source_id[i]),
+      time_unit = native_nullable(streams$time_unit[i]),
+      mz_unit = native_nullable(streams$mz_unit[i]),
+      value_name = native_nullable(streams$value_name[i]),
+      value_unit = native_nullable(streams$value_unit[i])
+    )
+  })
+}
+
+native_status_counts <- function(values) {
+  counts <- table(values, useNA = "no")
+  as.list(stats::setNames(as.integer(counts), names(counts)))
+}
+
+native_inspection <- function(acquisition, bundle) {
+  scan_points <- sum(vapply(acquisition$scans$.measures, nrow, integer(1)))
+  array_points <- sum(vapply(acquisition$arrays$.measures, nrow, integer(1)))
+  record_counts <- summary(acquisition)$counts
+  context <- native_context_rows(acquisition)
+  counts <- c(
+    as.list(record_counts),
+    list(
+      scan_points = scan_points,
+      array_points = array_points
+    )
+  )
+  list(
+    profile = "measure-acquisition-inspection/1",
+    summary = list(
+      counts = counts,
+      scan_status_counts = native_status_counts(acquisition$scans$scan_status),
+      streams = native_stream_rows(acquisition),
+      samples = context$samples,
+      injections = context$injections,
+      channels = context$channels,
+      sources = context$sources
+    ),
+    provenance = list(
+      operation = "inspect_acquisition",
+      backend = "measure",
+      package = as.character(utils::packageVersion("measure")),
+      bundle_bytes = bundle$total_bytes,
+      source_ids = acquisition$record$sources$source_id,
+      source_sha256 = acquisition$record$sources$source_sha256,
+      packages = package_versions(),
+      installed_r_code_md5 = package_code_fingerprints(),
+      r_version = as.character(getRversion())
+    )
+  )
+}
+
 project_peak_rows <- function(value) {
   required <- c(
     "peak_id",
@@ -109,6 +336,14 @@ analyze <- function(input) {
         all(
           c("mw_col", "mw_scale", "integration_range") %in%
             names(formals(measure.sec::step_sec_mw_distribution))
+        ),
+      native_acquisition_support = requireNamespace(
+        "measure",
+        quietly = TRUE
+      ) &&
+        all(
+          c("read_measure_acquisition", "measure_acquisition") %in%
+            getNamespaceExports("measure")
         )
     ))
   }
@@ -117,6 +352,10 @@ analyze <- function(input) {
       !requireNamespace("recipes", quietly = TRUE)
   ) {
     stop("The measure and recipes R packages are required.")
+  }
+
+  if (identical(input$operation, "inspect_acquisition")) {
+    return(with_native_acquisition(input, native_inspection))
   }
 
   if (identical(input$operation, "quantitation")) {

@@ -22,6 +22,7 @@ from mcp.types import ToolAnnotations
 from pydantic import Field, StrictInt, StrictStr, model_validator
 
 from . import (
+    acquisition_store,
     analysis_evidence,
     analysis_pages,
     analysis_runtime,
@@ -1153,6 +1154,7 @@ async def measurement_capabilities(ctx: Context) -> dict[str, Any]:
             "delimited_single_trace",
             "delimited_wide",
             "delimited_long",
+            *(["measure-acquisition/1"] if result.get("native_acquisition_support") else []),
         ],
         "techniques": {
             "generic_1d_trace": bool(packages.get("measure") and packages.get("recipes")),
@@ -1174,6 +1176,20 @@ async def measurement_capabilities(ctx: Context) -> dict[str, Any]:
             "page_size": MAX_PAGE,
         },
     }
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+async def measurement_register_acquisition(
+    files: Annotated[dict[str, StrictStr], Field(min_length=13, max_length=13)], ctx: Context
+) -> dict[str, Any]:
+    """Validate and retain the UTF-8 members of a native measure acquisition bundle. Repeating identical content returns the same owned acquisition."""
+    return await asyncio.to_thread(acquisition_store.register_acquisition, identity(ctx), files)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_acquisition(acquisition_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read the retained acquisition summary and source digest for this owner."""
+    return acquisition_store.get_acquisition(identity(ctx), acquisition_id)
 
 
 @mcp.tool(annotations=WRITE, structured_output=True)

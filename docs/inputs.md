@@ -19,6 +19,21 @@ values, duplicate headers and unmapped row groups are rejected. Rows within
 each trace must already be in increasing axis order. No sorting, interpolation,
 imputation or resampling occurs during registration.
 
+## Native acquisition bundles
+
+Use `measure::write_measure_acquisition()` to export a linked acquisition. Pass
+a `files` object to `measurement_register_acquisition`. Each key is a native
+member name and each value is the exact UTF-8 text of that file, including its
+line endings. Supply `manifest.dcf` and all twelve tables in its declared
+delimiter. The member texts can total up to 4,000,000 UTF-8 bytes. Empty
+tables retain their headers. The R reader checks the native
+manifest, table hashes and relationships before registration.
+
+Keep the returned `acquisition_id` to inspect the same input later with
+`measurement_get_acquisition`. An identical submission under the same owner
+returns that acquisition again. Sample, source and unit fields retain the
+declarations in the bundle.
+
 ## Trace metadata
 
 Every trace declares `trace_id`, `sample_id`, `injection_id`, `channel`,

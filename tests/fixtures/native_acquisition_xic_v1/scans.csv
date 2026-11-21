@@ -1,0 +1,6 @@
+"row_index","scan_id","stream_id","scan_index","scan_status","retention_time","polarity","ms_level","spectrum_type","source_scan_id","location_type","value_type","point_count"
+"1","scan-1","ms-xic","1","acquired","0.5","positive","1","centroid","raw-001","double","double","4"
+"2","scan-missing","ms-xic","2","missing","1","positive","1","","raw-002","double","double","0"
+"3","scan-empty","ms-xic","3","acquired","1.5","positive","1","centroid","raw-003","double","double","0"
+"4","scan-saturated","ms-xic","4","acquired","2","positive","1","centroid","raw-004","double","double","2"
+"5","scan-5","ms-xic","5","acquired","2.5","positive","1","centroid","raw-005","double","double","2"

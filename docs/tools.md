@@ -11,7 +11,7 @@ All tools return structured JSON. Check `isError` before reading
 Registry writes use required retry keys. Dataset and analysis writes create
 a new record each time. No tool executes an instrument command.
 
-The current catalog contains 76 tools.
+The current catalog contains 78 tools.
 
 | Tool | Group | Required arguments | Effect | Retry behavior |
 | --- | --- | --- | --- | --- |
@@ -28,6 +28,7 @@ The current catalog contains 76 tools.
 | `measurement_create_observation_snapshot` | `observations` | `contract_id`, `observation_ids`, `idempotency_key` | write | idempotent |
 | `measurement_evaluate_observation` | `observations` | `contract_id`, `attempt_id`, `expected_attempt_revision`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_export_chromatogram_batch` | `batches` | `batch_id`, `expected_revision`, `mode` | read | returns a new capture |
+| `measurement_get_acquisition` | `ms` | `acquisition_id` | read | idempotent |
 | `measurement_get_analysis` | `traces` | `analysis_id` | read | idempotent |
 | `measurement_get_analytical_import` | `batches` | `import_id` | read | idempotent |
 | `measurement_get_attempt` | `experiments` | `attempt_id` | read | idempotent |
@@ -75,6 +76,7 @@ The current catalog contains 76 tools.
 | `measurement_record_gaussian_observation` | `observations` | `producer_id`, `prediction_id`, `attempt_id`, `expected_attempt_revision`, `idempotency_key` | write | idempotent |
 | `measurement_record_results` | `experiments` | `attempt_id`, `expected_attempt_revision`, `results`, `idempotency_key` | write | idempotent |
 | `measurement_recover_chromatogram_batch` | `batches` | `batch_id`, `idempotency_key`, `expected_revision` | write | idempotent |
+| `measurement_register_acquisition` | `ms` | `files` | write | idempotent |
 | `measurement_register_campaign_protocol` | `campaigns` | `title`, `spec`, `idempotency_key` | write | idempotent |
 | `measurement_register_csv` | `traces` | `title`, `csv_text`, `axis_column`, `signal_column`, `metadata` | write | creates new record |
 | `measurement_register_dataset` | `traces` | `dataset` | write | creates new record |
@@ -145,6 +147,10 @@ Assess exact owned retention/resolution result records under the experiment's pr
 ### `measurement_export_chromatogram_batch`
 
 Capture owned quiescent batch evidence at a revision without R; explicitly choose metadata references or self-contained source assets, then read immutable byte pages.
+
+### `measurement_get_acquisition`
+
+Read the retained acquisition summary and source digest for this owner.
 
 ### `measurement_get_analysis`
 
@@ -333,6 +339,10 @@ Atomically record outcomes against an exact attempt revision; copy numeric analy
 ### `measurement_recover_chromatogram_batch`
 
 Mark expired owned claims interrupted and fence late results; does not kill a process, repeat analysis or automatically retry.
+
+### `measurement_register_acquisition`
+
+Validate and retain the UTF-8 members of a native measure acquisition bundle. Repeating identical content returns the same owned acquisition.
 
 ### `measurement_register_campaign_protocol`
 

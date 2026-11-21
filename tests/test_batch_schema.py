@@ -153,3 +153,20 @@ def test_synthetic_runner_accepts_empty_schema_but_rejects_analytical_batch_data
     with connect() as con, pytest.raises(ValueError, match="must not contain analytical batches"):
         benchmark._check_owned_store(con, identity, allow_empty=False)
     assert _digest() == before
+
+
+def test_synthetic_runner_rejects_native_acquisition_data_but_accepts_empty_tables():
+    from measure_service.benchmarks import synthetic_campaigns as benchmark
+
+    identity = "b" * 64
+    with connect() as con:
+        benchmark._insert_store_marker(con, identity)
+        assert benchmark._check_owned_store(con, identity, allow_empty=False)
+        con.execute(
+            "INSERT INTO acquisitions VALUES (?, ?, ?, ?, ?)",
+            ("acq", benchmark.OWNER, "d" * 64, "{}", "timestamp"),
+        )
+    before = _digest()
+    with connect() as con, pytest.raises(ValueError, match="must not contain native acquisitions"):
+        benchmark._check_owned_store(con, identity, allow_empty=False)
+    assert _digest() == before
