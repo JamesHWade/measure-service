@@ -286,3 +286,12 @@ def test_default_page_accepts_a_thousand_scan_rows():
     bundle["source_row_count"] = 0
     bundle["evidence_sha256"] = sha256({k: v for k, v in bundle.items() if k != "evidence_sha256"})
     assert asyncio.run(collect_xic_evidence(PagedClient(bundle), bundle["trace_id"])) == bundle
+
+
+@pytest.mark.parametrize("bounds", [["unknown", 101], [0, 101], [102, 101], [100], None])
+def test_offline_report_checks_mz_bounds_before_rendering(bounds):
+    bundle = synthetic_bundle()
+    bundle["processing"]["mz_range"] = bounds
+    bundle["evidence_sha256"] = sha256({k: v for k, v in bundle.items() if k != "evidence_sha256"})
+    with pytest.raises(ValueError, match="m/z"):
+        render_xic_report(bundle)

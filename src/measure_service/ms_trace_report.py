@@ -167,6 +167,13 @@ def _validate_manifest(manifest: Mapping[str, Any]) -> None:
         isinstance(item, (str, Mapping)) for item in manifest["warnings"]
     ):
         raise ValueError("MS trace warnings must be a list of text or objects")
+    bounds = manifest["processing"].get("mz_range")
+    if not isinstance(bounds, list) or len(bounds) != 2:
+        raise ValueError("XIC processing must contain two m/z bounds")
+    for bound in bounds:
+        _finite(bound, "m/z bound", positive=True)
+    if bounds[0] > bounds[1]:
+        raise ValueError("XIC m/z bounds must be ordered")
     canonical(manifest)
 
 
@@ -359,7 +366,7 @@ def _svg(bundle: Mapping[str, Any]) -> bytes:
         target = f"report.html#scan-{index}" if index < MAX_HTML_ROWS else "xic.csv"
         markers.append(f'<a href="{target}" aria-label="{label}">{marker}</a>')
     circles = "".join(markers)
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="group" aria-labelledby="plot-title plot-desc"><title id="plot-title">LC-MS {title} trace</title><desc id="plot-desc">{_e(description)}</desc><style>text {{ font: 13px sans-serif; fill: #263238; }} .axis,.tick {{ stroke: #65727a; stroke-width: 1; }} .grid {{ stroke: #e2e7e9; stroke-width: 1; }} .x-tick,.y-tick {{ font-size: 11px; }} .trace {{ fill: none; stroke: #007f78; stroke-width: 1.8; }} .point {{ fill: #007f78; stroke: white; stroke-width: .8; }}</style><rect width="100%" height="100%" fill="white" />{"".join(ticks_y)}<line class="axis" x1="{left}" y1="{top + plot_height}" x2="{left + plot_width}" y2="{top + plot_height}" /><line class="axis" x1="{left}" y1="{top}" x2="{left}" y2="{top + plot_height}" />{"".join(f'<path class="trace" d="{_e(path)}" />' for path in paths)}{circles}{"".join(ticks_x)}<text x="{left + plot_width / 2:.3f}" y="{height - 18}" text-anchor="middle">Retention time ({_e(time_unit)})</text><text x="18" y="{top + plot_height / 2:.3f}" transform="rotate(-90 18 {top + plot_height / 2:.3f})" text-anchor="middle">Intensity ({_e(value_unit)})</text><text x="{left}" y="24">{_e(title)}</text></svg>'''
+    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="group" aria-labelledby="plot-title plot-desc"><title id="plot-title">LC-MS {_e(title)} trace</title><desc id="plot-desc">{_e(description)}</desc><style>text {{ font: 13px sans-serif; fill: #263238; }} .axis,.tick {{ stroke: #65727a; stroke-width: 1; }} .grid {{ stroke: #e2e7e9; stroke-width: 1; }} .x-tick,.y-tick {{ font-size: 11px; }} .trace {{ fill: none; stroke: #007f78; stroke-width: 1.8; }} .point {{ fill: #007f78; stroke: white; stroke-width: .8; }}</style><rect width="100%" height="100%" fill="white" />{"".join(ticks_y)}<line class="axis" x1="{left}" y1="{top + plot_height}" x2="{left + plot_width}" y2="{top + plot_height}" /><line class="axis" x1="{left}" y1="{top}" x2="{left}" y2="{top + plot_height}" />{"".join(f'<path class="trace" d="{_e(path)}" />' for path in paths)}{circles}{"".join(ticks_x)}<text x="{left + plot_width / 2:.3f}" y="{height - 18}" text-anchor="middle">Retention time ({_e(time_unit)})</text><text x="18" y="{top + plot_height / 2:.3f}" transform="rotate(-90 18 {top + plot_height / 2:.3f})" text-anchor="middle">Intensity ({_e(value_unit)})</text><text x="{left}" y="24">{_e(title)}</text></svg>'''
     return svg.encode("utf-8")
 
 
