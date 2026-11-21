@@ -39,7 +39,8 @@ temporary store before you connect real measurements.
 
 | Workflow | Available behavior | Main limit |
 | --- | --- | --- |
-| Import | JSON traces; single, wide or grouped-long CSV/TSV with explicit mappings | Scalar numeric traces; no vendor files or spectra |
+| Scalar import | JSON traces; single, wide or grouped-long CSV/TSV with explicit mappings | Scalar numeric traces; no vendor files or spectra |
+| Native LC–MS | Extract a centroid XIC and follow a plotted point to its scan and contributing source rows | UTF-8 native CSV or TSV bundle, up to 4,000,000 bytes |
 | Chromatograms | Baseline correction, smoothing, peak detection and area integration | No compound identification or overlapping-peak deconvolution |
 | Analytical batches | Frozen owned inputs, bounded parallel processing, retained history, portable source/result snapshots and new-store import | Single-trace processing; historical execution authority and instrument execution are not imported |
 | Peak quantitation | Linear response calibration from supplied standards | Caller assigns the peak; no automatic dilution, LOD or uncertainty |
@@ -53,8 +54,8 @@ temporary store before you connect real measurements.
 | Latent Gaussian observations | Predeclared synthetic FWHM widths, prediction-bound generated results and immutable producer evidence | Finite-centroid reference; no traces, physical widths or signal processing |
 | Synthetic campaigns | Frozen isocratic protocols, sequential proposals and exact immutable outcome consumption; optional BO-MCP GP suggestions | Single-fidelity latent reference; no general BO or physical-instrument claim |
 
-Registry operations, import and record retrieval work without R. Numerical
-analysis and `measurement_capabilities` require R; use
+Registry operations, scalar trace import and retained record reads work without R.
+Validating a new native acquisition, numerical analysis and `measurement_capabilities` require R; use
 `measurement_registry_capabilities` for discovery without it.
 
 The service does not yet implement the full MoSeS or MOCCA2 workflow. LC-MS,
@@ -66,6 +67,7 @@ broader BO policies and instrument adapters are [roadmap work](docs/roadmap.md).
 - [Local setup and examples](docs/quickstart.md)
 - [Reproducible local alpha installation](docs/local-alpha-install.md)
 - [MCP client setup and installed checks](docs/mcp-clients.md)
+- [Inspect an extracted-ion chromatogram](docs/ms-trace-evidence.md)
 - [Input formats and limits](docs/inputs.md)
 - [Scientific methods and interpretation](docs/analysis.md)
 - [Choose peak thresholds and inspect ALS sampling sensitivity](docs/peak-settings.md)

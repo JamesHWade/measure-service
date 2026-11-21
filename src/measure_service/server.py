@@ -22,6 +22,7 @@ from mcp.types import ToolAnnotations
 from pydantic import Field, StrictInt, StrictStr, model_validator
 
 from . import (
+    acquisition_store,
     analysis_evidence,
     analysis_pages,
     analysis_runtime,
@@ -34,6 +35,7 @@ from . import (
     design_lineage,
     gaussian_producer,
     method_registry,
+    ms_trace_evidence,
     observations,
     result_tables,
     retention,
@@ -1153,8 +1155,10 @@ async def measurement_capabilities(ctx: Context) -> dict[str, Any]:
             "delimited_single_trace",
             "delimited_wide",
             "delimited_long",
+            *(["measure-acquisition/1"] if result.get("native_acquisition_support") else []),
         ],
         "techniques": {
+            "centroid_xic": bool(result.get("centroid_xic_support")),
             "generic_1d_trace": bool(packages.get("measure") and packages.get("recipes")),
             "linear_response_quantitation": bool(
                 packages.get("measure") and packages.get("recipes")
@@ -1174,6 +1178,64 @@ async def measurement_capabilities(ctx: Context) -> dict[str, Any]:
             "page_size": MAX_PAGE,
         },
     }
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+async def measurement_register_acquisition(
+    files: Annotated[dict[str, StrictStr], Field(min_length=13, max_length=13)], ctx: Context
+) -> dict[str, Any]:
+    """Validate and retain the UTF-8 members of a native measure acquisition bundle. Repeating identical content returns the same owned acquisition."""
+    return await asyncio.to_thread(acquisition_store.register_acquisition, identity(ctx), files)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_acquisition(acquisition_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read the retained acquisition summary and source digest for this owner."""
+    return acquisition_store.get_acquisition(identity(ctx), acquisition_id)
+
+
+@mcp.tool(annotations=RETRY_WRITE, structured_output=True)
+async def measurement_extract_ms_trace(
+    acquisition_id: RecordId,
+    stream_id: RecordId,
+    polarity: Literal["positive", "negative"],
+    ms_level: Annotated[StrictInt, Field(gt=0)],
+    mz_min: Annotated[float, Field(gt=0, allow_inf_nan=False, strict=True)],
+    mz_max: Annotated[float, Field(gt=0, allow_inf_nan=False, strict=True)],
+    ctx: Context,
+) -> dict[str, Any]:
+    """Sum centroid intensities in an inclusive m/z interval for one stream, polarity and MS level. Retain the scan results and contributing source rows."""
+    return await asyncio.to_thread(
+        ms_trace_evidence.extract_ms_trace,
+        identity(ctx),
+        acquisition_id,
+        stream_id,
+        polarity,
+        ms_level,
+        mz_min,
+        mz_max,
+    )
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_get_ms_trace(trace_id: RecordId, ctx: Context) -> dict[str, Any]:
+    """Read a retained XIC's selectors, units, row counts and provenance."""
+    return ms_trace_evidence.get_ms_trace(identity(ctx), trace_id)
+
+
+@mcp.tool(annotations=READ, structured_output=True)
+def measurement_read_ms_trace(
+    trace_id: RecordId,
+    kind: Literal["points", "source_rows"],
+    evidence_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")],
+    ctx: Context,
+    offset: Annotated[StrictInt, Field(ge=0)] = 0,
+    limit: Annotated[StrictInt, Field(ge=1, le=1000)] = 100,
+) -> dict[str, Any]:
+    """Read a page of retained scan results or their contributing centroid rows."""
+    return ms_trace_evidence.read_ms_trace(
+        identity(ctx), trace_id, kind, evidence_sha256, offset, limit
+    )
 
 
 @mcp.tool(annotations=WRITE, structured_output=True)

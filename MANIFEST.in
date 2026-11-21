@@ -4,6 +4,8 @@ recursive-include docs/reference-data/chromatogram-snapshot-example *.zip
 recursive-include examples *.py
 recursive-include scripts *.py *.R
 recursive-include tests *.py *.json
+include tests/fixtures/generate_native_xic_fixture.R
+recursive-include tests/fixtures/native_acquisition_xic_v1 *.dcf *.csv
 recursive-include src/measure_service *.R
 recursive-include src/measure_service/benchmarks/reference_data *.json *.md
 recursive-include src/measure_service/benchmarks/reference_data/suggestion_sequences_v1 *.txt

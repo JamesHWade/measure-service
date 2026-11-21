@@ -52,6 +52,15 @@ _OPTIONAL_SUGGESTION_TABLES = {
     "campaign_suggestion_attempt_outcomes",
     "campaign_suggestion_attempt_late_results",
 }
+_OPTIONAL_ACQUISITION_TABLES = {
+    "acquisitions",
+    "acquisition_files",
+}
+_OPTIONAL_TABLE_GROUPS = (
+    _OPTIONAL_SUGGESTION_TABLES,
+    _OPTIONAL_ACQUISITION_TABLES,
+    {"ms_traces", "ms_trace_rows"},
+)
 
 
 @lru_cache(maxsize=1)
@@ -307,10 +316,15 @@ def _check_core_schema(con: sqlite3.Connection, table_names: list[str]) -> None:
     objects = batch_schema._master_objects(con)
     actual_tables = {batch_schema._sqlite_name(name) for name in table_names}
     expected_tables = set(expected["tables"])
-    optional_present = actual_tables & _OPTIONAL_SUGGESTION_TABLES
-    if optional_present and optional_present != _OPTIONAL_SUGGESTION_TABLES:
-        raise StoreOperationError("Store durable suggestion state is incomplete")
-    known_tables = expected_tables - _OPTIONAL_SUGGESTION_TABLES | optional_present
+    known_tables = expected_tables.copy()
+    for optional_tables in _OPTIONAL_TABLE_GROUPS:
+        optional_present = actual_tables & optional_tables
+        if optional_present and optional_present != optional_tables:
+            if optional_tables is _OPTIONAL_SUGGESTION_TABLES:
+                raise StoreOperationError("Store durable suggestion state is incomplete")
+            raise StoreOperationError("Store acquisition state is incomplete")
+        known_tables -= optional_tables
+        known_tables |= optional_present
     if not known_tables <= actual_tables:
         raise StoreOperationError("Store is missing a required service table")
 

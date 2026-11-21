@@ -1,7 +1,7 @@
 # Tool catalog and schema profiles
 
 The service exposes a versioned catalog of MCP tools. Catalog version `1.0`
-assigns each of the 76 registered tools to exactly one stable group. MCP
+assigns each registered tool to exactly one stable group. MCP
 `Tool._meta` carries that group under the key
 `measure_service/tool_group`.
 
@@ -11,6 +11,7 @@ assigns each of the 76 registered tools to exactly one stable group. MCP
 | --- | --- |
 | `discovery` | Registry, method and numerical capabilities |
 | `traces` | Scalar trace import, inspection, analysis and peak quantitation |
+| `ms` | Native acquisitions, centroid XIC extraction and retained scan evidence |
 | `sec` | Relative SEC analysis and comparison |
 | `batches` | Declared analytical batches, execution, recovery and snapshots |
 | `evidence` | Exact source, result-table and analysis evidence pages |
@@ -29,7 +30,7 @@ those groups:
 MEASURE_MCP_TOOL_GROUPS='["discovery", "traces", "evidence"]' measure-service
 ```
 
-If the variable is unset, all 76 tools are enabled. `[]` enables none. The
+If the variable is unset, all registered tools are enabled. `[]` enables none. The
 value is limited to 1,024 UTF-8 bytes and ten unique known group names. Invalid
 JSON, a non-array value, duplicate names, unknown names, or an oversized value
 fails configuration validation without echoing the supplied value. Group

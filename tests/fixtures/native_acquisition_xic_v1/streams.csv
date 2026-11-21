@@ -1,0 +1,2 @@
+"row_index","stream_id","injection_id","channel_id","kind","source_id","time_unit","mz_unit","value_name","value_unit"
+"1","ms-xic","injection-xic","ms","ms","source-native","s","m/z","intensity","counts"

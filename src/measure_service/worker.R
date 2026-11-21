@@ -48,6 +48,365 @@ package_code_fingerprints <- function() {
 
 as_num <- function(x) as.numeric(unlist(x, use.names = FALSE))
 
+# Native acquisition inputs are passed as exact UTF-8 members rather than
+# paths. The R package reader remains the authority for the bundle format;
+# this adapter only bounds the transport and writes the already-validated
+# member bytes to a private temporary directory.
+native_bundle_files <- list(
+  csv = c(
+    "manifest.dcf",
+    "samples.csv",
+    "injections.csv",
+    "channels.csv",
+    "sources.csv",
+    "curves.csv",
+    "points.csv",
+    "streams.csv",
+    "scans.csv",
+    "scan_points.csv",
+    "arrays.csv",
+    "array_axes.csv",
+    "array_points.csv"
+  ),
+  tsv = c(
+    "manifest.dcf",
+    "samples.tsv",
+    "injections.tsv",
+    "channels.tsv",
+    "sources.tsv",
+    "curves.tsv",
+    "points.tsv",
+    "streams.tsv",
+    "scans.tsv",
+    "scan_points.tsv",
+    "arrays.tsv",
+    "array_axes.tsv",
+    "array_points.tsv"
+  )
+)
+native_bundle_max_bytes <- 4000000L
+native_bundle_max_file_bytes <- native_bundle_max_bytes
+native_trace_max_rows <- 50000L
+native_trace_max_points <- 100000L
+
+as_native_text <- function(x, field, max_bytes = NULL) {
+  if (
+    !is.character(x) ||
+      length(x) != 1L ||
+      is.na(x) ||
+      Encoding(x) == "bytes" ||
+      !validUTF8(x)
+  ) {
+    stop(field, " must be one nonmissing UTF-8 string.")
+  }
+  bytes <- charToRaw(x)
+  if (any(as.integer(bytes) == 0L)) {
+    stop(field, " must not contain NUL bytes.")
+  }
+  if (!is.null(max_bytes) && length(bytes) > max_bytes) {
+    stop(field, " exceeds the per-file byte limit.")
+  }
+  x
+}
+
+native_bundle_input <- function(input) {
+  files <- input$files
+  if (
+    !is.list(files) ||
+      is.data.frame(files) ||
+      is.null(names(files)) ||
+      anyNA(names(files)) ||
+      anyDuplicated(names(files))
+  ) {
+    stop("files must be a named object of bundle members.")
+  }
+  matching <- Filter(
+    function(nameset) setequal(names(files), nameset),
+    native_bundle_files
+  )
+  if (length(matching) != 1L) {
+    stop(
+      "files must contain exactly the fixed CSV or TSV bundle members."
+    )
+  }
+  ordered_names <- matching[[1L]]
+  sizes <- vapply(
+    ordered_names,
+    function(name) {
+      value <- as_native_text(files[[name]], paste0("files.", name))
+      length(charToRaw(value))
+    },
+    integer(1)
+  )
+  if (any(sizes > native_bundle_max_file_bytes)) {
+    stop("A native acquisition bundle member exceeds the per-file byte limit.")
+  }
+  total <- sum(sizes)
+  if (!is.finite(total) || total > native_bundle_max_bytes) {
+    stop("The native acquisition bundle exceeds the cumulative byte limit.")
+  }
+  list(
+    files = files,
+    names = ordered_names,
+    bytes = sizes,
+    total_bytes = total
+  )
+}
+
+with_native_acquisition <- function(input, callback) {
+  bundle <- native_bundle_input(input)
+  directory <- tempfile("measure-native-acquisition-")
+  dir.create(directory, mode = "0700")
+  on.exit(unlink(directory, recursive = TRUE, force = TRUE), add = TRUE)
+  for (name in bundle$names) {
+    connection <- file(file.path(directory, name), open = "wb")
+    writeBin(charToRaw(bundle$files[[name]]), connection)
+    close(connection)
+  }
+  acquisition <- measure::read_measure_acquisition(
+    directory,
+    max_bytes = native_bundle_max_bytes
+  )
+  callback(acquisition, bundle)
+}
+
+native_nullable <- function(x) {
+  if (length(x) == 0L || is.na(x[[1L]])) {
+    NULL
+  } else {
+    unname(x[[1L]])
+  }
+}
+
+native_context_rows <- function(acquisition) {
+  record <- acquisition$record
+  list(
+    samples = lapply(record$samples$sample_id, identity),
+    injections = lapply(seq_len(nrow(record$injections)), function(i) {
+      list(
+        injection_id = record$injections$injection_id[[i]],
+        sample_id = record$injections$sample_id[[i]]
+      )
+    }),
+    channels = lapply(seq_len(nrow(record$channels)), function(i) {
+      list(
+        channel_id = record$channels$channel_id[[i]],
+        channel_name = native_nullable(record$channels$channel_name[i])
+      )
+    }),
+    sources = lapply(seq_len(nrow(record$sources)), function(i) {
+      list(
+        source_id = record$sources$source_id[[i]],
+        source_name = native_nullable(record$sources$source_name[i]),
+        source_sha256 = native_nullable(record$sources$source_sha256[i])
+      )
+    })
+  )
+}
+
+native_stream_rows <- function(acquisition) {
+  streams <- acquisition$streams
+  lapply(seq_len(nrow(streams)), function(i) {
+    list(
+      stream_id = streams$stream_id[[i]],
+      injection_id = streams$injection_id[[i]],
+      channel_id = streams$channel_id[[i]],
+      kind = streams$kind[[i]],
+      source_id = native_nullable(streams$source_id[i]),
+      time_unit = native_nullable(streams$time_unit[i]),
+      mz_unit = native_nullable(streams$mz_unit[i]),
+      value_name = native_nullable(streams$value_name[i]),
+      value_unit = native_nullable(streams$value_unit[i])
+    )
+  })
+}
+
+native_status_counts <- function(values) {
+  counts <- table(values, useNA = "no")
+  as.list(stats::setNames(as.integer(counts), names(counts)))
+}
+
+native_inspection <- function(acquisition, bundle) {
+  scan_points <- sum(vapply(acquisition$scans$.measures, nrow, integer(1)))
+  array_points <- sum(vapply(acquisition$arrays$.measures, nrow, integer(1)))
+  record_counts <- summary(acquisition)$counts
+  context <- native_context_rows(acquisition)
+  counts <- c(
+    as.list(record_counts),
+    list(
+      scan_points = scan_points,
+      array_points = array_points
+    )
+  )
+  list(
+    profile = "measure-acquisition-inspection/1",
+    summary = list(
+      counts = counts,
+      scan_status_counts = native_status_counts(acquisition$scans$scan_status),
+      streams = native_stream_rows(acquisition),
+      samples = context$samples,
+      injections = context$injections,
+      channels = context$channels,
+      sources = context$sources
+    ),
+    provenance = list(
+      operation = "inspect_acquisition",
+      backend = "measure",
+      package = as.character(utils::packageVersion("measure")),
+      bundle_bytes = bundle$total_bytes,
+      source_ids = acquisition$record$sources$source_id,
+      source_sha256 = acquisition$record$sources$source_sha256,
+      packages = package_versions(),
+      installed_r_code_md5 = package_code_fingerprints(),
+      r_version = as.character(getRversion())
+    )
+  )
+}
+
+native_trace_scalar <- function(x, field, minimum = -Inf) {
+  values <- suppressWarnings(as_num(x))
+  if (
+    length(values) != 1L ||
+      !is.finite(values[[1L]]) ||
+      values[[1L]] < minimum ||
+      values[[1L]] != floor(values[[1L]])
+  ) {
+    stop(field, " must be one finite whole-number scalar.")
+  }
+  as.integer(values[[1L]])
+}
+
+native_trace_selection <- function(input) {
+  stream_id <- as_native_text(input$stream_id, "stream_id")
+  polarity <- as_native_text(input$polarity, "polarity")
+  if (!polarity %in% c("positive", "negative")) {
+    stop("polarity must be exactly 'positive' or 'negative'.")
+  }
+  ms_level <- native_trace_scalar(input$ms_level, "ms_level", minimum = 1)
+  mz_min <- input$mz_min
+  mz_max <- input$mz_max
+  if (is.null(mz_min) && is.null(mz_max)) {
+    mz_range <- NULL
+  } else {
+    if (is.null(mz_min) || is.null(mz_max)) {
+      stop("mz_min and mz_max must both be supplied for an XIC.")
+    }
+    mz_min <- suppressWarnings(as_num(mz_min))
+    mz_max <- suppressWarnings(as_num(mz_max))
+    if (
+      length(mz_min) != 1L ||
+        length(mz_max) != 1L ||
+        !is.finite(mz_min) ||
+        !is.finite(mz_max) ||
+        mz_min <= 0 ||
+        mz_max <= 0 ||
+        mz_min > mz_max
+    ) {
+      stop(
+        "mz_min and mz_max must be finite positive scalars with mz_min <= mz_max."
+      )
+    }
+    mz_range <- c(as.numeric(mz_min), as.numeric(mz_max))
+  }
+  list(
+    stream_id = stream_id,
+    polarity = polarity,
+    ms_level = ms_level,
+    mz_range = mz_range
+  )
+}
+
+native_trace_rows <- function(acquisition, trace) {
+  scans <- acquisition$scans
+  points <- vector("list", nrow(trace))
+  source_rows <- vector("list", sum(trace$selected_points))
+  next_source <- 0L
+  scan_positions <- match(trace$scan_id, scans$scan_id)
+  for (i in seq_len(nrow(trace))) {
+    row <- trace[i, , drop = FALSE]
+    scan_id <- row$scan_id[[1L]]
+    scan_position <- scan_positions[[i]]
+    if (is.na(scan_position)) {
+      stop("The trace returned a scan that is absent from the acquisition.")
+    }
+    measures <- scans$.measures[[scan_position]]
+    raw_source_rows <- scans$.source_rows[[scan_position]]
+    raw_saturated <- scans$.saturated[[scan_position]]
+    point_indices <- row$.point_indices[[1L]]
+    if (is.null(point_indices)) {
+      point_indices <- integer()
+    } else {
+      point_indices <- as.integer(point_indices)
+    }
+    if (length(point_indices) > 0L) {
+      for (j in seq_along(point_indices)) {
+        point_index <- point_indices[[j]]
+        if (
+          point_index < 1L ||
+            point_index > nrow(measures) ||
+            length(raw_source_rows) != nrow(measures) ||
+            length(raw_saturated) != nrow(measures)
+        ) {
+          stop("The trace returned a point index outside its source scan.")
+        }
+        next_source <- next_source + 1L
+        source_rows[[next_source]] <- list(
+          scan_id = scan_id,
+          point_index = point_index,
+          source_row = native_nullable(raw_source_rows[point_index]),
+          mz = as.numeric(measures$location[[point_index]]),
+          intensity = native_nullable(measures$value[point_index]),
+          saturated = native_nullable(raw_saturated[point_index])
+        )
+      }
+    }
+    points[[i]] <- list(
+      scan_id = scan_id,
+      scan_index = as.integer(row$scan_index[[1L]]),
+      source_scan_id = native_nullable(row$source_scan_id[1L]),
+      retention_time = as.numeric(row$retention_time[[1L]]),
+      value = native_nullable(row$value[1L]),
+      status = row$status[[1L]],
+      selected_points = as.integer(row$selected_points[[1L]]),
+      saturation_unknown = as.logical(row$saturation_unknown[[1L]])
+    )
+  }
+  list(points = points, source_rows = source_rows)
+}
+
+native_trace_extraction <- function(acquisition, selection) {
+  trace <- measure::measure_ms_trace(
+    acquisition,
+    stream_id = selection$stream_id,
+    polarity = selection$polarity,
+    ms_level = selection$ms_level,
+    mz_range = selection$mz_range
+  )
+  if (nrow(trace) > native_trace_max_rows) {
+    stop("The extracted trace exceeds the scan-row limit.")
+  }
+  selected_count <- sum(as_num(trace$selected_points))
+  if (!is.finite(selected_count) || selected_count > native_trace_max_points) {
+    stop("The extracted trace exceeds the selected-point limit.")
+  }
+  rows <- native_trace_rows(acquisition, trace)
+  if (length(rows$source_rows) > native_trace_max_points) {
+    stop("The extracted trace exceeds the source-row limit.")
+  }
+  processing <- attr(trace, "processing")
+  if (!is.list(processing)) {
+    stop("The measure backend returned no processing metadata.")
+  }
+  list(
+    points = rows$points,
+    source_rows = rows$source_rows,
+    processing = processing,
+    packages = package_versions(),
+    installed_r_code_md5 = package_code_fingerprints(),
+    r_version = as.character(getRversion())
+  )
+}
+
 project_peak_rows <- function(value) {
   required <- c(
     "peak_id",
@@ -109,7 +468,17 @@ analyze <- function(input) {
         all(
           c("mw_col", "mw_scale", "integration_range") %in%
             names(formals(measure.sec::step_sec_mw_distribution))
-        )
+        ),
+      native_acquisition_support = requireNamespace(
+        "measure",
+        quietly = TRUE
+      ) &&
+        all(
+          c("read_measure_acquisition", "measure_acquisition") %in%
+            getNamespaceExports("measure")
+        ),
+      centroid_xic_support = requireNamespace("measure", quietly = TRUE) &&
+        "measure_ms_trace" %in% getNamespaceExports("measure")
     ))
   }
   if (
@@ -117,6 +486,22 @@ analyze <- function(input) {
       !requireNamespace("recipes", quietly = TRUE)
   ) {
     stop("The measure and recipes R packages are required.")
+  }
+
+  if (identical(input$operation, "inspect_acquisition")) {
+    return(with_native_acquisition(input, native_inspection))
+  }
+
+  if (identical(input$operation, "extract_ms_trace")) {
+    selection <- native_trace_selection(input)
+    return(
+      with_native_acquisition(
+        input,
+        function(acquisition, ...) {
+          native_trace_extraction(acquisition, selection)
+        }
+      )
+    )
   }
 
   if (identical(input$operation, "quantitation")) {
