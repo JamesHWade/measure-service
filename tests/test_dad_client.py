@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import shutil
 import subprocess
 import sys
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import pytest
@@ -87,6 +89,149 @@ def test_dad_report_replays_without_stdio(tmp_path: Path, monkeypatch) -> None:
     args = parser.parse_args(["dad-report", str(evidence_path), "--output", str(output)])
     assert dad_cli.run(args, parser) == 0
     assert calls == [(evidence, output)]
+
+
+def test_dad_parser_accepts_independent_native_ranges() -> None:
+    parser = client_cli._parser()
+    args = parser.parse_args(
+        [
+            "dad",
+            "bundle",
+            "--array",
+            "dad-1",
+            "--time-axis",
+            "1",
+            "--time-range",
+            "1",
+            "2.5",
+            "--wavelength-range",
+            "250",
+            "280",
+            "--store",
+            "store",
+            "--output",
+            "report",
+        ]
+    )
+    assert args.time_range == [1.0, 2.5]
+    assert args.wavelength_range == [250.0, 280.0]
+
+
+def test_region_response_requires_matching_selection_and_preserves_legacy_profile() -> None:
+    common = {
+        "acquisition_id": "acq-1",
+        "array_id": "dad-1",
+        "time_axis": 1,
+        "profile": "measure-dad-plane/1",
+        "evidence_sha256": "a" * 64,
+    }
+    dad_cli._validate_plane_response(
+        common,
+        acquisition_id="acq-1",
+        array_id="dad-1",
+        time_axis=1,
+        time_range=None,
+        wavelength_range=None,
+    )
+
+    region = {
+        **common,
+        "profile": "measure-dad-region/1",
+        "selection": {"time_range": [1.0, 2.5], "wavelength_range": None},
+        "native_point_count": 8,
+        "points": [{"point_index": 3}],
+    }
+    dad_cli._validate_plane_response(
+        region,
+        acquisition_id="acq-1",
+        array_id="dad-1",
+        time_axis=1,
+        time_range=[1.0, 2.5],
+        wavelength_range=None,
+    )
+    with pytest.raises(ValueError, match="selection"):
+        dad_cli._validate_plane_response(
+            region,
+            acquisition_id="acq-1",
+            array_id="dad-1",
+            time_axis=1,
+            time_range=[2.0, 2.5],
+            wavelength_range=None,
+        )
+
+
+def test_read_plane_sends_only_the_ranges_that_were_selected(monkeypatch) -> None:
+    calls = []
+
+    @asynccontextmanager
+    async def fake_stdio_client(parameters, errlog):
+        yield object(), object()
+
+    class FakeSession:
+        def __init__(self, read, write):
+            self.read = read
+            self.write = write
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, traceback):
+            return None
+
+        async def initialize(self):
+            return None
+
+    async def fake_call(client, name, arguments):
+        calls.append((name, arguments))
+        if name == "measurement_register_acquisition":
+            return {"acquisition_id": "acq-1"}
+        return {
+            "profile": "measure-dad-region/1",
+            "acquisition_id": "acq-1",
+            "array_id": "dad-1",
+            "time_axis": 1,
+            "selection": {"time_range": [1.0, 2.0], "wavelength_range": None},
+            "native_point_count": 8,
+            "points": [],
+            "evidence_sha256": "a" * 64,
+        }
+
+    monkeypatch.setattr(dad_cli, "stdio_client", fake_stdio_client)
+    monkeypatch.setattr(dad_cli, "ClientSession", FakeSession)
+    monkeypatch.setattr(dad_cli, "_call", fake_call)
+    result = asyncio.run(
+        dad_cli._read_plane(
+            parameters=object(),
+            stderr_file=object(),
+            files={"member": "text"},
+            array_id="dad-1",
+            time_axis=1,
+            time_range=[1.0, 2.0],
+        )
+    )
+    assert result["profile"] == "measure-dad-region/1"
+    assert calls[1] == (
+        "measurement_read_dad_plane",
+        {
+            "acquisition_id": "acq-1",
+            "array_id": "dad-1",
+            "time_axis": 1,
+            "time_range": [1.0, 2.0],
+        },
+    )
+
+
+def test_range_validation_delegates_to_shared_dad_contract(monkeypatch) -> None:
+    calls = []
+
+    def validate_range(value, *, wavelength):
+        calls.append((value, wavelength))
+        return [float(value[0]), float(value[1])]
+
+    monkeypatch.setattr(dad_cli.dad_plane, "validate_range", validate_range, raising=False)
+    assert dad_cli._validated_range([1, 2], wavelength=False) == [1.0, 2.0]
+    assert dad_cli._validated_range([250, 280], wavelength=True) == [250.0, 280.0]
+    assert calls == [([1, 2], False), ([250, 280], True)]
 
 
 def test_dad_report_rejects_malformed_json(tmp_path: Path) -> None:
