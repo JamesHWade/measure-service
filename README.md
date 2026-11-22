@@ -40,7 +40,7 @@ temporary store before you connect real measurements.
 | Workflow | Available behavior | Main limit |
 | --- | --- | --- |
 | Scalar import | JSON traces; single, wide or grouped-long CSV/TSV with explicit mappings | Scalar numeric traces; no vendor files or spectra |
-| [Diode-array detector](docs/dad-plane.md) | Select a time and wavelength to see the chromatogram, spectrum and source row | Registered native array with up to 4,096 observed cells |
+| [Diode-array detector](docs/dad-plane.md) | Select a time and wavelength to see the chromatogram, spectrum and source row | Up to 4,096 observed cells per read, across a whole array or a selected region |
 | Native LC–MS | Extract a centroid XIC and follow a plotted point to its scan and contributing source rows | UTF-8 native CSV or TSV bundle, up to 4,000,000 bytes |
 | Chromatograms | Baseline correction, smoothing, peak detection and area integration | No compound identification or overlapping-peak deconvolution |
 | Analytical batches | Frozen owned inputs, bounded parallel processing, retained history, portable source/result snapshots and new-store import | Single-trace processing; historical execution authority and instrument execution are not imported |

@@ -59,8 +59,16 @@ The response contains each supplied coordinate once, in native row order,
 with its detector value, one-based point index, optional source row and
 saturation flag. A missing coordinate contributes no row. A null detector
 value belongs to an observed coordinate. The declared units accompany each
-view. The service accepts up to 4,096 observed cells and a 2 MB evidence
-document. Reading the array uses the current R worker and leaves the original
+view. For a region, supply `time_range`, `wavelength_range`, or both as
+two numbers in the corresponding axis units. Both endpoints are included.
+Equal endpoints select an exact time or wavelength. For example,
+`"time_range": [1, 3], "wavelength_range": [245, 255]` selects their intersection.
+
+A region returns `measure-dad-region/1` with the requested bounds, the total
+native point count and all matching observations in native order. Point indices
+still refer to the full array. An empty match has zero points. A whole-array
+read returns `measure-dad-plane/1`. Each read accepts up to 4,096 selected
+cells and a 2 MB evidence document. Narrow the bounds if either limit is exceeded. Reading the array uses the current R worker and leaves the original
 acquisition intact. Its evidence digest covers the view and worker provenance.
 
 For a restricted deployment, `dad` enables the plane reader. Registration and

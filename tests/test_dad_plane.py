@@ -24,6 +24,7 @@ def test_reader_scopes_native_files_before_dispatch_and_hashes_the_returned_view
         calls.append(request)
         return analysis_runtime._WorkerResult(
             {
+                "native_point_count": 9000,
                 "array_id": "a",
                 "stream_id": "s",
                 "injection_id": "i",
@@ -67,6 +68,25 @@ def test_reader_scopes_native_files_before_dispatch_and_hashes_the_returned_view
     assert result["points"][0]["value"] == 0
     assert result["points"][0]["source_row"] is None
 
+    region = dad_plane.read_dad_plane("alice", acquisition_id, "a", 1, time_range=[1, 1])
+    assert region["profile"] == "measure-dad-region/1"
+    assert region["selection"] == {"time_range": [1.0, 1.0], "wavelength_range": None}
+    assert calls[-1]["time_range"] == [1.0, 1.0]
+    assert "wavelength_range" not in calls[-1]
+    assert region["native_point_count"] == 9000
+    assert region.pop("evidence_sha256") == sha256(region)
+    assert "selection" not in result and "native_point_count" not in result
+
+
+@pytest.mark.parametrize(
+    "value", [[True, 2], ["1", 2], [1], [3, 2], [1, float("nan")], [0, 10**400], [0, 2**55 + 1]]
+)
+def test_invalid_region_bounds(value):
+    with pytest.raises(ValueError):
+        dad_plane.validate_range(value)
+    with pytest.raises(ValueError):
+        dad_plane.validate_range([0, 250], wavelength=True)
+
 
 def test_dad_tool_requires_explicit_native_axes_and_uses_authenticated_owner(monkeypatch):
     monkeypatch.setattr(server.mcp, "_selected_groups", frozenset({"dad"}))
@@ -74,8 +94,8 @@ def test_dad_tool_requires_explicit_native_axes_and_uses_authenticated_owner(mon
     array_id = "detector-" + "a" * 128
     calls = []
 
-    def reader(owner, acquisition_id, array_id, time_axis):
-        calls.append((owner, acquisition_id, array_id, time_axis))
+    def reader(owner, acquisition_id, array_id, time_axis, **bounds):
+        calls.append((owner, acquisition_id, array_id, time_axis, bounds))
         return {"array_id": array_id}
 
     monkeypatch.setattr(dad_plane, "read_dad_plane", reader)
@@ -90,9 +110,15 @@ def test_dad_tool_requires_explicit_native_axes_and_uses_authenticated_owner(mon
             assert (await client.call_tool(tools[0].name, {**arguments, "time_axis": 3})).isError
             result = await client.call_tool(tools[0].name, {**arguments, "time_axis": 2})
             assert not result.isError and result.structuredContent == {"array_id": array_id}
+            args = {**arguments, "time_axis": 1, "time_range": [1, 1]}
+            assert not (await client.call_tool(tools[0].name, args)).isError
+            assert (await client.call_tool(tools[0].name, {**args, "time_range": [1]})).isError
 
     asyncio.run(exercise())
-    assert calls == [("local", "owned", array_id, 2)]
+    assert calls == [
+        ("local", "owned", array_id, 2, {"time_range": None, "wavelength_range": None}),
+        ("local", "owned", array_id, 1, {"time_range": [1, 1], "wavelength_range": None}),
+    ]
 
 
 def test_array_preview_cannot_make_a_previously_valid_registration_too_large(monkeypatch):
