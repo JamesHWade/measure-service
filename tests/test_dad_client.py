@@ -89,6 +89,49 @@ def test_dad_report_replays_without_stdio(tmp_path: Path, monkeypatch) -> None:
     assert calls == [(evidence, output)]
 
 
+def test_region_response_requires_matching_selection_and_preserves_legacy_profile() -> None:
+    common = {
+        "acquisition_id": "acq-1",
+        "array_id": "dad-1",
+        "time_axis": 1,
+        "profile": "measure-dad-plane/1",
+        "evidence_sha256": "a" * 64,
+    }
+    dad_cli._validate_plane_response(
+        common,
+        acquisition_id="acq-1",
+        array_id="dad-1",
+        time_axis=1,
+        time_range=None,
+        wavelength_range=None,
+    )
+
+    region = {
+        **common,
+        "profile": "measure-dad-region/1",
+        "selection": {"time_range": [1.0, 2.5], "wavelength_range": None},
+        "native_point_count": 8,
+        "points": [{"point_index": 3}],
+    }
+    dad_cli._validate_plane_response(
+        region,
+        acquisition_id="acq-1",
+        array_id="dad-1",
+        time_axis=1,
+        time_range=[1.0, 2.5],
+        wavelength_range=None,
+    )
+    with pytest.raises(ValueError, match="selection"):
+        dad_cli._validate_plane_response(
+            region,
+            acquisition_id="acq-1",
+            array_id="dad-1",
+            time_axis=1,
+            time_range=[2.0, 2.5],
+            wavelength_range=None,
+        )
+
+
 def test_dad_report_rejects_malformed_json(tmp_path: Path) -> None:
     evidence_path = tmp_path / "malformed.json"
     evidence_path.write_text("not-json", encoding="utf-8")
@@ -106,7 +149,15 @@ def test_dad_report_rejects_malformed_json(tmp_path: Path) -> None:
 
 
 @pytest.mark.r_backend
-def test_installed_dad_client_roundtrip_and_r_free_replay(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("ranges", "indices"),
+    [
+        ([], list(range(1, 9))),
+        (["--wavelength-range", "250", "250"], [1, 3, 6]),
+        (["--time-range", "1", "1", "--wavelength-range", "260", "280"], [4, 5]),
+    ],
+)
+def test_installed_dad_client_roundtrip_and_r_free_replay(tmp_path: Path, ranges, indices) -> None:
     r = os.environ.get("MEASURE_MCP_TEST_R", "/opt/homebrew/opt/r/bin/R")
     if not Path(r).is_file():
         pytest.skip("the configured R executable is unavailable")
@@ -132,6 +183,7 @@ def test_installed_dad_client_roundtrip_and_r_free_replay(tmp_path: Path) -> Non
         "dad-1",
         "--time-axis",
         "1",
+        *ranges,
         "--store",
         store,
         "--output",
@@ -144,7 +196,33 @@ def test_installed_dad_client_roundtrip_and_r_free_replay(tmp_path: Path) -> Non
     assert receipt["acquisition_id"]
     assert receipt["array_id"] == "dad-1"
     assert len(receipt["evidence_sha256"]) == 64
+    if not ranges:
+        missing = _command(
+            tmp_path,
+            "dad",
+            FIXTURE,
+            "--array",
+            "absent",
+            "--time-axis",
+            "1",
+            "--store",
+            store,
+            "--output",
+            tmp_path / "missing",
+            "--r",
+            r,
+            "--r-library",
+            library,
+            check=False,
+        )
+        assert missing.returncode != 0 and "array_id was not found" in missing.stderr
     original = {path.name: path.read_bytes() for path in first.iterdir()}
+
+    evidence = json.loads(original["evidence.json"])
+    assert [p["point_index"] for p in evidence["points"]] == indices
+    if ranges:
+        assert evidence["native_point_count"] == 8
+        assert evidence["profile"] == "measure-dad-region/1"
 
     # A missing R executable and missing service data are intentional here:
     # replay must only read evidence.json and invoke the renderer.

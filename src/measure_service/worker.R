@@ -307,7 +307,61 @@ native_dad_selection <- function(input) {
   ) {
     stop("time_axis must be exactly 1 or 2.")
   }
-  list(array_id = array_id, time_axis = as.integer(time_axis))
+  native_dad_range <- function(value, field, positive = FALSE) {
+    if (is.null(value)) {
+      return(NULL)
+    }
+    values <- if (
+      is.list(value) &&
+        is.null(names(value)) &&
+        length(value) == 2L &&
+        all(
+          vapply(
+            value,
+            function(item) {
+              is.numeric(item) &&
+                !is.logical(item) &&
+                length(item) == 1L
+            },
+            logical(1)
+          )
+        )
+    ) {
+      vapply(value, as.numeric, numeric(1))
+    } else {
+      NULL
+    }
+    if (
+      is.null(values) ||
+        is.logical(values) ||
+        !is.numeric(values) ||
+        length(values) != 2L ||
+        !all(is.finite(values)) ||
+        values[[1L]] > values[[2L]] ||
+        (positive && any(values <= 0))
+    ) {
+      stop(
+        field,
+        " must be two finite, ordered numbers",
+        if (positive) " with positive endpoints" else "",
+        "."
+      )
+    }
+    as.numeric(values)
+  }
+  time_range <- native_dad_range(input$time_range, "time_range")
+  wavelength_range <- native_dad_range(
+    input$wavelength_range,
+    "wavelength_range",
+    positive = TRUE
+  )
+  list(
+    array_id = array_id,
+    time_axis = as.integer(time_axis),
+    time_range = time_range,
+    wavelength_range = wavelength_range,
+    has_window = !is.null(time_range) || !is.null(wavelength_range)
+  )
 }
 
 native_dad_unit <- function(units, index, field) {
@@ -336,9 +390,6 @@ native_dad_plane <- function(acquisition, selection) {
 
   measure <- arrays$.measures[[array_position]]
   point_count <- nrow(measure)
-  if (point_count > native_dad_max_points) {
-    stop("The selected DAD array exceeds the 4096 observed-point limit.")
-  }
   source_rows <- arrays$.source_rows[[array_position]]
   saturated <- arrays$.saturated[[array_position]]
   if (
@@ -375,7 +426,26 @@ native_dad_plane <- function(acquisition, selection) {
   if (any(is.nan(value)) || any(!is.na(value) & !is.finite(value))) {
     stop("DAD values must be finite or NA.")
   }
-  points <- lapply(seq_len(point_count), function(i) {
+  selected <- rep(TRUE, point_count)
+  if (!is.null(selection$time_range)) {
+    selected <- selected &
+      time >= selection$time_range[[1L]] &
+      time <= selection$time_range[[2L]]
+  }
+  if (!is.null(selection$wavelength_range)) {
+    selected <- selected &
+      wavelength >= selection$wavelength_range[[1L]] &
+      wavelength <= selection$wavelength_range[[2L]]
+  }
+  selected_indices <- which(selected)
+  selected_count <- length(selected_indices)
+  if (selected_count > native_dad_max_points) {
+    if (selection$has_window) {
+      stop("The selected DAD window exceeds the 4096 observed-point limit.")
+    }
+    stop("The selected DAD array exceeds the 4096 observed-point limit.")
+  }
+  points <- lapply(selected_indices, function(i) {
     list(
       point_index = as.integer(i),
       time = time[[i]],
@@ -387,7 +457,7 @@ native_dad_plane <- function(acquisition, selection) {
   })
 
   stream <- acquisition$streams[stream_position, , drop = FALSE]
-  list(
+  result <- list(
     array_id = selection$array_id,
     stream_id = stream$stream_id[[1L]],
     injection_id = stream$injection_id[[1L]],
@@ -401,6 +471,10 @@ native_dad_plane <- function(acquisition, selection) {
     installed_r_code_md5 = package_code_fingerprints(),
     r_version = as.character(getRversion())
   )
+  if (selection$has_window) {
+    result$native_point_count <- as.integer(point_count)
+  }
+  result
 }
 
 native_trace_scalar <- function(x, field, minimum = -Inf) {

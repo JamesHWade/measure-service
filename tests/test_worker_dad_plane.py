@@ -272,6 +272,153 @@ def test_dad_plane_uses_the_caller_selected_reversed_axis(
 
 
 @pytest.mark.r_backend
+def test_dad_plane_windows_keep_native_order_and_point_lineage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    result = _run_worker(
+        {
+            "operation": "read_dad_plane",
+            "files": _fixture_files(),
+            "array_id": "dad-1",
+            "time_axis": 1,
+            "time_range": [1, 2],
+            "wavelength_range": [250, 260],
+        },
+        monkeypatch,
+    )
+    assert result["native_point_count"] == 8
+    assert [point["point_index"] for point in result["points"]] == [3, 4, 6, 7]
+    assert [(point["time"], point["wavelength"]) for point in result["points"]] == [
+        (1, 250),
+        (1, 260),
+        (2, 250),
+        (2, 260),
+    ]
+    assert result["points"][1]["source_row"] == 104
+
+    reversed_result = _run_worker(
+        {
+            "operation": "read_dad_plane",
+            "files": _reversed_axis_files(),
+            "array_id": "dad-1",
+            "time_axis": 2,
+            "time_range": [1, 2],
+            "wavelength_range": [260, 280],
+        },
+        monkeypatch,
+    )
+    assert [point["point_index"] for point in reversed_result["points"]] == [4, 5, 7, 8]
+    assert [(point["time"], point["wavelength"]) for point in reversed_result["points"]] == [
+        (1, 260),
+        (1, 280),
+        (2, 260),
+        (2, 280),
+    ]
+
+
+@pytest.mark.r_backend
+def test_dad_plane_windows_allow_empty_and_equal_endpoints(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    equal = _run_worker(
+        {
+            "operation": "read_dad_plane",
+            "files": _fixture_files(),
+            "array_id": "dad-1",
+            "time_axis": 1,
+            "time_range": [1, 1],
+            "wavelength_range": [280, 280],
+        },
+        monkeypatch,
+    )
+    assert equal["native_point_count"] == 8
+    assert [point["point_index"] for point in equal["points"]] == [5]
+
+    empty = _run_worker(
+        {
+            "operation": "read_dad_plane",
+            "files": _fixture_files(),
+            "array_id": "dad-1",
+            "time_axis": 1,
+            "time_range": [10, 11],
+        },
+        monkeypatch,
+    )
+    assert empty["native_point_count"] == 8
+    assert empty["points"] == []
+
+
+@pytest.mark.r_backend
+def test_dad_plane_windows_validate_the_full_array_and_selected_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    outside_nonfinite = _nan_value_files()
+    result = {
+        "operation": "read_dad_plane",
+        "files": outside_nonfinite,
+        "array_id": "dad-1",
+        "time_axis": 1,
+        "time_range": [1, 2],
+    }
+    with pytest.raises(ValueError, match="finite or NA"):
+        _run_worker(result, monkeypatch)
+
+    large = _large_array_files()
+    selected = _run_worker(
+        {
+            "operation": "read_dad_plane",
+            "files": large,
+            "array_id": "dad-1",
+            "time_axis": 1,
+            "time_range": [0, 2],
+        },
+        monkeypatch,
+    )
+    assert selected["native_point_count"] == 4097
+    assert len(selected["points"]) == 8
+    assert [point["point_index"] for point in selected["points"]] == list(range(1, 9))
+
+    with pytest.raises(ValueError, match="selected DAD window exceeds"):
+        _run_worker(
+            {
+                "operation": "read_dad_plane",
+                "files": large,
+                "array_id": "dad-1",
+                "time_axis": 1,
+                "time_range": [0, 5000],
+            },
+            monkeypatch,
+        )
+
+
+@pytest.mark.r_backend
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("time_range", [2, 1]),
+        ("time_range", [0]),
+        ("time_range", ["not-a-number", 2]),
+        ("wavelength_range", [0, 250]),
+        ("wavelength_range", [250, -1]),
+    ],
+)
+def test_dad_plane_rejects_invalid_windows(
+    monkeypatch: pytest.MonkeyPatch, field: str, value: list[object]
+) -> None:
+    with pytest.raises(ValueError, match=field):
+        _run_worker(
+            {
+                "operation": "read_dad_plane",
+                "files": _fixture_files(),
+                "array_id": "dad-1",
+                "time_axis": 1,
+                field: value,
+            },
+            monkeypatch,
+        )
+
+
+@pytest.mark.r_backend
 def test_dad_plane_rejects_nonfinite_values_but_keeps_na(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

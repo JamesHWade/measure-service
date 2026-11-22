@@ -484,6 +484,10 @@ READ_CAPTURE = ToolAnnotations(
     readOnlyHint=True, destructiveHint=False, idempotentHint=False, openWorldHint=False
 )
 RequestKey = Annotated[str, Field(min_length=1, max_length=100)]
+DetectorRange = Annotated[
+    list[StrictInt | Annotated[float, Field(strict=True, allow_inf_nan=False)]],
+    Field(min_length=2, max_length=2),
+]
 RecordId = Annotated[str, Field(min_length=1, max_length=100)]
 
 
@@ -1202,10 +1206,18 @@ async def measurement_read_dad_plane(
     array_id: Annotated[StrictStr, Field(min_length=1, max_length=MAX_MEMBER_BYTES)],
     time_axis: Annotated[StrictInt, Field(ge=1, le=2)],
     ctx: Context,
+    time_range: DetectorRange | None = None,
+    wavelength_range: DetectorRange | None = None,
 ) -> dict[str, Any]:
-    """Read the observed time–wavelength cells of one owned native array. Declare which of its two axes holds time. Includes detector values, units, saturation flags and source rows."""
+    """Read the observed time–wavelength cells of one owned native array. Declare which of its two axes holds time. Optional inclusive time_range and wavelength_range bounds select up to 4,096 observed cells in the declared axis units. Each point retains its native index, value, saturation flag and source row."""
     return await asyncio.to_thread(
-        dad_plane.read_dad_plane, identity(ctx), acquisition_id, array_id, time_axis
+        dad_plane.read_dad_plane,
+        identity(ctx),
+        acquisition_id,
+        array_id,
+        time_axis,
+        time_range=time_range,
+        wavelength_range=wavelength_range,
     )
 
 

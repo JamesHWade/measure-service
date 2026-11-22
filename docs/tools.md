@@ -326,7 +326,7 @@ Read a bounded page from an owned immutable capture selected by its manifest dig
 
 ### `measurement_read_dad_plane`
 
-Read the observed time–wavelength cells of one owned native array. Declare which of its two axes holds time. Includes detector values, units, saturation flags and source rows.
+Read the observed time–wavelength cells of one owned native array. Declare which of its two axes holds time. Optional inclusive time_range and wavelength_range bounds select up to 4,096 observed cells in the declared axis units. Each point retains its native index, value, saturation flag and source row.
 
 ### `measurement_read_ms_trace`
 

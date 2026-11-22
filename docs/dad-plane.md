@@ -58,6 +58,40 @@ stopifnot(
 )
 ```
 
+## Inspect one region of a larger run
+
+Repeat the simulation with 127 time points and 64 wavelengths. The resulting
+8,128 observations exceed the whole-array read limit. To inspect the first
+response, select 1–3 min and 245–255 nm.
+
+```sh
+Rscript examples/make_dad_acquisition.R dense-run --dense
+measure-service-client dad dense-run --array dad-grid --time-axis 1 \
+  --time-range 1 3 --wavelength-range 245 255 \
+  --store study-store --output first-response
+```
+
+![The selected rectangle encloses the early peak near 2 min and 251 nm. The enlarged view contains only its measured rows. The later peak at 4 min is outside the rectangle.](figures/dad-region.png)
+
+The selected region contains **473 observations**. At 2 min and 251 nm, the
+28 mAU reading is native point **2716**. In this simulation its source row is
+also 2716. The exported chromatogram contains the 43 readings at 251 nm from
+1 through 3 min. The spectrum contains the 11 readings at 2 min from 245
+through 255 nm. The region ends before the second detector response.
+
+To reproduce the two-panel comparison, run the following from the checkout.
+The script checks each exported point index, coordinate and signal against the
+native array before drawing the figure.
+
+```sh
+Rscript examples/plot_dad_region.R dense-run first-response comparison.png
+```
+
+Use either range on its own to keep the full other axis. Equal endpoints
+select one exact coordinate along that axis. The point limit counts matching
+observations, including those with a missing signal. For an empty selection
+the JSON still records both the bounds and the native point count.
+
 ## Read a sparse acquisition
 
 The small test acquisition includes an absent coordinate, a missing response
@@ -95,4 +129,4 @@ checks consistency with the saved evidence. For a service client, register the
 [bundle](inputs.md) and call `measurement_read_dad_plane` with its acquisition
 ID, array ID and time-axis number. Registration and inspection use the `ms`
 tool group. The plane reader uses `dad`. A single read accepts up to 4,096
-observed points and 2 MB of canonical evidence.
+selected points and 2 MB of canonical evidence.
