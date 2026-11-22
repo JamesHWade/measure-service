@@ -194,7 +194,14 @@ def _dad_workflow(args: argparse.Namespace, parser: argparse.ArgumentParser) -> 
                 stderr_file.close()
         dad_report.write_dad_report(plane, args.output)
     except Exception as exc:
-        raise ValueError(str(exc) or "DAD workflow failed") from exc
+        # The MCP transport wraps a tool error in a task group on session exit.
+        cause = exc
+        while len(children := getattr(cause, "exceptions", ())) == 1:
+            cause = children[0]
+        message = str(cause) or "DAD workflow failed"
+        if "4096 observed-point limit" in message:
+            message += " Choose a narrower --time-range or --wavelength-range."
+        raise ValueError(message) from exc
     return {
         "acquisition_id": plane["acquisition_id"],
         "array_id": plane["array_id"],

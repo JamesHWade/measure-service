@@ -196,6 +196,26 @@ def test_installed_dad_client_roundtrip_and_r_free_replay(tmp_path: Path, ranges
     assert receipt["acquisition_id"]
     assert receipt["array_id"] == "dad-1"
     assert len(receipt["evidence_sha256"]) == 64
+    if not ranges:
+        missing = _command(
+            tmp_path,
+            "dad",
+            FIXTURE,
+            "--array",
+            "absent",
+            "--time-axis",
+            "1",
+            "--store",
+            store,
+            "--output",
+            tmp_path / "missing",
+            "--r",
+            r,
+            "--r-library",
+            library,
+            check=False,
+        )
+        assert missing.returncode != 0 and "array_id was not found" in missing.stderr
     original = {path.name: path.read_bytes() for path in first.iterdir()}
 
     evidence = json.loads(original["evidence.json"])
