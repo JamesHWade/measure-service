@@ -71,11 +71,21 @@ measure-service-client dad dense-run --array dad-grid --time-axis 1 \
   --store study-store --output first-response
 ```
 
+![The selected rectangle encloses the early peak near 2 min and 251 nm. The enlarged view contains only its measured rows. The later peak at 4 min is outside the rectangle.](figures/dad-region.png)
+
 The selected region contains **473 observations**. At 2 min and 251 nm, the
 28 mAU reading is native point **2716**. In this simulation its source row is
 also 2716. The exported chromatogram contains the 43 readings at 251 nm from
 1 through 3 min. The spectrum contains the 11 readings at 2 min from 245
 through 255 nm. The region ends before the second detector response.
+
+To reproduce the two-panel comparison, run the following from the checkout.
+The script checks each exported point index, coordinate and signal against the
+native array before drawing the figure.
+
+```sh
+Rscript examples/plot_dad_region.R dense-run first-response comparison.png
+```
 
 Use either range on its own to keep the full other axis. Equal endpoints
 select one exact coordinate along that axis. The point limit counts matching
