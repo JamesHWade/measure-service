@@ -1,16 +1,17 @@
 # Write two simulated detector responses to a native time–wavelength array.
 # Run from the service checkout with an installed measure package.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 1L) {
+dense <- identical(args[-1L], "--dense")
+if (length(args) == 0L || (length(args) > 1L && !dense)) {
   stop(
-    "Usage: Rscript examples/make_dad_acquisition.R NEW_DIRECTORY",
+    "Usage: Rscript examples/make_dad_acquisition.R NEW_DIRECTORY [--dense]",
     call. = FALSE
   )
 }
 
 grid <- expand.grid(
   wavelength = 224:287,
-  time = seq(0, 6, length.out = 64),
+  time = seq(0, 6, length.out = if (dense) 127L else 64L),
   KEEP.OUT.ATTRS = FALSE
 )
 response <- with(

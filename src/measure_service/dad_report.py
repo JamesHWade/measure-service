@@ -17,7 +17,7 @@ from decimal import Decimal, localcontext
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from .dad_plane import MAX_PLANE_BYTES, PROFILE
+from .dad_plane import MAX_PLANE_BYTES, PROFILE, REGION_PROFILE, validate_range
 from .portable_report import _axis_mapper, _csv_bytes, _e, _json, _ticks, write_report_files
 from .storage import canonical, sha256
 
@@ -44,6 +44,8 @@ _TOP_FIELDS = {
     "warnings",
     "evidence_sha256",
 }
+_REGION_FIELDS = {"selection", "native_point_count"}
+_SELECTION_FIELDS = {"time_range", "wavelength_range"}
 _POINT_FIELDS = {
     "point_index",
     "time",
@@ -145,10 +147,14 @@ def _validate_point(point: Any) -> None:
 
 
 def _validate_plane(plane: Mapping[str, Any]) -> None:
-    if not isinstance(plane, Mapping) or set(plane) != _TOP_FIELDS:
+    if not isinstance(plane, Mapping):
         raise ValueError("DAD plane has an unexpected shape")
-    if plane["profile"] != PROFILE:
+    profile = plane.get("profile")
+    if profile not in (PROFILE, REGION_PROFILE):
         raise ValueError("unsupported DAD plane evidence profile")
+    expected_fields = _TOP_FIELDS | (_REGION_FIELDS if profile == REGION_PROFILE else set())
+    if set(plane) != expected_fields:
+        raise ValueError("DAD plane has an unexpected shape")
     for field in (
         "acquisition_id",
         "array_id",
@@ -168,13 +174,41 @@ def _validate_plane(plane: Mapping[str, Any]) -> None:
     points = plane["points"]
     if type(points) is not list or len(points) > MAX_POINTS:
         raise ValueError(f"DAD points must contain at most {MAX_POINTS} rows")
+    region = profile == REGION_PROFILE
+    time_range = wavelength_range = None
+    if region:
+        selection_value = plane["selection"]
+        if not isinstance(selection_value, Mapping) or set(selection_value) != _SELECTION_FIELDS:
+            raise ValueError("DAD selection has an unexpected shape")
+        time_range = validate_range(selection_value["time_range"])
+        wavelength_range = validate_range(selection_value["wavelength_range"], wavelength=True)
+        if time_range is None and wavelength_range is None:
+            raise ValueError("DAD region selection must include a time or wavelength range")
+        if type(plane["native_point_count"]) is not int or plane["native_point_count"] < 0:
+            raise ValueError("DAD native_point_count must be a nonnegative integer")
+        if len(points) > plane["native_point_count"]:
+            raise ValueError("DAD native_point_count cannot be smaller than selected points")
     coordinates = set()
+    previous_index = 0
     for index, point in enumerate(points, start=1):
         _validate_point(point)
-        if point["point_index"] != index:
+        if region:
+            if point["point_index"] <= previous_index:
+                raise ValueError("DAD selected point indices must be strictly increasing")
+            if point["point_index"] > plane["native_point_count"]:
+                raise ValueError("DAD selected point index exceeds native_point_count")
+            previous_index = point["point_index"]
+        elif point["point_index"] != index:
             raise ValueError("DAD point indices must be contiguous and one-based")
         if point["wavelength"] <= 0:
             raise ValueError("DAD wavelengths must be positive")
+        if time_range is not None and not time_range[0] <= point["time"] <= time_range[1]:
+            raise ValueError("DAD point time falls outside the selected region")
+        if (
+            wavelength_range is not None
+            and not wavelength_range[0] <= point["wavelength"] <= wavelength_range[1]
+        ):
+            raise ValueError("DAD point wavelength falls outside the selected region")
         coordinate = (point["time"], point["wavelength"])
         if coordinate in coordinates:
             raise ValueError("DAD time and wavelength coordinate pairs must be unique")
@@ -195,9 +229,30 @@ def _validate_plane(plane: Mapping[str, Any]) -> None:
 
 
 def validate_dad_plane(plane: Mapping[str, Any]) -> None:
-    """Validate a complete retained ``measure-dad-plane/1`` document."""
+    """Validate a complete detector plane or region evidence document."""
 
     _validate_plane(plane)
+
+
+def _is_region(plane: Mapping[str, Any]) -> bool:
+    return plane["profile"] == REGION_PROFILE
+
+
+def _selection_summary(plane: Mapping[str, Any]) -> str:
+    if not _is_region(plane):
+        return ""
+    selection = plane["selection"]
+    parts = []
+    if selection["time_range"] is not None:
+        low, high = selection["time_range"]
+        parts.append(f"time {_number(low)}–{_number(high)} {plane['time_unit']}")
+    if selection["wavelength_range"] is not None:
+        low, high = selection["wavelength_range"]
+        parts.append(f"wavelength {_number(low)}–{_number(high)} {plane['wavelength_unit']}")
+    return (
+        f"Selected region ({', '.join(parts)}), with {len(plane['points'])} observed rows "
+        f"from {plane['native_point_count']} native points."
+    )
 
 
 def _number(value: Any) -> str:
@@ -287,7 +342,7 @@ def _heatmap_svg(plane: Mapping[str, Any]) -> bytes:
             ]
         )
     marks: list[str] = []
-    for index, point in enumerate(points):
+    for point in points:
         state = _point_state(point)
         classes = ["heatmap-mark", "missing-value" if point["value"] is None else "observed"]
         if point["saturated"] is True:
@@ -308,8 +363,8 @@ def _heatmap_svg(plane: Mapping[str, Any]) -> bytes:
             else ""
         )
         marks.append(
-            f'<a class="{" ".join(classes)}" data-point-index="{index}" '
-            f'href="#point-{index + 1}" tabindex="0" role="button" aria-label="{_e(label)}">'
+            f'<a class="{" ".join(classes)}" data-point-index="{point["point_index"]}" '
+            f'href="#point-{point["point_index"]}" tabindex="0" role="button" aria-label="{_e(label)}">'
             f'<circle cx="{x_coordinate}" cy="{y_coordinate}" r="{mark_radius:.3g}"{color_style}><title>{_e(label)}</title></circle></a>'
         )
     empty = (
@@ -353,6 +408,15 @@ def _metadata_rows(plane: Mapping[str, Any]) -> str:
         ("Wavelength unit", plane["wavelength_unit"]),
         ("Value unit", plane["value_unit"]),
         ("Observed point rows", len(plane["points"])),
+        *(
+            [
+                ("Native point rows", plane["native_point_count"]),
+                ("Selected time range", plane["selection"]["time_range"]),
+                ("Selected wavelength range", plane["selection"]["wavelength_range"]),
+            ]
+            if _is_region(plane)
+            else []
+        ),
         ("Input SHA-256", plane["input_sha256"]),
         ("Evidence SHA-256", plane["evidence_sha256"]),
     ]
@@ -373,7 +437,7 @@ def _point_table(plane: Mapping[str, Any]) -> str:
     )
     header_html = "".join(f'<th scope="col">{_e(header)}</th>' for header in headers)
     rows: list[str] = []
-    for index, point in enumerate(plane["points"]):
+    for point in plane["points"]:
         value_text = _number(point["value"])
         cells = (
             point["point_index"],
@@ -385,7 +449,7 @@ def _point_table(plane: Mapping[str, Any]) -> str:
             _point_state(point),
         )
         rows.append(
-            f'<tr id="point-{index + 1}" data-point-index="{index}" tabindex="0">'
+            f'<tr id="point-{point["point_index"]}" data-point-index="{point["point_index"]}" tabindex="0">'
             + "".join(f"<td>{_e(cell)}</td>" for cell in cells)
             + "</tr>"
         )
@@ -415,6 +479,12 @@ def _value_scale_note(plane: Mapping[str, Any]) -> str:
 
 def _html(plane: Mapping[str, Any], heatmap: bytes) -> bytes:
     unit = plane["value_unit"] or "unit not declared"
+    region = _is_region(plane)
+    scope = "windowed detector response" if region else "detector response"
+    selection_summary = _selection_summary(plane)
+    selection_html = (
+        f'<p class="selection-summary">{_e(selection_summary)}</p>' if selection_summary else ""
+    )
     warning_html = (
         '<section class="warning"><h2>Worker warnings</h2><ul>'
         + "".join(f"<li>{_e(warning)}</li>" for warning in plane["warnings"])
@@ -436,6 +506,7 @@ def _html(plane: Mapping[str, Any], heatmap: bytes) -> bytes:
 main {{ max-width:76rem; margin:auto; padding:clamp(1rem,4vw,3.25rem) }} h1,h2 {{ font-family:Georgia,serif; font-weight:normal; line-height:1.15 }}
 h1 {{ font-size:clamp(2rem,5vw,3.7rem); margin:.2em 0 }} h2 {{ font-size:1.65rem; margin:0 0 .55em }}
 section, details {{ padding:1.3rem 0; border-top:1px solid #b5c6c3 }} header p {{ margin:.3rem 0 1.4rem }}
+.skip-map {{ position:absolute; clip-path:inset(50%); width:1px; height:1px; overflow:hidden }} .skip-map:focus {{ position:static; clip-path:none; width:auto; height:auto }}
 .figure {{ background:white; border:1px solid #b5c6c3; border-radius:6px; padding:.5rem }} svg {{ width:100%; height:auto; display:block }}
 a {{ color:#005951; text-underline-offset:3px }} :focus-visible {{ outline:3px solid #bd5c14; outline-offset:2px }}
 .table-scroll {{ overflow:auto }} table {{ border-collapse:collapse; min-width:100%; font-variant-numeric:tabular-nums }}
@@ -451,14 +522,14 @@ form {{ display:flex; flex-wrap:wrap; align-items:end; gap:.75rem; margin:.8rem 
 .chart .axis {{ stroke:#617277; stroke-width:1 }} .chart .tick-mark {{ stroke:#617277; stroke-width:1 }} .chart .tick-label,.chart .null-label {{ font-size:13px; fill:#425557 }} .chart circle {{ cursor:pointer; stroke:#fff; stroke-width:1 }} .chart circle:focus {{ stroke:#161f20; stroke-width:2.5 }} .chart circle.observed {{ fill:#147d73 }} .chart circle.missing {{ fill:#d97706 }} .chart circle.saturated {{ fill:#b91c1c }}
 @media (max-width: 760px) {{ .chart-grid {{ grid-template-columns:1fr }} dl {{ grid-template-columns:1fr }} input {{ min-width:0; width:100% }} form label {{ flex:1 1 12rem }} button {{ flex:1 0 auto }} }}
 </style></head><body><main>
-<header><h1>Diode-array detector</h1><p>Array <strong>{_e(plane["array_id"])}</strong> · stream {_e(plane["stream_id"])} · {_e(len(plane["points"]))} observed rows</p><p>Detector values as supplied by the acquisition.</p></header>
-<section><h2>Detector response</h2><div class="figure">{heatmap.decode("utf-8")}</div>
+<header><h1>Diode-array detector</h1><p>Array <strong>{_e(plane["array_id"])}</strong> · stream {_e(plane["stream_id"])} · {_e(len(plane["points"]))} observed rows</p><p>Detector values as supplied by the acquisition.</p>{selection_html}</header>
+<section><h2>{_e(scope.title())}</h2><a class="skip-map" href="#inspect-time">Enter a coordinate</a><div class="figure">{heatmap.decode("utf-8")}</div>
 <div class="legend" aria-label="Point state legend"><span class="observed">Observed value</span><span class="missing">Observed coordinate with unavailable value</span><span class="saturated">Saturation declared</span></div>
 <p class="value-scale-note">{_value_scale_note(plane)}</p>
-<p>Select a measured point to inspect its source row and both slices. Blank coordinates have no observation.</p></section>
+<p>Select a measured point to inspect its source row and both slices. Blank coordinates have no observation.{" The displayed points are restricted to the selected inclusive bounds." if region else ""}</p></section>
 <section><h2>Inspect a coordinate</h2><form id="inspect-form"><label for="inspect-time">Time ({_e(plane["time_unit"])})<input id="inspect-time" name="time" type="number" step="any" required></label><label for="inspect-wavelength">Wavelength ({_e(plane["wavelength_unit"])})<input id="inspect-wavelength" name="wavelength" type="number" step="any" required></label><button type="submit">Inspect exact coordinate</button></form><p id="inspect-message" aria-live="polite">Select a heatmap mark or enter an exact coordinate.</p>
 <div class="selection" aria-live="polite"><dl><dt>Coordinate state</dt><dd id="selected-state">No coordinate selected</dd><dt>Point index</dt><dd id="selected-point">—</dd><dt>Time</dt><dd id="selected-time">—</dd><dt>Wavelength</dt><dd id="selected-wavelength">—</dd><dt>Value ({_e(unit)})</dt><dd id="selected-value">—</dd><dt>Source row</dt><dd id="selected-source-row">—</dd><dt>Saturated</dt><dd id="selected-saturated">—</dd></dl></div></section>
-<section><h2>Linked traces</h2><p>Each dot is a supplied reading at the selected wavelength or time.</p><div class="chart-grid"><div><h3 id="chrom-heading">Chromatogram</h3><div class="chart"><svg id="wavelength-chart" role="group" aria-label="Per-wavelength chromatogram"></svg></div></div><div><h3 id="spec-heading">Spectrum</h3><div class="chart"><svg id="time-chart" role="group" aria-label="Per-time spectrum"></svg></div></div></div></section>
+<section><h2>Linked traces</h2><p>Each dot is a supplied reading at the selected wavelength or time.{" These traces are windowed by the selected bounds." if region else ""}</p><div class="chart-grid"><div><h3 id="chrom-heading">Chromatogram</h3><div class="chart"><svg id="wavelength-chart" role="group" aria-label="Per-wavelength chromatogram"></svg></div></div><div><h3 id="spec-heading">Spectrum</h3><div class="chart"><svg id="time-chart" role="group" aria-label="Per-time spectrum"></svg></div></div></div></section>
 <details><summary>Complete observed rows ({_e(len(plane["points"]))})</summary><div class="table-scroll" tabindex="0" role="region" aria-label="Complete DAD point rows">{_point_table(plane)}</div></details>
 {warning_html}
 <details><summary>Acquisition and provenance</summary><table><tbody>{_metadata_rows(plane)}</tbody></table><h3>Worker provenance</h3><pre>{provenance_json}</pre></details>

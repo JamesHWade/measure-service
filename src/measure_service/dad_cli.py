@@ -71,11 +71,6 @@ async def _read_plane(
     wavelength_range: list[float] | None = None,
 ) -> dict[str, Any]:
     """Register an exact bundle and read one DAD plane over installed stdio."""
-    request: dict[str, Any] = {
-        "acquisition_id": "",
-        "array_id": array_id,
-        "time_axis": time_axis,
-    }
     async with stdio_client(parameters, errlog=stderr_file) as (read, write):
         async with ClientSession(read, write) as client:
             await client.initialize()
@@ -83,7 +78,11 @@ async def _read_plane(
             acquisition_id = acquisition.get("acquisition_id")
             if not isinstance(acquisition_id, str) or not acquisition_id:
                 raise ValueError("Acquisition registration returned no acquisition ID")
-            request["acquisition_id"] = acquisition_id
+            request = {
+                "acquisition_id": acquisition_id,
+                "array_id": array_id,
+                "time_axis": time_axis,
+            }
             if time_range is not None:
                 request["time_range"] = time_range
             if wavelength_range is not None:
@@ -102,13 +101,6 @@ async def _read_plane(
         wavelength_range=wavelength_range,
     )
     return plane
-
-
-def _validated_range(value: list[float] | None, *, wavelength: bool) -> list[float] | None:
-    """Validate one optional native-axis range with the shared DAD contract."""
-    if value is None:
-        return None
-    return dad_plane.validate_range(value, wavelength=wavelength)
 
 
 def _validate_plane_response(
@@ -130,7 +122,7 @@ def _validate_plane_response(
     ):
         raise ValueError("DAD plane response identity or axis does not match the request")
     expected_region = time_range is not None or wavelength_range is not None
-    expected_profile = "measure-dad-region/1" if expected_region else "measure-dad-plane/1"
+    expected_profile = dad_plane.REGION_PROFILE if expected_region else dad_plane.PROFILE
     if plane.get("profile") != expected_profile:
         raise ValueError("DAD plane response profile does not match the requested view")
     if expected_region:
@@ -167,8 +159,8 @@ def _dad_workflow(args: argparse.Namespace, parser: argparse.ArgumentParser) -> 
     r, r_library = _validate_runtime_paths(args, parser)
     if not args.array or "\x00" in args.array:
         parser.error("--array must be a non-empty array ID")
-    time_range = _validated_range(args.time_range, wavelength=False)
-    wavelength_range = _validated_range(args.wavelength_range, wavelength=True)
+    time_range = dad_plane.validate_range(args.time_range, wavelength=False)
+    wavelength_range = dad_plane.validate_range(args.wavelength_range, wavelength=True)
     try:
         _existing_output(args.output)
         files = ms_trace_cli._read_members(args.bundle)

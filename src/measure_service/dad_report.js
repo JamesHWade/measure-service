@@ -9,6 +9,16 @@
   const formMessage = document.getElementById("inspect-message");
   const wavelengthChart = document.getElementById("wavelength-chart");
   const timeChart = document.getElementById("time-chart");
+  const selection = plane.selection || null;
+  const isRegion = Boolean(selection);
+
+  function withinRange(value, range) {
+    return range === null || (value >= range[0] && value <= range[1]);
+  }
+
+  function pointAt(index) {
+    return points.find(function (point) { return point.point_index === index; });
+  }
 
   function numberText(value) {
     return value === null ? "Unavailable" : JSON.stringify(value);
@@ -159,7 +169,7 @@
       mark.setAttribute("class", row.point.value === null ? "missing" : (row.point.saturated === true ? "saturated" : "observed"));
       mark.setAttribute("tabindex", "0");
       mark.setAttribute("role", "button");
-      mark.setAttribute("data-point-index", row.point.point_index - 1);
+      mark.setAttribute("data-point-index", row.point.point_index);
       mark.setAttribute("aria-label", "point " + row.point.point_index + ", " + numberText(row.x) + ", value " + numberText(row.point.value));
       const tooltip = document.createElementNS("http://www.w3.org/2000/svg", "title");
       tooltip.textContent = "point " + row.point.point_index + "; " + numberText(row.x) + "; value " + numberText(row.point.value);
@@ -182,8 +192,8 @@
   }
 
   function renderTraces(time, wavelength) {
-    setText("chrom-heading", "Chromatogram at " + numberText(wavelength) + " " + plane.wavelength_unit);
-    setText("spec-heading", "Spectrum at " + numberText(time) + " " + plane.time_unit);
+    setText("chrom-heading", (isRegion ? "Windowed chromatogram at " : "Chromatogram at ") + numberText(wavelength) + " " + plane.wavelength_unit);
+    setText("spec-heading", (isRegion ? "Windowed spectrum at " : "Spectrum at ") + numberText(time) + " " + plane.time_unit);
     const wavelengthRows = points.filter(function (point) {
       return point.wavelength === wavelength;
     }).sort(function (a, b) { return a.time - b.time; }).map(function (point) {
@@ -199,10 +209,10 @@
   }
 
   function selectPoint(index) {
-    const point = points[index];
+    const point = pointAt(index);
     if (!point) return;
     document.querySelectorAll(".heatmap-mark.selected").forEach(function (mark) { mark.classList.remove("selected"); });
-    const mark = document.querySelector('.heatmap-mark[data-point-index="' + index + '"]');
+    const mark = document.querySelector('.heatmap-mark[data-point-index="' + point.point_index + '"]');
     if (mark) mark.classList.add("selected");
     setText("selected-state", stateText(point));
     setText("selected-point", numberText(point.point_index));
@@ -235,18 +245,23 @@
       return point.time === time && point.wavelength === wavelength;
     });
     if (index >= 0) {
-      selectPoint(index);
+      selectPoint(points[index].point_index);
       return;
     }
     document.querySelectorAll(".heatmap-mark.selected").forEach(function (mark) { mark.classList.remove("selected"); });
-    setText("selected-state", "Absent from sparse plane");
+    const insideRegion = !isRegion || (
+      withinRange(time, selection.time_range) && withinRange(wavelength, selection.wavelength_range)
+    );
+    setText("selected-state", insideRegion ? (isRegion ? "Absent from selected window" : "Absent from sparse plane") : "Outside selected window");
     setText("selected-point", "None");
     setText("selected-time", numberText(time) + " " + plane.time_unit);
     setText("selected-wavelength", numberText(wavelength) + " " + plane.wavelength_unit);
-    setText("selected-value", "No observed row");
-    setText("selected-source-row", "Not applicable: coordinate absent");
-    setText("selected-saturated", "Not applicable: coordinate absent");
-    formMessage.textContent = "The acquisition has no observation at this coordinate.";
+    setText("selected-value", insideRegion ? "No observed row" : "Outside this export");
+    setText("selected-source-row", insideRegion ? "Not applicable: coordinate absent" : "Not applicable: outside selected window");
+    setText("selected-saturated", insideRegion ? "Not applicable: coordinate absent" : "Not applicable: outside selected window");
+    formMessage.textContent = insideRegion
+      ? (isRegion ? "The selected window has no observation at this coordinate." : "The acquisition has no observation at this coordinate.")
+      : "This coordinate is outside the selected window.";
     renderTraces(time, wavelength);
   }
 
@@ -267,7 +282,7 @@
     view.addEventListener("keydown", activatePoint);
   });
   document.getElementById("inspect-form").addEventListener("submit", inspectCoordinate);
-  if (points.length) selectPoint(0);
+  if (points.length) selectPoint(points[0].point_index);
   else {
     setText("selected-state", "No observed point rows");
     clearChart(wavelengthChart, "No observed rows");

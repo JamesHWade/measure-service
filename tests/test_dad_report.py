@@ -7,6 +7,7 @@ import pytest
 
 from measure_service.dad_report import (
     MAX_POINTS,
+    REGION_PROFILE,
     _heatmap_svg,
     read_dad_evidence,
     render_dad_report,
@@ -68,6 +69,18 @@ def synthetic_plane():
     return plane
 
 
+def synthetic_region():
+    plane = synthetic_plane()
+    plane["profile"] = REGION_PROFILE
+    plane["selection"] = {"time_range": [0.0, 3.0], "wavelength_range": None}
+    plane["native_point_count"] = 7
+    plane["points"] = [plane["points"][0], plane["points"][2]]
+    plane["evidence_sha256"] = sha256(
+        {key: value for key, value in plane.items() if key != "evidence_sha256"}
+    )
+    return plane
+
+
 def test_validates_honest_digest_and_numeric_precision():
     plane = synthetic_plane()
     validate_dad_plane(plane)
@@ -77,6 +90,59 @@ def test_validates_honest_digest_and_numeric_precision():
     assert evidence["evidence_sha256"] == sha256(
         {key: value for key, value in plane.items() if key != "evidence_sha256"}
     )
+
+
+def test_region_preserves_native_indices_and_declares_selection():
+    plane = synthetic_region()
+    validate_dad_plane(plane)
+    artifacts = render_dad_report(plane)
+    html = artifacts["report.html"].decode("utf-8")
+    assert 'data-point-index="1"' in html
+    assert 'data-point-index="3"' in html
+    assert 'id="point-3"' in html
+    assert "Selected region (time 0.0–3.0 s)" in html
+    assert "Windowed chromatogram" in html
+    assert "native points" in html
+    assert json.loads(artifacts["evidence.json"])["points"][1]["point_index"] == 3
+
+
+def test_region_can_be_empty_and_reports_inside_vs_outside_window():
+    plane = synthetic_region()
+    plane["points"] = []
+    plane["selection"] = {"time_range": [10.0, 12.0], "wavelength_range": None}
+    plane["evidence_sha256"] = sha256(
+        {key: value for key, value in plane.items() if key != "evidence_sha256"}
+    )
+    validate_dad_plane(plane)
+    html = render_dad_report(plane)["report.html"].decode("utf-8")
+    assert "Selected region (time 10.0–12.0 s)" in html
+    assert "Outside selected window" in html
+    assert "Absent from selected window" in html
+
+
+@pytest.mark.parametrize(
+    ("change", "message"),
+    [
+        ({"selection": {"time_range": None, "wavelength_range": None}}, "must include"),
+        ({"selection": {"time_range": [3.0, 1.0], "wavelength_range": None}}, "ordered"),
+        (
+            {
+                "selection": {"time_range": [0.0, 3.0], "wavelength_range": None},
+                "native_point_count": 2,
+            },
+            "native_point_count",
+        ),
+        ({"selection": {"time_range": [0.0, 1.0], "wavelength_range": None}}, "outside"),
+    ],
+)
+def test_region_validation_rejects_ambiguous_or_inconsistent_selection(change, message):
+    plane = synthetic_region()
+    plane.update(change)
+    plane["evidence_sha256"] = sha256(
+        {key: value for key, value in plane.items() if key != "evidence_sha256"}
+    )
+    with pytest.raises(ValueError, match=message):
+        validate_dad_plane(plane)
 
 
 def test_render_is_offline_linked_and_escapes_markup():
