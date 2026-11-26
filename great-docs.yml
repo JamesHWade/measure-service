@@ -15,7 +15,7 @@ hero:
   logo: assets/logo.png
   logo_height: 210px
   name: measure-service
-  tagline: "MCP tools for analytical traces, diode-array and MS evidence, chromatography methods, and traceable experiment campaigns."
+  tagline: "Reproducible analytical chemistry for AI assistants—chromatography, SEC/GPC, DAD, LC–MS, and traceable lab records."
   badges: auto
 
 accent_color:
@@ -198,39 +198,39 @@ mcp:
 user_guide:
   - section: "Get Started"
     contents:
-      - text: "Ecosystem & Vision"
+      - text: "Overview & Ecosystem"
         href: overview.qmd
-      - text: "Setup & MCP Clients"
+      - text: "Setup & AI Clients"
         href: quickstart.qmd
   - section: "Analytical Workflows"
     contents:
-      - text: "Traces & Native Acquisitions"
+      - text: "Loading Instrument Data"
         href: inputs.qmd
       - text: "Chromatograms, Quantitation & SEC"
         href: analysis.qmd
-      - text: "Diode-Array (DAD) & LC-MS"
+      - text: "LC–DAD & LC–MS Inspection"
         href: dad-ms.qmd
-      - text: "Batches & Portable Snapshots"
+      - text: "Running Sample Sequences"
         href: batches.qmd
-  - section: "Methods, Registry & Campaigns"
+  - section: "Methods, Records & Optimization"
     contents:
-      - text: "Chromatography Methods"
+      - text: "LC Gradient Methods"
         href: methods.qmd
-      - text: "Experiment Registry & Tables"
+      - text: "Experiments & Result Tables"
         href: experiments.qmd
-      - text: "Retention, Observations & Campaigns"
+      - text: "Retention & Method Optimization"
         href: campaigns.qmd
   - section: "Architecture & Hosting"
     contents:
-      - text: "Architecture & Boundaries"
+      - text: "How It Fits Together"
         href: architecture.qmd
-      - text: "Hosting, Connect & Store Ops"
+      - text: "Hosting, Posit Connect & Backups"
         href: deployment.qmd
   - section: "Roadmap & Contributing"
     contents:
       - text: "Ecosystem Roadmap"
         href: roadmap.qmd
-      - text: "Development & Quality Checks"
+      - text: "Development & Checks"
         href: contributing.qmd
 
 skill:
@@ -267,4 +267,4 @@ skill:
 
 seo:
   enabled: true
-  default_description: "MCP tools for analytical traces, diode-array and LC-MS evidence, chromatography methods, resumable batches, and traceable experiment campaigns in the measure ecosystem."
+  default_description: "Connect AI assistants to reproducible analytical chemistry workflows: chromatogram integration, peak quantitation, SEC/GPC molecular weights, LC-DAD and LC-MS inspection, LC gradient checks, and traceable experiment records."

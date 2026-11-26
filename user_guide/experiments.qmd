@@ -1,8 +1,8 @@
 ---
-title: "Experiment Registry & Tables"
+title: "Experiments & Result Tables"
 ---
 
-The experiment registry is the local system of record for immutable experimental designs, design replacement lineage, append-only attempt revisions, mapped CSV outcome tables, and evidence-linked results.
+Use the experiment registry to keep your planned conditions, actual run conditions, linked instrument files, and final numerical results together in one place—while keeping non-detects, below-limit readings, failed runs, and later corrections completely transparent.
 
 ![Evidence-Linked Experiment Lifecycle](../assets/evidence-lifecycle.png){.diagram-frame}
 

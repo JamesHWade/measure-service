@@ -1,8 +1,8 @@
 ---
-title: "Diode-Array (DAD) & LC–MS"
+title: "LC–DAD & LC–MS Inspection"
 ---
 
-`measure-service` supports native two-dimensional diode-array (DAD) arrays and ragged centroid LC–MS acquisitions written by `measure::write_measure_acquisition()`, preserving exact point indices and source-row lineage all the way to offline interactive reports.
+When working with photodiode-array (LC–DAD) or centroid mass spectrometry (LC–MS) data saved by `measure`, you can inspect 2D spectrochromatograms and extracted-ion chromatograms directly—and trace any plotted point back to its exact retention time, scan, and raw source row.
 
 ## Inspecting diode-array (DAD) planes
 

@@ -1,41 +1,40 @@
 ---
-title: "Ecosystem & Vision"
+title: "Overview & Ecosystem"
 ---
 
-`measure-service` is the Model Context Protocol (MCP) service and durable evidence store for the [`measure`](https://jameshwade.github.io/measure/) analytical ecosystem. Rather than duplicating analytical algorithms inside an agent server, the ecosystem separates **scientific truth** from **operational state, provenance, and protocol contracts**.
+`measure-service` connects AI assistants and automated lab workflows to the analytical chemistry packages in the [`measure`](https://jameshwade.github.io/measure/) ecosystem. Rather than re-implementing calculations inside an agent server—or letting a language model estimate peak areas and molecular weights by eye—the service delegates every numerical calculation to `measure` and its technique packs while keeping raw data, method settings, warnings, and experimental outcomes linked together.
 
 ![The measure Analytical Ecosystem](../assets/ecosystem-architecture.png){.diagram-frame}
 
-## Two complementary layers
+## Two ways to work with your data
 
-Analytical workflows naturally split into two roles:
+Analytical work naturally falls into two modes:
 
-1. **Interactive science and method development** — exploring spectra and chromatograms, building preprocessing recipes, fitting calibrations, and running analytical method validation. That belongs in `measure` and its domain technique packs, where every numerical method can be tested directly against reference data without an agent protocol in the loop.
-2. **Repeatable, agent-driven, and closed-loop experimentation** — letting an AI assistant, automated pipeline, or Bayesian optimizer import bounded traces and native acquisitions, process resumable batches, validate LC gradient programs, track immutable experiment lineage, and feed versioned observations into campaigns without overwriting history or coercing missing outcomes to zero. That belongs in `measure-service`.
+1. **Interactive data analysis & method development** — exploring spectra and chromatograms, building preprocessing pipelines, fitting calibration curves, and validating methods directly in [`measure`](https://jameshwade.github.io/measure/) and its technique packs. Every algorithm lives here so it can be inspected and tested against reference data on its own.
+2. **AI-assisted analysis & traceable lab record-keeping** — letting an assistant like Claude, Codex, or Cursor load instrument data, run chromatograms or SEC calculations, check LC gradient limits and solvent use, process multi-sample sequences, and log experimental conditions and outcomes without losing non-detects, overwriting prior results, or breaking the link back to the raw run. That is what `measure-service` provides.
 
 ## Ecosystem components
 
-| Layer | Package | Responsibility |
+| Layer | Package | What it handles |
 | --- | --- | --- |
-| **Core analytical primitives** | [`measure`](https://jameshwade.github.io/measure/) | Measurement data structures (`measure_tbl`, `measure_nd_tbl`, `measure_record`, `measure_acquisition`), preprocessing recipes, peak operations, calibration, and analytical validation. |
-| **Domain technique packs** | [`measure.sec`](https://jameshwade.github.io/measure.sec/) *(and future `measure.lc`, `measure.ms`, thermal & spectroscopy packs)* | Technique-specific models and calculations (such as SEC/GPC calibration, molecular-weight moments, and distributions) registered via `measure`'s pack registry. |
-| **Agent & evidence service** | **`measure-service`** | 82 structured MCP tools across 12 workflow groups, bundled `measure_methods` gradient resource accounting, SQLite evidence store, portable batch snapshots, Posit Connect hosting, and thin adapters to `measure` and its technique packs. |
+| **Core analytical package** | [`measure`](https://jameshwade.github.io/measure/) | Measurement data structures, spectral/chromatographic preprocessing, peak detection and integration, calibration curves, and analytical method validation. |
+| **Domain technique packs** | [`measure.sec`](https://jameshwade.github.io/measure.sec/) *(and future `measure.lc`, `measure.ms`, thermal & spectroscopy packs)* | Specialized calculations for specific instruments and domains—such as SEC/GPC molecular-weight distributions—registered into `measure`. |
+| **AI & lab-record service** | **`measure-service`** | Structured MCP tools (82 tools across 12 groups), LC gradient timing and solvent calculations, local SQLite storage with full audit digests, portable batch archives, and Posit Connect hosting. |
 
-::: {.callout-note title="Where new capabilities belong"}
-A new preprocessing algorithm, peak model, retention equation, or detector calibration belongs in `measure` or a technique pack with reference tests there. `measure-service` adds the MCP contract, bounded validation, immutable provenance recording, and integration test—and as `measure`'s technique-pack backlog expands (thermal analysis, vibrational spectroscopy, NMR, LC-MS, validation reports), `measure-service` exposes those capabilities over the same evidence-first MCP boundary.
+::: {.callout-note title="How the ecosystem grows"}
+New preprocessing algorithms, deconvolution models, retention equations, and validation statistics are built and tested in `measure` or a dedicated technique pack first. As new domains mature—such as thermal analysis (DSC/TGA), FTIR/Raman, NMR, and ICH/USP validation reports—`measure-service` exposes them to AI assistants through the same traceable workflow.
 :::
 
-## Capabilities available today
+## What you can do today
 
-- **Scalar, 2D DAD, and LC–MS evidence:** Register 1D JSON/CSV/wide/long traces or native `measure` acquisition bundles; inspect 2D time–wavelength diode-array planes and bounded regions; extract scan-linked centroid XICs traceable to source rows.
-- **Chromatograms, peak quantitation, and relative SEC:** Run ALS baseline correction, Gaussian smoothing, peak integration with overlap diagnostics, linear peak quantitation, relative SEC molecular-weight moments/distributions, and multi-run SEC comparisons.
-- **Resumable analytical batches & portable snapshots:** Freeze owned trace selections and method settings, execute bounded parallel batches with cancellation/recovery/retry controls, and export self-contained snapshots for fresh-store import.
-- **Chromatography methods & experiment lineage:** Validate and store unit-safe LC gradients with exact solvent-use accounting, supersede immutable experiment designs with verified lineage, append attempt revisions, and atomically import mapped CSV outcome tables.
-- **Retention, analytical acceptance & synthetic BO campaigns:** Retain declared LSS/QSS/Neue–Kuss retention predictions, freeze predeclared analytical acceptance snapshots, and run matched sequential synthetic campaigns with optional BO-MCP Gaussian-process suggestions.
-- **Client tooling & Posit Connect hosting:** Generate verified Claude Code and Codex MCP configurations (`measure-service-client`), stage Posit Connect deployment bundles, and run verified store backups/restores (`measure-service-store`).
+- **Chromatograms, peak quantitation & SEC/GPC:** Correct baselines, smooth traces, integrate peaks with overlap checks, quantify unknowns against linear standards, calculate conventional SEC molecular-weight distributions ($M_n$, $M_w$, $M_z$, $M_p$, dispersity), and compare runs side by side.
+- **LC–DAD & LC–MS inspection:** Explore 2D time–wavelength diode-array data to view exact UV spectra and chromatograms, or pull centroid extracted-ion chromatograms (XICs) from LC–MS scans and trace any plotted point straight back to the underlying scan and raw centroids.
+- **Multi-sample sequences:** Apply one locked processing method across standards, blanks, QCs, and unknowns with restartable progress, failure recovery, and self-contained archives you can reopen in another store.
+- **LC gradient checks & experiment records:** Verify gradient flow/time constraints and exact solvent usage, log intended vs. actual run conditions, import mapped CSV result tables, and keep non-detects, below-limit measurements, and failed runs distinct from observed zeros.
+- **Retention predictions & method optimization:** Evaluate ideal LC retention models (LSS, QSS, Neue–Kuss), freeze acceptance criteria across analyte sets, and run reproducible synthetic optimization loops with optional BO-MCP suggestions.
 
-## Where to go next
+## Next steps
 
-- Ready to connect Claude Code, Codex, or Cursor? Start with [Setup & MCP Clients](quickstart.qmd).
-- Want to see how 2D DAD planes and LC–MS XICs trace back to source rows? Read [Diode-Array (DAD) & LC–MS](dad-ms.qmd).
-- Want the full 82-tool catalog with live schemas? Browse the [MCP Reference](../reference/mcp/index.qmd).
+- Ready to connect Claude Code, Codex, or Cursor? Follow [Setup & AI Clients](quickstart.qmd).
+- Want to see interactive LC–DAD and LC–MS inspection? Read [LC–DAD & LC–MS Inspection](dad-ms.qmd).
+- Looking for a specific tool's inputs? Browse the [MCP Reference](../reference/mcp/index.qmd).

@@ -1,8 +1,8 @@
 ---
-title: "Batches & Portable Snapshots"
+title: "Running Sample Sequences"
 ---
 
-When processing sequences of standards, blanks, QCs, and unknown injections under one fixed method, the **Analytical Batches** tools freeze inputs and method parameters, run bounded parallel work with durable state transitions, and export self-contained evidence snapshots that can be imported into a separate store.
+When processing a sequence of standards, blanks, QCs, and unknown injections under one fixed method, the batch tools lock your selected runs and processing parameters, process them safely in parallel with full restart and retry support, and package the inputs and results into a portable archive you can inspect or re-import elsewhere.
 
 ## Batch lifecycle
 

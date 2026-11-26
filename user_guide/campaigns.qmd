@@ -1,8 +1,8 @@
 ---
-title: "Retention, Observations & Campaigns"
+title: "Retention & Method Optimization"
 ---
 
-`measure-service` implements a complete, traceable synthetic optimization stack separating **ideal retention predictions**, **predeclared analytical acceptance snapshots**, **latent Gaussian observation producers**, and **durable sequential Bayesian optimization campaigns**—without conflating simulated results with physical measurements.
+For chromatography method development, `measure-service` lets you predict retention times from declared ideal retention models, evaluate whether an analyte set meets resolution and runtime goals, and run reproducible synthetic Bayesian optimization loops—keeping simulated results strictly separate from physical lab runs.
 
 ![Synthetic campaign utility comparison across matched sequential protocols](../assets/figures/synthetic-utility.png){.diagram-frame}
 
