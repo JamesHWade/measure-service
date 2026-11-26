@@ -2,11 +2,11 @@
 title: "LC–DAD & LC–MS Inspection"
 ---
 
-When working with photodiode-array (LC–DAD) or centroid mass spectrometry (LC–MS) data saved by `measure`, you can inspect 2D spectrochromatograms and extracted-ion chromatograms directly—and trace any plotted point back to its exact retention time, scan, and raw source row.
+When working with photodiode-array (LC–DAD) or centroid mass spectrometry (LC–MS) data saved by `measure`, you can inspect 2D spectrochromatograms and extracted-ion chromatograms directly and trace any plotted point back to its exact retention time, scan, and raw source row.
 
 ## Inspecting diode-array (DAD) planes
 
-A chromatogram shows response vs. time at one exact wavelength; a spectrum shows response vs. wavelength at one exact time. Register a native acquisition with [`measurement_register_acquisition`](../reference/mcp/measurement_register_acquisition.qmd) and query its 2D plane via [`measurement_read_dad_plane`](../reference/mcp/measurement_read_dad_plane.qmd) (or generate an interactive local HTML report with `measure-service-client dad`):
+A chromatogram shows response vs. time at one exact wavelength, and a spectrum shows response vs. wavelength at one exact time. Register a native acquisition with [`measurement_register_acquisition`](../reference/mcp/measurement_register_acquisition.qmd) and query its 2D plane via [`measurement_read_dad_plane`](../reference/mcp/measurement_read_dad_plane.qmd) (or generate an interactive local HTML report with `measure-service-client dad`):
 
 ```sh
 Rscript examples/make_dad_acquisition.R two-responses
@@ -22,7 +22,7 @@ Selecting any cell in the detector plane exposes both the exact single-wavelengt
 
 ### Zooming into bounded regions of dense runs
 
-Whole-array reads are bounded to **4,096 observed cells**. For denser runs, supply inclusive `time_range` and `wavelength_range` bounds in the array's declared units—each point retains its original native point index and source row:
+Whole-array reads are bounded to **4,096 observed cells**. For denser runs, supply inclusive `time_range` and `wavelength_range` bounds in the array's declared units. Each point retains its original native point index and source row:
 
 ```sh
 Rscript examples/make_dad_acquisition.R dense-run --dense

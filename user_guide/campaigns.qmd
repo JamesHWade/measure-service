@@ -2,15 +2,15 @@
 title: "Retention & Method Optimization"
 ---
 
-For chromatography method development, `measure-service` lets you predict retention times from declared ideal retention models, evaluate whether an analyte set meets resolution and runtime goals, and run reproducible synthetic Bayesian optimization loops—keeping simulated results strictly separate from physical lab runs.
+For chromatography method development, `measure-service` lets you predict retention times from declared ideal retention models, evaluate whether an analyte set meets resolution and runtime goals, and run reproducible synthetic Bayesian optimization loops. Simulated results stay strictly separate from physical lab runs.
 
 ![Synthetic campaign utility comparison across matched sequential protocols](../assets/figures/synthetic-utility.png){.diagram-frame}
 
 ## 1. Ideal retention models
 
-Register declared ideal retention equations—linear (`LSS`), quadratic (`QSS`), or Neue–Kuss—with explicit natural-log coefficients, column geometry, dead time, and units via [`measurement_register_retention_model`](../reference/mcp/measurement_register_retention_model.qmd).
+Register declared ideal retention equations (linear `LSS`, quadratic `QSS`, or Neue–Kuss) with explicit natural-log coefficients, column geometry, dead time, and units via [`measurement_register_retention_model`](../reference/mcp/measurement_register_retention_model.qmd).
 
-Predict ideal retention times for an owned constant-flow binary inlet method using [`measurement_predict_retention`](../reference/mcp/measurement_predict_retention.qmd), and retrieve immutable predictions with [`measurement_get_retention_prediction`](../reference/mcp/measurement_get_retention_prediction.qmd). Analytes that do not elute within the acquisition window remain explicitly censored; ideal predictions make no physical peak-width, resolution, or instrument claims.
+Predict ideal retention times for an owned constant-flow binary inlet method using [`measurement_predict_retention`](../reference/mcp/measurement_predict_retention.qmd), and retrieve immutable predictions with [`measurement_get_retention_prediction`](../reference/mcp/measurement_get_retention_prediction.qmd). Analytes that do not elute within the acquisition window remain explicitly censored, and ideal predictions make no physical peak-width, resolution, or instrument claims.
 
 ## 2. Analytical acceptance contracts and immutable snapshots
 

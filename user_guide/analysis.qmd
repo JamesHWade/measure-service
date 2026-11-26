@@ -31,7 +31,7 @@ Analysis responses stay compact by design. To inspect full peak tables, processe
 [`measurement_quantify_peak`](../reference/mcp/measurement_quantify_peak.qmd) calibrates one peak ID from a stored chromatogram analysis against caller-supplied response standards:
 
 - **Model:** Linear fit with optional zero intercept and weighting of `none`, `1/x`, or `1/x2`.
-- **Requirements:** At least three distinct concentration levels; strictly positive concentrations for inverse weighting; positive finite fitted slope.
+- **Requirements:** At least three distinct concentration levels, strictly positive concentrations for inverse weighting, and a positive finite fitted slope.
 - **Diagnostics:** Concentration estimate, slope, intercept, fit diagnostics, standard range, and an extrapolation warning outside the calibration range.
 
 The caller declares chemical identity and affirms comparable integration, response units, and detector conditions. Dilution factors, internal-standard corrections, LOD/LOQ, and uncertainty intervals are not automatically applied by this tool.

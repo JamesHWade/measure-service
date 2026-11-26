@@ -2,7 +2,7 @@
 title: "Experiments & Result Tables"
 ---
 
-Use the experiment registry to keep your planned conditions, actual run conditions, linked instrument files, and final numerical results together in one place—while keeping non-detects, below-limit readings, failed runs, and later corrections completely transparent.
+Use the experiment registry to keep your planned conditions, actual run conditions, linked instrument files, and final numerical results together in one place, while keeping non-detects, below-limit readings, failed runs, and later corrections completely transparent.
 
 ![Evidence-Linked Experiment Lifecycle](../assets/evidence-lifecycle.png){.diagram-frame}
 
@@ -16,9 +16,9 @@ Use the experiment registry to keep your planned conditions, actual run conditio
 
 Record each physical run with [`measurement_record_attempt`](../reference/mcp/measurement_record_attempt.qmd) and update records via [`measurement_revise_attempt`](../reference/mcp/measurement_revise_attempt.qmd):
 
-- Captures `actual_conditions`, separately reported `executable_method_id`, reported status (`planned`, `running`, `completed`, `cancelled`, `failed`, or `unknown`—the last three require explanations), UTC-normalized timestamps, owned dataset/trace links, replicate identifiers, and caller-declared evaluator metadata (`manual`, `instrument`, `simulator`, `replay`, optional `fidelity` in $[0, 1]$).
+- Captures `actual_conditions`, separately reported `executable_method_id`, reported status (`planned`, `running`, `completed`, `cancelled`, `failed`, or `unknown`, with explanations required for the last three), UTC-normalized timestamps, owned dataset/trace links, replicate identifiers, and caller-declared evaluator metadata (`manual`, `instrument`, `simulator`, `replay`, optional `fidelity` in $[0, 1]$).
 - Revisions require `expected_revision`, a full replacement specification, a `reason`, and a fresh `idempotency_key`. Earlier revisions remain readable via [`measurement_get_attempt`](../reference/mcp/measurement_get_attempt.qmd).
-- Use a **revision** to correct a record; create a **new attempt** for a separate physical run or injection.
+- Use a **revision** to correct a record, and create a **new attempt** for a separate physical run or injection.
 
 ## 3. Outcomes and evidence links
 
@@ -50,4 +50,4 @@ For multi-attempt result spreadsheets or lab exports:
 
 ## Registry bounds & idempotency
 
-Every registry write requires a principal-scoped `idempotency_key`; repeating the exact normalized request returns its original response, while reusing a key with different arguments fails. Limits are 64 conditions per set, 32 measurement links per attempt, 50 outcomes per batch, 50 records per list page, and 64,000 UTF-8 bytes per serialized record/request.
+Every registry write requires a principal-scoped `idempotency_key`. Repeating the exact normalized request returns its original response, while reusing a key with different arguments fails. Limits are 64 conditions per set, 32 measurement links per attempt, 50 outcomes per batch, 50 records per list page, and 64,000 UTF-8 bytes per serialized record/request.

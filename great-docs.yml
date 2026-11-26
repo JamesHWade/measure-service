@@ -15,7 +15,7 @@ hero:
   logo: assets/logo.png
   logo_height: 210px
   name: measure-service
-  tagline: "Reproducible analytical chemistry for AI assistants—chromatography, SEC/GPC, DAD, LC–MS, and traceable lab records."
+  tagline: "Reproducible analytical chemistry for AI assistants: chromatography, SEC/GPC, DAD, LC–MS, and traceable lab records."
   badges: auto
 
 accent_color:
@@ -238,10 +238,10 @@ skill:
   well_known: true
   gotchas:
     - "Never convert missing, not_detected, below_limit, censored, failed or infeasible outcomes to zero."
-    - "All registry, batch, method, observation and campaign writes require an idempotency_key scoped to the principal; reusing a key with different arguments fails."
+    - "All registry, batch, method, observation and campaign writes require an idempotency_key scoped to the principal. Reusing a key with different arguments fails."
     - "Dataset registration and single-trace analysis calls are not idempotent and create a new record each time."
     - "Use MEASURE_MCP_TOOL_GROUPS to scope clients to focused tool groups (default client config selects discovery, traces and evidence)."
-    - "HTTP mode requires a trusted authentication proxy (such as Posit Connect); header parsing alone is not authentication."
+    - "HTTP mode requires a trusted authentication proxy (such as Posit Connect). Header parsing alone is not authentication."
   best_practices:
     - "Call measurement_capabilities first to inspect installed analytical backends and available tool groups."
     - "Use measure-service-client config and check commands to generate verified Claude Code or Codex MCP configurations."

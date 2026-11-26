@@ -37,7 +37,7 @@ The chromatography method contract validates, normalizes, constrains, and perman
 }
 ```
 
-This normalizes to a `2.0 min` acquisition consuming `1.0 mL` of solvent A and `1.0 mL` of solvent B. Structural errors return `isError: true`; well-formed methods that exceed limits return `feasible: false` with structured constraint violations.
+This normalizes to a `2.0 min` acquisition consuming `1.0 mL` of solvent A and `1.0 mL` of solvent B. Structural errors return `isError: true`, while well-formed methods that exceed limits return `feasible: false` with structured constraint violations.
 
 ## Exact solvent-use and overhead accounting
 
@@ -51,8 +51,8 @@ For example, a 2-minute segment ramping flow from $1 \to 3\text{ mL/min}$ while 
 
 1. **Register:** Call [`measurement_register_method`](../reference/mcp/measurement_register_method.qmd) with `title`, `declaration`, optional `constraints`, and a fresh `idempotency_key` (registration requires `feasible: true`).
 2. **Retrieve & list:** Read full records with [`measurement_get_method`](../reference/mcp/measurement_get_method.qmd) or page compact identities with [`measurement_list_methods`](../reference/mcp/measurement_list_methods.qmd) (up to 50 records per page).
-3. **Two immutable digests:** `input_sha256` covers the complete normalized registration request (title, constraints, equipment declarations, and schedule); `canonical_program_sha256` covers only the canonical numerical schedule.
-4. **Intended vs. reported linking:** Experiments link an intended `executable_method_id`; attempts separately link their reported `executable_method_id`. Attempts never auto-inherit an experiment's intended method.
+3. **Two immutable digests:** `input_sha256` covers the complete normalized registration request (title, constraints, equipment declarations, and schedule), and `canonical_program_sha256` covers only the canonical numerical schedule.
+4. **Intended vs. reported linking:** Experiments link an intended `executable_method_id`, and attempts separately link their reported `executable_method_id`. Attempts never auto-inherit an experiment's intended method.
 
 ## Bounds and limits
 

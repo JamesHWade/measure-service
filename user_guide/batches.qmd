@@ -9,18 +9,18 @@ When processing a sequence of standards, blanks, QCs, and unknown injections und
 1. **Freeze the batch:** Call [`measurement_create_chromatogram_batch`](../reference/mcp/measurement_create_chromatogram_batch.qmd) with owned `(dataset_id, trace_id)` inputs, caller-assigned roles (`reference`, `blank`, `qc`, `unknown`), and a normalized chromatogram method. Creation does not execute analysis.
 2. **Run bounded work:** Call [`measurement_run_chromatogram_batch`](../reference/mcp/measurement_run_chromatogram_batch.qmd) with an optimistic `expected_revision` and `idempotency_key`. Each run executes up to two pending items with shared bounded capacity and atomic result retention. Replaying the same request key never executes additional items.
 3. **Inspect progress and history:**
-   - [`measurement_get_chromatogram_batch`](../reference/mcp/measurement_get_chromatogram_batch.qmd) — frozen manifest, current revision, and per-state item counts.
-   - [`measurement_read_chromatogram_batch_items`](../reference/mcp/measurement_read_chromatogram_batch_items.qmd) — item metadata, states, and retained `analysis_id` links.
-   - [`measurement_read_chromatogram_batch_attempts`](../reference/mcp/measurement_read_chromatogram_batch_attempts.qmd) — per-item execution attempts, failures, interruptions, and runtime evidence.
-   - [`measurement_read_chromatogram_batch_control_events`](../reference/mcp/measurement_read_chromatogram_batch_control_events.qmd) — immutable history of cancellations, recoveries, and selected retries.
+   - [`measurement_get_chromatogram_batch`](../reference/mcp/measurement_get_chromatogram_batch.qmd): frozen manifest, current revision, and per-state item counts.
+   - [`measurement_read_chromatogram_batch_items`](../reference/mcp/measurement_read_chromatogram_batch_items.qmd): item metadata, states, and retained `analysis_id` links.
+   - [`measurement_read_chromatogram_batch_attempts`](../reference/mcp/measurement_read_chromatogram_batch_attempts.qmd): per-item execution attempts, failures, interruptions, and runtime evidence.
+   - [`measurement_read_chromatogram_batch_control_events`](../reference/mcp/measurement_read_chromatogram_batch_control_events.qmd): immutable history of cancellations, recoveries, and selected retries.
 
 ## Cancellation, recovery, and selective retry
 
 | Control tool | Behavior |
 | --- | --- |
-| [`measurement_cancel_chromatogram_batch`](../reference/mcp/measurement_cancel_chromatogram_batch.qmd) | Cancels pending items using a revision check; preserves completed items and allows in-flight work to finish. |
-| [`measurement_recover_chromatogram_batch`](../reference/mcp/measurement_recover_chromatogram_batch.qmd) | Marks expired claims as `interrupted` and fences late results; never kills a process or auto-retries. |
-| [`measurement_retry_chromatogram_batch_items`](../reference/mcp/measurement_retry_chromatogram_batch_items.qmd) | Resets explicitly selected `failed`, `interrupted`, or `cancelled` ordinals back to `pending` while preserving earlier attempt history; never resets `completed` items. |
+| [`measurement_cancel_chromatogram_batch`](../reference/mcp/measurement_cancel_chromatogram_batch.qmd) | Cancels pending items using a revision check, while preserving completed items and allowing in-flight work to finish. |
+| [`measurement_recover_chromatogram_batch`](../reference/mcp/measurement_recover_chromatogram_batch.qmd) | Marks expired claims as `interrupted` and fences late results. Never kills a process or auto-retries. |
+| [`measurement_retry_chromatogram_batch_items`](../reference/mcp/measurement_retry_chromatogram_batch_items.qmd) | Resets explicitly selected `failed`, `interrupted`, or `cancelled` ordinals back to `pending` while preserving earlier attempt history. Never resets `completed` items. |
 
 Try the full restart-and-retry demonstration from the checkout:
 
@@ -37,7 +37,7 @@ Export a quiescent batch at an exact revision with [`measurement_export_chromato
 - **Metadata-reference mode** (compact references and digests), or
 - **Self-contained source-asset mode** (bundles the retained source inputs alongside historical analysis outputs).
 
-Page the immutable export bytes via [`measurement_read_chromatogram_batch_export`](../reference/mcp/measurement_read_chromatogram_batch_export.qmd) (base64 byte pages keyed by `snapshot_sha256`). Importing a snapshot into a new local store creates new local dataset IDs, preserves historical analysis copies, and stages a fresh pending batch—inspect the import mapping with [`measurement_get_analytical_import`](../reference/mcp/measurement_get_analytical_import.qmd).
+Page the immutable export bytes via [`measurement_read_chromatogram_batch_export`](../reference/mcp/measurement_read_chromatogram_batch_export.qmd) (base64 byte pages keyed by `snapshot_sha256`). Importing a snapshot into a new local store creates new local dataset IDs, preserves historical analysis copies, and stages a fresh pending batch. Inspect the import mapping with [`measurement_get_analytical_import`](../reference/mcp/measurement_get_analytical_import.qmd).
 
 ::: {.callout-note title="Import is not fresh execution"}
 Importing a batch snapshot preserves historical evidence and provenance without executing new numerical calculations or importing historical execution authority.

@@ -2,7 +2,7 @@
 title: "Overview & Ecosystem"
 ---
 
-`measure-service` connects AI assistants and automated lab workflows to the analytical chemistry packages in the [`measure`](https://jameshwade.github.io/measure/) ecosystem. Rather than re-implementing calculations inside an agent server—or letting a language model estimate peak areas and molecular weights by eye—the service delegates every numerical calculation to `measure` and its technique packs while keeping raw data, method settings, warnings, and experimental outcomes linked together.
+`measure-service` connects AI assistants and automated lab workflows to the analytical chemistry packages in the [`measure`](https://jameshwade.github.io/measure/) ecosystem. Every numerical calculation runs in `measure` and its technique packs, while the service keeps raw data, method settings, warnings, and experimental outcomes linked together.
 
 ![The measure Analytical Ecosystem](../assets/ecosystem-architecture.png){.diagram-frame}
 
@@ -10,19 +10,19 @@ title: "Overview & Ecosystem"
 
 Analytical work naturally falls into two modes:
 
-1. **Interactive data analysis & method development** — exploring spectra and chromatograms, building preprocessing pipelines, fitting calibration curves, and validating methods directly in [`measure`](https://jameshwade.github.io/measure/) and its technique packs. Every algorithm lives here so it can be inspected and tested against reference data on its own.
-2. **AI-assisted analysis & traceable lab record-keeping** — letting an assistant like Claude, Codex, or Cursor load instrument data, run chromatograms or SEC calculations, check LC gradient limits and solvent use, process multi-sample sequences, and log experimental conditions and outcomes without losing non-detects, overwriting prior results, or breaking the link back to the raw run. That is what `measure-service` provides.
+1. **Interactive data analysis & method development:** Explore spectra and chromatograms, build preprocessing pipelines, fit calibration curves, and validate methods directly in [`measure`](https://jameshwade.github.io/measure/) and its technique packs. Every algorithm lives here so it can be inspected and tested against reference data on its own.
+2. **AI-assisted analysis & traceable lab record-keeping:** Let an assistant like Claude, Codex, or Cursor load instrument data, run chromatograms or SEC calculations, check LC gradient limits and solvent use, process multi-sample sequences, and log experimental conditions and outcomes without losing non-detects, overwriting prior results, or breaking the link back to the raw run.
 
 ## Ecosystem components
 
 | Layer | Package | What it handles |
 | --- | --- | --- |
 | **Core analytical package** | [`measure`](https://jameshwade.github.io/measure/) | Measurement data structures, spectral/chromatographic preprocessing, peak detection and integration, calibration curves, and analytical method validation. |
-| **Domain technique packs** | [`measure.sec`](https://jameshwade.github.io/measure.sec/) *(and future `measure.lc`, `measure.ms`, thermal & spectroscopy packs)* | Specialized calculations for specific instruments and domains—such as SEC/GPC molecular-weight distributions—registered into `measure`. |
+| **Domain technique packs** | [`measure.sec`](https://jameshwade.github.io/measure.sec/) *(and future `measure.lc`, `measure.ms`, thermal & spectroscopy packs)* | Specialized calculations for specific instruments and domains, such as SEC/GPC molecular-weight distributions, registered into `measure`. |
 | **AI & lab-record service** | **`measure-service`** | Structured MCP tools (82 tools across 12 groups), LC gradient timing and solvent calculations, local SQLite storage with full audit digests, portable batch archives, and Posit Connect hosting. |
 
 ::: {.callout-note title="How the ecosystem grows"}
-New preprocessing algorithms, deconvolution models, retention equations, and validation statistics are built and tested in `measure` or a dedicated technique pack first. As new domains mature—such as thermal analysis (DSC/TGA), FTIR/Raman, NMR, and ICH/USP validation reports—`measure-service` exposes them to AI assistants through the same traceable workflow.
+New preprocessing algorithms, deconvolution models, retention equations, and validation statistics are built and tested in `measure` or a dedicated technique pack first. As new domains mature (such as thermal analysis, FTIR/Raman, NMR, and ICH/USP validation reports), `measure-service` exposes them to AI assistants through the same traceable workflow.
 :::
 
 ## What you can do today

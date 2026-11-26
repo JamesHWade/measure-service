@@ -25,7 +25,7 @@ Every registered 1D trace declares:
 - **Required:** `trace_id`, `sample_id`, `injection_id`, `channel`, `separation` (`LC`, `GC`, `CE`, `SEC`, or `other`), `detector`, `axis_unit`, `signal_unit`.
 - **Optional:** `sample_type` (defaults to `unknown`), `batch_id`, `run_order`.
 
-Within each dataset, `trace_id` and `(injection_id, channel)` pairs must be unique; multiple channels sharing one `injection_id` must agree on `sample_id`, `sample_type`, `batch_id`, `run_order`, and `separation`. Distinct injections may share a `sample_id`.
+Within each dataset, `trace_id` and `(injection_id, channel)` pairs must be unique. Multiple channels sharing one `injection_id` must agree on `sample_id`, `sample_type`, `batch_id`, `run_order`, and `separation`. Distinct injections may share a `sample_id`.
 
 ## Example CSV payloads
 
@@ -146,4 +146,4 @@ Within each dataset, `trace_id` and `(injection_id, channel)` pairs must be uniq
 
 - **Retained sources:** Delimited imports keep original UTF-8 text, its SHA-256 digest, and column/group mappings. Use [`measurement_inspect_dataset`](../reference/mcp/measurement_inspect_dataset.qmd) for compact metadata and [`measurement_read_source`](../reference/mcp/measurement_read_source.qmd) to page original CSV/TSV text.
 - **Native acquisitions:** Registering identical UTF-8 bundle members under the same owner is idempotent and returns the same `acquisition_id`. Inspect metadata with [`measurement_get_acquisition`](../reference/mcp/measurement_get_acquisition.qmd).
-- **Scalar registration idempotency:** Repeating a scalar dataset registration call always creates a new `dataset_id`; SHA-256 digests support client-side comparison.
+- **Scalar registration idempotency:** Repeating a scalar dataset registration call always creates a new `dataset_id`. SHA-256 digests support client-side comparison.

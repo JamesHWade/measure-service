@@ -19,7 +19,7 @@ Local **stdio** is the primary development path. For shared deployments, `measur
 
 ## Identity modes and trust boundary
 
-- **Stdio (`local`):** Uses a single `local` principal; all clients sharing one `MEASURE_MCP_DATA_DIR` share that principal's records.
+- **Stdio (`local`):** Uses a single `local` principal, so all clients sharing one `MEASURE_MCP_DATA_DIR` share that principal's records.
 - **Hosted HTTP (`connect`):** Rejects `local` identity mode. Behind a trusted proxy, the service reads verified Connect caller identity (supporting Connect credentials / API visitor lookup) and scopes every read, write, batch, and capture to `connect:<UUID>`.
 
 ::: {.callout-warning title="Header parsing is NOT authentication"}
@@ -45,8 +45,8 @@ Before inviting external researchers to a hosted instance, complete the qualific
 
 SQLite (`measure.sqlite3`) is a single-node persistent store:
 
-- **Permissions:** Newly created data directories use mode `0700`. Always point `MEASURE_MCP_DATA_DIR` at a private persistent directory—never a shared temporary path—for real measurements.
+- **Permissions:** Newly created data directories use mode `0700`. Always point `MEASURE_MCP_DATA_DIR` at a private persistent directory, never a shared temporary path, for real measurements.
 - **Verified backup & restore:** Use `measure-service-store` (see `docs/store-recovery.md` and `docs/store-recovery-example.md`) to take consistent backups, verify digests, and test exact restoration into a separate directory.
 - **Read-only inspection:** Existing stores can be opened in read-only mode without creating or migrating tables (`docs/read-only-store.md`).
 - **Capture retention:** Temporary export and evidence captures are owner-isolated and bounded (`docs/capture-retention.md`).
-- **Project sharing & deletion (design stage):** Runtime records are currently single-owner; the proposed actor/project sharing and tombstone/purge model is documented in `docs/project-sharing-design.md` and tracked in [issue #105](https://github.com/JamesHWade/measure-service/issues/105).
+- **Project sharing & deletion (design stage):** Runtime records are currently single-owner. The proposed actor/project sharing and tombstone/purge model is documented in `docs/project-sharing-design.md` and tracked in [issue #105](https://github.com/JamesHWade/measure-service/issues/105).

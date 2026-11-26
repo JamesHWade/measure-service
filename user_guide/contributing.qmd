@@ -2,7 +2,7 @@
 title: "Development & Quality Checks"
 ---
 
-Work on a feature branch and open a reviewable pull request. `measure-service` is an installed package—tests must never rely on adding `src/` to `PYTHONPATH`. Scientific algorithm changes belong in `measure` or the relevant technique pack with reference tests there and an integration contract test here; method resource calculations stay cleanly separated in `src/measure_methods`.
+Work on a feature branch and open a reviewable pull request. `measure-service` is an installed package, so tests must never rely on adding `src/` to `PYTHONPATH`. Scientific algorithm changes belong in `measure` or the relevant technique pack with reference tests there and an integration contract test here. Method resource calculations stay cleanly separated in `src/measure_methods`.
 
 ## Local verification suite
 
@@ -50,12 +50,12 @@ With [Quarto](https://quarto.org/) and `.[docs]` installed:
 .venv/bin/great-docs preview
 ```
 
-Regenerate `docs/tools.md` with `python scripts/render_reference.py --write` whenever MCP tool definitions change; the Great Docs MCP Reference pages introspect all 82 tools automatically from `measure_service.server:mcp` at build time.
+Regenerate `docs/tools.md` with `python scripts/render_reference.py --write` whenever MCP tool definitions change. The Great Docs MCP Reference pages introspect all 82 tools automatically from `measure_service.server:mcp` at build time.
 
 ## Documentation standard
 
-- Describe implemented behavior in the present tense; put proposed work in the [Ecosystem Roadmap](roadmap.qmd) with acceptance criteria.
-- Use concrete nouns and verbs; omit marketing claims and unsupported robustness assertions.
+- Describe implemented behavior in the present tense, and put proposed work in the [Ecosystem Roadmap](roadmap.qmd) with acceptance criteria.
+- Use concrete nouns and verbs, omitting marketing claims and unsupported robustness assertions.
 - Keep units, ownership, revision rules, idempotency semantics, and failure states explicit, and distinguish caller declarations from computed facts.
-- Use synthetic or public examples only—never include private application names, internal links, credentials, or confidential data.
-- Keep commands executable and relative links valid; `scripts/check_docs.py` verifies local links across Markdown and Quarto files and validates complete JSON payloads against live MCP schemas.
+- Use synthetic or public examples only. Never include private application names, internal links, credentials, or confidential data.
+- Keep commands executable and relative links valid. `scripts/check_docs.py` verifies local links across Markdown and Quarto files and validates complete JSON payloads against live MCP schemas.

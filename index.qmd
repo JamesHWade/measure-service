@@ -2,7 +2,7 @@
 title: "measure-service"
 ---
 
-**`measure-service`** connects AI assistants (Claude, Codex, Cursor) and automated workflows directly to the analytical calculations in [`measure`](https://jameshwade.github.io/measure/) and [`measure.sec`](https://jameshwade.github.io/measure.sec/). Instead of letting an AI guess numbers from exported spreadsheets, you can process chromatograms, calculate polymer molecular weights, inspect LC–DAD spectra and LC–MS ion chromatograms, check LC gradient methods, and record experimental results—with every number permanently tied back to the raw data, method settings, and warnings that produced it.
+**`measure-service`** connects AI assistants (Claude, Codex, Cursor) and automated workflows directly to the analytical calculations in [`measure`](https://jameshwade.github.io/measure/) and [`measure.sec`](https://jameshwade.github.io/measure.sec/). Process chromatograms, calculate polymer molecular weights, inspect LC–DAD spectra and LC–MS ion chromatograms, check LC gradient methods, and record experimental results with every number tied back to the raw data, method settings, and warnings that produced it.
 
 ![The measure Analytical Ecosystem](assets/ecosystem-architecture.png){.diagram-frame}
 
@@ -75,12 +75,12 @@ Logs an experiment, records an observed `0` alongside a below-limit result, and 
 
 ## How `measure` and `measure-service` work together
 
-Scientific calculations stay in reusable analytical packages; `measure-service` gives AI assistants and automated workflows a structured, auditable way to invoke them and keep lab records organized.
+Scientific calculations stay in reusable analytical packages, while `measure-service` gives AI assistants and automated workflows a structured, auditable way to invoke them and keep lab records organized.
 
 | Package | Role |
 | --- | --- |
 | [`measure`](https://jameshwade.github.io/measure/) | Core data structures, signal preprocessing, peak detection/integration, calibration, and analytical method validation |
-| [`measure.sec`](https://jameshwade.github.io/measure.sec/) | Size-exclusion chromatography (SEC/GPC) calibration, molecular-weight moments, and distributions; future technique packs (`measure.lc`, `measure.ms`, thermal & spectroscopy) follow the same pattern |
+| [`measure.sec`](https://jameshwade.github.io/measure.sec/) | Size-exclusion chromatography (SEC/GPC) calibration, molecular-weight moments, and distributions. Future technique packs (`measure.lc`, `measure.ms`, thermal, and spectroscopy) follow the same pattern. |
 | **`measure-service`** | MCP server (82 tools), LC gradient solvent/constraint checks, local SQLite record store, portable batch archives, and Posit Connect hosting |
 
 See [Overview & Ecosystem](user-guide/overview.qmd) and [Ecosystem Roadmap](user-guide/roadmap.qmd) for where the platform is heading.
@@ -90,14 +90,14 @@ See [Overview & Ecosystem](user-guide/overview.qmd) and [Ecosystem Roadmap](user
 | Analytical task | Supported today | Current limit |
 | --- | --- | --- |
 | **Chromatogram processing** | ALS baseline correction, Gaussian smoothing, peak detection, and trapezoidal area integration with overlap warnings | No automatic compound identification or overlapping-peak deconvolution |
-| **Peak quantitation** | Linear calibration (`none`, `1/x`, or `1/x²` weighting) from supplied standards | You assign the peak; no automatic dilution factors, LOD/LOQ, or uncertainty |
+| **Peak quantitation** | Linear calibration (`none`, `1/x`, or `1/x²` weighting) from supplied standards | You assign the peak. No automatic dilution factors, LOD/LOQ, or uncertainty. |
 | **Polymer SEC / GPC** | Conventional log-MW calibration, $M_n$/$M_w$/$M_z$/$M_p$/dispersity, distributions, and multi-run comparisons | Relative to supplied standards only (not absolute MALS) |
 | **LC–DAD inspection** | Pick any retention time and wavelength to inspect the UV spectrum, chromatogram, and exact source row | Up to 4,096 measured points per read (whole run or zoomed region) |
 | **LC–MS ion chromatograms** | Extract centroid XICs across an $m/z$ window and trace any point back to its scan and raw centroids | Native acquisition bundles up to 4 MB |
-| **Sample sequences** | Run one fixed method across standards, blanks, QCs, and unknowns with restartable progress and portable archives | Single-trace processing per run; no instrument control |
+| **Sample sequences** | Run one fixed method across standards, blanks, QCs, and unknowns with restartable progress and portable archives | Single-trace processing per run, with no instrument control |
 | **LC gradient methods** | Check isocratic and linear gradients for flow/time limits and exact solvent consumption | No column backpressure model or hardware control |
-| **Lab records & optimization** | Track intended vs. actual conditions, non-detects/censored results, ideal retention predictions, and synthetic optimization loops | Reported records and synthetic optimization only; no physical instrument control |
+| **Lab records & optimization** | Track intended vs. actual conditions, non-detects/censored results, ideal retention predictions, and synthetic optimization loops | Reported records and synthetic optimization only, with no physical instrument control |
 
 ## Storage & hosting
 
-Records live in a local SQLite database (`measure.sqlite3`). Local stdio mode uses one `local` user. Shared HTTP hosting (`/mcp`) runs behind a trusted authentication proxy such as Posit Connect—parsing identity headers alone is **not** authentication. Read [Hosting, Posit Connect & Backups](user-guide/deployment.qmd) before hosting.
+Records live in a local SQLite database (`measure.sqlite3`). Local stdio mode uses one `local` user. Shared HTTP hosting (`/mcp`) runs behind a trusted authentication proxy such as Posit Connect, because parsing identity headers alone is **not** authentication. Read [Hosting, Posit Connect & Backups](user-guide/deployment.qmd) before hosting.
