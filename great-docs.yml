@@ -1,0 +1,270 @@
+display_name: measure-service
+module: measure_service
+repo: https://github.com/JamesHWade/measure-service
+site_url: https://jameshwade.github.io/measure-service/
+pypi: false
+github_style: widget
+
+logo:
+  light: assets/logo.png
+  dark: assets/logo.png
+  show_title: true
+
+hero:
+  enabled: true
+  logo: assets/logo.png
+  logo_height: 210px
+  name: measure-service
+  tagline: "Reproducible analytical chemistry for AI assistants: chromatography, SEC/GPC, DAD, LC–MS, and traceable lab records."
+  badges: auto
+
+accent_color:
+  light: "#4A90A4"
+  dark: "#6BA5B8"
+
+navbar_color:
+  light: "#16324F"
+  dark: "#0F243A"
+
+dark_mode_toggle: true
+markdown_pages:
+  enabled: true
+  widget: true
+
+nav_icons:
+  navbar:
+    "User Guide": book-open
+    "MCP Reference": cpu
+
+include_in_header:
+  - |
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bs-body-font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --bs-font-monospace: "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      h1, h2, h3, h4, .navbar-title, .hero-name {
+        font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      img.diagram-frame {
+        border-radius: 10px;
+        border: 1px solid rgba(74, 144, 164, 0.22);
+        box-shadow: 0 6px 24px rgba(15, 36, 58, 0.08);
+        margin: 1.25rem 0;
+        background: #ffffff;
+      }
+      .gd-table-scroll > table,
+      main table {
+        width: 100% !important;
+        max-width: 100% !important;
+        table-layout: auto;
+      }
+      .gd-table-scroll > table th,
+      .gd-table-scroll > table td,
+      main table th,
+      main table td {
+        white-space: normal !important;
+        overflow-wrap: break-word;
+      }
+      #quarto-sidebar .sidebar-item-text {
+        font-size: 0.78rem;
+      }
+      .doc-mcp-reference #quarto-sidebar .sidebar-item-text,
+      .doc-api-page #quarto-sidebar .sidebar-item-text {
+        font-size: 0.70rem;
+        word-break: normal;
+        overflow-wrap: break-word;
+      }
+    </style>
+
+site:
+  toc: true
+  toc-depth: 3
+  grid:
+    sidebar-width: 305px
+
+authors:
+  - name: "James Wade"
+    role: "Maintainer"
+    github: JamesHWade
+
+# Public surface is the 82-tool MCP catalog + CLIs/ASGI, not an internal Python library API.
+reference: false
+
+mcp:
+  enabled: true
+  module: measure_service.server
+  server_var: mcp
+  name: measure-service
+  categories:
+    "Discovery":
+      - measurement_capabilities
+      - measurement_method_capabilities
+      - measurement_registry_capabilities
+    "Scalar Traces":
+      - measurement_register_dataset
+      - measurement_register_csv
+      - measurement_register_wide_csv
+      - measurement_register_long_csv
+      - measurement_inspect_dataset
+      - measurement_analyze_chromatogram
+      - measurement_quantify_peak
+      - measurement_get_analysis
+    "Relative SEC":
+      - measurement_analyze_sec
+      - measurement_compare_sec
+    "Diode-Array (DAD)":
+      - measurement_read_dad_plane
+    "LC-MS Acquisitions":
+      - measurement_register_acquisition
+      - measurement_get_acquisition
+      - measurement_extract_ms_trace
+      - measurement_get_ms_trace
+      - measurement_read_ms_trace
+    "Evidence & Source Reads":
+      - measurement_get_chromatogram_evidence
+      - measurement_read_chromatogram_evidence
+      - measurement_read_analysis_data
+      - measurement_read_source
+      - measurement_read_result_table_rows
+      - measurement_read_result_table_source
+    "Analytical Batches":
+      - measurement_create_chromatogram_batch
+      - measurement_get_chromatogram_batch
+      - measurement_run_chromatogram_batch
+      - measurement_get_chromatogram_batch_run
+      - measurement_read_chromatogram_batch_items
+      - measurement_read_chromatogram_batch_attempts
+      - measurement_read_chromatogram_batch_control_events
+      - measurement_cancel_chromatogram_batch
+      - measurement_recover_chromatogram_batch
+      - measurement_retry_chromatogram_batch_items
+      - measurement_export_chromatogram_batch
+      - measurement_read_chromatogram_batch_export
+      - measurement_get_analytical_import
+    "Chromatography Methods":
+      - measurement_validate_method
+      - measurement_register_method
+      - measurement_get_method
+      - measurement_list_methods
+    "Experiment Registry":
+      - measurement_create_experiment
+      - measurement_supersede_experiment
+      - measurement_get_experiment
+      - measurement_get_experiment_design_lineage
+      - measurement_list_experiments
+      - measurement_record_attempt
+      - measurement_revise_attempt
+      - measurement_get_attempt
+      - measurement_list_attempts
+      - measurement_record_results
+      - measurement_get_result
+      - measurement_list_results
+      - measurement_preview_result_table
+      - measurement_import_result_table
+      - measurement_get_result_table_import
+    "Observations & Acceptance":
+      - measurement_register_observation_contract
+      - measurement_get_observation_contract
+      - measurement_evaluate_observation
+      - measurement_get_observation
+      - measurement_create_observation_snapshot
+      - measurement_get_observation_snapshot
+      - measurement_register_gaussian_producer
+      - measurement_get_gaussian_producer
+      - measurement_record_gaussian_observation
+      - measurement_get_gaussian_observation
+    "Retention Models":
+      - measurement_register_retention_model
+      - measurement_get_retention_model
+      - measurement_predict_retention
+      - measurement_get_retention_prediction
+    "Synthetic Campaigns":
+      - measurement_register_campaign_protocol
+      - measurement_get_campaign_protocol
+      - measurement_create_campaign
+      - measurement_get_campaign
+      - measurement_suggest_campaign
+      - measurement_get_campaign_proposal
+      - measurement_get_campaign_suggestion_attempt
+      - measurement_list_campaign_suggestion_attempts
+      - measurement_abandon_campaign_suggestion_attempt
+      - measurement_consume_campaign_snapshot
+      - measurement_get_campaign_consumption
+
+user_guide:
+  - section: "Get Started"
+    contents:
+      - text: "Overview & Ecosystem"
+        href: overview.qmd
+      - text: "Setup & AI Clients"
+        href: quickstart.qmd
+  - section: "Analytical Workflows"
+    contents:
+      - text: "Loading Instrument Data"
+        href: inputs.qmd
+      - text: "Chromatograms, Quantitation & SEC"
+        href: analysis.qmd
+      - text: "LC–DAD & LC–MS Inspection"
+        href: dad-ms.qmd
+      - text: "Running Sample Sequences"
+        href: batches.qmd
+  - section: "Methods, Records & Optimization"
+    contents:
+      - text: "LC Gradient Methods"
+        href: methods.qmd
+      - text: "Experiments & Result Tables"
+        href: experiments.qmd
+      - text: "Retention & Method Optimization"
+        href: campaigns.qmd
+  - section: "Architecture & Hosting"
+    contents:
+      - text: "How It Fits Together"
+        href: architecture.qmd
+      - text: "Hosting, Posit Connect & Backups"
+        href: deployment.qmd
+  - section: "Roadmap & Contributing"
+    contents:
+      - text: "Ecosystem Roadmap"
+        href: roadmap.qmd
+      - text: "Development & Checks"
+        href: contributing.qmd
+
+skill:
+  enabled: true
+  well_known: true
+  gotchas:
+    - "Never convert missing, not_detected, below_limit, censored, failed or infeasible outcomes to zero."
+    - "All registry, batch, method, observation and campaign writes require an idempotency_key scoped to the principal. Reusing a key with different arguments fails."
+    - "Dataset registration and single-trace analysis calls are not idempotent and create a new record each time."
+    - "Use MEASURE_MCP_TOOL_GROUPS to scope clients to focused tool groups (default client config selects discovery, traces and evidence)."
+    - "HTTP mode requires a trusted authentication proxy (such as Posit Connect). Header parsing alone is not authentication."
+  best_practices:
+    - "Call measurement_capabilities first to inspect installed analytical backends and available tool groups."
+    - "Use measure-service-client config and check commands to generate verified Claude Code or Codex MCP configurations."
+    - "Inspect warnings, input digests and backend fingerprints alongside every stored analysis before linking results into outcomes or observation snapshots."
+    - "Use measurement_revise_attempt for record corrections, measurement_supersede_experiment for design replacements, and a new attempt for a separate physical run."
+  decision_table:
+    - need: "Check installed backends and service capabilities"
+      use: "measurement_capabilities / measurement_registry_capabilities"
+    - need: "Import 1D traces or native DAD/LC-MS acquisitions"
+      use: "measurement_register_csv / measurement_register_wide_csv / measurement_register_acquisition"
+    - need: "Inspect 2D DAD planes or scan-linked centroid XICs"
+      use: "measurement_read_dad_plane / measurement_extract_ms_trace"
+    - need: "Process chromatograms, quantify peaks or run relative SEC"
+      use: "measurement_analyze_chromatogram / measurement_quantify_peak / measurement_analyze_sec"
+    - need: "Run resumable parallel chromatogram batches and export snapshots"
+      use: "measurement_create_chromatogram_batch -> measurement_run_chromatogram_batch -> measurement_export_chromatogram_batch"
+    - need: "Validate LC gradient timing, constraints and solvent use"
+      use: "measurement_validate_method / measurement_register_method"
+    - need: "Track designs, revisions, mapped outcome tables and evidence-linked results"
+      use: "measurement_create_experiment -> measurement_record_attempt -> measurement_record_results"
+    - need: "Evaluate analytical acceptance and run matched synthetic BO campaigns"
+      use: "measurement_evaluate_observation -> measurement_create_observation_snapshot -> measurement_suggest_campaign"
+
+seo:
+  enabled: true
+  default_description: "Connect AI assistants to reproducible analytical chemistry workflows: chromatogram integration, peak quantitation, SEC/GPC molecular weights, LC-DAD and LC-MS inspection, LC gradient checks, and traceable experiment records."

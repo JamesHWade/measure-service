@@ -1,0 +1,70 @@
+---
+title: "Chromatography Methods"
+---
+
+The chromatography method contract validates, normalizes, constrains, and permanently retains liquid chromatography (LC) programs with explicit units and exact solvent-use accounting. Inspect live limits and supported units with [`measurement_method_capabilities`](../reference/mcp/measurement_method_capabilities.qmd).
+
+## Supported programs and canonicalization
+
+[`measurement_validate_method`](../reference/mcp/measurement_validate_method.qmd) accepts a versioned `declaration` and optional `constraints`:
+
+- **Program kinds:** Isocratic holds (`isocratic`), absolute-time gradients (`gradient_absolute`), and segment-duration gradients (`gradient_duration`).
+- **Interpolation:** Flow rate and every named solvent fraction interpolate linearly between consecutive endpoints (holds, ramps up, and ramps down).
+- **Units:** Declared `time_unit` and `flow_unit` are retained verbatim alongside a canonical copy normalized to `min` and `mL/min`.
+- **Canonical equivalence:** Equivalent absolute and duration programs produce the exact same canonical gradient and `canonical_program_sha256`.
+
+### Example validation request
+
+```json
+{
+  "declaration": {
+    "schema_version": "1.0",
+    "time_unit": "s",
+    "flow_unit": "uL/min",
+    "solvents": ["A", "B"],
+    "program": {
+      "kind": "gradient_absolute",
+      "points": [
+        {"time": 0, "state": {"flow": 1000, "solvent_fractions": {"A": 0.9, "B": 0.1}}},
+        {"time": 120, "state": {"flow": 1000, "solvent_fractions": {"A": 0.1, "B": 0.9}}}
+      ]
+    }
+  },
+  "constraints": {
+    "max_flow_ml_min": 1.5,
+    "max_acquisition_duration_min": 5
+  }
+}
+```
+
+This normalizes to a `2.0 min` acquisition consuming `1.0 mL` of solvent A and `1.0 mL` of solvent B. Structural errors return `isError: true`, while well-formed methods that exceed limits return `feasible: false` with structured constraint violations.
+
+## Exact solvent-use and overhead accounting
+
+Optional constant `pre_acquisition` and `post_acquisition` phases contribute to **total occupancy** and **total solvent use**, while analytical points retain their own `t = 0` origin. Within each linear segment where both flow $F(t)$ and solvent fraction $x_i(t)$ vary linearly, solvent volume is computed by exact integration via the bundled `measure_methods` kernel:
+
+$$V_i = \int_{t_0}^{t_1} F(t)\, x_i(t)\, dt$$
+
+For example, a 2-minute segment ramping flow from $1 \to 3\text{ mL/min}$ while ramping solvent A from $0.2 \to 0.8$ consumes **$2.2\text{ mL}$ of A** and **$1.8\text{ mL}$ of B** (not $2.0\text{ mL}$ each). Acquisition duration, occupancy, analytical solvent use, and total solvent use are reported separately.
+
+## Immutable registration and experiment linking
+
+1. **Register:** Call [`measurement_register_method`](../reference/mcp/measurement_register_method.qmd) with `title`, `declaration`, optional `constraints`, and a fresh `idempotency_key` (registration requires `feasible: true`).
+2. **Retrieve & list:** Read full records with [`measurement_get_method`](../reference/mcp/measurement_get_method.qmd) or page compact identities with [`measurement_list_methods`](../reference/mcp/measurement_list_methods.qmd) (up to 50 records per page).
+3. **Two immutable digests:** `input_sha256` covers the complete normalized registration request (title, constraints, equipment declarations, and schedule), and `canonical_program_sha256` covers only the canonical numerical schedule.
+4. **Intended vs. reported linking:** Experiments link an intended `executable_method_id`, and attempts separately link their reported `executable_method_id`. Attempts never auto-inherit an experiment's intended method.
+
+## Bounds and limits
+
+| Item | Bound |
+| --- | --- |
+| Analytical points | Up to 16 |
+| Named solvents | Up to 6 |
+| Violation entries | Up to 256 |
+| Serialized method record | 64,000 UTF-8 bytes |
+| Solvent fraction sum tolerance | `1e-9` absolute |
+| Constraint comparison tolerance | `1e-9` relative or `1e-12` absolute |
+
+::: {.callout-warning title="Feasibility scope"}
+Feasibility reflects only the caller's declared numerical and categorical limits. It does **not** establish backpressure feasibility, solvent miscibility, column chemical suitability, or instrument qualification, and registering a method never starts an acquisition.
+:::

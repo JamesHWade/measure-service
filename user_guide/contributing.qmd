@@ -1,0 +1,61 @@
+---
+title: "Development & Quality Checks"
+---
+
+Work on a feature branch and open a reviewable pull request. `measure-service` is an installed package, so tests must never rely on adding `src/` to `PYTHONPATH`. Scientific algorithm changes belong in `measure` or the relevant technique pack with reference tests there and an integration contract test here. Method resource calculations stay cleanly separated in `src/measure_methods`.
+
+## Local verification suite
+
+Install development and documentation extras into a virtual environment, then run repository-wide checks before opening a PR:
+
+```sh
+python -m venv .venv
+.venv/bin/python -m pip install -e '.[dev,docs]'
+.venv/bin/ruff check .
+.venv/bin/ruff format --check .
+.venv/bin/air format --check .
+.venv/bin/jarl check .
+.venv/bin/python scripts/render_reference.py --check
+.venv/bin/python scripts/check_docs.py
+.venv/bin/python -m pytest -q -m 'not r_backend and not bo_backend'
+```
+
+Use `ruff format .`, `ruff check . --fix`, and `air format .` to apply formatting fixes.
+
+### Analytical & BO integration suites
+
+Whenever you modify `worker.R`, numerical adapters, packaging, or method contracts, run the analytical integration suite with `measure` and corrected `measure.sec` installed:
+
+```sh
+MEASURE_MCP_TEST_R="$(command -v R)" .venv/bin/python -m pytest -q -m 'not bo_backend'
+MEASURE_MCP_R="$(command -v R)" .venv/bin/python examples/analyze_trace.py
+```
+
+When touching BO campaign adapters, set `MEASURE_BO_PYTHON` to an environment with the optional BO-MCP runtime and include `-m bo_backend`. Always report any skipped suites in your PR description.
+
+### Distribution check
+
+Build both the source archive and wheel, install the wheel into a fresh virtual environment, and verify entrypoints and packaged data (`worker.R`, `dad_report.js`, `benchmarks/reference_data/*`) from outside the checkout:
+
+```sh
+.venv/bin/python -m build
+```
+
+## Building the Great Docs site locally
+
+With [Quarto](https://quarto.org/) and `.[docs]` installed:
+
+```sh
+.venv/bin/great-docs build
+.venv/bin/great-docs preview
+```
+
+Regenerate `docs/tools.md` with `python scripts/render_reference.py --write` whenever MCP tool definitions change. The Great Docs MCP Reference pages introspect all 82 tools automatically from `measure_service.server:mcp` at build time.
+
+## Documentation standard
+
+- Describe implemented behavior in the present tense, and put proposed work in the [Ecosystem Roadmap](roadmap.qmd) with acceptance criteria.
+- Use concrete nouns and verbs, omitting marketing claims and unsupported robustness assertions.
+- Keep units, ownership, revision rules, idempotency semantics, and failure states explicit, and distinguish caller declarations from computed facts.
+- Use synthetic or public examples only. Never include private application names, internal links, credentials, or confidential data.
+- Keep commands executable and relative links valid. `scripts/check_docs.py` verifies local links across Markdown and Quarto files and validates complete JSON payloads against live MCP schemas.

@@ -1,0 +1,118 @@
+---
+title: "Setup & MCP Clients"
+---
+
+`measure-service` installs as a standard package with four CLI entrypoints (`measure-service`, `measure-service-client`, `measure-service-store`, and `measure-service-pilot`) and runs locally over **stdio** against a private SQLite store.
+
+## 1. Install `measure-service`
+
+From a checkout with Python 3.10+ (3.11+ if building docs locally):
+
+```sh
+python -m venv .venv
+.venv/bin/python -m pip install .
+```
+
+On Windows, replace `.venv/bin/python` with `.venv\Scripts\python.exe`. For repeatable offline installations from exact source snapshots, see `docs/local-alpha-install.md` in the repository.
+
+## 2. Install the analytical backends
+
+Install `measure` and the corrected `measure.sec` backend into the R library visible to the service runtime so chromatogram processing, native acquisition validation, DAD/LC–MS inspection, and relative SEC are available:
+
+```sh
+Rscript -e 'install.packages(c("remotes", "jsonlite", "tibble", "recipes"), repos = "https://cloud.r-project.org")'
+Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org")); remotes::install_github("JamesHWade/measure@main", dependencies = NA)'
+Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org")); remotes::install_github("JamesHWade/measure.sec@fix/separations-sec-correctness", dependencies = FALSE)'
+Rscript -e 'for (p in c("measure", "measure.sec")) {d <- packageDescription(p); cat(p, d$Version, d$RemoteRef, d$RemoteSha, "\n")}'
+```
+
+::: {.callout-important title="Record installed backend revisions"}
+Development version strings alone do not identify exact source code. Record the installed `RemoteSha` alongside analytical evidence, or pass `MEASURE_MCP_MEASURE_REVISION` and `MEASURE_MCP_SEC_REVISION` as operator declarations in the server environment.
+:::
+
+## 3. Generate MCP client settings
+
+Use `measure-service-client config` to print safe, absolute-path client configuration fragments to stdout (it never mutates your existing configuration files):
+
+::: {.panel-tabset}
+
+### Claude Code (`.mcp.json`)
+
+```sh
+.venv/bin/measure-service-client config claude \
+  --data-dir /absolute/path/to/private-measure-data \
+  --r "$(command -v R)" \
+  --r-library /absolute/path/to/R/library
+```
+
+Merge the printed JSON fragment into your project's `.mcp.json` and approve the server when prompted.
+
+### Codex (`config.toml`)
+
+```sh
+.venv/bin/measure-service-client config codex \
+  --data-dir /absolute/path/to/private-measure-data \
+  --r "$(command -v R)" \
+  --r-library /absolute/path/to/R/library
+```
+
+Merge the printed TOML block into `~/.codex/config.toml` or a trusted project's `.codex/config.toml`.
+
+### Manual JSON (Cursor / Claude Desktop)
+
+```json
+{
+  "mcpServers": {
+    "measure": {
+      "command": "/absolute/path/to/.venv/bin/python",
+      "args": ["-m", "measure_service"],
+      "env": {
+        "MEASURE_MCP_DATA_DIR": "/absolute/path/to/private-measure-data",
+        "MEASURE_MCP_R": "/usr/local/bin/R"
+      }
+    }
+  }
+}
+```
+
+:::
+
+### Scoping tool groups and schema profiles
+
+`measure-service` ships **82 tools across 12 groups**. To keep agent context lean, `measure-service-client config` defaults to `discovery`, `traces`, and `evidence` (add `--include-sec` to include SEC tools), or set `MEASURE_MCP_TOOL_GROUPS` to any JSON array of group names (`discovery`, `traces`, `sec`, `dad`, `ms`, `evidence`, `batches`, `methods`, `experiments`, `observations`, `retention`, `campaigns`). Passing `--schema-profile canonical` retains full canonical JSON schemas instead of the compact `function-host/1` projection.
+
+## 4. Verify your installation
+
+Run the built-in stdio verification command in an isolated temporary store before connecting real data:
+
+```sh
+.venv/bin/measure-service-client check
+```
+
+To also verify the full analytical trace and relative SEC backends end-to-end across a process restart:
+
+```sh
+.venv/bin/measure-service-client check \
+  --include-sec \
+  --numerical \
+  --r "$(command -v R)" \
+  --r-library /absolute/path/to/R/library
+```
+
+You can also run the standalone workflow scripts directly from the checkout:
+
+```sh
+.venv/bin/python examples/registry.py
+.venv/bin/python examples/methods.py
+MEASURE_MCP_R="$(command -v R)" .venv/bin/python examples/analyze_trace.py
+```
+
+## Common setup failures
+
+| Failure | What to check |
+| --- | --- |
+| `measure_service` cannot be imported | Ensure your MCP client invokes the exact virtual environment where `measure-service` is installed. |
+| Analytical worker fails to start or times out | Verify `MEASURE_MCP_R` points to `R` (not `Rscript`), pass `--r-library` when using a non-default library, and confirm calls finish within the 90-second worker limit. |
+| SEC reports missing calibrated-curve support | Install the corrected `measure.sec` branch (`fix/separations-sec-correctness` until merged). |
+| Tool returns unexpected `isError` | Check `MEASURE_MCP_TOOL_GROUPS` to confirm the tool's group is enabled in your client config. |
+| Idempotency key conflict | Reuse the exact original request arguments for retries, or supply a fresh `idempotency_key` for a new operation. |

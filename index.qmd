@@ -1,0 +1,103 @@
+---
+title: "measure-service"
+---
+
+**`measure-service`** connects AI assistants (Claude, Codex, Cursor) and automated workflows directly to the analytical calculations in [`measure`](https://jameshwade.github.io/measure/) and [`measure.sec`](https://jameshwade.github.io/measure.sec/). Process chromatograms, calculate polymer molecular weights, inspect LC–DAD spectra and LC–MS ion chromatograms, check LC gradient methods, and record experimental results with every number tied back to the raw data, method settings, and warnings that produced it.
+
+![The measure Analytical Ecosystem](assets/ecosystem-architecture.png){.diagram-frame}
+
+::: {.callout-note title="Status: research prototype"}
+Local analytical workflows, LC–DAD and LC–MS inspection, multi-sample batch runs, and synthetic method-optimization loops are tested. Shared Posit Connect hosting is in pilot qualification ([issue #116](https://github.com/JamesHWade/measure-service/issues/116)), and the service never sends commands to laboratory instruments.
+:::
+
+## Start here
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-6}
+### [Setup & AI Clients](user-guide/quickstart.qmd)
+Install the service, generate ready-to-paste Claude Code or Codex settings with `measure-service-client`, and run a built-in verification check.
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### [Chromatograms, SEC, DAD & LC–MS](user-guide/analysis.qmd)
+Correct baselines, integrate and quantify peaks, compute polymer molecular-weight distributions, and slice 2D LC–DAD or LC–MS data back to raw scans.
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### [LC Methods & Lab Records](user-guide/experiments.qmd)
+Check LC gradient timing and solvent use, log intended vs. actual run conditions, and record non-detects, below-limit values, and failed runs without turning them into zeros.
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### [Tool Reference (82 MCP Tools)](reference/mcp/index.qmd)
+Browse all 82 tools across 12 analytical and record-keeping groups with exact input schemas and discovery metadata.
+:::
+
+:::
+
+## Try it in 30 seconds
+
+::: {.panel-tabset}
+
+### Install & verify
+
+```sh
+python -m venv .venv
+.venv/bin/python -m pip install .
+.venv/bin/measure-service-client check
+```
+
+Verifies the installed server in an isolated temporary store: imports a synthetic chromatogram, checks its retained digest and metadata across a restart, and cleans up automatically.
+
+### Connect Claude Code or Codex
+
+```sh
+.venv/bin/measure-service-client config claude \
+  --data-dir /absolute/path/to/private-measure-data
+
+.venv/bin/measure-service-client config codex \
+  --data-dir /absolute/path/to/private-measure-data
+```
+
+Prints safe, absolute-path configuration blocks for `.mcp.json` (Claude Code) or `config.toml` (Codex) without touching your existing settings files.
+
+### Run an example workflow
+
+```sh
+.venv/bin/python examples/registry.py
+.venv/bin/python examples/methods.py
+```
+
+Logs an experiment, records an observed `0` alongside a below-limit result, and checks exact solvent consumption for a two-minute LC gradient.
+
+:::
+
+## How `measure` and `measure-service` work together
+
+Scientific calculations stay in reusable analytical packages, while `measure-service` gives AI assistants and automated workflows a structured, auditable way to invoke them and keep lab records organized.
+
+| Package | Role |
+| --- | --- |
+| [`measure`](https://jameshwade.github.io/measure/) | Core data structures, signal preprocessing, peak detection/integration, calibration, and analytical method validation |
+| [`measure.sec`](https://jameshwade.github.io/measure.sec/) | Size-exclusion chromatography (SEC/GPC) calibration, molecular-weight moments, and distributions. Future technique packs (`measure.lc`, `measure.ms`, thermal, and spectroscopy) follow the same pattern. |
+| **`measure-service`** | MCP server (82 tools), LC gradient solvent/constraint checks, local SQLite record store, portable batch archives, and Posit Connect hosting |
+
+See [Overview & Ecosystem](user-guide/overview.qmd) and [Ecosystem Roadmap](user-guide/roadmap.qmd) for where the platform is heading.
+
+## What you can do today
+
+| Analytical task | Supported today | Current limit |
+| --- | --- | --- |
+| **Chromatogram processing** | ALS baseline correction, Gaussian smoothing, peak detection, and trapezoidal area integration with overlap warnings | No automatic compound identification or overlapping-peak deconvolution |
+| **Peak quantitation** | Linear calibration (`none`, `1/x`, or `1/x²` weighting) from supplied standards | You assign the peak. No automatic dilution factors, LOD/LOQ, or uncertainty. |
+| **Polymer SEC / GPC** | Conventional log-MW calibration, $M_n$/$M_w$/$M_z$/$M_p$/dispersity, distributions, and multi-run comparisons | Relative to supplied standards only (not absolute MALS) |
+| **LC–DAD inspection** | Pick any retention time and wavelength to inspect the UV spectrum, chromatogram, and exact source row | Up to 4,096 measured points per read (whole run or zoomed region) |
+| **LC–MS ion chromatograms** | Extract centroid XICs across an $m/z$ window and trace any point back to its scan and raw centroids | Native acquisition bundles up to 4 MB |
+| **Sample sequences** | Run one fixed method across standards, blanks, QCs, and unknowns with restartable progress and portable archives | Single-trace processing per run, with no instrument control |
+| **LC gradient methods** | Check isocratic and linear gradients for flow/time limits and exact solvent consumption | No column backpressure model or hardware control |
+| **Lab records & optimization** | Track intended vs. actual conditions, non-detects/censored results, ideal retention predictions, and synthetic optimization loops | Reported records and synthetic optimization only, with no physical instrument control |
+
+## Storage & hosting
+
+Records live in a local SQLite database (`measure.sqlite3`). Local stdio mode uses one `local` user. Shared HTTP hosting (`/mcp`) runs behind a trusted authentication proxy such as Posit Connect, because parsing identity headers alone is **not** authentication. Read [Hosting, Posit Connect & Backups](user-guide/deployment.qmd) before hosting.
