@@ -1,0 +1,149 @@
+---
+title: "Traces & Native Acquisitions"
+---
+
+Clients supply analytical inputs directly in MCP tool arguments. By design, `measure-service` never opens an arbitrary server-side filesystem path or fetches a remote URL.
+
+## Ingestion tools at a glance
+
+| Input type | Tool | When to use |
+| --- | --- | --- |
+| Structured 1D arrays | [`measurement_register_dataset`](../reference/mcp/measurement_register_dataset.qmd) | Parsed numeric `axis` and `signal` arrays for one or more traces. |
+| Single CSV/TSV trace | [`measurement_register_csv`](../reference/mcp/measurement_register_csv.qmd) | One axis column and one signal column in delimited text. |
+| Wide multi-channel CSV/TSV | [`measurement_register_wide_csv`](../reference/mcp/measurement_register_wide_csv.qmd) | Multiple detector columns sharing one elution axis. |
+| Grouped long CSV/TSV | [`measurement_register_long_csv`](../reference/mcp/measurement_register_long_csv.qmd) | Row-grouped traces where each group has its own axis points and length. |
+| Native `measure` acquisition bundle | [`measurement_register_acquisition`](../reference/mcp/measurement_register_acquisition.qmd) | UTF-8 native bundle written by `measure::write_measure_acquisition()` containing 2D DAD arrays or ragged LC–MS centroid scans. |
+
+::: {.callout-warning title="Explicit mappings, never silent repair"}
+Delimited tools accept comma (`,`), tab (`\t`), or semicolon (`;`) chosen explicitly by the caller. They never guess columns, units, detector types, or sample IDs, and never sort, interpolate, impute, or resample rows. Extra fields, missing numeric values, duplicate headers, unmapped groups, or non-increasing axes are rejected immediately.
+:::
+
+## Required scalar trace metadata
+
+Every registered 1D trace declares:
+
+- **Required:** `trace_id`, `sample_id`, `injection_id`, `channel`, `separation` (`LC`, `GC`, `CE`, `SEC`, or `other`), `detector`, `axis_unit`, `signal_unit`.
+- **Optional:** `sample_type` (defaults to `unknown`), `batch_id`, `run_order`.
+
+Within each dataset, `trace_id` and `(injection_id, channel)` pairs must be unique; multiple channels sharing one `injection_id` must agree on `sample_id`, `sample_type`, `batch_id`, `run_order`, and `separation`. Distinct injections may share a `sample_id`.
+
+## Example CSV payloads
+
+::: {.panel-tabset}
+
+### Single CSV (`measurement_register_csv`)
+
+```json
+{
+  "title": "LC scouting injection",
+  "csv_text": "time,uv\n0,0\n1,2\n2,0\n",
+  "axis_column": "time",
+  "signal_column": "uv",
+  "metadata": {
+    "trace_id": "uv-254",
+    "sample_id": "sample-01",
+    "injection_id": "injection-01",
+    "channel": "uv-254",
+    "separation": "LC",
+    "detector": "UV",
+    "axis_unit": "min",
+    "signal_unit": "mAU"
+  }
+}
+```
+
+### Wide CSV (`measurement_register_wide_csv`)
+
+```json
+{
+  "title": "Dual-channel LC-UV/RI injection",
+  "csv_text": "time,uv,ri\n0,0.0,0.1\n1,2.4,1.2\n2,0.0,0.1\n",
+  "axis_column": "time",
+  "channels": [
+    {
+      "column": "uv",
+      "metadata": {
+        "trace_id": "uv-254",
+        "sample_id": "sample-01",
+        "injection_id": "injection-01",
+        "channel": "uv-254",
+        "separation": "LC",
+        "detector": "UV",
+        "axis_unit": "min",
+        "signal_unit": "mAU"
+      }
+    },
+    {
+      "column": "ri",
+      "metadata": {
+        "trace_id": "ri-main",
+        "sample_id": "sample-01",
+        "injection_id": "injection-01",
+        "channel": "ri",
+        "separation": "LC",
+        "detector": "RI",
+        "axis_unit": "min",
+        "signal_unit": "nRIU"
+      }
+    }
+  ]
+}
+```
+
+### Long CSV (`measurement_register_long_csv`)
+
+```json
+{
+  "title": "Grouped replicate injections",
+  "csv_text": "inj,time,uv\ninj-1,0,0\ninj-1,1,2\ninj-1,2,0\ninj-2,0,0\ninj-2,1.1,2.1\ninj-2,2.2,0\n",
+  "axis_column": "time",
+  "signal_column": "uv",
+  "group_columns": ["inj"],
+  "groups": [
+    {
+      "values": ["inj-1"],
+      "metadata": {
+        "trace_id": "inj-1-uv",
+        "sample_id": "sample-01",
+        "injection_id": "inj-1",
+        "channel": "uv-254",
+        "separation": "LC",
+        "detector": "UV",
+        "axis_unit": "min",
+        "signal_unit": "mAU"
+      }
+    },
+    {
+      "values": ["inj-2"],
+      "metadata": {
+        "trace_id": "inj-2-uv",
+        "sample_id": "sample-01",
+        "injection_id": "inj-2",
+        "channel": "uv-254",
+        "separation": "LC",
+        "detector": "UV",
+        "axis_unit": "min",
+        "signal_unit": "mAU"
+      }
+    }
+  ]
+}
+```
+
+:::
+
+## Payload bounds and retained sources
+
+| Resource | Limit |
+| --- | --- |
+| Traces per scalar dataset | 32 |
+| Points per trace | 3 – 50,000 |
+| Total points per scalar dataset | 150,000 |
+| Raw delimited text or native acquisition bundle | 4,000,000 UTF-8 bytes |
+| Normalized dataset JSON | 4,000,000 UTF-8 bytes |
+| Analysis array read page | Up to 1,000 rows and 48,000 UTF-8 bytes |
+| Source-text read page | 1,000 characters |
+
+- **Retained sources:** Delimited imports keep original UTF-8 text, its SHA-256 digest, and column/group mappings. Use [`measurement_inspect_dataset`](../reference/mcp/measurement_inspect_dataset.qmd) for compact metadata and [`measurement_read_source`](../reference/mcp/measurement_read_source.qmd) to page original CSV/TSV text.
+- **Native acquisitions:** Registering identical UTF-8 bundle members under the same owner is idempotent and returns the same `acquisition_id`. Inspect metadata with [`measurement_get_acquisition`](../reference/mcp/measurement_get_acquisition.qmd).
+- **Scalar registration idempotency:** Repeating a scalar dataset registration call always creates a new `dataset_id`; SHA-256 digests support client-side comparison.

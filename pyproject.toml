@@ -24,6 +24,9 @@ dev = [
   "air-formatter==0.12.0",
   "jarl-linter==0.7.1",
 ]
+docs = [
+  "great-docs>=0.17.0",
+]
 
 [project.scripts]
 measure-service = "measure_service.server:main"
@@ -32,6 +35,7 @@ measure-service-pilot = "measure_service.pilot_cli:main"
 measure-service-client = "measure_service.client_cli:main"
 
 [project.urls]
+Documentation = "https://jameshwade.github.io/measure-service/"
 Repository = "https://github.com/JamesHWade/measure-service"
 Issues = "https://github.com/JamesHWade/measure-service/issues"
 

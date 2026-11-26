@@ -1,0 +1,37 @@
+---
+title: "Ecosystem Roadmap"
+---
+
+The `measure` ecosystem spans scientific packages ([`measure`](https://github.com/JamesHWade/measure/), [`measure.sec`](https://github.com/JamesHWade/measure.sec/), and future technique packs) alongside the operational MCP service (`measure-service`). Tracking stays cleanly separated by layer—[**`measure #44`**](https://github.com/JamesHWade/measure/issues/44) serves as the ecosystem north star, while service-specific contracts, hosting, and campaigns are tracked in **`measure-service`**.
+
+## Ownership principle
+
+- **`measure` & technique packs** own measurement data models, open-format codecs, preprocessing/deconvolution/calibration algorithms, analytical validation statistics, and scientific reference benchmarks.
+- **`measure-service`** owns MCP tool contracts, durable SQLite/snapshot storage, multi-user sharing/auth, hosted deployment operations, campaign/BO orchestration, and thin adapters exposing capabilities from `measure` and its technique packs.
+
+## Active service gates and next increments
+
+| Track | Current state on `main` | Remaining work & acceptance gate | Tracking |
+| --- | --- | --- | --- |
+| **Hosted Posit Connect pilot** | Bundle builder, Connect identity adapter, Host/Origin admission, and health limits shipped | Record live two-account hosted pilot acceptance, header-stripping check, and restart verification | [#116](https://github.com/JamesHWade/measure-service/issues/116) |
+| **Project sharing & deletion** | Design specification merged (`docs/project-sharing-design.md`) | Implement actor/project separation, membership enforcement, tombstones/purge, and cross-owner tests | [#105](https://github.com/JamesHWade/measure-service/issues/105) |
+| **General BO adapter & campaigns** | Frozen synthetic protocols, sequential BO-MCP GP suggestions, durable attempt/consumption state, and 5-arm ablations shipped | Reconcile archived MoSeS metrics ([#26](https://github.com/JamesHWade/measure-service/issues/26)), run predeclared ablations ([#41](https://github.com/JamesHWade/measure-service/issues/41)), generalize search spaces/constraints ([#6](https://github.com/JamesHWade/measure-service/issues/6), [#7](https://github.com/JamesHWade/measure-service/issues/7)), and add multi-fidelity physical refits ([#13](https://github.com/JamesHWade/measure-service/issues/13)) | [#3](https://github.com/JamesHWade/measure-service/issues/3), [#6](https://github.com/JamesHWade/measure-service/issues/6), [#13](https://github.com/JamesHWade/measure-service/issues/13), [#26](https://github.com/JamesHWade/measure-service/issues/26), [#41](https://github.com/JamesHWade/measure-service/issues/41) |
+| **Optimization diagnostics & benchmarks** | Matched synthetic comparisons and suggestion allocation telemetry shipped | Multiobjective & knowledge-informed diagnostics ([#8](https://github.com/JamesHWade/measure-service/issues/8)) and full target-method benchmarks/demos ([#5](https://github.com/JamesHWade/measure-service/issues/5), [#12](https://github.com/JamesHWade/measure-service/issues/12)) | [#5](https://github.com/JamesHWade/measure-service/issues/5), [#8](https://github.com/JamesHWade/measure-service/issues/8), [#12](https://github.com/JamesHWade/measure-service/issues/12) |
+| **Instrument execution adapters** | Not implemented (service issues no instrument commands) | Define optional device adapters kept strictly separate from scientific packages; require simulator then named-instrument qualification | [#9](https://github.com/JamesHWade/measure-service/issues/9) |
+
+## Cross-repo analytical expansion (`measure` ↔ `measure-service`)
+
+As analytical domains mature in `measure` and dedicated technique packs, `measure-service` exposes them through matching MCP tool groups and evidence contracts:
+
+| Analytical domain | Backend ownership (`measure` / packs) | Service exposure (`measure-service`) | Planning links |
+| --- | --- | --- | --- |
+| **Scalar LC, GC & CE** | Reproducible calibrated batch quantitation & QC | Batches, snapshots, evidence views, and calibrated batch MCP flows | [measure #80](https://github.com/JamesHWade/measure/issues/80), [#84](https://github.com/JamesHWade/measure/issues/84), [#203](https://github.com/JamesHWade/measure/issues/203) |
+| **SEC / GPC** | Explicit concentration units & mass normalization in `measure.sec` | Relative SEC analysis & comparison tools | [measure #51](https://github.com/JamesHWade/measure/issues/51), [measure.sec #60](https://github.com/JamesHWade/measure.sec/issues/60) |
+| **DAD & spectral deconvolution** | LC-DAD/PDA deconvolution, purity, and MOCCA2 parity cases | 2D plane/region inspection shipped; future deconvolution & purity evidence | [measure #88](https://github.com/JamesHWade/measure/issues/88) |
+| **LC–MS & GC–MS** | Open-format MS records, targeted annotation, cross-run identity | Native acquisition & scan-linked XIC shipped; future annotation & correspondence views | [measure #53](https://github.com/JamesHWade/measure/issues/53), [#85](https://github.com/JamesHWade/measure/issues/85), [#98](https://github.com/JamesHWade/measure/issues/98), [#99](https://github.com/JamesHWade/measure/issues/99) |
+| **Retention & method spaces** | Physicochemical LSS/QSS/Neue–Kuss fitting, method spaces, and paper–code audit | Declared ideal predictions shipped; fitted model profiles & bounded search spaces next | [measure #92](https://github.com/JamesHWade/measure/issues/92), [#93](https://github.com/JamesHWade/measure/issues/93), [#100](https://github.com/JamesHWade/measure/issues/100), [#108](https://github.com/JamesHWade/measure/issues/108) |
+| **Thermal, spectroscopy & validation** | Technique packs for DSC/TGA/DMA, FTIR/Raman, NMR, XRD, spectral imaging, interchange, and ICH/USP validation | Expose validated workflows & reports over MCP as each pack reaches reference maturity | [measure #44](https://github.com/JamesHWade/measure/issues/44), [#52](https://github.com/JamesHWade/measure/issues/52), [#54](https://github.com/JamesHWade/measure/issues/54)–[#59](https://github.com/JamesHWade/measure/issues/59), [#204](https://github.com/JamesHWade/measure/issues/204) |
+
+::: {.callout-important title="Completion standard"}
+A roadmap item is complete only when its public contract, executable example, reference datasets/tolerances, provenance, and failure behavior are both documented and tested. Synthetic checks prove only the paths they run; real-instrument or manuscript-reproduction claims require named datasets, protocol versions, baselines, and explicit limitations.
+:::

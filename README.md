@@ -1,12 +1,19 @@
 # measure-service
 
-MCP tools for processing analytical traces and tracking experiment results.
-The service stores measurements, analysis methods, results and their provenance.
-Method resource calculations use the R-free Python package `measure_methods`,
-which ships inside the `measure-service` distribution. It has no dependency on
-MCP, storage or R. The service delegates trace analysis to the R packages
+[![Checks](https://github.com/JamesHWade/measure-service/actions/workflows/checks.yml/badge.svg)](https://github.com/JamesHWade/measure-service/actions/workflows/checks.yml)
+[![Docs](https://img.shields.io/badge/docs-Great%20Docs-4A90A4.svg)](https://jameshwade.github.io/measure-service/)
+[![License: MIT](https://img.shields.io/badge/license-MIT%20%26%20CC--BY--4.0-4A90A4.svg)](LICENSE)
+
+MCP tools for processing analytical traces, inspecting diode-array and LC–MS evidence, validating chromatography methods, and tracking experiment campaigns.
+The service stores measurements, analysis methods, results and their provenance,
+bundles `measure_methods` for chromatography method resource calculations, and
+delegates analytical trace processing to
 [measure](https://github.com/JamesHWade/measure) and
 [measure.sec](https://github.com/JamesHWade/measure.sec).
+
+![The measure Analytical Ecosystem](assets/ecosystem-architecture.png)
+
+Browse the rendered documentation site at **[jameshwade.github.io/measure-service](https://jameshwade.github.io/measure-service/)** (including an interactive 82-tool MCP Reference).
 
 **Status: research prototype.** Local analytical workflows and a bounded
 synthetic campaign loop are tested. BO-MCP execution uses an optional separate

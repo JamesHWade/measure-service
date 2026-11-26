@@ -10,3 +10,5 @@ dist/
 *.sqlite3-*
 .Rhistory
 .RData
+great-docs/
+

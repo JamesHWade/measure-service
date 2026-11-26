@@ -1,0 +1,41 @@
+---
+title: "Ecosystem & Vision"
+---
+
+`measure-service` is the Model Context Protocol (MCP) service and durable evidence store for the [`measure`](https://jameshwade.github.io/measure/) analytical ecosystem. Rather than duplicating analytical algorithms inside an agent server, the ecosystem separates **scientific truth** from **operational state, provenance, and protocol contracts**.
+
+![The measure Analytical Ecosystem](../assets/ecosystem-architecture.png){.diagram-frame}
+
+## Two complementary layers
+
+Analytical workflows naturally split into two roles:
+
+1. **Interactive science and method development** — exploring spectra and chromatograms, building preprocessing recipes, fitting calibrations, and running analytical method validation. That belongs in `measure` and its domain technique packs, where every numerical method can be tested directly against reference data without an agent protocol in the loop.
+2. **Repeatable, agent-driven, and closed-loop experimentation** — letting an AI assistant, automated pipeline, or Bayesian optimizer import bounded traces and native acquisitions, process resumable batches, validate LC gradient programs, track immutable experiment lineage, and feed versioned observations into campaigns without overwriting history or coercing missing outcomes to zero. That belongs in `measure-service`.
+
+## Ecosystem components
+
+| Layer | Package | Responsibility |
+| --- | --- | --- |
+| **Core analytical primitives** | [`measure`](https://jameshwade.github.io/measure/) | Measurement data structures (`measure_tbl`, `measure_nd_tbl`, `measure_record`, `measure_acquisition`), preprocessing recipes, peak operations, calibration, and analytical validation. |
+| **Domain technique packs** | [`measure.sec`](https://jameshwade.github.io/measure.sec/) *(and future `measure.lc`, `measure.ms`, thermal & spectroscopy packs)* | Technique-specific models and calculations (such as SEC/GPC calibration, molecular-weight moments, and distributions) registered via `measure`'s pack registry. |
+| **Agent & evidence service** | **`measure-service`** | 82 structured MCP tools across 12 workflow groups, bundled `measure_methods` gradient resource accounting, SQLite evidence store, portable batch snapshots, Posit Connect hosting, and thin adapters to `measure` and its technique packs. |
+
+::: {.callout-note title="Where new capabilities belong"}
+A new preprocessing algorithm, peak model, retention equation, or detector calibration belongs in `measure` or a technique pack with reference tests there. `measure-service` adds the MCP contract, bounded validation, immutable provenance recording, and integration test—and as `measure`'s technique-pack backlog expands (thermal analysis, vibrational spectroscopy, NMR, LC-MS, validation reports), `measure-service` exposes those capabilities over the same evidence-first MCP boundary.
+:::
+
+## Capabilities available today
+
+- **Scalar, 2D DAD, and LC–MS evidence:** Register 1D JSON/CSV/wide/long traces or native `measure` acquisition bundles; inspect 2D time–wavelength diode-array planes and bounded regions; extract scan-linked centroid XICs traceable to source rows.
+- **Chromatograms, peak quantitation, and relative SEC:** Run ALS baseline correction, Gaussian smoothing, peak integration with overlap diagnostics, linear peak quantitation, relative SEC molecular-weight moments/distributions, and multi-run SEC comparisons.
+- **Resumable analytical batches & portable snapshots:** Freeze owned trace selections and method settings, execute bounded parallel batches with cancellation/recovery/retry controls, and export self-contained snapshots for fresh-store import.
+- **Chromatography methods & experiment lineage:** Validate and store unit-safe LC gradients with exact solvent-use accounting, supersede immutable experiment designs with verified lineage, append attempt revisions, and atomically import mapped CSV outcome tables.
+- **Retention, analytical acceptance & synthetic BO campaigns:** Retain declared LSS/QSS/Neue–Kuss retention predictions, freeze predeclared analytical acceptance snapshots, and run matched sequential synthetic campaigns with optional BO-MCP Gaussian-process suggestions.
+- **Client tooling & Posit Connect hosting:** Generate verified Claude Code and Codex MCP configurations (`measure-service-client`), stage Posit Connect deployment bundles, and run verified store backups/restores (`measure-service-store`).
+
+## Where to go next
+
+- Ready to connect Claude Code, Codex, or Cursor? Start with [Setup & MCP Clients](quickstart.qmd).
+- Want to see how 2D DAD planes and LC–MS XICs trace back to source rows? Read [Diode-Array (DAD) & LC–MS](dad-ms.qmd).
+- Want the full 82-tool catalog with live schemas? Browse the [MCP Reference](../reference/mcp/index.qmd).
